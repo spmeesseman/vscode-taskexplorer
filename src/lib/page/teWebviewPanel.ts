@@ -25,8 +25,8 @@ export default class TeWebviewPanel
         this.viewType = viewType;
 
         const resourceDir = Uri.joinPath(context.extensionUri, "res"),
-              cssDir = Uri.joinPath(resourceDir, "page"),
-              jsDir = Uri.joinPath(resourceDir, "page"),
+              cssDir = Uri.joinPath(resourceDir, "css"),
+              jsDir = Uri.joinPath(resourceDir, "js"),
               pageDir = Uri.joinPath(resourceDir, "page"),
               sourceImgDir = Uri.joinPath(resourceDir, "sources"),
               pageUri = panel.webview.asWebviewUri(pageDir),
@@ -170,15 +170,17 @@ export default class TeWebviewPanel
         {
             const taskFiles = getTaskFiles(tcKey) || [];
             fileCount += taskFiles.length;
-            html = html.replace(`\${taskCounts.${tcKey}}`, taskCounts[tcKey] || "0");
+            html = html.replace(new RegExp(`\\\${taskCounts.${tcKey}}`, "g"), taskCounts[tcKey] || "0");
         });
 
-        if (getPackageManager() === "yarn") {
-            html = html.replace(/\$\{taskCounts.yarn\}/g, taskCounts.npm || "0");
-        }
-        else {
-            html = html.replace(/\$\{taskCounts.yarn\}/g, "0");
-        }
+        // html = html.replace(/\$\{taskCounts.npm_plus_yarn\}/g, taskCounts.npm || "0");
+
+        // if (getPackageManager() === "yarn") {
+        //     html = html.replace(/\$\{taskCounts.yarn\}/g, taskCounts.npm || "0");
+        // }
+        // else {
+        //     html = html.replace(/\$\{taskCounts.yarn\}/g, "0");
+        // }
 
         html = html.replace(/\$\{taskCounts\.length\}/g, tasks.length.toString());
         html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
