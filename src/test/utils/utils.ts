@@ -229,6 +229,8 @@ export const cleanup = async () =>
     console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
     await configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
     await configuration.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
+    // await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt, ConfigurationTarget.Global);
+    // await workspace.getConfiguration("gulp").update("autoDetect", tc.vsCodeAutoDetectGulp, ConfigurationTarget.Global);
 
     console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
 

@@ -40,6 +40,8 @@ const initSettings = async () =>
     tc.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
     await configuration.updateVs("grunt.autoDetect", "on");
     await configuration.updateVs("gulp.autoDetect", "on");
+    // await workspace.getConfiguration("grunt").update("autoDetect", "on", ConfigurationTarget.Global);
+    // await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE

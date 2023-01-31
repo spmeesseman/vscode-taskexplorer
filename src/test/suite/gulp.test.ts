@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import * as path from "path";
-import { Uri } from "vscode";
+import { Uri, workspace } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { configuration } from "../../lib/utils/configuration";
@@ -47,12 +47,14 @@ suite("Gulp Tests", () =>
         // Reset both Grunt / Gulp VSCode internal task providers, which we enabled b4 extension
         // activation in helper.test
         //
-        if (teApi.config.getVs<string>("grunt.autoDetect") !== tc.vsCodeAutoDetectGrunt) {
+        if (workspace.getConfiguration("grunt").get<string>("autoDetect") !== tc.vsCodeAutoDetectGrunt) {
             await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+            // await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt, ConfigurationTarget.Global);
             await waitForTeIdle(tc.waitTime.config.enableEvent);
         }
-        if (teApi.config.getVs<string>("gulp.autoDetect") !== tc.vsCodeAutoDetectGulp) {
-            await teApi.config.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
+        if (workspace.getConfiguration("gulp").get<string>("autoDetect") !== tc.vsCodeAutoDetectGulp) {
+            await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt);
+            // await workspace.getConfiguration("gulp").update("autoDetect", tc.vsCodeAutoDetectGulp, ConfigurationTarget.Global);
             await waitForTeIdle(tc.waitTime.config.enableEvent);
         }
         await fsApi.deleteFile(fileUri.fsPath);
