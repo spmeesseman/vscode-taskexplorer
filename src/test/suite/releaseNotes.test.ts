@@ -45,7 +45,7 @@ suite("Release Notes Page Tests", () =>
 	test("Open Release Notes", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 200);
+		this.slow(testControl.slowTime.viewReleaseNotes + 200);
 		webviewPanel = await executeTeCommand("viewReleaseNotes", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
         endRollingCount(this);
@@ -55,7 +55,7 @@ suite("Release Notes Page Tests", () =>
 	test("Open Release Notes (Error No Version)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 200);
+		this.slow(testControl.slowTime.viewReleaseNotes + 200);
 		await closeEditors();
 		const version = extension.packageJSON.version;
 		extension.packageJSON.version = "17.4444.0";
@@ -72,7 +72,7 @@ suite("Release Notes Page Tests", () =>
 	test("View License Info from Webview", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
+		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 		await webviewPanel?.webview.postMessage({ command: "viewLicense" });
 		await sleep(500);
         endRollingCount(this);
@@ -82,7 +82,7 @@ suite("Release Notes Page Tests", () =>
 	test("View Parsing Report from Webview", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
+		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 	    await webviewPanel?.webview.postMessage({ command: "viewReport" });
 		await sleep(500);
 		webviewPanel?.dispose();
@@ -94,7 +94,7 @@ suite("Release Notes Page Tests", () =>
 	test("Deserialize Release Notes Page", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 200);
+		this.slow(testControl.slowTime.viewReleaseNotes + 200);
 		const panel = createwebviewForRevive(getViewTitle(), getViewType());
 	    await getReleaseNotesSerializer().deserializeWebviewPanel(panel, null);
 		await sleep(50);

@@ -13,7 +13,7 @@ import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
 } from "../utils/utils";
 
 const testsName = "webpack";
-const startTaskCount = tc.isMultiRootWorkspace ? 6 : 0;
+let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 const dirName = getWsPath("tasks_test_");
 const fileUri = Uri.file(path.join(dirName, "webpack.config.js"));
 const fileUri2 = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
@@ -30,6 +30,7 @@ suite("Webpack Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
+        startTaskCount = tc.isMultiRootWorkspace ? 6 : 0;
         provider = teApi.providers[testsName] as WebpackTaskProvider;
         await fsApi.createDir(dirName);
         endRollingCount(this, true);

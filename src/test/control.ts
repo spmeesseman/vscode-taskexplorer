@@ -164,7 +164,7 @@ export const testControl: ITestControl =
             verifyNpm: 1360, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1760
         },
-        viewReleaseNotes: 300,
+        viewReleaseNotes: 385,
         viewReport: 375
     },
     //
@@ -229,7 +229,7 @@ export const testControl: ITestControl =
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 215,
-            pageWithDetail: 275,
+            pageWithDetail: 270,
             checkLicense: 405,
             enterKey: 845,
             get30DayLicense: 1500,
@@ -270,7 +270,7 @@ export const testControl: ITestControl =
             verifyNpm: 1540, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1980
         },
-        viewReleaseNotes: 340,
+        viewReleaseNotes: 655,
         viewReport: 390
     },
     //
@@ -326,7 +326,6 @@ export const testControl: ITestControl =
         taskCommand: 450,
         verifyTaskCountRetry: 70,
         verifyTaskCountRetryInterval: 100,
-        viewReleaseNotes: 80,
         viewReport: 80
     },
     waitTimeMultiRoot:
@@ -379,7 +378,6 @@ export const testControl: ITestControl =
         taskCommand: 700,
         verifyTaskCountRetry: 110,
         verifyTaskCountRetryInterval: 160,
-        viewReleaseNotes: 130,
         viewReport: 130
     }
 };
@@ -550,7 +548,6 @@ export interface IWaitTimes
     taskCommand: number;
     verifyTaskCountRetry: number;
     verifyTaskCountRetryInterval: number;
-    viewReleaseNotes: number;
     viewReport: number;
 };
 
