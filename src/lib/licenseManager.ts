@@ -143,6 +143,9 @@ export class LicenseManager implements ILicenseManager
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);
 
 
+	getToken = () => this.token;
+
+
 	getVersion = () => this.version;
 
 

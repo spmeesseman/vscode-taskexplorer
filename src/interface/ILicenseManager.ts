@@ -8,6 +8,7 @@ export interface ILicenseManager
     getLicenseKey: () => Promise<string | undefined>;
     getMaxNumberOfTasks: (taskType?: string) => number;
     getMaxNumberOfTaskFiles: () => number;
+    getToken: () => string;
     getVersion: () => string;
     getWebviewPanel: () => WebviewPanel | undefined;
     isBusy: () => boolean;

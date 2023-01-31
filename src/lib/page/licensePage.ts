@@ -4,6 +4,7 @@ import TeWebviewPanel from "./teWebviewPanel";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "../../interface";
 import { timeout } from "../utils/utils";
+import { getLicenseManager } from "../../extension";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
@@ -38,7 +39,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	{
 		html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Licensing");
 
-		let infoContent = getExtraContent(logPad + "   ", newKey);
+		let infoContent = getExtraContent(api, logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
 
 		infoContent = getExtraContent2(logPad + "   ");
@@ -53,11 +54,12 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 };
 
 
-const getExtraContent = (logPad: string, newKey?: string) =>
+const getExtraContent = (api: ITaskExplorerApi, logPad: string, newKey?: string) =>
 {
     log.methodStart("get body content", 1, logPad);
 
-	const details = !newKey ? `
+	const details = !newKey ?
+(!api.isLicensed() ? `
 <table class="margin-top-15">
 	<tr><td class="content-subsection-header">
 		Licensing Note
@@ -78,11 +80,26 @@ const getExtraContent = (logPad: string, newKey?: string) =>
 ` : `
 <table class="margin-top-15">
 	<tr><td class="content-subsection-header">
-		30-Day License Key: &nbsp;${newKey}
+		License Key: &nbsp;${newKey}
+	</td></tr>
+	<tr><td>
+		Thank you for your support!
+	</td></tr>
+</table>
+<table class="margin-top-20">
+	<tr><td>You can view a detailed parsing report using the "<i>Task Explorer: View Parsing Report</i>"
+	command in the Explorer context menu for any project.  It can alternatively be ran from the
+	command pallette for "all projects" to see how many tasks the extension has parsed.
+	<tr><td height="20"></td></tr>
+</table>
+`) : `
+<table class="margin-top-15">
+	<tr><td class="content-subsection-header">
+		30-Day License Key: &nbsp;${getLicenseManager().getLicenseKey()}
 	</td></tr>
 	<tr><td>
 		This license key is valid for30 days from the time it was issued.  Please show your support for
-		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(newKey)}">here</a>.
+		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(`${newKey}&${getLicenseManager().getToken()}`)}">here</a>.
 	</td></tr>
 </table>
 <table class="margin-top-20">
