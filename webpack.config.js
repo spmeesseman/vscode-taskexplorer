@@ -36,12 +36,12 @@ module.exports = (env) =>
 	/**@type {WebpackConfig}*/
 	const wpConfig = {               // Base Webpack configuration object
 		target: "node",
+		// target: "webworker",
 		mode: env.environment !== "dev" && env.environment !== "test" ? "production" : "development",
 		resolve:
-		{   //
-			// support reading TypeScript and JavaScript files, -> https://github.com/TypeStrong/ts-loader
-			//
-			extensions: ['.ts', '.js']
+		{   
+			extensions: [ ".ts", ".js" ],
+			// mainFields: [ "browser", "module", "main" ]
 		}
 	};
 

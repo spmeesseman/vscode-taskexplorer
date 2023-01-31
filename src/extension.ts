@@ -39,12 +39,13 @@ import { ILicenseManager } from "./interface/ILicenseManager";
 import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
 import { registerExplorer } from "./lib/registerExplorer";
-import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env } from "vscode";
+import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env, /* authentication, window*/ } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
 import { IConfiguration } from "./interface/IConfiguration";
 import { registerStatusBarItem } from "./lib/statusBarItem";
+// import { TeAuthenticationProvider } from "./lib/auth/authProvider";
 
 export const providers: IDictionary<TaskExplorerProvider> = {};
 export const providersExternal: IDictionary<IExternalProvider> = {};
@@ -179,6 +180,13 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     licenseManager = new LicenseManager(context, teApi);
 
     //
+    // Authentication Provider
+    //
+    // context.subscriptions.push(
+	// 	new TeAuthenticationProvider(context)
+	// );
+
+    //
     // Use a delayed initialization so we can display an 'Initializing...' message
     // in the tree on startup.  Really no good way to do that w/o this.
     //
@@ -197,6 +205,13 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
           lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
           lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
     log.methodStart("initialization", 1, "", true);
+    //
+    // Authentication
+    //
+    // const session = await authentication.getSession("auth0", [], { createIfNone: false });
+    // if (session) {
+    //     window.showInformationMessage(`Welcome back ${session.account.label}`);
+    // }
     //
     // Check license
     //
