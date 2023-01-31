@@ -133,6 +133,7 @@ suite("NPM Tests", () =>
         for (const taskItem of npmTaskItems) {
             await executeTeCommand2("open", [ taskItem ], tc.waitTime.commandFast);
         }
+		await utils.closeEditors();
         utils.endRollingCount(this);
     });
 
