@@ -97,7 +97,7 @@ suite("Webpack Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath,
+        await fsApi.writeFile(fileUri2.fsPath,
 `
 module.exports = (env) =>
 {
@@ -115,11 +115,11 @@ module.exports = (env) =>
     });
 
 
-    test("Create File 2", async function()
+    test("Create File (w/ Folder)", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri2.fsPath,
+        await fsApi.writeFile(fileUri.fsPath,
 `
 module.exports = (env) =>
 {
@@ -147,23 +147,23 @@ module.exports = (env) =>
     });
 
 
-    test("Delete File", async function()
+    test("Delete File (in Folder)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 6);
         endRollingCount(this);
     });
 
 
-    test("Delete File 2", async function()
+    test("Delete File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        await fsApi.deleteFile(fileUri2.fsPath);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
@@ -191,11 +191,11 @@ module.exports = (env) =>
 });
 
 
-    test("Delete File", async function()
+    test("Delete File (w/ Folder)", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

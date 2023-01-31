@@ -241,9 +241,9 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - OSX", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.min);
+        this.slow(tc.slowTime.config.shellChange);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
-        await sleep(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
 
@@ -251,9 +251,9 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - Linux", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.min);
+        this.slow(tc.slowTime.config.shellChange);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
-        await sleep(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
 
@@ -261,9 +261,9 @@ suite("Configuration / Settings Tests", () =>
     test("Change Default Shell - Windows", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + (tc.waitTime.refreshCommand * 2));
+        this.slow(tc.slowTime.config.shellChange);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
-        await waitForTeIdle(tc.waitTime.refreshCommand);
+        await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
 

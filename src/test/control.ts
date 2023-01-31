@@ -93,9 +93,10 @@ export const testControl: ITestControl =
             globEvent: 1125,
             groupingEvent: 990,
             pathToProgramsEvent: 710,
+            readEvent: 25,
+            shellChange: 1290,
             showHideSpecialFolder: 500,
             showHideUserTasks: 1000,
-            readEvent: 25,
             sortingEvent: 750,
             terminalEvent: 250
         },
@@ -121,7 +122,7 @@ export const testControl: ITestControl =
         getTreeTasks: 195,
         getTreeTasksNpm: 470, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 155,
+            page: 205,
             pageWithDetail: 270,
             checkLicense: 395,
             enterKey: 840,
@@ -138,10 +139,10 @@ export const testControl: ITestControl =
         runCommand: 4890,
         runPauseCommand: 3250,
         runStopCommand: 3505,
-        storageRead: 30,
-        storageUpdate: 40,
-        storageSecretRead: 50,
-        storageSecretUpdate: 60,
+        storageRead: 20,
+        storageUpdate: 30,
+        storageSecretRead: 40,
+        storageSecretUpdate: 50,
         taskCommand: 1000,
         taskProviderReadUri: 90,
         tasks: {
@@ -198,9 +199,10 @@ export const testControl: ITestControl =
             globEvent: 1240,
             groupingEvent: 1090,
             pathToProgramsEvent: 780,
+            readEvent: 30,
+            shellChange: 1490,
             showHideSpecialFolder: 625,
             showHideUserTasks: 1100,
-            readEvent: 30,
             sortingEvent: 800,
             terminalEvent: 300
         },
@@ -226,7 +228,7 @@ export const testControl: ITestControl =
         getTreeTasks: 225,
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
-            page: 165,
+            page: 215,
             pageWithDetail: 275,
             checkLicense: 405,
             enterKey: 845,
@@ -243,10 +245,10 @@ export const testControl: ITestControl =
         runCommand: 5400,
         runPauseCommand: 3590,
         runStopCommand: 3860,
-        storageRead: 30,
-        storageUpdate: 40,
-        storageSecretRead: 50,
-        storageSecretUpdate: 60,
+        storageRead: 20,
+        storageUpdate: 30,
+        storageSecretRead: 40,
+        storageSecretUpdate: 50,
         taskCommand: 1155,
         taskProviderReadUri: 100,
         tasks: {
@@ -293,6 +295,7 @@ export const testControl: ITestControl =
             groupingEvent: 95,
             pathToProgramsEvent: 120,
             registerExplorerEvent: 130,
+            shellChange: 95,
             showHideSpecialFolder: 95,
             showHideUserTasks: 105,
             sortingEvent: 95
@@ -345,6 +348,7 @@ export const testControl: ITestControl =
             groupingEvent: 155,
             pathToProgramsEvent: 190,
             registerExplorerEvent: 205,
+            shellChange: 130,
             showHideSpecialFolder: 150,
             showHideUserTasks: 160,
             sortingEvent: 150
@@ -421,6 +425,7 @@ export interface ISlowTimes
         groupingEvent: number;
         pathToProgramsEvent: number;
         readEvent: number;
+        shellChange: number;
         showHideSpecialFolder: number;
         showHideUserTasks: number;
         sortingEvent: number;
@@ -514,6 +519,7 @@ export interface IWaitTimes
         groupingEvent: number;
         pathToProgramsEvent: number;
         registerExplorerEvent: number;
+        shellChange: number;
         showHideSpecialFolder: number;
         showHideUserTasks: number;
         sortingEvent: number;
