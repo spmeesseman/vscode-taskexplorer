@@ -17,23 +17,7 @@
     {
         "type": "npm",
         "script": "webpack-watch",
-        "problemMatcher": {
-            "owner": "typescript",
-            "pattern": [
-                {
-                    "regexp": "\\[tsl\\] ERROR",
-                    "file": 1,
-                    "location": 2,
-                    "message": 3
-                }
-            ],
-            "background": {
-                "activeOnStart": true,
-                // Webpack watch output, or we hang
-                "beginsPattern": "Entrypoint\\s+extension",
-                "endsPattern": "compiled\\s+successfully\\s+in\\s+[0-9]+\\s+ms"
-            }
-        },
+        "problemMatcher": "$webpackte",
         "isBackground": true,
         "presentation": {
             "reveal": "always"

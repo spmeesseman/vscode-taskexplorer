@@ -14,13 +14,13 @@ export class WebpackTaskProvider extends TaskExplorerProvider implements TaskExp
     constructor() { super("webpack"); }
 
 
-    public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task
+    public createTask(target: string, cmd: "npx", folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task
     {
         const def = this.getDefaultDefinition(target, folder, uri);
-        const args = [ "webpack", cmd, ...xArgs ];
+        const args = [ "webpack", ...xArgs ];
         const options: ShellExecutionOptions = { cwd: dirname(uri.fsPath) };
-        const execution = new ShellExecution("npx", args, options);
-        return new Task(def, folder, target, "webpack", execution, "$msCompile");
+        const execution = new ShellExecution(cmd, args, options);
+        return new Task(def, folder, target, "webpack", execution, "$webpackte");
     }
 
 

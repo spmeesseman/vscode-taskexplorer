@@ -50,6 +50,7 @@
         "tsbuildinfo",
         "uild",
         "vsix",
-        "vslauncher"
+        "vslauncher",
+        "webpackte"
     ]
 }

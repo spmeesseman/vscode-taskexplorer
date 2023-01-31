@@ -41,6 +41,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
   - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
   - [Running Task Icon Animations](#running-task-icon-animations)
+  - [Webpack 5 Problem Matcher](#webpack-5-problem-matcher)
   - [Parsing Reports](#parsing-reports)
   - [External Provider Integration API](#external-provider-integration-api)
   - [Feedback \& Contributing](#feedback--contributing)
@@ -216,7 +217,32 @@ Bash/sh scripts in Windows will have the shell executable automatically set to a
 
 ## Running Task Icon Animations
 
-FOr whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
+For whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
+
+## Webpack 5 Problem Matcher
+
+For extension developers, this extension contributes a basic problem matcher for Webpack 5 - `$webpackte`.  To set up a watch task for debugging a Webpack 5 VSCode extension build, you can add an entry like the following to the VSCode tasks.json file:
+
+    {
+        "type": "npm",
+        "script": "webpack-watch",
+        "problemMatcher": "$webpackte",
+        "isBackground": true,
+        "presentation": {
+            "reveal": "always"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        }
+    }
+
+And in the package.json file:
+
+    scripts: {
+        ...,
+        "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js"
+    }
 
 ## Parsing Reports
 
