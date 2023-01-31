@@ -104,8 +104,8 @@ export const testControl: ITestControl =
         explorerViewStartup: 7565,
         fetchTasksCommand: 1835,
         fileCachePersist: 245,
-        findTaskPosition: 320,
-        findTaskPositionDocOpen: 40,
+        findTaskPosition: 300,
+        findTaskPositionDocOpen: 35,
         focusCommand: 2330,
         focusCommandAlreadyFocused: 375,
         focusCommandChangeViews: 775,
@@ -135,7 +135,7 @@ export const testControl: ITestControl =
         refreshCommandNoChanges: 240,
         removeWorkspaceFolder: 550,
         removeWorkspaceFolderEmpty: 475,
-        reorderWorkspaceFolders: 570,
+        reorderWorkspaceFolders: 580,
         runCommand: 4890,
         runPauseCommand: 3250,
         runStopCommand: 3505,
@@ -164,7 +164,7 @@ export const testControl: ITestControl =
             verifyNpm: 1000, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 1260
         },
-        viewReleaseNotes: 385,
+        viewReleaseNotes: 410,
         viewReport: 375
     },
     //
