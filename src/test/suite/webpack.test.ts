@@ -11,15 +11,17 @@ import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplor
 import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { env } from "process";
 
 const testsName = "webpack";
 const startTaskCount = tc.isMultiRootWorkspace ? 6 : 0;
+const dirName = getWsPath("tasks_test_");
+const fileUri = Uri.file(path.join(dirName, "webpack.config.js"));
+const fileUri2 = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let provider: WebpackTaskProvider;
-let fileUri: Uri;
+
 
 suite("Webpack Tests", () =>
 {
@@ -29,7 +31,7 @@ suite("Webpack Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as WebpackTaskProvider;
-        fileUri = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
+        await fsApi.createDir(dirName);
         endRollingCount(this, true);
     });
 
@@ -38,6 +40,7 @@ suite("Webpack Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -112,6 +115,28 @@ module.exports = (env) =>
     });
 
 
+    test("Create File 2", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
+        await fsApi.writeFile(fileUri2.fsPath,
+`
+module.exports = (env) =>
+{
+	const wpConfig = {
+		target: "node",
+		mode: "production",
+		resolve: {extensions: ['.ts', '.js'] }
+	};
+	return wpConfig;
+}
+`);
+        await waitForTeIdle(tc.waitTime.fs.createEvent);
+        await verifyTaskCount(testsName, startTaskCount + 12);
+        endRollingCount(this);
+    });
+
+
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
@@ -128,6 +153,17 @@ module.exports = (env) =>
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await verifyTaskCount(testsName, startTaskCount + 6);
+        endRollingCount(this);
+    });
+
+
+    test("Delete File 2", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
+        await fsApi.deleteDir(dirName);
+        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
