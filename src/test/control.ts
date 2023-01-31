@@ -95,7 +95,7 @@ export const testControl: ITestControl =
             pathToProgramsEvent: 710,
             readEvent: 25,
             shellChange: 1290,
-            showHideSpecialFolder: 500,
+            showHideSpecialFolder: 505,
             showHideUserTasks: 1000,
             sortingEvent: 750,
             terminalEvent: 250

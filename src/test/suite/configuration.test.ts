@@ -271,7 +271,7 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - OSX", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.config.shellChange);
         // Set up coverage on if() statement in configWatcher ~ ln 260
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
@@ -285,7 +285,7 @@ suite("Configuration / Settings Tests", () =>
         });
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
-        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges);
+        await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
 
@@ -293,13 +293,12 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Linux", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
-        // Set up coverage on if() statement in configWatcher ~ ln 240
+        this.slow(tc.slowTime.config.shellChange);
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("enabledTasks.nsis", true); // last of an or'd if() extension.ts ~line 240 processConfigChanges()
+        await executeSettingsUpdate("enabledTasks.nsis", true);
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges);
+        await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
 
@@ -307,14 +306,14 @@ suite("Configuration / Settings Tests", () =>
     test("Reset Default Shell - Windows", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.config.shellChange);
         // Set up coverage on if() statement in configWatcher ~ ln 240
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", enabledTasks); // reset back to default enabled tasks
         testsApi.enableConfigWatcher(true);
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
-        await waitForTeIdle(tc.waitTime.refreshCommandNoChanges); // setting with current enabled tasks will trigger a refresh
-        endRollingCount(this);                                  // but since no glob/file changes it'll be noticed by fcache and quick
+        await waitForTeIdle(tc.waitTime.config.shellChange);
+        endRollingCount(this);
     });
 
 
