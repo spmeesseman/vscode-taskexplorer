@@ -30,7 +30,7 @@ suite("Webpack Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
-        startTaskCount = tc.isMultiRootWorkspace ? 6 : 0;
+        startTaskCount = tc.isMultiRootWorkspace ? 8 : 0;
         provider = teApi.providers[testsName] as WebpackTaskProvider;
         await fsApi.createDir(dirName);
         endRollingCount(this, true);
@@ -111,7 +111,7 @@ module.exports = (env) =>
 }
 `);
         await waitForTeIdle(tc.waitTime.fs.createEvent);
-        await verifyTaskCount(testsName, startTaskCount + 6);
+        await verifyTaskCount(testsName, startTaskCount + 8);
         endRollingCount(this);
     });
 
@@ -133,7 +133,7 @@ module.exports = (env) =>
 }
 `);
         await waitForTeIdle(tc.waitTime.fs.createEvent);
-        await verifyTaskCount(testsName, startTaskCount + 12);
+        await verifyTaskCount(testsName, startTaskCount + 16);
         endRollingCount(this);
     });
 
@@ -154,7 +154,7 @@ module.exports = (env) =>
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        await verifyTaskCount(testsName, startTaskCount + 6);
+        await verifyTaskCount(testsName, startTaskCount + 8);
         endRollingCount(this);
     });
 
@@ -187,7 +187,7 @@ module.exports = (env) =>
 }
 `);
         await waitForTeIdle(tc.waitTime.fs.createEvent);
-        await verifyTaskCount(testsName, startTaskCount + 6);
+        await verifyTaskCount(testsName, startTaskCount + 8);
         endRollingCount(this);
 });
 

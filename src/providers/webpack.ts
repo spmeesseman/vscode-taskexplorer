@@ -55,7 +55,9 @@ export class WebpackTaskProvider extends TaskExplorerProvider implements TaskExp
         log.methodStart("read webpack uri task", 3, logPad, false, [[ "project folder", folder.name ], [ "relative path", path ]], this.logQueueId);
 
         tasks.push(this.createTask(`build${groupSep}dev`, "npx", folder, uri, [ "--mode", "development", "--env", "environment=dev", "--config", "./" + path ]));
+        tasks.push(this.createTask(`build${groupSep}dev:verbose`, "npx", folder, uri, [ "--stats", "verbose", "--mode", "development", "--env", "environment=dev", "--config", "./" + path ]));
         tasks.push(this.createTask(`build${groupSep}prod`, "npx", folder, uri, [ "--mode", "production", "--config", "./" + path ]));
+        tasks.push(this.createTask(`build${groupSep}prod:verbose`, "npx", folder, uri, [ "--stats", "verbose", "--mode", "production", "--config", "./" + path ]));
         tasks.push(this.createTask(`build${groupSep}test`, "npx", folder, uri, [ "--mode", "development", "--env", "environment=test", "--config", "./" + path ]));
         tasks.push(this.createTask(`rebuild${groupSep}dev`, "npx", folder, uri, [ "-w", "--mode", "development", "--env", "environment=dev", "--env", "clean=true", "--config", "./" + path ]));
         tasks.push(this.createTask(`rebuild${groupSep}prod`, "npx", folder, uri, [ "--mode", "production", "--env", "clean=true", "--config", "./" + path ]));
