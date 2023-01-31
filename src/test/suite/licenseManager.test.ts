@@ -89,8 +89,8 @@ suite("License Manager Tests", () =>
 	{
         await startupFocus(this, async () => {
 			tasks = explorer.getTasks();
-			await licMgr.setTasks(tasks, "");
-			await licMgr.setTasks(tasks);
+			await licMgr.setTasks(tasks, ""); // covers checking same # of tasks onsetTasks() calls
+			await licMgr.setTasks(tasks);     // covers checking same # of tasks onsetTasks() calls
 		});
 	});
 
@@ -188,8 +188,6 @@ suite("License Manager Tests", () =>
 		await utils.sleep(50);
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
 		await utils.sleep(500);
-		licMgr.dispose();
-		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 
@@ -198,9 +196,6 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + 1100 + tc.slowTime.storageUpdate);
-		await teApi.testsApi.storage.update("version", undefined);
-		await setTasks();
-		await utils.sleep(50);
 		utils.overrideNextShowInputBox("1234-5678-9098-0000000");
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "enterLicense" });
 		await utils.sleep(500);
