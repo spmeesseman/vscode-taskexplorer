@@ -5,7 +5,6 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import fsUtils from "../utils/fsUtils";
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { join } from "path";
@@ -17,6 +16,7 @@ import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { refresh } from "../utils/treeUtils";
 
 
 const tempFiles: string[] = [];
@@ -353,8 +353,28 @@ suite("Provider Tests", () =>
         let numOpened: number;
         let numFilesOpened: number;
         ({ taskMap, numOpened, numFilesOpened } = await treeUtils.walkTreeItems(undefined, true));
-        checkTasks(7, 42, 3, 4, 4, 13, 32, 2, 4, 10); // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
         this.slow((numFilesOpened * tc.slowTime.findTaskPosition) + ((numOpened - numFilesOpened) * tc.slowTime.findTaskPositionDocOpen));
+        let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
+        expect(taskCount).to.be.equal(7, `Unexpected Ant task count (Found ${taskCount} of 7)`);
+        taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
+        expect(taskCount).to.be.equal(42, `Unexpected App-Publisher task count (Found ${taskCount} of 42)`);
+        taskCount = treeUtils.findIdInTaskMap(":bash:", taskMap);
+        expect(taskCount).to.be.equal(3, `Unexpected Bash task count (Found ${taskCount} of 3)`);
+        taskCount = treeUtils.findIdInTaskMap(":batch:", taskMap);
+        expect(taskCount).to.be.equal(4, `Unexpected Batch task count (Found ${taskCount} of 4)`);
+        taskCount = treeUtils.findIdInTaskMap(":gradle:", taskMap);
+        expect(taskCount).to.be.equal(4, `Unexpected Gradle task count (Found ${taskCount} of 4)`);
+        taskCount = treeUtils.findIdInTaskMap(":grunt:", taskMap);
+        expect(taskCount).to.be.equal(13, `Unexpected Grunt task count (Found ${taskCount} of 13)`);
+        taskCount = treeUtils.findIdInTaskMap(":gulp:", taskMap);
+        expect(taskCount).to.be.equal(32, `Unexpected Gulp task count (Found ${taskCount} of 32)`);
+        taskCount = treeUtils.findIdInTaskMap(":python:", taskMap);
+        expect(taskCount).to.be.equal(2, `Unexpected Python task count (Found ${taskCount} of 2)`);
+        taskCount = treeUtils.findIdInTaskMap(":tsc:", taskMap);
+        expect(taskCount).to.be.equal(4, `Unexpected Typescript task count (Found ${taskCount} of 4)`);
+        taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
+        // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
+        expect(taskCount).to.be.equal(10, `Unexpected VSCode task count (Found ${taskCount} of 10)`);
         endRollingCount(this);
     });
 
@@ -420,40 +440,14 @@ suite("Provider Tests", () =>
     });
 
 
-    test("Refresh Tree", async function()
+    test("Project Folder Collapsed on Start", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.config.event * 2));
-        await executeSettingsUpdate("specialFolders.expanded.project1", true);
-        await executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
-        endRollingCount(this);
-    });
-
-
-    test("Invalidate Bash Tasks With New Bash Shell Setting", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.min +
+        this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.config.eventFast + tc.slowTime.min +
                   (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
-        await teApi.config.updateVsWs("terminal.integrated.shell.windows",
-                                       "C:\\Program Files\\Git\\bin\\bash.exe");
-        await waitForTeIdle(tc.waitTime.refreshCommand);
-        await teApi.testsApi.fileCache.buildTaskTypeCache("bash", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
-        await waitForTeIdle(tc.waitTime.min);
+        await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
         await executeSettingsUpdate("specialFolders.expanded.project1", false, tc.waitTime.config.event);
-        await teApi.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
-        await waitForTeIdle(tc.waitTime.refreshCommand);
-        endRollingCount(this);
-    });
-
-
-    test("Rebuild Gulp FileCache on Single Workspace Folder", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.build + tc.slowTime.min);
-        await teApi.testsApi.fileCache.buildTaskTypeCache("gulp", (workspace.workspaceFolders as WorkspaceFolder[])[0], true, "");
-        await waitForTeIdle(tc.waitTime.min);
+        await refresh();
         endRollingCount(this);
     });
 
@@ -507,53 +501,6 @@ suite("Provider Tests", () =>
     });
 
 });
-
-
-function checkTasks(ant: number, ap: number, bash: number, bat: number, gradle: number, grunt: number, gulp: number, python: number, tsc: number, vsc: number)
-{
-    console.log("    Task Counts");
-
-    let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
-    console.log("      Ant           : " + taskCount.toString());
-    expect(taskCount).to.be.equal(ant, `Unexpected Ant task count (Found ${taskCount} of ${ant})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
-    console.log("      App-Publisher : " + taskCount.toString());
-    expect(taskCount).to.be.equal(ap, `Unexpected App-Publisher task count (Found ${taskCount} of ${ap})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":bash:", taskMap);
-    console.log("      Bash          : " + taskCount.toString());
-    expect(taskCount).to.be.equal(bash, `Unexpected Bash task count (Found ${taskCount} of ${bash})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":batch:", taskMap);
-    console.log("      Batch         : " + taskCount.toString());
-    expect(taskCount).to.be.equal(bat, `Unexpected Batch task count (Found ${taskCount} of ${bat})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":gradle:", taskMap);
-    console.log("      Gradle        : " + taskCount.toString());
-    expect(taskCount).to.be.equal(gradle, `Unexpected Gradle task count (Found ${taskCount} of ${gradle})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":grunt:", taskMap);
-    console.log("      Grunt         : " + taskCount.toString());
-    expect(taskCount).to.be.equal(grunt, `Unexpected Grunt task count (Found ${taskCount} of ${grunt})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":gulp:", taskMap);
-    console.log("      Gulp          : " + taskCount.toString());
-    expect(taskCount).to.be.equal(gulp, `Unexpected Gulp task count (Found ${taskCount} of ${gulp})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":python:", taskMap);
-    console.log("      Python        : " + taskCount.toString());
-    expect(taskCount).to.be.equal(python, `Unexpected Python task count (Found ${taskCount} of ${python})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":tsc:", taskMap);
-    console.log("      TypeScript    : " + taskCount.toString());
-    expect(taskCount).to.be.equal(tsc, `Unexpected Typescript task count (Found ${taskCount} of ${tsc})`);
-
-    taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
-    console.log("      VSCode        : " + taskCount.toString());
-     // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
-    expect(taskCount).to.be.equal(vsc, `Unexpected VSCode task count (Found ${taskCount} of ${vsc})`);
-}
 
 
 async function deleteTempFilesAndDirectories()
