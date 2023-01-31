@@ -127,7 +127,7 @@
         "webpack-rebuild": "rimraf dist && npm run webpack-build:extension",
         "webpack-rebuild:extension": "rimraf dist && npm run webpack-build:extension --config ./webpack.config.js",
         "webpack-build:extension": "webpack --mode production --config ./webpack.config.js",
-        "webpack-build:dev": "webpack --env environment=dev --config ./webpack.config.js",
+        "webpack-build:dev": "webpack --mode development --env environment=dev --config ./webpack.config.js",
         "webpack-rebuild:dev": "rimraf dist && npm run webpack-build:dev --config ./webpack.config.js",
         "webpack-build:test": "webpack --env environment=test --config ./webpack.config.test.js"
     },

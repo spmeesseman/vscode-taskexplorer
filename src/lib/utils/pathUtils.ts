@@ -1,20 +1,15 @@
 
 import log from "../log/log";
-import { dirname, join, resolve, sep } from "path";
+import { dirname, join, relative, resolve, sep } from "path";
 import { Uri, WorkspaceFolder } from "vscode";
 import { pathExists, pathExistsSync } from "./fs";
 import { homedir } from "os";
-
-
 
 
 export const getCwd = (uri: Uri): string =>
 {
     return uri.fsPath.substring(0, uri.fsPath.lastIndexOf(sep) + 1);
 };
-
-
-
 
 
 /**
@@ -57,11 +52,11 @@ export const getPortableDataPath = (padding = "") =>
 };
 
 
-export const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
+export const getRelativePath = (folder: WorkspaceFolder, uri: Uri, includeFileName?: boolean): string =>
 {
-    const rootUri = folder.uri;
-    const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
-    return absolutePath.substring(rootUri.path.length + 1);
+    let relPath = relative(folder.uri.fsPath, uri.fsPath);
+    relPath = !includeFileName ? dirname(relPath) : relPath;
+    return relPath;
 };
 
 

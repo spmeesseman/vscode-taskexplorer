@@ -287,7 +287,7 @@ const output = (env, wpConfig) =>
 const plugins = (env, wpConfig) =>
 {
 	wpConfig.plugins = [];
-	if (env.environment === "production")
+	if (wpConfig.mode === "production")
 	{
 		wpConfig.plugins = [ // add AfterDone plugin at the end of the plugins array
 		{
