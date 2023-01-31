@@ -25,18 +25,21 @@ export default class TeWebviewPanel
         this.viewType = viewType;
 
         const resourceDir = Uri.joinPath(context.extensionUri, "res"),
+              cssDir = Uri.joinPath(resourceDir, "page"),
+              jsDir = Uri.joinPath(resourceDir, "page"),
               pageDir = Uri.joinPath(resourceDir, "page"),
-              sourceImgDir = Uri.joinPath(resourceDir, "sources");
-
-        const pageUri = panel.webview.asWebviewUri(pageDir),
+              sourceImgDir = Uri.joinPath(resourceDir, "sources"),
+              pageUri = panel.webview.asWebviewUri(pageDir),
+              cssUri = panel.webview.asWebviewUri(cssDir),
+              jsUri = panel.webview.asWebviewUri(jsDir),
               resourceDirUri = panel.webview.asWebviewUri(resourceDir),
               sourceImgDirUri = panel.webview.asWebviewUri(sourceImgDir);
 
         panel.webview.html = html.replace(/\[webview\.cspSource\]/g, panel.webview.cspSource)
-                                 .replace(/\[webview\.cssDir\]/g, pageUri.toString())
+                                 .replace(/\[webview\.cssDir\]/g, cssUri.toString())
+                                 .replace(/\[webview\.jsDir\]/g, jsUri.toString())
                                  .replace(/\[webview\.pageDir\]/g, pageUri.toString())
                                  .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                                 .replace(/\[webview\.scriptDir\]/g, pageUri.toString())
                                  .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
                                  .replace(/\[webview\.nonce\]/g, this.getNonce());
         //
@@ -64,7 +67,6 @@ export default class TeWebviewPanel
         );
 
         panel.reveal();
-        this.disposables.unshift(panel);
     }
 
 
@@ -95,6 +97,7 @@ export default class TeWebviewPanel
 
     dispose = () =>
     {
+        this.panel.dispose();
         while (this.disposables.length)
         {
             (this.disposables.pop() as Disposable).dispose();
