@@ -118,7 +118,7 @@ const main = async(args: string[]) =>
         const testsWorkspace = !multiRoot ? testWorkspaceSingleRoot : multiRootWsFile;
         await runTests(
         {
-            version: "1.60.1", // process.env.CODE_VERSION,
+            version: "1.63.0", // process.env.CODE_VERSION,
             extensionDevelopmentPath,
             extensionTestsPath,
             launchArgs: [ testsWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
@@ -183,7 +183,7 @@ const main = async(args: string[]) =>
                         ]
                     }, null, 4));
                 }
-               else
+                else
                 {
                     wsConfig.settings = {
                         "taskExplorer.exclude": [
