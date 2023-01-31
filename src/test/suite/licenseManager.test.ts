@@ -12,6 +12,7 @@ import { ILicenseManager } from "../../interface/ILicenseManager";
 import { executeTeCommand } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getViewTitle, getViewType, reviveLicensePage } from "../../lib/page/licensePage";
+import { getLicensePageSerializer } from "../../commands/viewLicense";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -336,13 +337,17 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("Revive License Page", async function()
+	test("Deserialize License Page", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.viewReport + 150);
+		this.slow(tc.slowTime.viewReport + 200);
 		const panel = utils.createwebviewForRevive(getViewTitle(), getViewType());
-	    await reviveLicensePage(panel, teApi, teApi.testsApi.extensionContext, "");
-		await utils.sleep(75);
+	    await getLicensePageSerializer().deserializeWebviewPanel(panel, null);
+		await utils.sleep(50);
+		teApi.testsApi.isBusy = true;
+		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
+	    await getLicensePageSerializer().deserializeWebviewPanel(panel, null);
+		await utils.sleep(50);
 		panel.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);

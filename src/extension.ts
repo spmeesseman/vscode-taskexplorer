@@ -76,6 +76,7 @@ export const teApi: ITaskExplorerApi =
         fs,
         explorer: {} as ITaskExplorer, // registerExplorer() will set
         fileCache,
+        isBusy: false,
         storage,
         enableConfigWatcher,
         onWsFoldersChange,
@@ -100,6 +101,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     }
     else {
         teApi.testsApi.extensionContext = context;
+        teApi.isBusy = () => isBusy() || teApi.testsApi.isBusy;
     }
 
     //

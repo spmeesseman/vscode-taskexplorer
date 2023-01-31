@@ -9,6 +9,7 @@ import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
 import { getViewTitle, getViewType, reviveParsingReport } from "../../lib/page/infoPage";
+import { getParsingReportSerializer } from "../../commands/viewReport";
 
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;
@@ -193,13 +194,17 @@ suite("Info Report Tests", () =>
 	});
 
 
-	test("Revive Report Page (All Projects)", async function()
+	test("Deserialize Report Page (All Projects)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 150);
+		this.slow(testControl.slowTime.viewReport + 200);
 		const panel = createwebviewForRevive(getViewTitle(), getViewType());
-	    await reviveParsingReport(panel, teApi, teApi.testsApi.extensionContext, "");
-		await sleep(75);
+	    await getParsingReportSerializer().deserializeWebviewPanel(panel, null);
+		await sleep(50);
+		teApi.testsApi.isBusy = true;
+		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
+	    await getParsingReportSerializer().deserializeWebviewPanel(panel, null);
+		await sleep(50);
 		panel.dispose();
 		await closeEditors();
         endRollingCount(this);

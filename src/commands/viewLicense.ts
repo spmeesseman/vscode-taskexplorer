@@ -8,6 +8,9 @@ let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
 
 
+export const getLicensePageSerializer = () => serializer;
+
+
 const viewLicense = async() =>
 {
     log.methodStart("view license command", 1, "", true);
@@ -18,8 +21,8 @@ const viewLicense = async() =>
 
 
 const serializer: WebviewPanelSerializer =
-{   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-    async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any)
+{
+    deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: any) =>
     {
         await reviveLicensePage(webviewPanel, teApi, context, "");
     }

@@ -9,6 +9,7 @@ import { getViewTitle, getViewType, reviveReleaseNotes } from "../../lib/page/re
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
+import { getReleaseNotesSerializer } from "../../commands/viewReleaseNotes";
 
 let teApi: ITaskExplorerApi;
 let extension: Extension<any>;
@@ -90,16 +91,20 @@ suite("Release Notes Page Tests", () =>
 	});
 
 
-	test("Revive Release Notes Page", async function()
+	test("Deserialize Release Notes Page", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 150);
+		this.slow(testControl.slowTime.viewReport + 200);
 		const panel = createwebviewForRevive(getViewTitle(), getViewType());
-	    await reviveReleaseNotes(panel, teApi, teApi.testsApi.extensionContext, "");
-		await sleep(75);
+	    await getReleaseNotesSerializer().deserializeWebviewPanel(panel, null);
+		await sleep(50);
+		teApi.testsApi.isBusy = true;
+		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
+	    await getReleaseNotesSerializer().deserializeWebviewPanel(panel, null);
+		await sleep(50);
 		panel.dispose();
 		await closeEditors();
-       endRollingCount(this);
+        endRollingCount(this);
 	});
 
 });

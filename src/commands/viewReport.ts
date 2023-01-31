@@ -8,6 +8,9 @@ let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
 
 
+export const getParsingReportSerializer = () => serializer;
+
+
 const viewReport = async(uri?: Uri) =>
 {
     log.methodStart("view report command", 1, "", true);
@@ -18,8 +21,8 @@ const viewReport = async(uri?: Uri) =>
 
 
 const serializer: WebviewPanelSerializer =
-{   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-    async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any)
+{
+    deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: any) =>
     {
         await reviveParsingReport(webviewPanel, teApi, context, "");
     }

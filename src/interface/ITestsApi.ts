@@ -7,6 +7,7 @@ import { IStorage } from "./IStorage";
 
 export interface ITestsApi
 {
+    isBusy: boolean;
     explorer: ITaskExplorer;
     fileCache: IFileCache; // for tests use only
     fs: IFilesystemApi;

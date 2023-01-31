@@ -50,9 +50,9 @@ export default class TeWebviewPanel
 
         panel.onDidChangeViewState(
             e => {
-                if (panel.visible) {
+                // if (panel.visible) {
                     // update();
-                }
+                // }
             },
             null, this.disposables
         );
