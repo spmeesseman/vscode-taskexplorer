@@ -279,6 +279,18 @@ export default class TaskFile extends TreeItem implements ITaskFile
                 }
             }
 
+            if (source === "webpack")
+            {   //
+                // For ap files in the same dir, nsamed with a tag, e.g.:
+                //    webpack.config.dev.json
+                //
+                const match = (taskDef.fileName as string).match(/webpack\.config\.(.+)\.(?:js(?:on)?)$/i);
+                if (match && match.length > 1 && match[1])
+                {
+                    return (label + " (" + match[1].toLowerCase() + ")");
+                }
+            }
+
             //
             // Reference ticket #133, vscode folder should not use a path appenditure in it's folder label
             // in the task tree, there is only one path for vscode/workspace tasks, /.vscode.  The fact that

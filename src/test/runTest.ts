@@ -30,6 +30,7 @@ async function main(args: string[])
     // Setting file to clear and restore
     //
     const project1Path = testWorkspaceSingleRoot;
+    // const project2Path = path.join(testWorkspaceMultiRoot, "project2");
     const projectSettingsFile = path.join(project1Path, ".vscode", "settings.json");
     const multiRootWsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
 

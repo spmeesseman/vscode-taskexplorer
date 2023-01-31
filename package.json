@@ -1970,10 +1970,6 @@
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAnt%"
                         },
-                        "apppublisher": {
-                            "type": "string",
-                            "description": "%config.taskExplorer.pathToAppPublisher%"
-                        },
                         "ansicon": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAnsicon%"
@@ -2033,8 +2029,7 @@
                     },
                     "default": {
                         "ant": "ant.bat",
-                        "apppublisher": "",
-                        "ansicon": "",
+                        "ansicon": "ansicon",
                         "bash": "bash",
                         "composer": "composer",
                         "curl": "curl",

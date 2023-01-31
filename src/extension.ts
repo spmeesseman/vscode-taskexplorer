@@ -141,6 +141,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     await tempRemapSettingsToNewLayout();
     await tempResetGroupingSep();
+    await tempDeleteAppPublisherPathToProgram();
     //
     // !!! End temporary !!!
     //
@@ -271,12 +272,25 @@ const tempResetGroupingSep = async () =>
     }
 };
 
+
+//
+// !!! Temporary                                     !!!
+// !!! Remove sometime down the road (from 1/18/22)  !!!
+// !!! Remove call in method activate() too          !!!
+//
+const tempDeleteAppPublisherPathToProgram = async () =>
+{
+    await configuration.update("pathToPrograms.apppublisher", undefined);
+    await configuration.updateWs("pathToPrograms.apppublisher", undefined);
+};
+
+
 //
 // !!! Temporary after settings layout redo / rename !!!
 // !!! Remove sometime down the road (from 12/22/22) !!!
 // !!! Remove call in method activate() too          !!!
 //
-async function tempRemapSettingsToNewLayout()
+const tempRemapSettingsToNewLayout = async() =>
 {
     const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
     /* istanbul ignore next */
@@ -325,7 +339,7 @@ async function tempRemapSettingsToNewLayout()
         /* istanbul ignore next */
         await storage.update("DID_SETTINGS_UPGRADE", true);
     }
-}
+};
 
 
 export async function deactivate()

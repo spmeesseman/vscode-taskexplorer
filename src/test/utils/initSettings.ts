@@ -83,7 +83,6 @@ const initSettings = async () =>
     await configuration.updateWs("pathToPrograms",
     {
         ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
-        apppublisher: "",
         ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), // "c:\\Code\\ansicon\\x64\\ansicon.exe",
         bash: "bash",
         composer: "composer",

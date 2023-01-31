@@ -257,20 +257,11 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         {   //
             // Script type task defs will change with terminal change
             //
-            const enabledTasks = configuration.get<any>("enabledTasks");
-            teApi.log.write("   a 'terminal.integrated.shell' setting has changed", 1);
+            teApi.log.write("   a terminal shell setting has changed", 1);
             teApi.log.value("      windows shell", configuration.getVs<boolean>("terminal.integrated.shell.windows"), 2);
             teApi.log.value("      linux shell", configuration.getVs<boolean>("terminal.integrated.shell.linux"), 2);
             teApi.log.value("      osx shell", configuration.getVs<boolean>("terminal.integrated.shell.osx"), 2);
-            refresh = enabledTasks.bash || enabledTasks.batch || enabledTasks.perl || enabledTasks.powershell ||
-                      enabledTasks.python || enabledTasks.ruby || enabledTasks.nsis;
-            // if (enabledTasks.bash) { registerChange("bash"); }
-            // if (enabledTasks.batch) { registerChange("batch"); }
-            // if (enabledTasks.perl) { registerChange("perl"); }
-            // if (enabledTasks.powershell) { registerChange("powershell"); }
-            // if (enabledTasks.python) { registerChange("python"); }
-            // if (enabledTasks.ruby) { registerChange("ruby"); }
-            // if (enabledTasks.nsis) { registerChange("nsis"); }
+            util.getScriptTaskTypes().forEach(t => { if (enabledTasks[t]) registerChange(t); });
         }
     }
 

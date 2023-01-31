@@ -85,6 +85,7 @@ module.exports = (env) =>
  */
 const devTool = (env, wpConfig) =>
 {
+	wpConfig.devtool = false;
 	if (env.environment === "dev" || wpConfig.mode === 'development')
 	{
 		wpConfig.devtool = "source-map";
