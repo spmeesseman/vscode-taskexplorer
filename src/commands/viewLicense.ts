@@ -1,31 +1,40 @@
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import log from "../lib/log/log";
 import { ITaskExplorerApi } from "../interface";
-import { commands, ExtensionContext } from "vscode";
-import { displayLicenseReport } from "../lib/page/licensePage";
+import { commands, ExtensionContext, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
+import { displayLicenseReport, getViewType, reviveLicenseReport } from "../lib/page/licensePage";
 
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
 
 
-async function viewLicense()
+const viewLicense = async() =>
 {
     log.methodStart("view license command", 1, "", true);
     const panel = await displayLicenseReport(teApi, context, "   ");
     log.methodDone("view license command", 1);
-    return panel;
-}
+    return panel.getWebviewPanel();
+};
 
 
-function registerViewLicenseCommand(ctx: ExtensionContext, api: ITaskExplorerApi)
+const serializer: WebviewPanelSerializer =
+{   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any)
+    {
+        await reviveLicenseReport(webviewPanel, teApi, context, "");
+    }
+};
+
+
+const registerViewLicenseCommand = (ctx: ExtensionContext, api: ITaskExplorerApi) =>
 {
     teApi = api;
     context = ctx;
 	ctx.subscriptions.push(
-        commands.registerCommand("vscode-taskexplorer.viewLicense", async () => viewLicense())
+        commands.registerCommand("vscode-taskexplorer.viewLicense", async () => viewLicense()),
+        window.registerWebviewPanelSerializer(getViewType(), serializer)
     );
-}
+};
 
 
 export default registerViewLicenseCommand;

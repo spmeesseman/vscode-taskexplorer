@@ -6,17 +6,19 @@ import { readFileAsync } from "../utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
 import { ExtensionContext, WebviewPanel } from "vscode";
-import { cleanLicenseButtons, createWebviewPanel } from "./utils";
+import { cleanLicenseButtons, TeWebviewPanel } from "./utils";
 
-let panel: WebviewPanel | undefined;
+const viewTitle = "Task Explorer Release Notes";
+const viewType = "viewReleaseNotes";
+let panel: TeWebviewPanel | undefined;
 
 
 export const displayReleaseNotes = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
 {
-	log.methodStart("display license report", 1, logPad);
+	log.methodStart("display release notes", 1, logPad);
 	const html = await getPageContent(context, api, logPad + "   ");
-	panel = await createWebviewPanel("Task Explorer Release Notes", html, context);
-    log.methodDone("display license report", 1, logPad);
+	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
+    log.methodDone("display release notes", 1, logPad);
     return panel;
 };
 
@@ -118,4 +120,25 @@ const getReleaseNotes = (section: string, version: string, noChangesDsc: string,
 	}
 	html += "</ul>";
 	return html;
+};
+
+
+export const getViewType = () => viewType;
+
+
+export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
+{   //
+	// Use a timeout so license manager can initialize first
+	//
+	await new Promise<void>((resolve) =>
+	{
+		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
+		{
+			log.methodStart("revive release notes", 1, logPad);
+			const html = await getPageContent(context, api, logPad + "   ");
+			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+			log.methodDone("revive release notes", 1, logPad);
+			resolve();
+		}, 500, webviewPanel, api, context, logPad);
+	});
 };

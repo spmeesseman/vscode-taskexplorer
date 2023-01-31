@@ -6,6 +6,7 @@ import figures from "./figures";
 import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";
 import { refreshTree } from "./refreshTree";
+import { TeWebviewPanel } from "./page/utils";
 import { isObject, isScriptType, isString } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { displayLicenseReport } from "./page/licensePage";
@@ -26,7 +27,7 @@ export class LicenseManager implements ILicenseManager
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
 	private maxTasksReached = false;
-	private panel: WebviewPanel | undefined;
+	private panel: TeWebviewPanel | undefined;
 	private port = 443;
 	private teApi: ITaskExplorerApi;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
@@ -145,7 +146,7 @@ export class LicenseManager implements ILicenseManager
 	getVersion = () => this.version;
 
 
-	getWebviewPanel = () => this.panel;
+	getWebviewPanel = () => this.panel?.getWebviewPanel();
 
 
 	isBusy = () => this.busy;

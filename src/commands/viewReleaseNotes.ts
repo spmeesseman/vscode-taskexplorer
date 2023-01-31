@@ -1,31 +1,40 @@
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import log from "../lib/log/log";
-import { commands, ExtensionContext, Uri } from "vscode";
-import { displayReleaseNotes } from "../lib/page/releaseNotes";
+import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
+import { displayReleaseNotes, getViewType, reviveReleaseNotes } from "../lib/page/releaseNotes";
 import { ITaskExplorerApi } from "../interface";
 
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
 
 
-async function viewReleaseNotes(uri?: Uri)
+const viewReleaseNotes = async(uri?: Uri) =>
 {
     log.methodStart("view report command", 1, "", true);
     const panel = await displayReleaseNotes(teApi, context, "   ");
     log.methodDone("view report command", 1);
-    return panel;
-}
+    return panel.getWebviewPanel();
+};
 
 
-function registerViewReleaseNotesCommand(ctx: ExtensionContext, api: ITaskExplorerApi)
+const serializer: WebviewPanelSerializer =
+{   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
+    async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any)
+    {
+        await reviveReleaseNotes(webviewPanel, teApi, context, "");
+    }
+};
+
+
+const registerViewReleaseNotesCommand = (ctx: ExtensionContext, api: ITaskExplorerApi) =>
 {
     teApi = api;
     context = ctx;
-	ctx.subscriptions.push(
-        commands.registerCommand("vscode-taskexplorer.viewReleaseNotes", async () => viewReleaseNotes())
+    ctx.subscriptions.push(
+        commands.registerCommand("vscode-taskexplorer.viewReleaseNotes", async () => viewReleaseNotes()),
+        window.registerWebviewPanelSerializer(getViewType(), serializer)
     );
-}
+};
 
 
 export default registerViewReleaseNotesCommand;

@@ -2,18 +2,20 @@
 import * as path from "path";
 import log from "../log/log";
 import { ITaskExplorerApi } from "../../interface";
-import { Disposable, ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
-import { createTaskCountTable, createWebviewPanel } from "./utils";
+import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
+import { createTaskCountTable, TeWebviewPanel } from "./utils";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../utils/utils";
 
-let panel: WebviewPanel | undefined;
+const viewTitle = "Task Explorer Parsing Report";
+const viewType = "viewParsingReport";
+let panel: TeWebviewPanel | undefined;
 
 
 export const displayParsingReport = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	panel = await createWebviewPanel("Task Explorer", html, context);
+	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
@@ -123,4 +125,25 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 	log.methodDone("get body content", 1, logPad);
 
 	return `<tr><td><table><tr><td>${summary}</td></tr></table><table><tr><td>${details}</td></tr></table></td></tr>`;
+};
+
+
+export const getViewType = () => viewType;
+
+
+export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+{   //
+	// Use a timeout so license manager can initialize first
+	//
+	await new Promise<void>((resolve) =>
+	{
+		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+		{
+			log.methodStart("revive parsing report", 1, logPad);
+			const html = await getPageContent(api, logPad, uri);
+			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+			log.methodDone("revive parsing report", 1, logPad);
+			resolve();
+		}, 10, webviewPanel, api, context, logPad, uri);
+	});
 };

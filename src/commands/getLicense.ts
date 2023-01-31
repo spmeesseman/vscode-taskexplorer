@@ -16,7 +16,7 @@ async function getLicense()
     const newKey = await getLicenseManager().requestLicense("   ");
     const panel = await displayLicenseReport(teApi, context, "   ", [], newKey);
     log.methodDone("get 30-day license command", 1);
-    return { panel, newKey };
+    return { panel: panel.getWebviewPanel(), newKey };
 }
 
 

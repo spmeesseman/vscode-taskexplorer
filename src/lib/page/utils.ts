@@ -4,10 +4,121 @@ import { readFileAsync } from "../utils/fs";
 import { IDictionary, ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
 import { getPackageManager, getTaskTypes, lowerCaseFirstChar } from "../utils/utils";
-import { commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
+import { commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewOptions, WebviewPanel, window, workspace } from "vscode";
 
-const disposablesMap: IDictionary<Disposable[]> = {};
-const panelMap: IDictionary<WebviewPanel> = {};
+
+export class TeWebviewPanel
+{
+
+    public title: string;
+    public viewType: string;
+    private panel: WebviewPanel;
+    private disposables: Disposable[] = [];
+    private static panelMap: IDictionary<TeWebviewPanel> = {};
+
+
+    private constructor(panel: WebviewPanel, title: string, viewType: string, html: string, context: ExtensionContext)
+    {
+        TeWebviewPanel.panelMap[title] = this;
+
+        this.panel = panel;
+        this.title = title;
+        this.viewType = viewType;
+
+        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
+              pageDir = Uri.joinPath(resourceDir, "page"),
+              sourceImgDir = Uri.joinPath(resourceDir, "sources");
+
+        const pageUri = panel.webview.asWebviewUri(pageDir),
+              resourceDirUri = panel.webview.asWebviewUri(resourceDir),
+              sourceImgDirUri = panel.webview.asWebviewUri(sourceImgDir);
+
+        panel.webview.html = html.replace(/\[webview\.cspSource\]/g, panel.webview.cspSource)
+                                 .replace(/\[webview\.cssDir\]/g, pageUri.toString())
+                                 .replace(/\[webview\.pageDir\]/g, pageUri.toString())
+                                 .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
+                                 .replace(/\[webview\.scriptDir\]/g, pageUri.toString())
+                                 .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
+                                 .replace(/\[webview\.nonce\]/g, getNonce());
+        //
+        // Listen for when the panel is disposed
+        // This happens when the user closes the panel or when the panel is closed programmatically
+        //
+        panel.onDidDispose(() => this.dispose.call(panel), panel, this.disposables);
+
+        panel.onDidChangeViewState(
+            e => {
+                if (panel.visible) {
+                    // update();
+                }
+            },
+            null, this.disposables
+        );
+
+        panel.webview.onDidReceiveMessage
+        (
+            message => {
+                // i think don't await, the caller can't get the final result anyway
+                commands.executeCommand("vscode-taskexplorer." + message.command);
+            },
+            undefined, this.disposables
+        );
+
+        panel.reveal();
+        this.disposables.unshift(panel);
+    }
+
+
+    public static create(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
+    {
+		const column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
+
+		if (this.panelMap[viewType]) {
+			this.panelMap[viewType].panel.reveal(column);
+			return this.panelMap[viewType];
+		}
+
+        panel = panel || window.createWebviewPanel(
+            viewType,                 // Identifies the type of the webview. Used internally
+            title,                    // Title of the panel displayed to the users
+            column || ViewColumn.One, // Editor column to show the new webview panel in.
+            TeWebviewPanel.getWebviewOptions(context.extensionUri)
+        );
+
+        TeWebviewPanel.panelMap[viewType] = new TeWebviewPanel(panel, title, viewType, html, context);
+        return TeWebviewPanel.panelMap[viewType];
+	}
+
+
+    dispose = () =>
+    {
+        while (this.disposables.length)
+        {
+            (this.disposables.pop() as Disposable).dispose();
+        }
+        TeWebviewPanel.panelMap[this.viewType] = null as unknown as TeWebviewPanel;
+    };
+
+
+    public getWebviewPanel = () => this.panel;
+
+
+	public static revive(panel: WebviewPanel, title: string, viewType: string, html: string, context: ExtensionContext)
+    {
+		TeWebviewPanel.panelMap[viewType] = new TeWebviewPanel(panel, title, viewType, html, context);
+	}
+
+
+    public static getWebviewOptions = (extensionUri: Uri): WebviewOptions =>
+    {
+        const resourceDir = Uri.joinPath(extensionUri, "res");
+        return {
+            enableScripts: true,
+            localResourceRoots: [ resourceDir ]
+        };
+    };
+
+}
 
 
 export const createTaskCountTable = async (api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
@@ -101,92 +212,6 @@ export const cleanLicenseButtons = (html: string, api: ITaskExplorerApi) =>
         html = html.replace(html.slice(idx1, idx2), "");
     }
     return html;
-};
-
-
-export const createWebviewPanel = async(title: string, html: string, context: ExtensionContext) =>
-{
-    let panel: WebviewPanel;
-
-    if (panelMap[title])
-    {
-        panel = panelMap[title];
-    }
-    else
-    {
-        const disposables: Disposable[] = [];
-        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
-              pageDir = Uri.joinPath(resourceDir, "page"),
-              sourceImgDir = Uri.joinPath(resourceDir, "sources");
-
-        panel = window.createWebviewPanel(
-            lowerCaseFirstChar(title, true), // Identifies the type of the webview. Used internally
-            title,                           // Title of the panel displayed to the users
-            ViewColumn.One,                  // Editor column to show the new webview panel in.
-            {
-                enableScripts: true,
-                localResourceRoots: [ resourceDir ]
-            }
-        );
-
-        const pageUri = panel.webview.asWebviewUri(pageDir),
-              resourceDirUri = panel.webview.asWebviewUri(resourceDir),
-              sourceImgDirUri = panel.webview.asWebviewUri(sourceImgDir);
-
-        panel.webview.html = html.replace(/\[webview\.cspSource\]/g, panel.webview.cspSource)
-                                 .replace(/\[webview\.cssDir\]/g, pageUri.toString())
-                                 .replace(/\[webview\.pageDir\]/g, pageUri.toString())
-                                 .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                                 .replace(/\[webview\.scriptDir\]/g, pageUri.toString())
-                                 .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
-                                 .replace(/\[webview\.nonce\]/g, getNonce());
-
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programmatically
-        panel.onDidDispose(() => dispose(), panel, disposables);
-
-        panel.onDidChangeViewState(
-            e => {
-                if (panel.visible) {
-                    // update();
-                }
-            },
-            null, disposables
-        );
-
-        panel.webview.onDidReceiveMessage
-        (
-            message => {
-                // i think don't await, the caller can't get the final result anyway
-                commands.executeCommand("vscode-taskexplorer." + message.command);
-            },
-            undefined, disposables
-        );
-
-        panel.reveal();
-        disposables.unshift(panel);
-
-        panelMap[panel.title] = panel;
-        disposablesMap[panel.title] = disposables;
-    }
-
-    return panel;
-};
-
-
-const dispose = () =>
-{
-    console.log((this as unknown as WebviewPanel).title);
-    console.log(this);
-    const t = (this as unknown as WebviewPanel).title;
-    while (disposablesMap[t]?.length) {
-        const x = disposablesMap[t].pop();
-        if (x) {
-            x.dispose();
-        }
-    }
-    delete panelMap[t];
-    delete disposablesMap[t];
 };
 
 
