@@ -52,11 +52,11 @@ export const getPortableDataPath = (padding = "") =>
 };
 
 
-export const getRelativePath = (folder: WorkspaceFolder, uri: Uri, includeFileName?: boolean): string =>
+export const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
 {
-    let relPath = relative(folder.uri.fsPath, uri.fsPath);
-    relPath = !includeFileName ? dirname(relPath) : relPath;
-    return relPath;
+    const rootUri = folder.uri;
+    const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
+    return absolutePath.substring(rootUri.path.length + 1);
 };
 
 
