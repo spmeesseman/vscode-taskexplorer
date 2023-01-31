@@ -13,24 +13,22 @@
       <sleep/>
       <sleep milliseconds="75"/>
       <sleep milliseconds="75"/>
-      <sleep milliseconds="100"/>
       <echo message="Sleeping in 2..."/>
       <sleep/>
-      <sleep milliseconds="100"/>
+      <sleep milliseconds="75"/>
       <sleep milliseconds="25"/>
-      <sleep milliseconds="100"/>
       <sleep milliseconds="25"/>
       <sleep/>
       <sleep milliseconds="100"/>
-      <sleep milliseconds="250"/>
+      <sleep milliseconds="75"/>
+      <sleep milliseconds="75"/>
       <echo message="Sleeping in 1..."/>
       <sleep milliseconds="25"/>
       <sleep milliseconds="25"/>
       <sleep/>
       <sleep milliseconds="25"/>
-      <sleep milliseconds="250"/>
       <sleep milliseconds="25"/> 
-      <sleep milliseconds="150"/>
+      <sleep milliseconds="125"/>
       <echo message="Out!!!"/>
 
    </target>
