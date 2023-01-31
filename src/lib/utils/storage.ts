@@ -40,6 +40,16 @@ class Storage implements IStorage, Memento
     }
 
 
+    keys(): readonly string[]
+    {
+        if (this.storage && (this.storage as any)._value) {
+        	const keys = Object.keys((this.storage as any)._value);
+        	return keys.filter((key) => this.storage.get(key) !== undefined);
+        }
+        return [];
+    }
+
+
     private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" : (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
 
 
