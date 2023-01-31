@@ -1,16 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import { workspace } from "vscode";
+import { ConfigurationTarget, workspace } from "vscode";
 import figures from "../../lib/figures";
 import { getWsPath } from "./sharedUtils";
 import { testControl as tc } from "../control";
 import { isObject } from "../../lib/utils/utils";
-import { configuration } from "../../lib/utils/configuration";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 
 const initSettings = async () =>
 {
+    const config = workspace.getConfiguration("taskExplorer");
     console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
     //
     // This function runs BEFORE the extension is initialized, so any updates have no immediate
@@ -31,33 +31,31 @@ const initSettings = async () =>
     // await writeFile(settingsFile, "{}");
 
 
-    tc.user.logLevel = configuration.get<number>("logging.level");
-    await configuration.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
+    tc.user.logLevel = config.get<number>("logging.level", 1);
+    await config.update("terminal.integrated.shell.windows", tc.defaultWindowsShell, ConfigurationTarget.Workspace);
     //
     // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
     //
-    tc.vsCodeAutoDetectGrunt = configuration.getVs<string>("grunt.autoDetect", "off") as "on" | "off";
-    tc.vsCodeAutoDetectGulp = configuration.getVs<string>("gulp.autoDetect", "off") as "on" | "off";
-    await configuration.updateVs("grunt.autoDetect", "on");
-    await configuration.updateVs("gulp.autoDetect", "on");
-    // await workspace.getConfiguration("grunt").update("autoDetect", "on", ConfigurationTarget.Global);
-    // await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
+    tc.vsCodeAutoDetectGrunt = workspace.getConfiguration("grunt").get<string>("autoDetect", "off") as "on" | "off";
+    tc.vsCodeAutoDetectGulp = workspace.getConfiguration("gulp").get<string>("autoDetect", "off") as "on" | "off";
+    await workspace.getConfiguration("grunt").update("autoDetect", "on", ConfigurationTarget.Global);
+    await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
     //
     // Enable views, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enableExplorerView", true);
-    await configuration.updateWs("enableSideBar", false);
+    await config.update("enableExplorerView", true, ConfigurationTarget.Workspace);
+    await config.update("enableSideBar", false, ConfigurationTarget.Workspace);
     //
     // Persistent file caching off.  Pretty intensive when enabled in tests.  Adds 1+
     // minute to overall tests completion time if set `true`.  Default is `false`.
     //
-    await configuration.updateWs("enablePersistentFileCaching", false);
+    await config.update("enablePersistentFileCaching", false, ConfigurationTarget.Workspace);
     //
     // Set misc settings, use workspace level so that running this test from Code itself
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
-    await configuration.updateWs("enabledTasks",
+    await config.update("enabledTasks",
     {
         ant: true,
         apppublisher: false,
@@ -80,9 +78,9 @@ const initSettings = async () =>
         tsc: true,
         webpack: false,
         workspace: true
-    });
+    }, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("pathToPrograms",
+    await config.update("pathToPrograms",
     {
         ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
         ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), // "c:\\Code\\ansicon\\x64\\ansicon.exe",
@@ -99,11 +97,11 @@ const initSettings = async () =>
         powershell: "powershell",
         python: "c:\\Code\\python\\python.exe",
         ruby: "ruby"
-    });
-    // await configuration.updateWs("pathToPrograms.ant", tc.userPathToAnt);
-    // await configuration.updateWs("pathToPrograms.ansicon", tc.userPathToAnsicon);
+    }, ConfigurationTarget.Workspace);
+    // await config.update("pathToPrograms.ant", tc.userPathToAnt);
+    // await config.update("pathToPrograms.ansicon", tc.userPathToAnsicon);
 
-    await configuration.updateWs("logging.enable", tc.log.enabled);
+    await config.update("logging.enable", tc.log.enabled, ConfigurationTarget.Workspace);
     if (!tc.log.enabled){
         tc.log.file = false;
         tc.log.output = false;
@@ -111,43 +109,43 @@ const initSettings = async () =>
     else if (!tc.log.output && !tc.log.file && !tc.log.console) {
         tc.log.output = true;
     }
-    await configuration.updateWs("logging.level", tc.log.level);
-    await configuration.updateWs("logging.enableFile", tc.log.file);
-    await configuration.updateWs("logging.enableFileSymbols", tc.log.fileSymbols);
-    await configuration.updateWs("logging.enableOutputWindow", tc.log.output);
+    await config.update("logging.level", tc.log.level, ConfigurationTarget.Workspace);
+    await config.update("logging.enableFile", tc.log.file, ConfigurationTarget.Workspace);
+    await config.update("logging.enableFileSymbols", tc.log.fileSymbols, ConfigurationTarget.Workspace);
+    await config.update("logging.enableOutputWindow", tc.log.output, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("specialFolders.numLastTasks", 10);
-    await configuration.updateWs("specialFolders.showFavorites", true);
-    await configuration.updateWs("specialFolders.showLastTasks", true);
-    await configuration.updateWs("specialFolders.showUserTasks", true);
-    // await configuration.updateWs("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
-    await configuration.updateWs("specialFolders.expanded", {
+    await config.update("specialFolders.numLastTasks", 10, ConfigurationTarget.Workspace);
+    await config.update("specialFolders.showFavorites", true, ConfigurationTarget.Workspace);
+    await config.update("specialFolders.showLastTasks", true, ConfigurationTarget.Workspace);
+    await config.update("specialFolders.showUserTasks", true, ConfigurationTarget.Workspace);
+    // await config.update("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
+    await config.update("specialFolders.expanded", {
         favorites: true,
         lastTasks: true,
         userTasks: true
-    });
+    }, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("taskButtons.clickAction", "Open");
-    await configuration.updateWs("taskButtons.showFavoritesButton", true);
-    await configuration.updateWs("taskButtons.showExecuteWithArgumentsButton", false);
-    await configuration.updateWs("taskButtons.showExecuteWithNoTerminalButton", false);
+    await config.update("taskButtons.clickAction", "Open", ConfigurationTarget.Workspace);
+    await config.update("taskButtons.showFavoritesButton", true, ConfigurationTarget.Workspace);
+    await config.update("taskButtons.showExecuteWithArgumentsButton", false, ConfigurationTarget.Workspace);
+    await config.update("taskButtons.showExecuteWithNoTerminalButton", false, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("visual.disableAnimatedIcons", true);
-    await configuration.updateWs("visual.enableAnsiconForAnt", false);
+    await config.update("visual.disableAnimatedIcons", true, ConfigurationTarget.Workspace);
+    await config.update("visual.enableAnsiconForAnt", false, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("groupMaxLevel", 1);
-    await configuration.updateWs("groupSeparator", "-");
-    await configuration.updateWs("groupWithSeparator", true);
-    await configuration.updateWs("groupStripTaskLabel", true);
+    await config.update("groupMaxLevel", 1, ConfigurationTarget.Workspace);
+    await config.update("groupSeparator", "-", ConfigurationTarget.Workspace);
+    await config.update("groupWithSeparator", true, ConfigurationTarget.Workspace);
+    await config.update("groupStripTaskLabel", true, ConfigurationTarget.Workspace);
 
-    await configuration.updateWs("exclude", []);
-    await configuration.updateWs("includeAnt", []); // Deprecated, use `globPatternsAnt`
-    await configuration.updateWs("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ]);
-    await configuration.updateWs("keepTermOnStop", false);
-    await configuration.updateWs("showHiddenWsTasks", true);
-    await configuration.updateWs("showRunningTask", true);
-    await configuration.updateWs("useGulp", false);
-    await configuration.updateWs("useAnt", false);
+    await config.update("exclude", [], ConfigurationTarget.Workspace);
+    await config.update("includeAnt", [], ConfigurationTarget.Workspace); // Deprecated, use `globPatternsAnt`
+    await config.update("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], ConfigurationTarget.Workspace);
+    await config.update("keepTermOnStop", false, ConfigurationTarget.Workspace);
+    await config.update("showHiddenWsTasks", true, ConfigurationTarget.Workspace);
+    await config.update("showRunningTask", true, ConfigurationTarget.Workspace);
+    await config.update("useGulp", false, ConfigurationTarget.Workspace);
+    await config.update("useAnt", false, ConfigurationTarget.Workspace);
 
     if (tc.log.enabled)
     {

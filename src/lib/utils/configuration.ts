@@ -1,12 +1,11 @@
 
 import { isObject } from "./utils";
 import { IConfiguration } from "../../interface/IConfiguration";
-const extensionName = "taskExplorer";
 import {
     ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext
 } from "vscode";
 
-let pkgJsonCfgProps = require("../../../package.json").contributes.configuration.properties;
+const extensionName = "taskExplorer";
 
 
 class Configuration implements IConfiguration
@@ -15,6 +14,7 @@ class Configuration implements IConfiguration
     private configurationGlobal: WorkspaceConfiguration;
     private isDev = false;
     private isTests = false;
+    private pkgJsonCfgProps: any;
 
 
     constructor()
@@ -28,10 +28,10 @@ class Configuration implements IConfiguration
     {
         this.isDev = isDev;
         this.isTests = isTests;
-        this.configuration = workspace.getConfiguration(extensionName);
         this.configurationGlobal = workspace.getConfiguration();
+        this.configuration = workspace.getConfiguration(extensionName);
+        this.pkgJsonCfgProps = context.extension.packageJSON.contributes.configuration.properties;
         context.subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigurationChanged, this));
-        pkgJsonCfgProps = pkgJsonCfgProps || /* istanbul ignore next */context.extension.packageJSON.contributes.configuration.properties;
     }
 
 
@@ -53,7 +53,7 @@ class Configuration implements IConfiguration
         let propertyKey = key,
             valueKey = key,
             isObject = false;
-        if (!pkgJsonCfgProps[propertyKey] && key.includes("."))
+        if (!this.pkgJsonCfgProps[propertyKey] && key.includes("."))
         {
             let propsKey = "";
             const keys = key.split(".");
@@ -61,7 +61,7 @@ class Configuration implements IConfiguration
                 propsKey += ((i > 0 ? "." : "") + keys[i]);
             }
             const pkgJsonPropsKey = extensionName + "." + propsKey;
-            if (pkgJsonCfgProps[pkgJsonPropsKey] && pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
+            if (this.pkgJsonCfgProps[pkgJsonPropsKey] && this.pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
             {
                 isObject = true;
                 propertyKey = propsKey;
