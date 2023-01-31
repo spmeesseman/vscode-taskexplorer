@@ -68,8 +68,8 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 1350,
-        addWorkspaceFolderEmpty: 1325,
+        addWorkspaceFolder: 1475,
+        addWorkspaceFolderEmpty: 1420,
         cache: {
             build: 480,
             buildCancel: 290,
@@ -95,9 +95,9 @@ export const testControl: ITestControl =
             pathToProgramsEvent: 710,
             readEvent: 25,
             shellChange: 1290,
-            showHideSpecialFolder: 505,
+            showHideSpecialFolder: 520,
             showHideUserTasks: 1000,
-            sortingEvent: 750,
+            sortingEvent: 815,
             terminalEvent: 250
         },
         excludeCommand: 1360,
@@ -133,8 +133,8 @@ export const testControl: ITestControl =
         min: 50,
         refreshCommand: 6550,
         refreshCommandNoChanges: 240,
-        removeWorkspaceFolder: 500,
-        removeWorkspaceFolderEmpty: 425,
+        removeWorkspaceFolder: 550,
+        removeWorkspaceFolderEmpty: 475,
         reorderWorkspaceFolders: 570,
         runCommand: 4890,
         runPauseCommand: 3250,
@@ -158,11 +158,11 @@ export const testControl: ITestControl =
             npmInstallCommand: 9375
         },
         taskCount: {
-            verify: 450,
-            verifyByTree: 490,
-            verifyFirstCall: 660,
-            verifyNpm: 1360, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1760
+            verify: 400,
+            verifyByTree: 450,
+            verifyFirstCall: 600,
+            verifyNpm: 1000, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1260
         },
         viewReleaseNotes: 385,
         viewReport: 375
@@ -174,8 +174,8 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTimeMultiRoot: {
-        addWorkspaceFolder: 3200,
-        addWorkspaceFolderEmpty: 1525,
+        addWorkspaceFolder: 3250,
+        addWorkspaceFolderEmpty: 1625,
         cache: {
             build: 540,
             buildCancel: 330,
@@ -239,8 +239,8 @@ export const testControl: ITestControl =
         min: 50,
         refreshCommand: 7500,
         refreshCommandNoChanges: 345,
-        removeWorkspaceFolder: 2225,
-        removeWorkspaceFolderEmpty: 1350,
+        removeWorkspaceFolder: 2275,
+        removeWorkspaceFolderEmpty: 1450,
         reorderWorkspaceFolders: 935,
         runCommand: 5400,
         runPauseCommand: 3590,
@@ -264,11 +264,11 @@ export const testControl: ITestControl =
             npmInstallCommand: 10400
         },
         taskCount: {
-            verify: 500,
-            verifyByTree: 550,
+            verify: 450,
+            verifyByTree: 500,
             verifyFirstCall: 750,
-            verifyNpm: 1540, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1980
+            verifyNpm: 1140, // internal vscode npm task provider is slower than shit wtf
+            verifyWorkspace: 1380
         },
         viewReleaseNotes: 655,
         viewReport: 390

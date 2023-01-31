@@ -289,7 +289,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add Workspace Folder 1 (w/ File)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify + 20); // +20 unawaited file write
+        this.slow(tc.slowTime.addWorkspaceFolder + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             join(wsf1DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
