@@ -53,16 +53,6 @@ export function getGroupSeparator()
 }
 
 
-export function getPackageManager(): string
-{
-    let pkgMgr = workspace.getConfiguration("npm", null).get<string>("packageManager") || "npm";
-    if (pkgMgr.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
-        pkgMgr = "npm";
-    }
-    return pkgMgr;
-}
-
-
 export function getGlobPattern(taskType: string): string
 {
     taskType = taskType.replace(/\W*\-/, "");
@@ -76,6 +66,16 @@ export function getGlobPattern(taskType: string): string
     else {
         return constants["GLOB_" + taskType.toUpperCase()];
     }
+}
+
+
+export function getPackageManager(): string
+{
+    let pkgMgr = workspace.getConfiguration("npm", null).get<string>("packageManager") || "npm";
+    if (pkgMgr.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
+        pkgMgr = "npm";
+    }
+    return pkgMgr;
 }
 
 
