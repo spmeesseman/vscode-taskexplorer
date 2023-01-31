@@ -39,11 +39,18 @@ General Todos:
     ✔ Clean up interface file names @done(23-01-13 22:21)
         Remove trailing 'Api' from most except main TaskExplorerApi.  Just I[ClassName] I want now.
     
-    ☐ add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'
+    ☐ Add info box maybe monthly nag if grunt/gulp tasks VSCode provider(s) are 'on'
         Provide Yes/No to disable
     
     ✔ The 'use gulp' feature needs to use async exec @done(23-01-22 16:34)
         WHen used, VSCode complains Task Explorer used 100&% resource for x seconds
+    
+    ☐ Pay Page
+        Pay page on license server. https://license.spmeesseman.com/purchase
+        Google Pay?  Paypal
+    
+    ☐ Improve License Page
+        Webview page currently has very basic layout and info
 
 Tests:
 
