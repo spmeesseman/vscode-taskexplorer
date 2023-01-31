@@ -42,11 +42,8 @@ class Storage implements IStorage, Memento
 
     keys(): readonly string[]
     {
-        if (this.storage && (this.storage as any)._value) {
-        	const keys = Object.keys((this.storage as any)._value);
-        	return keys.filter((key) => this.storage.get(key) !== undefined);
-        }
-        return [];
+        const keys = Object.keys((this.storage as any)._value);
+        return keys.filter((key) => this.storage.get(key) !== undefined);
     }
 
 
@@ -67,7 +64,7 @@ class Storage implements IStorage, Memento
     }
 
 
-    public get<T>(key: string, defaultValue?: T): T | undefined
+    get<T>(key: string, defaultValue?: T): T | undefined
     {
         if (defaultValue || (isString(defaultValue) && defaultValue === "") || (isNumber(defaultValue) && defaultValue === 0))
         {
@@ -87,7 +84,7 @@ class Storage implements IStorage, Memento
     }
 
 
-    public async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
+    async get2<T>(key: string, defaultValue?: T): Promise<T | undefined>
     {
         let store: IDictionary<any>;
         try {
@@ -98,7 +95,7 @@ class Storage implements IStorage, Memento
     }
 
 
-    public get2Sync<T>(key: string, defaultValue?: T): T | undefined
+    get2Sync<T>(key: string, defaultValue?: T): T | undefined
     {
         let store: IDictionary<any>;
         try {
@@ -109,14 +106,14 @@ class Storage implements IStorage, Memento
     }
 
 
-    public getSecret = (key: string) => this.secrets.get(this.getKey(key));
+    getSecret = (key: string) => this.secrets.get(this.getKey(key));
 
 
     // update = (key: string, value: any) => this.storage.update(key, value);
-    public update = (key: string, value: any) => this.storage.update(this.getKey(key), value);
+    update = (key: string, value: any) => this.storage.update(this.getKey(key), value);
 
 
-    public async update2(key: string, value: any)
+    async update2(key: string, value: any)
     {
         let store: IDictionary<any>;
         try {
@@ -133,7 +130,7 @@ class Storage implements IStorage, Memento
     }
 
 
-    public update2Sync(key: string, value: any)
+    update2Sync(key: string, value: any)
     {
         let store: IDictionary<any>;
         try {
@@ -150,6 +147,6 @@ class Storage implements IStorage, Memento
     }
 
 
-    public updateSecret = (key: string, value: any) => this.secrets.store(this.getKey(key), value);
+    updateSecret = (key: string, value: any) => this.secrets.store(this.getKey(key), value);
 
 }

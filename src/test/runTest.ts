@@ -6,6 +6,8 @@ import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
 import { copyFile, deleteDir, writeFile } from "../lib/utils/fs";
 
+const VSCODE_TEST_VERSION = "1.63.0";
+
 
 const main = async(args: string[]) =>
 {
@@ -118,11 +120,11 @@ const main = async(args: string[]) =>
         const testsWorkspace = !multiRoot ? testWorkspaceSingleRoot : multiRootWsFile;
         await runTests(
         {
-            version: "1.63.0", // process.env.CODE_VERSION,
+            version: VSCODE_TEST_VERSION,
             extensionDevelopmentPath,
             extensionTestsPath,
             launchArgs: [ testsWorkspace, "--disable-extensions", "--disable-workspace-trust" ],
-            extensionTestsEnv: { xArgs: JSON.stringify(xArgs), testArgs: JSON.stringify(testsArgs) }
+            extensionTestsEnv: { xArgs: JSON.stringify(xArgs), testArgs: JSON.stringify(testsArgs), vsCodeTestVersion: VSCODE_TEST_VERSION }
         }); // --upload-logs could be interesting (for prod).  look at it sometime.
     }
     catch (err: any) {

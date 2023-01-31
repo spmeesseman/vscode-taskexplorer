@@ -96,12 +96,12 @@ class Configuration implements IConfiguration
         if (settingKeys.isObject)
         {
             const v = this.get<any>(settingKeys.pKey);
-            if (value !== undefined) {
+            // if (value !== undefined) {
                 v[settingKeys.vKey] = value;
-            }
-            else {
-                delete v[settingKeys.vKey];
-            }
+            //  }
+            //  else {
+            //      delete v[settingKeys.vKey];
+            //  }
             value = v;
         }
         else if (isObject(value))
@@ -120,12 +120,12 @@ class Configuration implements IConfiguration
         if (settingKeys.isObject)
         {
             const v = this.get<any>(settingKeys.pKey);
-            if (value !== undefined) {
+            // if (value !== undefined) {
                 v[settingKeys.vKey] = value;
-            }
-            else {
-                delete v[settingKeys.vKey];
-            }
+            // }
+            // else {
+            //     delete v[settingKeys.vKey];
+            // }
             value = v;
         }
         else if (isObject(value))
