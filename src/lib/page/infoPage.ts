@@ -3,7 +3,7 @@ import * as path from "path";
 import log from "../log/log";
 import TeWebviewPanel from "./teWebviewPanel";
 import { ITaskExplorerApi } from "../../interface";
-import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
+import { ExtensionContext, Task, Uri, WebviewPanel, WorkspaceFolder } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
@@ -77,25 +77,19 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 			project = "User";
 		}
 
-		let filePath = "N/A";
-		/* istanbul ignore else */
-		if (t.definition.uri)
+		let filePath: string;
+		if (wsFolder)
 		{
-			/* istanbul ignore else */
-			if (wsFolder) {
+			if (t.definition.uri)
+			{
 				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath);
 			}
 			else {
-				filePath = t.definition.uri.fsPath;
+				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name);
 			}
 		}
-		else if (wsFolder)
-		{
-			filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name);
-		}
-		else if (t.definition.path)
-		{
-			filePath = t.definition.path;
+		else {
+			filePath = "N/A";
 		}
 
 		details += `
@@ -109,22 +103,21 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 	</tr>
 	<tr><td height="10"></td></tr>`;
 
-		/* istanbul ignore else */
 		if (wsFolder) {
 			pushIfNotExists(projects, wsFolder.name);
 		}
 		else {
-			pushIfNotExists(projects, "User");
+			pushIfNotExists(projects, "+ User Tasks");
 		}
 	});
 
 	details += "</table>";
 
-	const summary = `<span class="content-text-medium"># of Tasks:</b> ${tasks.length}<br><br><b>Projects:</b> ${projects.join(", ")}</span>`;
+	const summary = `<table><tr><td class="parsing-report-projects-title">Projects:</td><td class="parsing-report-projects">${projects.join(", &nbsp;")}</td></tr></table>`;
 
 	log.methodDone("get body content", 1, logPad);
 
-	return `<tr><td><table><tr><td>${summary}</td></tr></table><table><tr><td>${details}</td></tr></table></td></tr>`;
+	return `<tr><td><table class="margin-top-15"><tr><td>${summary}</td></tr></table><table><tr><td>${details}</td></tr></table></td></tr>`;
 };
 
 
