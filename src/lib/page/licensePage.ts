@@ -3,6 +3,7 @@ import log from "../log/log";
 import TeWebviewPanel from "./teWebviewPanel";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "../../interface";
+import { timeout } from "../utils/utils";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
@@ -123,8 +124,11 @@ export const reviveLicenseReport = async(webviewPanel: WebviewPanel, api: ITaskE
 {   //
 	// Use a timeout so license manager can initialize first
 	//
-	await new Promise<void>((resolve) =>
+	await new Promise<void>(async(resolve) =>
 	{
+		while (api.isBusy()) {
+			await timeout(100);
+		}
 		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, tasks?: Task[], newKey?: string) =>
 		{
 			log.methodStart("revive license report", 1, logPad);

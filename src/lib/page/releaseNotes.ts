@@ -7,6 +7,8 @@ import { readFileAsync } from "../utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
 import { ExtensionContext, WebviewPanel } from "vscode";
+import { teApi } from "../../extension";
+import { timeout } from "../utils/utils";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
@@ -130,8 +132,11 @@ export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskEx
 {   //
 	// Use a timeout so license manager can initialize first
 	//
-	await new Promise<void>((resolve) =>
+	await new Promise<void>(async(resolve) =>
 	{
+		while (api.isBusy()) {
+			await timeout(100);
+		}
 		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
 		{
 			log.methodStart("revive release notes", 1, logPad);
@@ -139,6 +144,6 @@ export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskEx
 			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
 			log.methodDone("revive release notes", 1, logPad);
 			resolve();
-		}, 500, webviewPanel, api, context, logPad);
+		}, 10, webviewPanel, api, context, logPad);
 	});
 };
