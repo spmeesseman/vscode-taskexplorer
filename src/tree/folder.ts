@@ -32,7 +32,7 @@ export default class TaskFolder extends TreeItem implements ITaskFolder
         }
 
         this.iconPath = ThemeIcon.Folder;
-        this.id = "fid-" + this.label;
+        this.id = "treeFolderId-" + this.label;
         this.tooltip = "A tree folder representing a workspace/project";
     }
 

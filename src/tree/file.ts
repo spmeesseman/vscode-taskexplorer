@@ -93,20 +93,20 @@ export default class TaskFile extends TreeItem implements ITaskFile
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
     constructor(context: ExtensionContext, folder: TaskFolder, taskDef: ITaskDefinition, source: string,
-                relativePath: string, groupLevel: number, group: boolean, label: string | undefined, logPad: string)
+                relativePath: string, groupLevel: number, groupId: string | undefined, label: string | undefined, logPad: string)
     {
-        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, group || false), TreeItemCollapsibleState.Collapsed);
+        super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, groupId), TreeItemCollapsibleState.Collapsed);
 
         log.methodStart("construct tree file", 4, logPad, false, [
             [ "label", label ?? source ], [ "source", source ], [ "relativePath", relativePath ], [ "task folder", folder.label ],
-            [ "groupLevel", groupLevel ], [ "group", group ], [ "taskDef cmd line", taskDef.cmdLine ],
+            [ "groupLevel", groupLevel ], [ "group id", groupId ], [ "taskDef cmd line", taskDef.cmdLine ],
             [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
             [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
         ]);
 
         this.folder = folder;
         this.taskSource = source;
-        this.isGroup = (group === true);
+        this.isGroup = !!groupId;
         this.isUser = false;
         this.groupLevel = 0;
         //
@@ -120,7 +120,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
         this.path = this.label !== "vscode" ? relativePath : ".vscode";
         this.nodePath = this.label !== "vscode" ? relativePath : "vscode"; // <---- ??? TODO - Why vscode and not .vscode.  same as .path?
 
-        if (group && this.label) {
+        if (groupId && this.label) {
             this.nodePath = path.join(this.nodePath, this.label.toString());
         }
 
@@ -152,7 +152,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
             this.isUser = true;
         }
 
-        if (!group)
+        if (!groupId)
         {
             this.contextValue = "taskFile" + util.properCase(this.taskSource);
         }       //
@@ -212,7 +212,8 @@ export default class TaskFile extends TreeItem implements ITaskFile
             log.value("      dark", iconDark, 4, logPad);
         }
 
-        this.id = "id-" + folder.id.replace("fid-", ":") + this.nodePath + ":" + this.fileName + ":" + this.groupLevel + ":" + source;
+        this.id = ("treeFileId-" + folder.id.replace("treeFolderId-", ":") + this.nodePath + ":" + this.fileName +
+                  ":" + this.groupLevel + ":" + groupId + ":" + this.label + ":" + source).replace(/ /g, "");
 
         log.methodDone("construct tree file", 4, logPad, [
             [ "id", this.id ], [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
@@ -237,12 +238,27 @@ export default class TaskFile extends TreeItem implements ITaskFile
     }
 
 
+    static getGroupedId = (folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number) =>
+    {
+        const groupSeparator = util.getGroupSeparator();
+        const labelSplit = label.split(groupSeparator);
+        let id = "";
+        for (let i = 0; i <= treeLevel; i++)
+        {
+            id += labelSplit[i];
+        }
+        id += file.resourceUri.fsPath.replace(/\W/gi, "");
+        return folder.label + file.taskSource + id + treeLevel.toString();
+    };
+
+
+
     /**
      * @method getLabel
      *
      * @param treeNode The node/item to add to this TaskFile node.
      */
-    private static getLabel(taskDef: ITaskDefinition, source: string, relativePath: string, group: boolean): string
+    private static getLabel(taskDef: ITaskDefinition, source: string, relativePath: string, groupId: string | undefined): string
     {
         let label = source;
         if (source === "Workspace")
@@ -250,7 +266,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
             label = "vscode";
         }
 
-        if (group !== true)
+        if (!groupId)
         {
             if (source === "ant")
             {   //

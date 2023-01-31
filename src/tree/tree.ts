@@ -446,7 +446,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     if (node instanceof TaskItem)
                     {
                         subfolder = new TaskFile(this.extensionContext, folder, node.task.definition,
-                                                 taskFile.taskSource, taskFile.path, 0, true, undefined, "   ");
+                                                 taskFile.taskSource, taskFile.path, 0, id, undefined, "   ");
                         subfolders[id] = subfolder;
                         await folder.addTaskFile(subfolder);
                         //
@@ -631,7 +631,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 // We found a pair of tasks that need to be grouped.  i.e. the first part of the label
                 // when split by the separator character is the same...
                 //
-                const id = this.getGroupedId(folder, taskFile, label, treeLevel);
+                const id = TaskFile.getGroupedId(folder, taskFile, label, treeLevel);
                 subfolder = subfolders[id];
 
                 if (!subfolder)
@@ -641,7 +641,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                     // added to
                     //
                     subfolder = new TaskFile(this.extensionContext, folder, each.task.definition, taskFile.taskSource,
-                                             each.taskFile.path, treeLevel, true, prevName[treeLevel], logPad);
+                                             each.taskFile.path, treeLevel, id, prevName[treeLevel], logPad);
                     subfolders[id] = subfolder;
                     _setNodePath(prevTaskItem, each.nodePath);
                     //
@@ -962,20 +962,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     };
 
 
-    private getGroupedId = (folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number) =>
-    {
-        const groupSeparator = util.getGroupSeparator();
-        const labelSplit = label.split(groupSeparator);
-        let id = "";
-        for (let i = 0; i <= treeLevel; i++)
-        {
-            id += labelSplit[i];
-        }
-        id += file.resourceUri.fsPath.replace(/\W/gi, "");
-        return folder.label + file.taskSource + id + treeLevel.toString();
-    };
-
-
     getName = () => this.name;
 
 
@@ -1008,7 +994,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         if (!taskFile) // Create taskfile node if needed
         {
             log.value("   Add source file container", task.source, 2, logPad);
-            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, false, undefined, logPad + "   ");
+            taskFile = new TaskFile(this.extensionContext, folder, task.definition, task.source, relativePath, 0, undefined, undefined, logPad + "   ");
             await folder.addTaskFile(taskFile);
             files[id] = taskFile;
         }
@@ -1530,7 +1516,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const taskFile = each as TaskFile,
                   taskFileLabel = taskFile.label as string,
                   id = folder.label + taskFile.taskSource,
-                  id2 = this.getGroupedId(folder, taskFile, taskFileLabel, taskFile.groupLevel);
+                  id2 = TaskFile.getGroupedId(folder, taskFile, taskFileLabel, taskFile.groupLevel);
 
             if (!taskFile.isGroup && subfolders[id])
             {
@@ -1594,7 +1580,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const label = each.label.toString();
 
             const labelPart = label.split(groupSeparator)[level];
-            const id = this.getGroupedId(folder, taskFile, label, level);
+            const id = TaskFile.getGroupedId(folder, taskFile, label, level);
 
             if (each instanceof TaskItem)
             {
