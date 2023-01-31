@@ -229,7 +229,7 @@ export const testControl: ITestControl =
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 215,
-            pageWithDetail: 270,
+            pageWithDetail: 275,
             checkLicense: 405,
             enterKey: 845,
             get30DayLicense: 1500,
