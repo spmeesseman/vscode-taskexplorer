@@ -16,6 +16,7 @@ import {
 	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount,
 	getWsPath, endRollingCount, sleep
 } from "../utils/utils";
+import { env } from "process";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -544,7 +545,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
 		dataPath = pathUtils.getUserDataPath("win32");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\test\\AppData\\Roaming\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -553,7 +554,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
 		dataPath = pathUtils.getUserDataPath("nothing");
-		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1`, "C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
+		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}`, "C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
 		//
 		// Set environment variables for specific test
 		//
@@ -585,7 +586,7 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		dataPath = pathUtils.getUserDataPath("win32");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\AppData\\Roaming\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
 		//
@@ -594,13 +595,13 @@ suite("Util Tests", () =>
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
 		dataPath = pathUtils.getUserDataPath("linux");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\.config\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\.config\\vscode`);
 		dataPath = pathUtils.getUserDataPath("win32");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\AppData\\Roaming\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\AppData\\Roaming\\vscode`);
 		dataPath = pathUtils.getUserDataPath("darwin");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1\\Library\\Application Support\\vscode`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\Library\\Application Support\\vscode`);
 		dataPath = pathUtils.getUserDataPath("invalid_platform");
-		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-1.60.1`);
+		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}`);
 		//
 		// Set environment variables for specific test
 		//
@@ -718,6 +719,8 @@ suite("Util Tests", () =>
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
 			expect(await teApi.testsApi.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
 			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
+
+			log.write("STORAGE KEYS: " + teApi.testsApi.storage.keys().join(", "));
         }
         endRollingCount(this);
     });
