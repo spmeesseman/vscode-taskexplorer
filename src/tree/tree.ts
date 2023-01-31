@@ -54,7 +54,7 @@ import { ILicenseManager } from "../interface/ILicenseManager";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskExplorer
+export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskExplorer, Disposable
 {
     private static firstTreeBuildDone = false;
     private defaultGetChildrenLogLevel = 1;
@@ -63,7 +63,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private eventQueue: IEvent[] = [];
     private name: string;
     private disposables: Disposable[];
-    private subscriptionStartIndex: number;
+    private subscriptionIndex: number;
     private tasks: Task[] | null = null;
     private refreshPending = false;
     private visible = false;
@@ -88,11 +88,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         lastTasks: SpecialTaskFolder;
     };
 
+
     constructor(name: "taskExplorer"|"taskExplorerSideBar", context: ExtensionContext)
     {
         this.name = name;
+        this.disposables = [];
         this.extensionContext = context;
-        this.subscriptionStartIndex = -1;
 
         const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         const favoritesExpanded = nodeExpandedeMap.favorites !== false ?
@@ -103,10 +104,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             favorites: new SpecialTaskFolder(context, name, this, constants.FAV_TASKS_LABEL, favoritesExpanded),
             lastTasks: new SpecialTaskFolder(context, name, this, constants.LAST_TASKS_LABEL, lastTaskExpanded)
         };
+        this.disposables.push(this.specialFolders.favorites);
+        this.disposables.push(this.specialFolders.lastTasks);
 
-        this.taskWatcher = new TaskWatcher(this, this.specialFolders, context);
+        this.taskWatcher = new TaskWatcher(this, this.specialFolders);
+        this.disposables.push(this.taskWatcher);
 
-        this.disposables = [];
         // task.registerTreeTasks(this, this.specialFolders.lastTasks);
         this.disposables.push(commands.registerCommand(name + ".run",  async (item: TaskItem) => task.run(this, item, this.specialFolders.lastTasks), this));
         this.disposables.push(commands.registerCommand(name + ".runNoTerm",  async (item: TaskItem) => task.run(this, item, this.specialFolders.lastTasks, true, false), this));
@@ -126,20 +129,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
 
-        context.subscriptions.push(...this.disposables);
-        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
+        this.subscriptionIndex = context.subscriptions.push(this);
     }
 
 
-    dispose = (context: ExtensionContext) =>
+    dispose = () =>
     {
         this.disposables.forEach((d) => {
             d.dispose();
         });
-        this.taskWatcher.dispose(context);              // <-- must be in this order
-        this.specialFolders.favorites.dispose(context); // <-- must be in this order
-        this.specialFolders.lastTasks.dispose(context); // <-- must be in this order
-        context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
+        this.extensionContext.subscriptions.splice(this.subscriptionIndex, 1);
         this.disposables = [];
     };
 

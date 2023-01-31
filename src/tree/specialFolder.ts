@@ -16,7 +16,7 @@ import { ITaskExplorer } from "../interface";
  *
  * A tree node that represents a special folder i.e. the `Favorites` or `Last Tasks` folder
  */
-export default class SpecialTaskFolder extends TaskFolder
+export default class SpecialTaskFolder extends TaskFolder implements Disposable
 {
 
     public explorer: ITaskExplorer;
@@ -25,7 +25,6 @@ export default class SpecialTaskFolder extends TaskFolder
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
     public taskFiles: TaskItem[];
-    private subscriptionStartIndex: number;
     private store: string[];
     private enabled: boolean;
     private settingNameEnabled: string;
@@ -34,7 +33,6 @@ export default class SpecialTaskFolder extends TaskFolder
     constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: ITaskExplorer, label: string, state: TreeItemCollapsibleState)
     {
         super(label, state);
-        this.subscriptionStartIndex = -1;
         this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.iconPath = ThemeIcon.Folder;
         this.explorer = treeProvider;
@@ -57,8 +55,6 @@ export default class SpecialTaskFolder extends TaskFolder
         }
         const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(context, e); }, this);
         this.disposables.push(d);
-        context.subscriptions.push(...this.disposables);
-        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
     }
 
 
@@ -258,14 +254,13 @@ export default class SpecialTaskFolder extends TaskFolder
     }
 
 
-    dispose(context: ExtensionContext)
+    dispose()
     {
-        this.taskFiles = [];
         this.disposables.forEach((d) => {
             d.dispose();
         });
-        context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
         this.disposables = [];
+        this.taskFiles = [];
     }
 
 

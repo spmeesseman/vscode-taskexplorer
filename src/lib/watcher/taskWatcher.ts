@@ -12,18 +12,17 @@ import {
 } from "vscode";
 
 
-export class TaskWatcher
+export class TaskWatcher implements Disposable
 {
     private static statusBarSpace: StatusBarItem;
     private tree: ITaskExplorer;
     private disposables: Disposable[];
-    private subscriptionStartIndex: number;
     private babysitterCt = 0;
     private babysitterTimers: { [taskType: string]:  NodeJS.Timeout } = {};
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
-    constructor(tree: ITaskExplorer, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder }, context: ExtensionContext)
+    constructor(tree: ITaskExplorer, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
     {
         this.tree = tree;
         this.specialFolders = specialFolders;
@@ -36,18 +35,15 @@ export class TaskWatcher
             tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e)),
             tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e))
         ];
-        context.subscriptions.push(...this.disposables);
-        this.subscriptionStartIndex = context.subscriptions.length - (this.disposables.length + 1);
     }
 
 
-    dispose(context: ExtensionContext)
+    dispose()
     {
         this.fireAllBabySitters();
         this.disposables.forEach((d) => {
             d.dispose();
         });
-        context.subscriptions.splice(this.subscriptionStartIndex, this.disposables.length);
         this.disposables = [];
     }
 
