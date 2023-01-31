@@ -296,7 +296,9 @@ const plugins = (env, wpConfig) =>
 			{
 				compiler.hooks.done.tap("AfterDonePlugin", () =>
 				{
-					renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
+					try {
+						renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
+					} catch {}
 				});
 			}
 		}];
