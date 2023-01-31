@@ -1,6 +1,6 @@
 
 import log from "../log/log";
-import { Disposable, ExtensionContext, Task, WebviewPanel } from "vscode";
+import { ExtensionContext, Task, WebviewPanel } from "vscode";
 import { createTaskCountTable, createWebviewPanel } from "./utils";
 import { ITaskExplorerApi } from "../../interface";
 
