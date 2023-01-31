@@ -1,7 +1,7 @@
 
 import * as path from "path";
 import log from "../log/log";
-import TeWebviewPanel from "./utils";
+import TeWebviewPanel from "./teWebviewPanel";
 import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../utils/utils";

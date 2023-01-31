@@ -1,6 +1,6 @@
 
 import log from "../log/log";
-import TeWebviewPanel from "./utils";
+import TeWebviewPanel from "./teWebviewPanel";
 import { join } from "path";
 import { marked } from "marked";
 import { readFileAsync } from "../utils/fs";

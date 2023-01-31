@@ -2,7 +2,7 @@
 // import * as https from "http";
 import * as https from "https";
 import figures from "./figures";
-import TeWebviewPanel from "./page/utils";
+import TeWebviewPanel from "./page/teWebviewPanel";
 import log, { logControl } from "./log/log";
 import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";

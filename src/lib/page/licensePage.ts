@@ -1,6 +1,6 @@
 
 import log from "../log/log";
-import TeWebviewPanel from "./utils";
+import TeWebviewPanel from "./teWebviewPanel";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "../../interface";
 
