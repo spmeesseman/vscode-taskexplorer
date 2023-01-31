@@ -16,7 +16,7 @@ import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { commands, Extension, extensions, Task, TaskExecution, tasks, window, workspace } from "vscode";
+import { commands, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 
@@ -257,6 +257,22 @@ export const clearOverrideShowInfoBox = () => overridesShowInfoBox = [];
 
 
 export const closeEditors = () => commands.executeCommand("openEditors.closeAll");
+
+
+export const createwebviewForRevive = (viewTitle: string, viewType: string) =>
+{
+    const resourceDir = Uri.joinPath(teApi.testsApi.extensionContext.extensionUri, "res");
+    const panel = window.createWebviewPanel(
+        viewType,
+        viewTitle,
+        ViewColumn.One,
+        {
+            enableScripts: true,
+            localResourceRoots: [ resourceDir ]
+        }
+    );
+    return panel;
+};
 
 
 export const getSuccessCount = (instance: Mocha.Context) =>

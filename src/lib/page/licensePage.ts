@@ -117,10 +117,13 @@ const getExtraContent2 = (logPad: string) =>
 };
 
 
+export const getViewTitle = () => viewTitle;
+
+
 export const getViewType = () => viewType;
 
 
-export const reviveLicenseReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, tasks?: Task[], newKey?: string) =>
+export const reviveLicensePage = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, tasks?: Task[], newKey?: string) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//

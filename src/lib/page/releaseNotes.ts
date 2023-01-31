@@ -125,6 +125,9 @@ const getReleaseNotes = (section: string, version: string, noChangesDsc: string,
 };
 
 
+export const getViewTitle = () => viewTitle;
+
+
 export const getViewType = () => viewType;
 
 

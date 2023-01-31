@@ -111,33 +111,13 @@ export default class TeWebviewPanel
 
     static createTaskCountTable = async(api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
     {
-        const projects: string[] = [];
-        const installPath = await getInstallPath();
-        let fileCount = 0;
-        let html = await readFileAsync(join(installPath, "res", "page", "license-manager.html"));
+        const projects: string[] = [],
+              taskCounts: IDictionary<number> = {},
+              installPath = await getInstallPath();
+        let fileCount = 0,
+            html = await readFileAsync(join(installPath, "res", "page", "license-manager.html"));
 
         html = html.replace("<!-- title -->", title);
-
-        const taskCounts: any = {
-            ant: 0,
-            apppublisher: 0,
-            bash: 0,
-            batch: 0,
-            composer: 0,
-            gradle: 0,
-            grunt: 0,
-            gulp: 0,
-            make: 0,
-            maven: 0,
-            npm: 0,
-            nsis: 0,
-            powershell: 0,
-            python: 0,
-            ruby: 0,
-            tsc: 0,
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            Workspace: 0
-        };
 
         tasks.forEach((t) =>
         {
@@ -170,7 +150,7 @@ export default class TeWebviewPanel
         {
             const taskFiles = getTaskFiles(tcKey) || [];
             fileCount += taskFiles.length;
-            html = html.replace(new RegExp(`\\\${taskCounts.${tcKey}}`, "g"), taskCounts[tcKey] || "0");
+            html = html.replace(new RegExp(`\\\${taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
         });
 
         // html = html.replace(/\$\{taskCounts.npm_plus_yarn\}/g, taskCounts.npm || "0");

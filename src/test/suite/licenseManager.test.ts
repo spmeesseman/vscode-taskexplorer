@@ -11,6 +11,7 @@ import { getLicenseManager } from "../../extension";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { executeTeCommand } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { getViewTitle, getViewType, reviveLicensePage } from "../../lib/page/licensePage";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -331,6 +332,19 @@ suite("License Manager Tests", () =>
 		licMgr.dispose();
 		await utils.closeEditors();
 		await teApi.testsApi.storage.update("version", version);
+        utils.endRollingCount(this);
+	});
+
+
+	test("Revive License Page", async function()
+	{
+        if (utils.exitRollingCount(this)) return;
+		this.slow(tc.slowTime.viewReport + 150);
+		const panel = utils.createwebviewForRevive(getViewTitle(), getViewType());
+	    await reviveLicensePage(panel, teApi, teApi.testsApi.extensionContext, "");
+		await utils.sleep(75);
+		panel.dispose();
+		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
 

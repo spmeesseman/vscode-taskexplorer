@@ -121,6 +121,9 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 };
 
 
+export const getViewTitle = () => viewTitle;
+
+
 export const getViewType = () => viewType;
 
 

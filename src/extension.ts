@@ -46,13 +46,13 @@ import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFol
 import { IConfiguration } from "./interface/IConfiguration";
 import { registerStatusBarItem } from "./lib/statusBarItem";
 
+export const providers: IDictionary<TaskExplorerProvider> = {};
+export const providersExternal: IDictionary<IExternalProvider> = {};
 
-let licenseManager: ILicenseManager;
 let ready = false;
 let tests = false;
 let dev = false;
-export const providers: IDictionary<TaskExplorerProvider> = {};
-export const providersExternal: IDictionary<IExternalProvider> = {};
+let licenseManager: ILicenseManager;
 
 export const teApi: ITaskExplorerApi =
 {
@@ -79,6 +79,7 @@ export const teApi: ITaskExplorerApi =
         storage,
         enableConfigWatcher,
         onWsFoldersChange,
+        extensionContext: undefined as unknown as ExtensionContext,
         wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]
     }
 };
@@ -96,6 +97,9 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         teApi.testsApi = {} as unknown as ITestsApi;
         teApi.config = undefined as unknown as IConfiguration;
         teApi.utilities = undefined;
+    }
+    else {
+        teApi.testsApi.extensionContext = context;
     }
 
     //

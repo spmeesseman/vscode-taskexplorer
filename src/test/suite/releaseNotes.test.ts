@@ -4,10 +4,13 @@
 import { Extension, Uri, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { getViewTitle, getViewType, reviveReleaseNotes } from "../../lib/page/releaseNotes";
 import {
-	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount
+	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
 
+let teApi: ITaskExplorerApi;
 let extension: Extension<any>;
 let webviewPanel: WebviewPanel | undefined;
 
@@ -17,7 +20,7 @@ suite("Release Notes Page Tests", () =>
 	suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ extension } = await activate(this));
+        ({ teApi, extension } = await activate(this));
         endRollingCount(this, true);
 	});
 
@@ -84,6 +87,19 @@ suite("Release Notes Page Tests", () =>
 		webviewPanel?.dispose();
 		webviewPanel = undefined;
         endRollingCount(this);
+	});
+
+
+	test("Revive Release Notes Page", async function()
+	{
+        if (exitRollingCount(this)) return;
+		this.slow(testControl.slowTime.viewReport + 150);
+		const panel = createwebviewForRevive(getViewTitle(), getViewType());
+	    await reviveReleaseNotes(panel, teApi, teApi.testsApi.extensionContext, "");
+		await sleep(75);
+		panel.dispose();
+		await closeEditors();
+       endRollingCount(this);
 	});
 
 });

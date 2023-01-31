@@ -2,7 +2,7 @@
 import log from "../lib/log/log";
 import { ITaskExplorerApi } from "../interface";
 import { commands, ExtensionContext, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
-import { displayLicenseReport, getViewType, reviveLicenseReport } from "../lib/page/licensePage";
+import { displayLicenseReport, getViewType, reviveLicensePage } from "../lib/page/licensePage";
 
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;
@@ -21,7 +21,7 @@ const serializer: WebviewPanelSerializer =
 {   // eslint-disable-next-line prefer-arrow/prefer-arrow-functions
     async deserializeWebviewPanel(webviewPanel: WebviewPanel, state: any)
     {
-        await reviveLicenseReport(webviewPanel, teApi, context, "");
+        await reviveLicensePage(webviewPanel, teApi, context, "");
     }
 };
 
