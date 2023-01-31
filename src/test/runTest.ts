@@ -5,11 +5,9 @@ import * as path from "path";
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
 import { copyFile, deleteDir, writeFile } from "../lib/utils/fs";
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { runTests } from "vscode-test";
 
-// eslint-disable-next-line prefer-arrow/prefer-arrow-functions
-async function main(args: string[])
+
+const main = async(args: string[]) =>
 {
     let failed = false;
     let multiRoot = false;
@@ -208,6 +206,6 @@ async function main(args: string[])
             process.exit(1);
         }
     }
-}
+};
 
 main(process.argv.slice(2));
