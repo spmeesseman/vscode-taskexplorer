@@ -48,25 +48,25 @@ return `
 	${getNewReleaseNotesHdr("Features", "plus")}
 	<tr>
 		<td>
-			${getReleaseNotes("Features", version, changeLogMd)}
+			${getReleaseNotes("Features", version, "feature", changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Bug Fixes", "bug")}
 	<tr>
 		<td>
-			${getReleaseNotes("Bug Fixes", version, changeLogMd)}
+			${getReleaseNotes("Bug Fixes", version, "bug fix", changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Refactoring", "cog")}
 	<tr>
 		<td>
-			${getReleaseNotes("Refactoring", version, changeLogMd)}
+			${getReleaseNotes("Refactoring", version, "refactoring", changeLogMd)}
 		</td>
 	</tr>
 	${getNewReleaseNotesHdr("Miscellaneous", "asterisk")}
 	<tr>
 		<td>
-			${getReleaseNotes("Miscellaneous", version, changeLogMd)}
+			${getReleaseNotes("Miscellaneous", version, "miscellaneous", changeLogMd)}
 		</td>
 	</tr>
 </table>`;
@@ -88,7 +88,7 @@ const getNewReleaseNotesHdr = (title: string, icon: string) =>
 };
 
 
-const getReleaseNotes = (section: string, version: string, changeLogMd: string) =>
+const getReleaseNotes = (section: string, version: string, noChangesDsc: string, changeLogMd: string) =>
 {
 	let html = "<ul>";
 	let match: RegExpExecArray | null;
@@ -110,7 +110,7 @@ const getReleaseNotes = (section: string, version: string, changeLogMd: string) 
 			}
 		}
 		else {
-			html += `<li>there are no ${section.replace(/e?s$/, "")} changes in this release</li>`;
+			html += `<li>there are no new ${noChangesDsc} changes in this release</li>`;
 		}
 	}
 	else {

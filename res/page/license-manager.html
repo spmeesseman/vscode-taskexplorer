@@ -1,14 +1,16 @@
 <!DOCTYPE html>
     <html lang="en">
+
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src [webview.cspSource]; script-src [webview.cspSource] 'unsafe-inline'; script-src-elem [webview.cspSource]; style-src [webview.cspSource] 'unsafe-inline';">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src [webview.cspSource]; script-src 'nonce-[webview.nonce]'; style-src [webview.cspSource] 'nonce-[webview.nonce]';">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
-        <link href="[webview.pageDir]/page.css" rel="stylesheet">
-        <script src="[webview.pageDir]/command.js"></script>
+        <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
+        <link rel="stylesheet" href="[webview.cssDir]/page.css">
     </head>
-    <body style="padding:20px">
+
+    <body>
 
         <table align="center" width="900">
 
@@ -224,22 +226,22 @@
                     <td valign="top" align="right" class="button-panel">
                         <!-- startEnterLicenseButton -->
                         <div>
-                            <button onclick="enterLicense();">Enter License Key</button>
+                            <button id="btnEnterLicense">Enter License Key</button>
                         </div>
                         <!-- endEnterLicenseButton -->
                         <!-- startGetLicenseButton -->
                         <div class="margin-top-10">
-                            <button onclick="getLicense();">Get License Key</button>
+                            <button id="btnGetLicense">Get License Key</button>
                         </div>
                         <!-- endGetLicenseButton -->
                         <!-- startViewLicenseButton -->
                         <div class="margin-top-10">
-                            <button onclick="viewLicense();">View License Info</button>
+                            <button id="btnViewLicense">View License Info</button>
                         </div>
                         <!-- endViewLicenseButton -->
                         <!-- startParsingReportButton -->
                         <div class="margin-top-10">
-                            <button onclick="viewReport();">View Parsing Report</button>
+                            <button id="btnViewReport">View Parsing Report</button>
                         </div>
                         <!-- endParsingReportButton -->
                     </td></tr>
@@ -251,6 +253,8 @@
             <!-- addtlContent -->
 
         </table>
+
+        <script nonce="[webview.nonce]" src="[webview.scriptDir]/command.js"></script>
 
     </body>
 </html>
