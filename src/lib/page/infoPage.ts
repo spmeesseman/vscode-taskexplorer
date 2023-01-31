@@ -1,9 +1,9 @@
 
 import * as path from "path";
 import log from "../log/log";
+import TeWebviewPanel from "./utils";
 import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
-import { createTaskCountTable, TeWebviewPanel } from "./utils";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
@@ -32,7 +32,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 		const tasks = explorer.getTasks() // Filter out 'User' tasks for project/folder reports
 							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
+		html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
 
 		const infoContent = getExtraContent(tasks, logPad + "   ", uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);

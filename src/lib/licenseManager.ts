@@ -1,12 +1,12 @@
 
 // import * as https from "http";
 import * as https from "https";
-import log, { logControl } from "./log/log";
 import figures from "./figures";
+import TeWebviewPanel from "./page/utils";
+import log, { logControl } from "./log/log";
 import { IncomingMessage } from "http";
 import { storage } from "./utils/storage";
 import { refreshTree } from "./refreshTree";
-import { TeWebviewPanel } from "./page/utils";
 import { isObject, isScriptType, isString } from "./utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { displayLicenseReport } from "./page/licensePage";

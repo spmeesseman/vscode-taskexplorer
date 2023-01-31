@@ -1,7 +1,7 @@
 
 import log from "../log/log";
+import TeWebviewPanel from "./utils";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
-import { createTaskCountTable, TeWebviewPanel } from "./utils";
 import { ITaskExplorerApi } from "../../interface";
 
 const viewTitle = "Task Explorer Licensing";
@@ -35,7 +35,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	/* istanbul ignore else */
 	if (tasks)
 	{
-		html = await createTaskCountTable(api, tasks, "Task Explorer Licensing");
+		html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Licensing");
 
 		let infoContent = getExtraContent(logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);

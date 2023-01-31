@@ -1,12 +1,12 @@
 
 import log from "../log/log";
+import TeWebviewPanel from "./utils";
 import { join } from "path";
 import { marked } from "marked";
 import { readFileAsync } from "../utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../utils/pathUtils";
 import { ExtensionContext, WebviewPanel } from "vscode";
-import { cleanLicenseButtons, TeWebviewPanel } from "./utils";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
@@ -34,7 +34,7 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
 							   .replace("<!-- releasenotes -->", getNewReleaseNotes(context.extension.packageJSON.version, changeLogMd));
-	html = cleanLicenseButtons(html, api);
+	html = TeWebviewPanel.cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
 	return html;
 };
