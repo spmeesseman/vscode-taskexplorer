@@ -39,7 +39,7 @@ suite("Webpack Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteFile(fileUri.fsPath);
+        await fsApi.deleteFile(fileUri2.fsPath);
         await fsApi.deleteDir(dirName);
         suiteFinished(this);
     });
