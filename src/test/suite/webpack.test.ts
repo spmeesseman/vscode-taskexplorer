@@ -14,7 +14,7 @@ import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
 import { env } from "process";
 
 const testsName = "webpack";
-const startTaskCount = tc.isMultiRootWorkspace ? 0 : 0;
+const startTaskCount = tc.isMultiRootWorkspace ? 6 : 0;
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
@@ -29,7 +29,7 @@ suite("Webpack Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as WebpackTaskProvider;
-        fileUri = Uri.file(path.join(getWsPath("."), "webpack.config.js"));
+        fileUri = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
         endRollingCount(this, true);
     });
 
