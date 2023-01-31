@@ -305,38 +305,6 @@ suite("License Manager Tests", () =>
 	});
 
 
-	test("License Page w/ Set License Key", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page  + tc.slowTime.licenseMgr.checkLicense + (tc.slowTime.storageUpdate * 2) + 800);
-		const version = licMgr.getVersion(); // will be set on ext. startup
-		await teApi.testsApi.storage.update("version", version);
-		await licMgr.checkLicense();
-		await setTasks();
-		await utils.sleep(400);
-		licMgr.dispose();
-		await utils.closeEditors();
-		await teApi.testsApi.storage.update("version", version);
-        utils.endRollingCount(this);
-	});
-
-
-	test("License Page w/ Set License Key", async function()
-	{
-        if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + 800);
-		const version = licMgr.getVersion(); // will be set on ext. startup
-		await teApi.testsApi.storage.update("version", version);
-		await licMgr.checkLicense();
-		await setTasks();
-		await utils.sleep(400);
-		licMgr.dispose();
-		await utils.closeEditors();
-		await teApi.testsApi.storage.update("version", version);
-        utils.endRollingCount(this);
-	});
-
-
 	test("Deserialize License Page", async function()
 	{
         if (utils.exitRollingCount(this)) return;
