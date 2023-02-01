@@ -1,13 +1,13 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "../utils/utils";
-import { configuration } from "../utils/configuration";
-import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
-import { registerFileWatcher } from "./fileWatcher";
-import { refreshTree } from "../refreshTree";
-import { registerExplorer } from "../registerExplorer";
-import { ITaskExplorerApi } from "../../interface";
 import { persistCache } from "../fileCache";
+import { refreshTree } from "../refreshTree";
+import { ITaskExplorerApi } from "../../interface";
+import { registerFileWatcher } from "./fileWatcher";
+import { registerExplorer } from "../registerExplorer";
+import { configuration } from "../utils/configuration";
+import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
+import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
 
 let teApi: ITaskExplorerApi;
 let watcherEnabled = true;
@@ -95,7 +95,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             {   /* istanbul ignore else */
                 if ({}.hasOwnProperty.call(enabledTasks, p))
                 {
-                    const taskType = util.getTaskTypeRealName(p),
+                    const taskType = getTaskTypeRealName(p),
                           oldValue = enabledTasks[p],
                           newValue = newEnabledTasks[p];
                     if (newValue !== oldValue)
@@ -144,7 +144,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             {   /* istanbul ignore else */
                 if ({}.hasOwnProperty.call(pathToPrograms, p))
                 {
-                    const taskType = util.getTaskTypeRealName(p),
+                    const taskType = getTaskTypeRealName(p),
                           oldValue = pathToPrograms[p],
                           newValue = newPathToPrograms[p];
                     if (newValue !== oldValue)
@@ -261,7 +261,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             teApi.log.value("      windows shell", configuration.getVs<boolean>("terminal.integrated.shell.windows"), 2);
             teApi.log.value("      linux shell", configuration.getVs<boolean>("terminal.integrated.shell.linux"), 2);
             teApi.log.value("      osx shell", configuration.getVs<boolean>("terminal.integrated.shell.osx"), 2);
-            util.getScriptTaskTypes().forEach(t => { if (enabledTasks[t]) registerChange(t); });
+            getScriptTaskTypes().forEach(t => { if (enabledTasks[t]) registerChange(t); });
         }
     }
 

@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "./utils/utils";
+import * as taskTypeUtils from "./utils/taskTypeUtils";
 import log from "./log/log";
 import statusBarItem from "./statusBarItem";
 import { join } from "path";
@@ -70,8 +71,8 @@ export async function addFolder(folder: Uri, logPad: string)
     {
         await startBuild();
 
-        const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
-            return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
+        const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+            return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
         });
 
         for (const providerName of taskProviders)
@@ -89,7 +90,7 @@ export async function addFolder(folder: Uri, logPad: string)
                     glob = util.getGlobPattern(providerName);
                 }
 
-                const dspTaskType = util.getTaskTypeFriendlyName(providerName);
+                const dspTaskType = taskTypeUtils.getTaskTypeFriendlyName(providerName);
                 statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`);
 
                 /* istanbul ignore else */
@@ -170,8 +171,8 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         await startBuild();
         if (!cancel)
         {
-            const taskProviders = ([ ...util.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
-                return util.getTaskTypeFriendlyName(a).localeCompare(util.getTaskTypeFriendlyName(b));
+            const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+                return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
             });
 
             for (const tasktype of taskProviders)
@@ -242,7 +243,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
     let numFilesFound = 0;
     const licMgr = getLicenseManager();
     const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks",
-          dspTaskType = util.getTaskTypeFriendlyName(taskType);
+          dspTaskType = taskTypeUtils.getTaskTypeFriendlyName(taskType);
 
     log.methodStart(logMsg, 1, logPad);
     statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${folder.name}`);
@@ -305,7 +306,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFolder | undefined, setCacheBuilding: boolean, logPad: string)
 {
     let numFilesFound = 0;
-    const providerType = util.isScriptType(taskType) ? "script" : taskType;
+    const providerType = taskTypeUtils.isScriptType(taskType) ? "script" : taskType;
     log.methodStart("build file cache", 1, logPad, false, [
         [ "folder", !wsFolder ? "entire workspace" : wsFolder.name ], [ "task type", taskType ],
         [ "task provider type", providerType ], [ "setCacheBuilding", setCacheBuilding.toString() ]

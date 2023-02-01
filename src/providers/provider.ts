@@ -7,8 +7,9 @@ import { getLicenseManager } from "../extension";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
 import { isDirectory, pathExistsSync } from "../lib/utils/fs";
+import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { Uri, Task, WorkspaceFolder, TaskProvider, workspace } from "vscode";
-import { getTaskTypeFriendlyName, isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
+import { isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
 
 
 export abstract class TaskExplorerProvider implements TaskProvider

@@ -9,10 +9,11 @@ import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";
 import { refreshTree } from "../refreshTree";
 import { ITaskExplorerApi } from "../../interface";
+import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
+import { configuration } from "../utils/configuration";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
-import { configuration } from "../utils/configuration";
 
 let extContext: ExtensionContext;
 let teApi: ITaskExplorerApi;
@@ -51,7 +52,7 @@ function createDirWatcher(context: ExtensionContext)
 async function createFileWatchers(context: ExtensionContext, logPad: string)
 {
     log.methodStart("create file watchers", 1, logPad);
-    const taskTypes = util.getTaskTypes();
+    const taskTypes = getTaskTypes();
     for (const taskType of taskTypes)
     {
         log.write(`   create file watchers for task type '${taskType}'`, 1, logPad);
@@ -427,7 +428,7 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         // Ignore modification events for some task types (script type, e.g. 'bash', 'python' etc)
         // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
         //
-        const ignoreModify = util.isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
+        const ignoreModify = isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(util.getGlobPattern(taskType));
             watchers[taskType] = watcher;
