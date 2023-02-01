@@ -720,6 +720,15 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }
 
         //
+        // Check the finalized task cache array for any ignores that still need to be processed,
+        // e.g. 'grunt' or 'gulp' tasks that are internally provided by VSCode and we have no
+        // control over the provider returning them.  Internally provided Grunt and Gulp tasks
+        // are differentiable from TE provided Gulp and Grunt tasks in that the VSCode provided
+        // tasks do no not have task.definition.uri set.
+        //
+        this.cleanFetchedTasks(logPad + "   ");
+
+        //
         // Check License Manager for any task count restrictions
         //
         const maxTasks = licMgr.getMaxNumberOfTasks();
@@ -741,6 +750,31 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         TaskExplorerProvider.logPad = "";
         statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
+    };
+
+
+    private cleanFetchedTasks = (logPad: string) =>
+    {
+        let ctRmv = 0;
+        const tasksCache = this.tasks as Task[];
+        log.write("removing any ignored tasks from new fetch", 3, logPad);
+        tasksCache.slice().reverse().forEach((item, index, object) =>
+        {   //
+            // Make sure this task shouldn't be ignored based on various criteria...
+            // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
+            // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
+            // other providers unless it has registered as an external provider via Task Explorer API.
+            // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
+            // provided tasks will have been skipped/ignored in the provideTasks() processing.
+            //
+            if (!isTaskIncluded(item, this.getTaskRelativePath(item), logPad + "   "))
+            {
+                ++ctRmv;
+                tasksCache.splice(object.length - 1 - index, 1);
+                log.value("   ignoring task", item.name, 3, logPad);
+            }
+        });
+        log.write(`ignored ${ctRmv} ${this.currentInvalidation} tasks from new fetch`, 3, logPad);
     };
 
 
@@ -772,19 +806,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             if (!showUserTasks && item.source === "Workspace" && !util.isWorkspaceFolder(item.scope))
             {
                 tasksCache.splice(object.length - 1 - index, 1);
-            }
-            //
-            // Make sure this task shouldn't be ignored based on various criteria...
-            // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
-            // By default, also ignore npm 'install' tasks, since its available in the context menu, ignore
-            // other providers unless it has registered as an external provider via Task Explorer API.
-            // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
-            // provided tasks will have been skipped/ignored in the provideTasks() processing.
-            //
-            if (!isTaskIncluded(item, this.getTaskRelativePath(item), logPad + "   "))
-            {
-                tasksCache.splice(object.length - 1 - index, 1);
-                log.write("   removed vscode internally provided task", 3, logPad);
             }
         });
         log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, 3, logPad);

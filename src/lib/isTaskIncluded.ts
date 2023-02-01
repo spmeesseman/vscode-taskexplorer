@@ -30,12 +30,6 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // in a workspace folder root directory.  All internally provided tasks will have the 'uri' property
     // set in its task definition, VSCode provided Grunt/Gulp tasks will not
     //
-    // 1/31/23 - Updating VScode test version from 1.61.1 to 1.63.0 seems to have caused the internal Gulp/
-    //           Grunt 'autoDetect' feature to stop working.  Maybe fixed after 1.63?  1.63 adds "pricing"
-    //           support in package.json, until we update @types/vscode again, gotta slap a cheap istanbul
-    //           ignore tag here.  I'm sure it's fixed after 1.63, so have to keep it here too.
-    //
-    /* istanbul ignore if */
     if (!task.definition.uri && (task.source === "grunt" || task.source === "gulp"))
     {
         log.write(`   skipping vscode provided ${task.source} task`, 4, logPad, logQueueId);
