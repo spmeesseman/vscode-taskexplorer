@@ -6,21 +6,20 @@ import * as path from "path";
 import { Uri, workspace } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { GulpTaskProvider } from "../../providers/gulp";
-import { configuration } from "../../lib/utils/configuration";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc,
-    testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
+    testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "gulp";
 const startTaskCount = 17;
+const gulpConfig = workspace.getConfiguration("gulp");
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let provider: GulpTaskProvider;
-let dirName: string;
 let fileUri: Uri;
 let file2Uri: Uri;
 
@@ -33,9 +32,8 @@ suite("Gulp Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GulpTaskProvider;
-        dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "gulpfile.js"));
-        file2Uri = Uri.file(path.join(dirName, "gulpfile.mjs"));
+        fileUri = Uri.file(path.join(getWsPath("."), "gulpfile.js"));
+        file2Uri = Uri.file(path.join(getWsPath("."), "gulpfile.mjs"));
         endRollingCount(this, true);
     });
 
@@ -43,23 +41,11 @@ suite("Gulp Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        //
-        // Reset both Grunt / Gulp VSCode internal task providers, which we enabled b4 extension
-        // activation in helper.test
-        //
-        if (workspace.getConfiguration("grunt").get<string>("autoDetect") !== tc.vsCodeAutoDetectGrunt) {
-            await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
-            // await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt, ConfigurationTarget.Global);
-            await waitForTeIdle(tc.waitTime.config.enableEvent);
-        }
-        if (workspace.getConfiguration("gulp").get<string>("autoDetect") !== tc.vsCodeAutoDetectGulp) {
-            await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt);
-            // await workspace.getConfiguration("gulp").update("autoDetect", tc.vsCodeAutoDetectGulp, ConfigurationTarget.Global);
-            await waitForTeIdle(tc.waitTime.config.enableEvent);
-        }
+        await updateInternalProviderAutoDetect("gulp", "off"); // turned on in tests initSettings()
+        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteFile(file2Uri.fsPath);
-        await waitForTeIdle(tc.waitTime.min);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         suiteFinished(this);
     });
 
@@ -112,9 +98,7 @@ suite("Gulp Tests", () =>
     test("Create JS File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
@@ -192,8 +176,6 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             file2Uri.fsPath,
             "import pkg from 'gulp';\n" +
@@ -222,14 +204,13 @@ suite("Gulp Tests", () =>
     });
 
 
-    test("Delete Directory w/ MJS File", async function()
+    test("Delete MJS File", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify + tc.waitTime.min);
-        await fsApi.deleteDir(dirName);
+        this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
+        await fsApi.deleteFile(file2Uri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
 
@@ -242,7 +223,7 @@ suite("Gulp Tests", () =>
         //
         // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
         //
-        await configuration.updateVs("gulp.autoDetect", "off");
+        await updateInternalProviderAutoDetect("gulp", "off"); // turned on in tests initSettings()
         await waitForTeIdle(tc.waitTime.config.enableEvent);
         await executeSettingsUpdate("useGulp", true, tc.waitTime.config.event);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
@@ -252,32 +233,6 @@ suite("Gulp Tests", () =>
         //
         await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
-        await verifyTaskCount(testsName, startTaskCount);
-        endRollingCount(this);
-    });
-
-/*
-    test("Turn VSCode Gulp Provider On", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 3000);
-        await configuration.updateVs("gulp.autoDetect", "on");
-        await waitForTeIdle(tc.waitTime.config.enableEvent);
-        await sleep(3000);
-        await treeUtils.refresh();
-        await verifyTaskCount(testsName, startTaskCount);
-        endRollingCount(this);
-    });
-*/
-
-    test("Turn VSCode Gulp Provider Off", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 2000);
-        await configuration.updateVs("gulp.autoDetect", "off");
-        await sleep(1000);
-        // await executeTeCommand("refresh", tc.waitTime.refreshCommand);
-        await treeUtils.refresh();
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });

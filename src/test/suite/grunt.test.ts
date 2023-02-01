@@ -6,12 +6,11 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { GruntTaskProvider } from "../../providers/grunt";
-import { configuration } from "../../lib/utils/configuration";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, sleep, suiteFinished, testControl as tc,
-    testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    testInvDocPositions, treeUtils, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "grunt";
@@ -20,7 +19,6 @@ const startTaskCount = 7;
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
 let provider: GruntTaskProvider;
-let dirName: string;
 let fileUri: Uri;
 
 
@@ -32,15 +30,16 @@ suite("Grunt Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi } = await activate(this));
         provider = teApi.providers[testsName] as GruntTaskProvider;
-        dirName = getWsPath("tasks_test_");
-        fileUri = Uri.file(path.join(dirName, "gruntfile.js"));
-        // await executeSettingsUpdate("groupMaxLevel", 5); // this is just a random spot to bump the grouping level
+        fileUri = Uri.file(path.join(getWsPath("."), "gruntfile.js"));
         endRollingCount(this, true);
     });
+
 
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        await updateInternalProviderAutoDetect("grunt", "off"); // turned on in tests initSettings()
+        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });
@@ -101,8 +100,6 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await fsApi.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
@@ -162,27 +159,13 @@ suite("Grunt Tests", () =>
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
         await fsApi.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
-        await fsApi.deleteDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
 
-/*
-    test("Turn VSCode Grunt Provider On", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 3000);
-        await configuration.updateVs("grunt.autoDetect", "on");
-        await sleep(3000);
-        await treeUtils.refresh();
-        await verifyTaskCount(testsName, startTaskCount);
-        endRollingCount(this);
-    });
-*/
 
     //
-    // *** FOCUS #1 ***   Moved up one suite from infoPage tests.
+    // *** FOCUS #1 ***
     //
     // Go ahead and focus the view.  Have done enough tests now with it not having received a visibility event yet.
     // We need the visual loaded to scan VSCode provided and Grunt tasks and in the next suite Gulp tasks same thing.
@@ -195,17 +178,5 @@ suite("Grunt Tests", () =>
         }
         endRollingCount(this);
 	});
-
-
-    test("Turn VSCode Grunt Provider Off", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.eventFast +  tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify + 2000);
-        await configuration.updateVs("grunt.autoDetect", "off");
-        await sleep(1000);
-        await treeUtils.refresh();
-        await verifyTaskCount(testsName, startTaskCount);
-        endRollingCount(this);
-    });
 
 });

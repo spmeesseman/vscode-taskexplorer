@@ -16,7 +16,7 @@ import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { commands, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
+import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 
@@ -477,6 +477,12 @@ export const testInvDocPositions = (provider: ITaskExplorerProvider) =>
     provider.getDocumentPosition("test", "");
     provider.getDocumentPosition("test", " ");
     provider.getDocumentPosition("test", "\n");
+};
+
+
+export const updateInternalProviderAutoDetect = async(source: "grunt"|"gulp", value: "on"|"off") =>
+{
+    await workspace.getConfiguration(source).update("autoDetect", value, ConfigurationTarget.Global);
 };
 
 
