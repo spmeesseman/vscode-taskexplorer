@@ -185,7 +185,7 @@ suite("Typescript Tests", () =>
         //
         // Note: FileWatcher ignores mod event for this task type since # of tasks never changes
         //
-        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.taskCount.verifyByTree);
+        this.slow(testControl.slowTime.fs.modifyEventTsc + testControl.slowTime.taskCount.verifyByTree);
         // let resetLogging = teApi.log.isLoggingEnabled();
         // if (resetLogging) { // turn scary error logging off
         //     this.slow(testControl.slowTime.fs.createEvent + (testControl.slowTime.config.event * 2));
@@ -214,7 +214,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "\n"
         );
-        await utils.waitForTeIdle(testControl.waitTime.fs.modifyEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fs.modifyEventTsc);
         //
         // See fileWatcher.ts, we ignore modify event because the task count will never change
         // for this task type. So if there is invalid json after a save, the tasks will remain,
@@ -232,7 +232,7 @@ suite("Typescript Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.modifyEvent + testControl.slowTime.taskCount.verifyByTree);
+        this.slow(testControl.slowTime.fs.modifyEventTsc + testControl.slowTime.taskCount.verifyByTree);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -252,7 +252,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await utils.waitForTeIdle(testControl.waitTime.fs.modifyEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fs.modifyEventTsc);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });

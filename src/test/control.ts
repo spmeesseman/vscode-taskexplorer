@@ -115,7 +115,8 @@ export const testControl: ITestControl =
             deleteEventTsc: 1655,
             deleteFolderEvent: 1400,
             modifyEvent: 1140,
-            modifyEventAnt: 1200
+            modifyEventAnt: 1200,
+            modifyEventTsc: 1200
         },
         getTreeTasks: 205,
         getTreeTasksNpm: 470, // npm task provider is slower than shit on a turtle
@@ -222,7 +223,8 @@ export const testControl: ITestControl =
             deleteEventTsc: 1920,
             deleteFolderEvent: 1735,
             modifyEvent: 1430,
-            modifyEventAnt: 1590
+            modifyEventAnt: 1590,
+            modifyEventTsc: 1590
         },
         getTreeTasks: 225,
         getTreeTasksNpm: 540, // npm task provider is slower than shit on a turtle
@@ -302,7 +304,8 @@ export const testControl: ITestControl =
             createEventTsc: 240,
             deleteEvent: 185,
             deleteFolderEvent: 205,
-            modifyEvent: 180
+            modifyEvent: 180,
+            modifyEventTsc: 240
         },
         getTreeTasks: 50,
         licenseMgr: {
@@ -352,7 +355,8 @@ export const testControl: ITestControl =
             createEventTsc: 550,
             deleteEvent: 485,
             deleteFolderEvent: 525,
-            modifyEvent: 475
+            modifyEvent: 475,
+            modifyEventTsc: 525
         },
         getTreeTasks: 80,
         licenseMgr: {
@@ -445,6 +449,7 @@ export interface ISlowTimes
         deleteFolderEvent: number;
         modifyEvent: number;
         modifyEventAnt: number;
+        modifyEventTsc: number;
     };
     getTreeTasks: number;
     getTreeTasksNpm: number; // npm task provider is slower than shit on a turtle
@@ -522,6 +527,7 @@ export interface IWaitTimes
         deleteEvent: number;
         deleteFolderEvent: number;
         modifyEvent: number;
+        modifyEventTsc: number;
     };
     getTreeTasks: number;
     licenseMgr: {
