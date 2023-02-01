@@ -28,6 +28,10 @@ Features:
     ☐ Enter external task types
         some way for user to enter an external task provider name w/o using API
 
+    ☐ Context Menu - "GoTo/Select Task Tree Item" from File Explorer
+
+    ☐ Context Menu - For scripts i.e. sh bat etc, menu item to 'run' and 'run w arguments'
+
 General Todos:
 
     ✔ Test visibility change event @done(23-01-13 22:22)
