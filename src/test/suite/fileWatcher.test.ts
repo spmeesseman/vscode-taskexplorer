@@ -4,11 +4,10 @@
 
 import * as utils from "../utils/utils";
 import { join } from "path";
-import { startupFocus } from "../utils/suiteUtils";
-import { getLicenseManager } from "../../extension";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
+import { getLicenseManager } from "../../extension";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -86,10 +85,14 @@ suite("File Watcher Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        await startupFocus(this);
-	});
+    test("Build Tree", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        if (utils.needsTreeBuild()) {
+            await utils.treeUtils.refresh(this);
+        }
+        utils.endRollingCount(this);
+    });
 
 
     test("Check Task Counts", async function()

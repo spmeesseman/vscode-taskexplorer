@@ -2,7 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
-import { startupFocus } from "../utils/suiteUtils";
 import { ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 
@@ -35,10 +34,14 @@ suite("File Cache Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        await startupFocus(this);
-	});
+    test("Build Tree", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        if (utils.needsTreeBuild()) {
+            await utils.treeUtils.refresh(this);
+        }
+        utils.endRollingCount(this);
+    });
 
 
     test("Check Task Counts", async function()

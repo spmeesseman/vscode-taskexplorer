@@ -5,14 +5,14 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { ExternalTaskProvider } from "./externalTaskProvider";
 import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, suiteFinished, testControl, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished,
+    testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
@@ -46,10 +46,14 @@ suite("External Provider Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        await startupFocus(this);
-	});
+    test("Build Tree", async function()
+    {
+        if (exitRollingCount(this)) return;
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
+        endRollingCount(this);
+    });
 
 
     test("Get API", async function()

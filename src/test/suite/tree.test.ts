@@ -45,7 +45,7 @@ suite("Tree Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
+	test("Focus Explorer View", async function()
 	{
         if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild(true)) {

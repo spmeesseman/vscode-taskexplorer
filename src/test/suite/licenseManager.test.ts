@@ -87,7 +87,7 @@ suite("License Manager Tests", () =>
         utils.suiteFinished(this);
 	});
 
-	test("Focus Tree View", async function()
+	test("Focus Explorer View", async function()
 	{
         await startupFocus(this, async () => {
 			tasks = explorer.getTasks();

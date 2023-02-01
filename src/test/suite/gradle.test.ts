@@ -5,7 +5,7 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { startupFocus } from "../utils/suiteUtils";
+import { startupBuildTree } from "../utils/suiteUtils";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
@@ -54,10 +54,10 @@ suite("Gradle Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        await startupFocus(this);
-	});
+    test("Build Tree", async function()
+    {
+        await startupBuildTree(this);
+    });
 
 
     test("Document Position", async function()

@@ -35,7 +35,7 @@ suite("Menu Command Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
+	test("Focus Explorer View", async function()
 	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild(true)) {

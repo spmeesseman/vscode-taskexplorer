@@ -1,5 +1,5 @@
 import { commands } from "vscode";
-import { waitForTeIdle, testControl as tc, teApi, teExplorer } from "./utils";
+import { waitForTeIdle, testControl as tc, teApi, teExplorer, sleep } from "./utils";
 
 let explorerHasFocused = false;
 
@@ -52,6 +52,9 @@ export const focusExplorerView = async (instance?: any) =>
         await waitForTeIdle(tc.waitTime.min);
     }
 };
+
+
+export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
 
 
 export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus");

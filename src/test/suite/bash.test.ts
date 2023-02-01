@@ -4,7 +4,6 @@
 
 import { join } from "path";
 import { expect } from "chai";
-import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
 import { executeSettingsUpdate } from "../utils/commandUtils";
@@ -44,10 +43,14 @@ suite("Bash Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
-	{
-        await startupFocus(this);
-	});
+    test("Build Tree", async function()
+    {
+        if (exitRollingCount(this)) return;
+        if (needsTreeBuild()) {
+            await treeUtils.refresh(this);
+        }
+        endRollingCount(this);
+    });
 
 
     test("Document Position", async function()

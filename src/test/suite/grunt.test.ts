@@ -46,7 +46,7 @@ suite("Grunt Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
+	test("Focus Explorer View", async function()
 	{
         await startupFocus(this);
 	});
@@ -158,21 +158,5 @@ suite("Grunt Tests", () =>
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
-
-
-    //
-    // *** FOCUS #1 ***
-    //
-    // Go ahead and focus the view.  Have done enough tests now with it not having received a visibility event yet.
-    // We need the visual loaded to scan VSCode provided and Grunt tasks and in the next suite Gulp tasks same thing.
-    //
-	test("Focus Tree View", async function()
-	{
-        if (exitRollingCount(this)) return;
-		if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
-	});
 
 });

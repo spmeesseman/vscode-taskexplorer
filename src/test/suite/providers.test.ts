@@ -9,14 +9,14 @@ import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
-import { tasks } from "vscode";
-import { refresh } from "../utils/treeUtils";
-import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
+import { workspace, tasks, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { refresh } from "../utils/treeUtils";
 
 
 const tempFiles: string[] = [];
@@ -28,6 +28,7 @@ let rootPath: string;
 let dirName: string;
 let dirNameL2: string;
 let dirNameIgn: string;
+let taskMap: TaskMap;
 let tempDirsDeleted = false;
 
 
@@ -53,6 +54,12 @@ suite("Provider Tests", () =>
         await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);
+        await executeSettingsUpdate("enabledTasks", {
+            apppublisher: false, // off by default
+            gradle: false,       // off by default
+            maven: false,        // off by default
+            pipenv: false,       // off by default
+        });
         if (!tempDirsDeleted) {
             await deleteTempFilesAndDirectories();
         }
@@ -90,6 +97,33 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Create Temporary Task Files - App Publisher", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent);
+        await setupAppPublisher();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Ant", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 5);
+        await setupAnt();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Bash", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 3);
+        await setupBash();
+        endRollingCount(this);
+    });
+
+
     test("Create Temporary Task Files - Batch", async function()
     {
         if (exitRollingCount(this)) return;
@@ -99,11 +133,57 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Create Temporary Task Files - Gradle", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 3);
+        await setupGradle();
+        endRollingCount(this);
+    });
+
+
     test("Create Temporary Task Files - Grunt", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent * 4);
         await setupGrunt();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Gulp", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 5);
+        await setupGulp();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Makefile", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 3);
+        await setupMakefile();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Maven", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent);
+        await setupMaven();
+        endRollingCount(this);
+    });
+
+
+    test("Create Temporary Task Files - Typescript", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.fs.createEvent * 2);
+        await setupTsc();
+        await waitForTeIdle(tc.waitTime.min);
         endRollingCount(this);
     });
 
@@ -120,6 +200,42 @@ suite("Provider Tests", () =>
         }
         endRollingCount(this);
 	});
+
+
+    test("Enable App-Publisher Tasks (Off by Default)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enabledTasks.apppublisher", true);
+        endRollingCount(this);
+    });
+
+
+    test("Enable Gradle Tasks (Off by Default)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enabledTasks.gradle", true);
+        endRollingCount(this);
+    });
+
+
+    test("Enable Pipenv Tasks (Off by Default)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enabledTasks.pipenv", true);
+        endRollingCount(this);
+    });
+
+
+    test("Enable Maven Tasks (Off by Default)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enabledTasks.maven", true);
+        endRollingCount(this);
+    });
 
 
     test("Enable Python Tasks (Turned Off in Configuration Suite)", async function()
@@ -258,18 +374,26 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         const taskMap = teApi.testsApi.explorer.getTaskMap();
         let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
-        expect(taskCount).to.be.equal(3, `Unexpected Ant task count (Found ${taskCount} of 7)`);
+        expect(taskCount).to.be.equal(7, `Unexpected Ant task count (Found ${taskCount} of 7)`);
+        taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
+        expect(taskCount).to.be.equal(42, `Unexpected App-Publisher task count (Found ${taskCount} of 42)`);
         taskCount = treeUtils.findIdInTaskMap(":bash:", taskMap);
-        expect(taskCount).to.be.equal(1, `Unexpected Bash task count (Found ${taskCount} of 3)`);
+        expect(taskCount).to.be.equal(3, `Unexpected Bash task count (Found ${taskCount} of 3)`);
         taskCount = treeUtils.findIdInTaskMap(":batch:", taskMap);
         expect(taskCount).to.be.equal(4, `Unexpected Batch task count (Found ${taskCount} of 4)`);
+        taskCount = treeUtils.findIdInTaskMap(":gradle:", taskMap);
+        expect(taskCount).to.be.equal(4, `Unexpected Gradle task count (Found ${taskCount} of 4)`);
         taskCount = treeUtils.findIdInTaskMap(":grunt:", taskMap);
         expect(taskCount).to.be.equal(13, `Unexpected Grunt task count (Found ${taskCount} of 13)`);
         taskCount = treeUtils.findIdInTaskMap(":gulp:", taskMap);
-        expect(taskCount).to.be.equal(17, `Unexpected Gulp task count (Found ${taskCount} of 32)`);
+        expect(taskCount).to.be.equal(32, `Unexpected Gulp task count (Found ${taskCount} of 32)`);
         taskCount = treeUtils.findIdInTaskMap(":python:", taskMap);
         expect(taskCount).to.be.equal(2, `Unexpected Python task count (Found ${taskCount} of 2)`);
+        taskCount = treeUtils.findIdInTaskMap(":tsc:", taskMap);
+        expect(taskCount).to.be.equal(4, `Unexpected Typescript task count (Found ${taskCount} of 4)`);
         taskCount = treeUtils.findIdInTaskMap(":Workspace:", taskMap);
+        // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
+        expect(taskCount).to.be.equal(10, `Unexpected VSCode task count (Found ${taskCount} of 10)`);
         // There are 3 'User' Workspace/VSCode Tasks but they won't be in the TaskMap
         expect(taskCount).to.be.equal(10, `Unexpected VSCode task count (Found ${taskCount} of 10)`);
         endRollingCount(this);
@@ -321,6 +445,22 @@ suite("Provider Tests", () =>
     });
 
 
+    test("Disable Task Types Off by Default", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow((tc.slowTime.config.disableEvent * 4) + (tc.slowTime.taskCount.verify * 4));
+        await executeSettingsUpdate("enabledTasks.apppublisher", false);
+        await executeSettingsUpdate("enabledTasks.gradle", false);
+        await executeSettingsUpdate("enabledTasks.maven", false);
+        await executeSettingsUpdate("enabledTasks.pipenv", false);
+        await verifyTaskCount("apppublisher", 0);
+        await verifyTaskCount("gradle", 0);
+        await verifyTaskCount("maven", 0);
+        await verifyTaskCount("pipenv", 0);
+        endRollingCount(this);
+    });
+
+
     test("Project Folder Collapsed on Start", async function()
     {
         if (exitRollingCount(this)) return;
@@ -348,8 +488,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.globEvent + (tc.slowTime.fetchTasksCommand * 2) + tc.slowTime.min);
-        const taskMap = teApi.testsApi.explorer.getTaskMap(),
-              taskItemsB4 = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
+        const taskItemsB4 = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItemsB4.length;
         for (const taskItem of Object.values(taskMap))
         {
@@ -415,6 +554,269 @@ async function deleteTempFilesAndDirectories()
 }
 
 
+async function setupAnt()
+{
+    await createAntFile();
+
+    const file2 = join(dirName, "test.xml");
+    const file3 = join(dirName, "emptytarget.xml");
+    const file4 = join(dirName, "emptyproject.xml");
+    const file5 = join(dirNameIgn, "build.xml");
+
+    tempFiles.push(file2);
+    tempFiles.push(file3);
+    tempFiles.push(file4);
+    tempFiles.push(file5);
+
+    await fsApi.writeFile(
+        file2,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test2">\n' +
+        '    <property name="test2" value="test2" />\n' +
+        "    <target name='test3'></target>\n" +
+        '    <target name="test4"></target>\n' +
+        "</project>\n"
+    );
+
+    await fsApi.writeFile(
+        file3,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test1">\n' +
+        '    <property environment="env" />\n' +
+        '    <property name="test" value="test" />\n' +
+        "</project>\n"
+    );
+
+    await fsApi.writeFile(file4, '<?xml version="1.0"?>\n');
+
+    await fsApi.writeFile(
+        file5,
+        '<?xml version="1.0"?>\n' +
+        '<project basedir="." default="test2">\n' +
+        '    <property name="testv" value="testv" />\n' +
+        "    <target name='test5'></target>\n" +
+        "</project>\n"
+    );
+
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
+
+async function setupGradle()
+{
+    await createGradleFile();
+
+    const file2 = join(dirName, "TEST.GRADLE");
+    const file3 = join(dirNameIgn, "build.gradle");
+
+    tempFiles.push(file2);
+    tempFiles.push(file3);
+
+    await fsApi.writeFile(
+        file2,
+        "task fatJar2(type: Jar) {\n" +
+        "    manifest {\n" +
+        "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+        "            'Implementation-Version': version,\n" +
+        "            'Main-Class': 'com.spmeesseman.test'\n" +
+        "    }\n" +
+        "    baseName = project.name + '-all'\n" +
+        "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+        "    with jar\n" +
+        "}\n"
+    );
+
+    await fsApi.writeFile(
+        file3,
+        "task fatJar3(type: Jar) {\n" +
+        "    manifest {\n" +
+        "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+        "            'Implementation-Version': version,\n" +
+        "            'Main-Class': 'com.spmeesseman.test'\n" +
+        "    }\n" +
+        "    baseName = project.name + '-all'\n" +
+        "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+        "    with jar\n" +
+        "}\n"
+    );
+
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
+
+async function setupTsc()
+{
+    const file = join(rootPath, "tsconfig.json");
+    tempFiles.push(file);
+    const file2 = join(dirName, "tsconfig.json");
+    tempFiles.push(file2);
+
+    await fsApi.writeFile(
+        file,
+        "{\n" +
+        '    "compilerOptions":\n' +
+        "  {\n" +
+        '    "target": "es6",\n' +
+        '    "lib": ["es2016"],\n' +
+        '    "module": "commonjs",\n' +
+        '    "outDir": "./out",\n' +
+        '    "typeRoots": ["./node_modules/@types"],\n' +
+        '    "strict": true,\n' +
+        '    "experimentalDecorators": true,\n' +
+        '    "sourceMap": true,\n' +
+        '    "noImplicitThis": false\n' +
+        "  },\n" +
+        '  "include": ["**/*"],\n' +
+        '  "exclude": ["node_modules"]\n' +
+        "}\n"
+    );
+
+    await fsApi.writeFile(
+        file2,
+        "{\n" +
+        '    "compilerOptions":\n' +
+        "  {\n" +
+        '    "target": "es6",\n' +
+        '    "lib": ["es2016"],\n' +
+        '    "module": "commonjs",\n' +
+        '    "outDir": "./out",\n' +
+        '    "typeRoots": ["./node_modules/@types"],\n' +
+        '    "strict": true,\n' +
+        '    "experimentalDecorators": true,\n' +
+        '    "sourceMap": true,\n' +
+        '    "noImplicitThis": false\n' +
+        "  },\n" +
+        '  "include": ["**/*"],\n' +
+        '  "exclude": ["node_modules"]\n' +
+        "}\n"
+    );
+
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
+
+async function setupGulp()
+{
+    await createGulpFile();
+
+    const file2 = join(dirName, "Gulpfile.js");
+    tempFiles.push(file2);
+
+    const file3 = join(dirNameIgn, "gulpfile.js");
+    tempFiles.push(file3);
+
+    const file4 = join(dirName, "GULPFILE.MJS");
+    tempFiles.push(file4);
+
+    const file5 = join(dirNameL2, "GULPFILE.js");
+    tempFiles.push(file5);
+
+
+    await fsApi.writeFile(
+        file2,
+        "const { series } = require('gulp');\n" +
+        "function clean(cb) {\n" +
+        "    console.log('clean!!!');\n" +
+        "    cb();\n" +
+        "};\n" +
+        "function build(cb) {" +
+        "    console.log('build!!!');\n" +
+        "    cb();\n" +
+        "};\n" +
+        "exports.build = build;\n" +
+        'exports["clean"] = clean;\n' +
+        "exports.default = series(clean, build);\n"
+    );
+
+    await fsApi.writeFile(
+        file3,
+        "var gulp = require('gulp');\n" +
+        "gulp.task('hello3', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        'gulp.task(\n"hello4", (done) => {\n' +
+        "    console.log('Hello4!');\n" +
+        "    done();\n" +
+        "});\n"
+    );
+
+    await fsApi.writeFile(
+        file4,
+        "import pkg from 'gulp';\n" +
+        "const { task, series } = pkg;\n" +
+        "function clean2(cb) {\n" +
+        "    console.log('clean2!!!');\n" +
+        "    cb();\n" +
+        "}\n" +
+        "function build2(cb) {\n" +
+        "    console.log('build2!!!');\n" +
+        "    cb();\n" +
+        "}\n" +
+        "const _build1 = build2;\n" +
+        "const _build2 = build2;\n" +
+        "const build3 = build2;\n" +
+        "const build4 = build2;\n" +
+        "export { _build1 as build1 };\n" +
+        "export { _build2 as build2 };\n" +
+        "export { build3 };\n" +
+        "export { build4 };\n" +
+        "export const default123 = series(clean2, build2);\n"
+    );
+
+    await fsApi.writeFile(
+        file5,
+        "var gulp = require('gulp');\n" +
+        "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
+        "    console.log('Hello1!');\n" +
+        "    done();\n" +
+        "});\n" +
+        'gulp.task(\n"group2-test2-build-ui-two", (done) => {\n' +
+        "    console.log('Hello2!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-three', (done) => {\n" +
+        "    console.log('Hello3!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-four', (done) => {\n" +
+        "    console.log('Hello4!');\n" +
+        "    done();\n" +
+        "});\n" +
+        "gulp.task('group2-test2-build-ui-five', (done) => {\n" +
+        "    console.log('Hello5!');\n" +
+        "    done();\n" +
+        "});\n"
+    );
+
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
+
+async function setupMakefile()
+{
+    await createMakeFile();
+
+    const file2 = join(dirName, "Makefile");
+    tempFiles.push(file2);
+
+    const file3 = join(dirNameIgn, "Makefile");
+    tempFiles.push(file3);
+
+    await fsApi.writeFile(
+        file2,
+        "# all tasks comment\n" +
+        "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
+    );
+
+    await fsApi.writeFile(
+        file3,
+        "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
+    );
+
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
 
 async function setupBatch()
 {
@@ -428,6 +830,25 @@ async function setupBatch()
 
     await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
     await fsApi.writeFile(file3, "@echo testing batch file 3\r\n");
+    await waitForTeIdle(tc.waitTime.fs.createEvent);
+}
+
+
+async function setupBash()
+{
+    const file = join(rootPath, "test.sh");
+    tempFiles.push(file);
+
+    const file2 = join(dirName, "test2.SH");
+    tempFiles.push(file2);
+
+    const file3 = join(dirNameIgn, "test3.sh");
+    tempFiles.push(file3);
+
+    await fsApi.writeFile(file, "echo testing bash file\n");
+    await fsApi.writeFile(file2, "echo testing bash file 2\n");
+    await fsApi.writeFile(file3, "echo testing bash file 3\n");
+
     await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
@@ -473,6 +894,89 @@ async function setupGrunt()
 }
 
 
+async function setupAppPublisher()
+{
+    await createAppPublisherFile();
+}
+
+
+async function setupMaven()
+{
+    await createMavenPomFile();
+}
+
+
+async function createAntFile()
+{
+    if (dirName)
+    {
+        const file = join(dirName, "build.xml");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                '<?xml version="1.0"?>\n' +
+                '<project basedir="." default="test1">\n' +
+                '    <property environment="env" />\n' +
+                '    <property name="test" value="test" />\n' +
+                '    <target name="test1" depends="init"></target>\n' +
+                '    <target name="test2" depends="init"></target>\n' +
+                "</project>\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
+
+
+async function createAppPublisherFile()
+{
+    if (rootPath)
+    {
+        const file = join(rootPath, ".publishrc.json");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                "{\n" +
+                '    "version": "1.0.0",\n' +
+                '    "branch": "trunk",\n' +
+                '    "buildCommand": [],\n' +
+                '    "mantisbtRelease": "Y",\n' +
+                '    "mantisbtChglogEdit": "N",\n' +
+                '    "mantisbtProject": "",\n' +
+                '    "repoType": "svn"\n' +
+                "}\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
+
+
+async function createMavenPomFile()
+{
+    if (rootPath)
+    {
+        const file = join(rootPath, "pom.xml");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "</project>\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
 
 
 async function createBatchFile()
@@ -489,6 +993,35 @@ async function createBatchFile()
     }
 }
 
+
+async function createGradleFile()
+{
+    if (dirName)
+    {
+        const file = join(dirName, "build.gradle");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                "task fatJar(type: Jar) {\n" +
+                "    manifest {\n" +
+                "        attributes 'Implementation-Title': 'Gradle Jar File Example',\n" +
+                "            'Implementation-Version': version,\n" +
+                "            'Main-Class': 'com.spmeesseman.test'\n" +
+                "    }\n" +
+                "    baseName = project.name + '-all'\n" +
+                "    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }\n" +
+                "    with jar\n" +
+                "}\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
+
+
 async function createGruntFile()
 {
     if (rootPath)
@@ -504,6 +1037,51 @@ async function createGruntFile()
                 "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
                 '    grunt.registerTask("upload", [\'s3\']);\n' +
                 "};\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
+
+
+async function createGulpFile()
+{
+    if (rootPath)
+    {
+        const file = join(rootPath, "gulpfile.js");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                "var gulp = require('gulp');\n" +
+                "gulp.task(\n'hello', (done) => {\n" +
+                "    console.log('Hello!');\n" +
+                "    done();\n" +
+                "});\n" +
+                'gulp.task(\n       "hello2", (done) => {\n' +
+                "    done();\n" +
+                "});\n"
+            );
+            await waitForTeIdle(tc.waitTime.fs.createEvent);
+        }
+    }
+}
+
+
+async function createMakeFile()
+{
+    if (rootPath)
+    {
+        const file = join(rootPath, "Makefile");
+        tempFiles.push(file);
+
+        if (!await fsApi.pathExists(file))
+        {
+            await fsApi.writeFile(
+                file,
+                "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );
             await waitForTeIdle(tc.waitTime.fs.createEvent);
         }

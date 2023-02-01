@@ -57,7 +57,7 @@ suite("Pipenv Tests", () =>
     });
 
 
-	test("Focus Tree View", async function()
+	test("Focus Explorer View", async function()
 	{
         await startupFocus(this);
 	});
