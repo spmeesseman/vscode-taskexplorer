@@ -18,6 +18,71 @@ hr {
     background-color: var(--vscode-button-background);
 }
 
+.te-icon {
+    font-size: 56px;
+    --fa-primary-color: var(--vscode-button-background);
+    --fa-secondary-color: var(--vscode-button-hoverBackground);
+}
+
+.te-page-bg {
+    padding-left: 32px;
+    position: relative;
+}
+
+.te-page-bg:before {
+    font: var(--fa-font-solid);
+    content: "\f013";
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size:500px;
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    opacity: 0.04;
+}
+
+
+div.gfg {
+    margin:5px;
+    padding:5px;
+    background-color: var(--vscode-background);
+    height: 500px;
+    overflow: auto;
+    text-align:justify;
+}
+
+#releaseNotesDiv {
+    transform: scaleY(0);
+    transition: transform 400ms ease 0ms;
+}
+
+#releaseNotesDiv.is-show {
+    transform: scaleY(1);
+    transition: transform 400ms ease 0ms;
+}
+
+.change-log-container {
+    color: var(--vscode-foreground);
+    padding-top: 13px;
+    border-spacing: 0px;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 15px;
+}
+
+.change-log-title {
+    color: var(--vscode-foreground);
+}
+
+.toggle-button {
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    color: var(--vscode-button-hoverBackground);
+}
+
 .parsing-report-projects {
     color: var(--vscode-foreground);
     font-weight: bold;
@@ -78,8 +143,8 @@ hr {
 
 .content-subtitle {
     font-size: 28px;
-    color: var(--vscode-button-hoverBackground);
-    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+    color: var(--vscode-button-background);
+    text-shadow: 0px 1px 0px #999, 0px 1px 0px #888, 0px 2px 0px #777, 0px 2px 0px #666, 0px 1px 0px #555, 0px 2px 0px #444, 0px 2px 0px #333, 0px 3px 2px #001135;
 }
 
 .content-text-medium {
@@ -95,7 +160,7 @@ hr {
     font-weight: bold;
     text-align: center;
     vertical-align: middle;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
     color: var(--vscode-button-hoverBackground);
     text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
 }

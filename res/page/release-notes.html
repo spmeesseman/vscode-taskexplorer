@@ -11,18 +11,19 @@
         <link rel="stylesheet" href="[webview.cssDir]/fa.css"> <!-- <link rel="stylesheet" href="https://kit.fontawesome.com/e5d9daff3c.css" crossorigin="anonymous"> -->
     </head>
 
-    <body>
+    <body class="te-page-bg">
 
         <table align="center" width="900">
 
             <!-- startBodyContent-->
             <tr><td>
 
-                <table>
+                <table width="100%">
                     <tr><td>
                         <table><tr>
                             <td class="content-img">
-                                <img src="[webview.resourceDir]/gears-r-colors.png" />
+                                <!--<img src="[webview.resourceDir]/gears-r-colors.png" />-->
+                                <span class="fad fa-cogs te-icon"></span>
                             </td>
                             <td class="content-title"> &nbsp;<!-- title --></td>
                         </tr></table>
@@ -90,10 +91,10 @@
             <!-- startInfoContent -->
             <tr><td>
 
-                <table class="content-table">
+                <table class="content-table" width="100%">
                     <tr>
                     <td>
-                        <table>
+                        <table width="100%">
                             <tr>
                                 <td class="content-subtitle">
                                     NEW IN THIS RELEASE:
@@ -104,12 +105,39 @@
                                     <!-- subtitle -->
                                 </td>
                             </tr>
-                            <tr><td><table>
+                            <tr><td><table width="100%">
                                 <tr>
                                     <td><!-- releasenotes --></td>
                                 </tr>
                                 <tr>
-                                    <td><!-- changelog --></td>
+                                    <td>
+                                        <table class="change-log-container" width="100%">
+                                            <tr>
+                                                <td width="3">
+                                                    <hr>
+                                                </td>
+                                                <td width="15" align="center">
+                                                    <span id="btnToggleReleaseNotes" class="far fa-chevron-up toggle-button"></span>
+                                                </td>
+                                                <td width="10">
+                                                    <hr>
+                                                </td>
+                                                <td width="80" class="change-log-title">
+                                                    CHANGE LOG
+                                                </td>
+                                                <td>
+                                                    <hr>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div id="releaseNotesDiv" class="gfg">
+                                                        <!-- changelog -->
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
                             </table></td></tr>
                         </table>
@@ -144,6 +172,7 @@
         </table>
 
         <script nonce="[webview.nonce]" src="[webview.jsDir]/command.js"></script>
+        <script nonce="[webview.nonce]" src="[webview.jsDir]/toggle.js"></script>
 
     </body>
 </html>

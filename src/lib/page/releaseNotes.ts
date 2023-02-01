@@ -48,7 +48,7 @@ const getNewInThisReleaseShortDsc = () => "MAJOR RELEASE - A PLETHORA OF NEW FEA
 const getNewReleaseNotes = (version: string, changeLogMd: string) =>
 {
 return `
-<table style="margin-top:15px" width="100%" align="center">
+<table style="margin-top:15px" width="100%">
 	${getNewReleaseNotesHdr("Features", "plus")}
 	<tr>
 		<td>
@@ -80,13 +80,13 @@ return `
 const getNewReleaseNotesHdr = (title: string, icon: string) =>
 {
 	return `
-	<tr><td>
+	<tr><td width="100%">
 		<hr>
 	</td></tr>
 	<tr class="content-section-header">
 		<td class="content-section-header-nowrap" nowrap>&nbsp;<span class=\"far fa-${icon} content-section-fa-img\"></span> &nbsp;${title}</td>
 	</tr>
-	<tr><td>
+	<tr><td width="100%">
 		<hr>
 	</td></tr>`;
 };
