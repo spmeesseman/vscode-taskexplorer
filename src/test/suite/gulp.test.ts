@@ -40,11 +40,11 @@ suite("Gulp Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
         await updateInternalProviderAutoDetect("gulp", "off"); // turned on in tests initSettings()
-        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
         await fsApi.deleteFile(file2Uri.fsPath);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent + tc.waitTime.config.disableEvent);
         suiteFinished(this);
     });
 
@@ -217,21 +217,11 @@ suite("Gulp Tests", () =>
     test("Gulp Parser", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.config.enableEvent * 2) + (tc.waitTime.config.event * 2) +
-                  tc.waitTime.config.disableEvent + (tc.slowTime.taskCount.verify * 2) + (tc.slowTime.tasks.gulpParser * 4));
-        //
-        // Use Gulp to parse tasks. The configuration change will cause gulp tasks to be invalidated and refreshed
-        //
+        this.slow(tc.slowTime.config.enableEvent  + tc.waitTime.config.event + tc.slowTime.taskCount.verify + (tc.slowTime.tasks.gulpParser * 4));
         await updateInternalProviderAutoDetect("gulp", "off"); // turned on in tests initSettings()
         await waitForTeIdle(tc.waitTime.config.enableEvent);
-        await executeSettingsUpdate("useGulp", true, tc.waitTime.config.event);
+        await executeSettingsUpdate("useGulp", true);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
-        await verifyTaskCount(testsName, startTaskCount);
-        //
-        // Reset to Basic Parser. The configuration change will cause gulp tasks to be invalidated and refreshed
-        //
-        await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
-        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });

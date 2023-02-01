@@ -40,8 +40,8 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         await updateInternalProviderAutoDetect("grunt", "off"); // turned on in tests initSettings()
-        await waitForTeIdle(tc.waitTime.config.disableEvent);
         await fsApi.deleteFile(fileUri.fsPath);
+        await waitForTeIdle(tc.waitTime.fs.deleteEvent + tc.waitTime.config.disableEvent);
         suiteFinished(this);
     });
 

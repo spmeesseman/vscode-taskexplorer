@@ -58,8 +58,6 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 1485,
-        addWorkspaceFolderEmpty: 1430,
         cache: {
             build: 480,
             buildCancel: 300,
@@ -71,7 +69,11 @@ export const testControl: ITestControl =
         cleanup: 320,
         closeEditors: 15,
         commands: {
+            exclude: 1350,
             fast: 250,
+            focus: 2330,
+            focusAlreadyFocused: 375,
+            focusChangeViews: 775,
             refresh: 6250,
             refreshNoChanges: 235,
             run: 4750,
@@ -94,29 +96,25 @@ export const testControl: ITestControl =
             pathToProgramsEvent: 710,
             readEvent: 25,
             shellChange: 1325,
-            showHideSpecialFolder: 525,
+            showHideSpecialFolder: 530,
             showHideUserTasks: 975,
             sortingEvent: 815,
             terminalEvent: 250
         },
-        excludeCommand: 1350,
         explorerViewStartup: 9500,
         fetchTasksCommand: 350,
         findTaskPosition: 280,
         findTaskPositionDocOpen: 30,
-        focusCommand: 2330,
-        focusCommandAlreadyFocused: 375,
-        focusCommandChangeViews: 775,
         fs: {
             createEvent: 1550,
-            createEventTsc: 1835,
+            createEventTsc: 1885,
             createFolderEvent: 1600,
             deleteEvent: 1325,
-            deleteEventTsc: 1655,
+            deleteEventTsc: 1780,
             deleteFolderEvent: 1400,
             modifyEvent: 1140,
             modifyEventAnt: 1200,
-            modifyEventTsc: 1200
+            modifyEventTsc: 1220
         },
         getTreeTasks: 205,
         getTreeTasksNpm: 470, // npm task provider is slower than shit on a turtle
@@ -130,9 +128,6 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        removeWorkspaceFolder: 550,
-        removeWorkspaceFolderEmpty: 475,
-        reorderWorkspaceFolders: 580,
         storageRead: 15,
         storageUpdate: 25,
         storageSecretRead: 35,
@@ -157,7 +152,14 @@ export const testControl: ITestControl =
             verifyFirstCall: 550
         },
         viewReleaseNotes: 415,
-        viewReport: 380
+        viewReport: 380,
+        wsFolder: {
+            add: 1600,
+            addEmpty: 1500,
+            remove: 550,
+            removeEmpty: 475,
+            reorder: 450
+        }
     },
     //
     // SLOW TIMES (TESTS MARKED RED WHEN EXCEEDED)
@@ -166,8 +168,6 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTimeMultiRoot: {
-        addWorkspaceFolder: 3250,
-        addWorkspaceFolderEmpty: 1625,
         cache: {
             build: 540,
             buildCancel: 330,
@@ -179,7 +179,11 @@ export const testControl: ITestControl =
         cleanup: 375,
         closeEditors: 20,
         commands: {
+            exclude: 1510,
             fast: 290,
+            focus: 2575,
+            focusAlreadyFocused: 700,
+            focusChangeViews: 775,
             refresh: 6250,
             refreshNoChanges: 235,
             run: 5400,
@@ -207,14 +211,10 @@ export const testControl: ITestControl =
             sortingEvent: 800,
             terminalEvent: 300
         },
-        excludeCommand: 1510,
         explorerViewStartup: 9500,
         fetchTasksCommand: 375,
         findTaskPosition: 355,
         findTaskPositionDocOpen: 45,
-        focusCommand: 2575,
-        focusCommandAlreadyFocused: 700,
-        focusCommandChangeViews: 775,
         fs: {
             createEvent: 1930,
             createEventTsc: 2105,
@@ -238,11 +238,6 @@ export const testControl: ITestControl =
             setLicenseCmd: 220
         },
         min: 50,
-        refreshCommand: 7500,
-        refreshCommandNoChanges: 345,
-        removeWorkspaceFolder: 2275,
-        removeWorkspaceFolderEmpty: 1450,
-        reorderWorkspaceFolders: 935,
         storageRead: 20,
         storageUpdate: 30,
         storageSecretRead: 40,
@@ -267,7 +262,14 @@ export const testControl: ITestControl =
             verifyFirstCall: 750,
         },
         viewReleaseNotes: 655,
-        viewReport: 390
+        viewReport: 390,
+        wsFolder: {
+            add: 3250,
+            addEmpty: 1625,
+            remove: 2275,
+            removeEmpty: 1450,
+            reorder: 835
+        }
     },
     //
     // WAIT TIMES (MAX TIME IS USUALLY ~ SLOW TIME, OR waitTime.max)
@@ -391,8 +393,6 @@ interface ISuiteResults extends IDictionary<any>
 
 export interface ISlowTimes
 {
-    addWorkspaceFolder: number;
-    addWorkspaceFolderEmpty: number;
     cache: {
         build: number;
         buildCancel: number;
@@ -404,7 +404,11 @@ export interface ISlowTimes
     cleanup: number;
     closeEditors: number;
     commands: {
+        exclude: number;
         fast: number;
+        focus: number;
+        focusAlreadyFocused: number;
+        focusChangeViews: number;
         refresh: number;
         refreshNoChanges: number;
         run: number;
@@ -432,14 +436,10 @@ export interface ISlowTimes
         sortingEvent: number;
         terminalEvent: number;
     };
-    excludeCommand: number;
     explorerViewStartup: number;
     fetchTasksCommand: number;
     findTaskPosition: number;
     findTaskPositionDocOpen: number;
-    focusCommand: number;
-    focusCommandAlreadyFocused: number;
-    focusCommandChangeViews: number;
     fs: {
         createEvent: number;
         createEventTsc: number;
@@ -463,9 +463,6 @@ export interface ISlowTimes
         setLicenseCmd: number;
     };
     min: number;
-    removeWorkspaceFolder: number;
-    removeWorkspaceFolderEmpty: number;
-    reorderWorkspaceFolders: number;
     storageRead: number;
     storageUpdate: number;
     storageSecretRead: number;
@@ -491,6 +488,13 @@ export interface ISlowTimes
     };
     viewReleaseNotes: number;
     viewReport: number;
+    wsFolder: {
+        add: number;
+        addEmpty: number;
+        remove: number;
+        removeEmpty: number;
+        reorder: number;
+    };
 };
 
 

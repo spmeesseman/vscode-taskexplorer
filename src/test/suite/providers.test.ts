@@ -418,7 +418,7 @@ suite("Provider Tests", () =>
     test("Add to Excludes - TaskItem (Script Type)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.excludeCommand);
+        this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.commands.exclude);
         const batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[],
               taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,

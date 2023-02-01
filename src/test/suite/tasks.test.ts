@@ -222,7 +222,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.commands.run +
-                  tc.slowTime.tasks.antTaskWithAnsicon + 300 + tc.slowTime.focusCommandChangeViews);
+                  tc.slowTime.tasks.antTaskWithAnsicon + 300 + tc.slowTime.commands.focusChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), tc.waitTime.config.enableEvent);
