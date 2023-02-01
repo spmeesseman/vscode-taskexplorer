@@ -4,7 +4,7 @@
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, treeUtils, waitForTeIdle
+    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, treeUtils, waitForTeIdle
 } from "../utils/utils";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
 
@@ -24,6 +24,7 @@ suite("Initialization", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        await closeEditors();
         suiteFinished(this);
     });
 
@@ -31,7 +32,7 @@ suite("Initialization", () =>
     test("Build Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        //sawait treeUtils.refresh(this);
+        // await treeUtils.refresh(this);
         endRollingCount(this);
     });
 

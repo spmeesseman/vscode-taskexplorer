@@ -8,8 +8,9 @@ import TaskItem from "../../tree/item";
 import TaskFolder from "../../tree/folder";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { sortFolders } from "../../lib/sortTasks";
+import { startupFocus } from "../utils/suiteUtils";
+import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 
 const tc = utils.testControl;
 let teApi: ITaskExplorerApi;
@@ -45,13 +46,9 @@ suite("Tree Tests", () =>
     });
 
 
-	test("Focus Explorer View", async function()
+    test("Focus Explorer View", async function()
 	{
-        if (utils.exitRollingCount(this)) return;
-        if (utils.needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        utils.endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

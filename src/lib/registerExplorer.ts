@@ -16,31 +16,25 @@ export function registerExplorer(name: "taskExplorer"|"taskExplorerSideBar", con
 
     if (enabled)
     {
-        if (!view)
+        const treeDataProvider = new TaskTreeDataProvider(name, context), // , teApi.isTests()),
+                treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
+        views[name] = treeView;
+        view = views[name] as TreeView<TreeItem>;
+        view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
+        context.subscriptions.push(view);
+        if (name === "taskExplorer")
         {
-            const treeDataProvider = new TaskTreeDataProvider(name, context), // , teApi.isTests()),
-                  treeView = window.createTreeView(name, { treeDataProvider, showCollapseAll: true });
-            views[name] = treeView;
-            view = views[name] as TreeView<TreeItem>;
-            view.onDidChangeVisibility(e => { treeDataProvider.onVisibilityChanged(e.visible); }, treeDataProvider);
-            context.subscriptions.push(view);
-            if (name === "taskExplorer")
-            {
-                teApi.explorer = treeDataProvider;
-                teApi.explorer.setEnabled(!isActivation, logPad + "   ");
-                teApi.explorerView = view;
-            }
-            else // name === "taskExplorerSideBar"
-            {
-                teApi.sidebar = treeDataProvider;
-                teApi.sidebar.setEnabled(!isActivation, logPad + "   ");
-                teApi.sidebarView = view;
-            }
-            log.write("   tree data provider '" + name + "' registered", 1, logPad);
+            teApi.explorer = treeDataProvider;
+            teApi.explorer.setEnabled(!isActivation, logPad + "   ");
+            teApi.explorerView = view;
         }
-        else {
-            log.write("   tree data provider '" + name + "' has already been registered", 1, logPad);
+        else // name === "taskExplorerSideBar"
+        {
+            teApi.sidebar = treeDataProvider;
+            teApi.sidebar.setEnabled(!isActivation, logPad + "   ");
+            teApi.sidebarView = view;
         }
+        log.write("   tree data provider '" + name + "' registered", 1, logPad);
     }
     else
     {

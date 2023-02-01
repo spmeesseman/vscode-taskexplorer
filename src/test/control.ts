@@ -91,7 +91,7 @@ export const testControl: ITestControl =
             terminalEvent: 250
         },
         excludeCommand: 1350,
-        explorerViewStartup: 6000,
+        explorerViewStartup: 9500,
         fetchTasksCommand: 1835,
         fileCachePersist: 245,
         findTaskPosition: 275,
@@ -101,12 +101,12 @@ export const testControl: ITestControl =
         focusCommandChangeViews: 775,
         fs: {
             createEvent: 1550,
-            createEventTsc: 1675,
+            createEventTsc: 1725,
             createFolderEvent: 1600,
             deleteEvent: 1325,
-            deleteEventTsc: 1550,
+            deleteEventTsc: 1600,
             deleteFolderEvent: 1400,
-            modifyEvent: 1100,
+            modifyEvent: 1140,
             modifyEventAnt: 1200
         },
         getTreeTasks: 195,

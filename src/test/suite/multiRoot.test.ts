@@ -16,14 +16,15 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
+import { startupFocus } from "../utils/suiteUtils";
 import { Task, Uri, workspace, WorkspaceFolder } from "vscode";
+import { enableConfigWatcher } from "../../lib/watcher/configWatcher";
+import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
-import { enableConfigWatcher } from "../../lib/watcher/configWatcher";
 
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
@@ -114,21 +115,9 @@ suite("Multi-Root Workspace Tests", () =>
     });
 
 
-    // test("Build Tree", async function()
-    // {
-    //     if (exitRollingCount(this)) return;
-    //     if (needsTreeBuild()) {
-    //         await treeUtils.refresh(this);
-    //     }
-    //     endRollingCount(this);
-    // });
 	test("Focus Explorer View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

@@ -4,6 +4,7 @@ import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
 import TaskFolder  from "./folder";
 import { pathExistsSync } from "../lib/utils/fs";
+import { properCase } from "../lib/utils/commonUtils";
 import { getUserDataPath } from "../lib/utils/pathUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
@@ -155,7 +156,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
 
         if (!groupId)
         {
-            this.contextValue = "taskFile" + util.properCase(this.taskSource);
+            this.contextValue = "taskFile" + properCase(this.taskSource);
         }       //
         else { // When a grouped node is created, the definition for the first task is passed
               // to this function. Remove the filename part of tha path for this resource.
@@ -164,7 +165,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
             // Use a custom toolip (default is to display resource uri)
             const taskName = getTaskTypeFriendlyName(source, true);
             this.tooltip = `A tree item representing a ${taskName} task file grouping`;
-            this.contextValue = "taskGroup" + util.properCase(this.taskSource);
+            this.contextValue = "taskGroup" + properCase(this.taskSource);
             this.groupLevel = groupLevel;
         }
 

@@ -4,8 +4,6 @@ import figures from "../figures";
 import { logControl } from "./log";
 import { appendFileSync } from "fs";
 import { window } from "vscode"; // TODO - this is used as scope but thought browser 'window' duh
-import { properCase } from "../utils/utils";
-import { sep } from "path";
 import { IDictionary } from "../../interface";
 
 const colors = figures.colors;

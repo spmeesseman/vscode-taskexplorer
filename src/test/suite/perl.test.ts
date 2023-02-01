@@ -4,6 +4,7 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { PerlTaskProvider } from "../../providers/perl";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -44,11 +45,7 @@ suite("Perl Tests", () =>
 
     test("Focus Explorer View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

@@ -5,9 +5,10 @@
 import * as utils from "../utils/utils";
 import TaskItem from "../../tree/item";
 import { TaskExecution } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { getPackageManager } from "../../lib/utils/utils";
+import { executeTeCommand2 } from "../utils/commandUtils";
 import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 
 const testsName = "npm";
 const startTaskCount = 0;
@@ -49,13 +50,9 @@ suite("NPM Tests", () =>
     });
 
 
-	test("Focus Explorer View", async function()
+    test("Focus Explorer View", async function()
 	{
-        if (utils.exitRollingCount(this)) return;
-        if (utils.needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        utils.endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

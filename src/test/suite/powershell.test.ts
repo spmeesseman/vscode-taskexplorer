@@ -7,12 +7,13 @@
 //
 import * as path from "path";
 import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { PowershellTaskProvider } from "../../providers/powershell";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath,
-    logErrorsAreFine, needsTreeBuild, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
+    logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "powershell";
@@ -58,13 +59,9 @@ suite("Powershell Tests", () =>
     });
 
 
-	test("Focus Explorer View", async function()
+    test("Focus Explorer View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

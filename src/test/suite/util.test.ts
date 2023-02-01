@@ -5,12 +5,13 @@
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
 import * as pathUtils from "../../lib/utils/pathUtils";
+import log, { logControl } from "../../lib/log/log";
 import { env } from "process";
 import { join } from "path";
 import { expect } from "chai";
 import { InitScripts } from "../../lib/noScripts";
-import log, { logControl } from "../../lib/log/log";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
+import { camelCase, properCase } from "../../lib/utils/commonUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
@@ -427,20 +428,20 @@ suite("Util Tests", () =>
 
         util.timeout(10);
 
-        expect(util.camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
-        expect(util.camelCase(undefined, 4)).to.be.equal(undefined);
-        expect(util.camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
-        expect(util.camelCase("test", -1)).to.be.equal("test");
+        expect(camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
+        expect(camelCase(undefined, 4)).to.be.equal(undefined);
+        expect(camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
+        expect(camelCase("test", -1)).to.be.equal("test");
 
-        expect(util.properCase("taskexplorer")).to.be.equal("Taskexplorer");
-        expect(util.properCase(undefined)).to.be.equal("");
-		expect(util.properCase("dc is here", true)).to.be.equal("DcIsHere");
-		expect(util.properCase("dc is here", false)).to.be.equal("Dc Is Here");
-		expect(util.properCase("dc is here")).to.be.equal("Dc Is Here");
-		expect(util.properCase("dc was here", true)).to.be.equal("DcWasHere");
-		expect(util.properCase("dc was here", false)).to.be.equal("Dc Was Here");
-		expect(util.properCase(undefined)).to.equal("");
-		expect(util.properCase("")).to.equal("");
+        expect(properCase("taskexplorer")).to.be.equal("Taskexplorer");
+        expect(properCase(undefined)).to.be.equal("");
+		expect(properCase("dc is here", true)).to.be.equal("DcIsHere");
+		expect(properCase("dc is here", false)).to.be.equal("Dc Is Here");
+		expect(properCase("dc is here")).to.be.equal("Dc Is Here");
+		expect(properCase("dc was here", true)).to.be.equal("DcWasHere");
+		expect(properCase("dc was here", false)).to.be.equal("Dc Was Here");
+		expect(properCase(undefined)).to.equal("");
+		expect(properCase("")).to.equal("");
 
         expect(isScriptType("batch"));
         expect(getScriptTaskTypes().length > 0);

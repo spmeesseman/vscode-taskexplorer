@@ -6,11 +6,12 @@
 //
 import * as utils from "../utils/utils";
 import { Uri } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 import { ITestControl } from "../control";
 import { pathExists } from "../../lib/utils/fs";
-import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
+import { startupFocus } from "../utils/suiteUtils";
+import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 
 const testsName = "tsc";
 const startTaskCount = 0;
@@ -55,14 +56,11 @@ suite("Typescript Tests", () =>
     });
 
 
-	test("Focus Explorer View", async function()
+    test("Focus Explorer View", async function()
 	{
-        if (utils.exitRollingCount(this)) return;
-        if (utils.needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        utils.endRollingCount(this);
+        await startupFocus(this);
 	});
+
 
 
     test("Start", async function()

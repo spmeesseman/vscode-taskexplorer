@@ -1,7 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { properCase } from "./utils";
-
+import { properCase } from "./commonUtils";
 
 
 export function getScriptTaskTypes(): string[]

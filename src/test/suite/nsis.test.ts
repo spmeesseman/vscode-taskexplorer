@@ -4,6 +4,7 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
 import { NsisTaskProvider } from "../../providers/nsis";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -44,13 +45,8 @@ suite("Nullsoft NSIS Tests", () =>
 
     test("Focus Explorer View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
-
 
 
     test("Document Position", async function()

@@ -87,6 +87,7 @@ suite("License Manager Tests", () =>
         utils.suiteFinished(this);
 	});
 
+
 	test("Focus Explorer View", async function()
 	{
         await startupFocus(this, async () => {
@@ -95,6 +96,7 @@ suite("License Manager Tests", () =>
 			await licMgr.setTasks(tasks);     // covers checking same # of tasks onsetTasks() calls
 		});
 	});
+
 
 
 	test("Clear License Key", async function()
@@ -450,7 +452,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.get30DayLicense +
 				  tc.slowTime.storageSecretRead + tc.slowTime.closeEditors + 1100);
-		await teApi.testsApi.storage.update("version", undefined);
+		await teApi.testsApi.storage.updateSecret("version", undefined);
 		await setTasks();
 		await utils.sleep(50);
 		const result = await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });

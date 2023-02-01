@@ -876,6 +876,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     {
         if (!this.enabled)
         {
+            this.refreshPending = false;
             this.scanningFilesItem = this.scanningFilesItem || new InitScripts(this);
             return [ this.scanningFilesItem ]; // 'scanningFilesItem' continually fires tree refresh events
         }                                      // to roll it's elipsis

@@ -3,15 +3,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskFolder } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-    activate, endRollingCount, exitRollingCount, needsTreeBuild, sleep, suiteFinished, testControl as tc,
-    treeUtils,
-    verifyTaskCount, waitForTeIdle
-} from "../utils/utils";
 import { expect } from "chai";
 import { TreeItem } from "vscode";
+import { startupFocus } from "../utils/suiteUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {
+    activate, endRollingCount, exitRollingCount, needsTreeBuild, sleep, suiteFinished, testControl as tc,
+    verifyTaskCount, waitForTeIdle
+} from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
@@ -66,11 +66,7 @@ suite("NoScripts TreeItem Tests", () =>
 
 	test("Focus Explorer View", async function()
 	{
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
-        }
-        endRollingCount(this);
+        await startupFocus(this);
 	});
 
 

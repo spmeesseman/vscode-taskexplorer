@@ -1,9 +1,10 @@
 
 
 import figures from "../../lib/figures";
-import { lowerCaseFirstChar, properCase } from "../../lib/utils/utils";
-import { testControl as tc } from "../control";
 import { teApi } from "./utils";
+import { testControl as tc } from "../control";
+import { properCase } from "../../lib/utils/commonUtils";
+import { lowerCaseFirstChar } from "../../lib/utils/utils";
 
 const tct = tc.tests;
 const timeSep = "----------------------------------------------------------------------------------------------------";
