@@ -223,7 +223,7 @@
                     "name": "",
                     "when": "config.taskExplorer.enableSideBar",
                     "icon": "res/gears-r.svg",
-                    "visibility": "hidden"
+                    "visibility": "visible"
                 }
             ]
         },

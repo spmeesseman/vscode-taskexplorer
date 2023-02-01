@@ -6,6 +6,7 @@ import TaskFile from "./file";
 import TaskFolder from "./folder";
 import { ITaskItem } from "../interface";
 import { configuration } from "../lib/utils/configuration";
+import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command, Uri
 }
@@ -112,7 +113,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
         //
         // Tooltip
         //
-        const taskName = util.getTaskTypeFriendlyName(task.source, true);
+        const taskName = getTaskTypeFriendlyName(task.source, true);
         this.tooltip = "Open " + task.name + (task.detail ? ` | ${task.detail}` : "") +
                         `   source : \`${taskName}\``;
         if (task.definition.type !== task.source) {

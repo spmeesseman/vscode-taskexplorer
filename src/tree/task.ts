@@ -10,7 +10,8 @@ import { TaskTreeDataProvider } from "./tree";
 import { getTerminal } from "../lib/getTerminal";
 import { ScriptTaskProvider } from "../providers/script";
 import { configuration } from "../lib/utils/configuration";
-import { getPackageManager, isScriptType, timeout } from "../lib/utils/utils";
+import { isScriptType } from "../lib/utils/taskTypeUtils";
+import { getPackageManager, timeout } from "../lib/utils/utils";
 import { providers, providersExternal } from "../extension";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import {

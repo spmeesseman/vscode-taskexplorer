@@ -19,12 +19,13 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "../providers/provider";
+import { ITaskFile, ITaskItem, IDictionary } from "../interface";
 import { ITaskExplorer, TaskMap } from "../interface/ITaskExplorer";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
 import { getLicenseManager, providers, providersExternal } from "../extension";
-import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition, IDictionary } from "../interface";
+import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
-    Event, EventEmitter, ExtensionContext, Task, TaskDefinition, TreeDataProvider, TreeItem,
+    Event, EventEmitter, ExtensionContext, Task, TreeDataProvider, TreeItem,
     TreeItemCollapsibleState, Uri, commands, tasks, Disposable, workspace
 } from "vscode";
 import { ILicenseManager } from "../interface/ILicenseManager";
@@ -182,7 +183,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         else // if (selection instanceof TaskItem)
         {
             uri = false;
-            if (util.isScriptType(selection.taskSource))
+            if (isScriptType(selection.taskSource))
             {
                 const resourceUri = selection.resourceUri as Uri;
                 log.value("   adding file path", resourceUri.path, 2);
@@ -701,7 +702,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         }     //
         else // this.currentInvalidation guaranteed to be a string (task type) here
         {   //
-            const taskName = util.getTaskTypeFriendlyName(this.currentInvalidation);
+            const taskName = getTaskTypeFriendlyName(this.currentInvalidation);
             log.write(`   fetching ${taskName} tasks via VSCode fetchTasks call`, logLevel, logPad);
             statusBarItem.update("Requesting  tasks from " + taskName + " task provider");
             //

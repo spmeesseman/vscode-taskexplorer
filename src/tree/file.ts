@@ -5,6 +5,7 @@ import log from "../lib/log/log";
 import TaskFolder  from "./folder";
 import { pathExistsSync } from "../lib/utils/fs";
 import { getUserDataPath } from "../lib/utils/pathUtils";
+import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
 
@@ -161,7 +162,7 @@ export default class TaskFile extends TreeItem implements ITaskFile
              //
             this.fileName = "group"; // change to name of directory
             // Use a custom toolip (default is to display resource uri)
-            const taskName = util.getTaskTypeFriendlyName(source, true);
+            const taskName = getTaskTypeFriendlyName(source, true);
             this.tooltip = `A tree item representing a ${taskName} task file grouping`;
             this.contextValue = "taskGroup" + util.properCase(this.taskSource);
             this.groupLevel = groupLevel;

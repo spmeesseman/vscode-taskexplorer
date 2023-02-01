@@ -45,6 +45,7 @@ import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } 
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
 import { IConfiguration } from "./interface/IConfiguration";
 import { registerStatusBarItem } from "./lib/statusBarItem";
+import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 // import { TeAuthenticationProvider } from "./lib/auth/authProvider";
 
 export const providers: IDictionary<TaskExplorerProvider> = {};
@@ -311,14 +312,14 @@ const tempRemapSettingsToNewLayout = async() =>
     /* istanbul ignore next */
     if (didSettingUpgrade)
     {   /* istanbul ignore next */
-        const taskTypes = util.getTaskTypes();
+        const taskTypes = getTaskTypes();
         /* istanbul ignore next */
         taskTypes.push("ansicon");
         /* istanbul ignore next */
         for (const taskType of taskTypes)
         {   /* istanbul ignore next */
-            let oldEnabledSetting = util.getTaskTypeSettingName(taskType, "enable"),
-                newEnabledSetting = util.getTaskTypeEnabledSettingName(taskType);
+            let oldEnabledSetting = getTaskTypeSettingName(taskType, "enable"),
+                newEnabledSetting = getTaskTypeEnabledSettingName(taskType);
             /* istanbul ignore next */
             if (taskType !== "ansicon" && taskType !== "curl")
             {   /* istanbul ignore next */
@@ -335,9 +336,9 @@ const tempRemapSettingsToNewLayout = async() =>
             }
 
             /* istanbul ignore next */
-            oldEnabledSetting = util.getTaskTypeSettingName(taskType, "pathTo");
+            oldEnabledSetting = getTaskTypeSettingName(taskType, "pathTo");
             /* istanbul ignore next */
-            newEnabledSetting = util.getTaskTypeSettingName(taskType, "pathToPrograms.");
+            newEnabledSetting = getTaskTypeSettingName(taskType, "pathToPrograms.");
             /* istanbul ignore next */
             const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
             /* istanbul ignore next */
