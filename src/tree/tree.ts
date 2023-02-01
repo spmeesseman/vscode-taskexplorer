@@ -985,7 +985,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     getName = () => this.name;
 
 
-//     /* istanbul ignore next */  // will be needed for TaskResolve API??
+//     /* istanbul ignore next */  // will be needed for TaskResolve API and/or TreeView/Reveal API??
 //     public getParent(element: TreeItem): TreeItem | null
 //     {
 //         /* istanbul ignore next */

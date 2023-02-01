@@ -8,6 +8,10 @@ import { copyFile, deleteDir, writeFile } from "../lib/utils/fs";
 
 const VSCODE_TEST_VERSION = "1.63.0";
 
+interface IDictionary<TValue>
+{
+    [id: string]: TValue;
+}
 
 const main = async(args: string[]) =>
 {
@@ -34,18 +38,23 @@ const main = async(args: string[]) =>
     const projectSettingsFile = path.join(project1Path, ".vscode", "settings.json");
     const multiRootWsFile = path.join(testWorkspaceMultiRoot, "tests.code-workspace");
 
-    const wsConfig = {
+    const mwsConfig: IDictionary<any> = {
         folders: [
-            {
-                name: "project1",
-                path: "project1"
-            },
-            {
-                name: "project2",
-                path: "project2"
-            }
-        ],
-        settings: {}
+        {
+            name: "project1",
+            path: "project1"
+        },
+        {
+            name: "project2",
+            path: "project2"
+        }],
+        settings: {
+            "taskExplorer.enableSideBar": true
+        }
+    };
+
+    const swsConfig: IDictionary<any> = {
+        "taskExplorer.enableSideBar": true
     };
 
     try
@@ -81,10 +90,10 @@ const main = async(args: string[]) =>
         //
         // let settingsJsonOrig: string | undefined;
         if (!multiRoot) {
-            await writeFile(projectSettingsFile, "{}");
+            await writeFile(projectSettingsFile, JSON.stringify(swsConfig));
         }
         else {
-            await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
+            await writeFile(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
         }
 
         //
@@ -187,7 +196,7 @@ const main = async(args: string[]) =>
                 }
                 else
                 {
-                    wsConfig.settings = {
+                    mwsConfig.settings = {
                         "taskExplorer.exclude": [
                             "**/tasks_test_ignore_/**",
                         ],
@@ -195,7 +204,7 @@ const main = async(args: string[]) =>
                             "**/hello.xml"
                         ]
                     };
-                    await writeFile(multiRootWsFile, JSON.stringify(wsConfig, null, 4));
+                    await writeFile(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
                 }
             }
             console.log("delete any leftover temporary files and/or directories");

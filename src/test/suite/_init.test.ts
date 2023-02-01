@@ -28,14 +28,6 @@ suite("Initialization", () =>
     });
 
 
-    // test("Build Tree", async function()
-    // {
-    //     if (exitRollingCount(this)) return;
-    //     await treeUtils.refresh(this);
-    //     endRollingCount(this);
-    // });
-
-
     test("Show/Hide Output Window", async function()
     {
         if (exitRollingCount(this)) return;
@@ -48,7 +40,7 @@ suite("Initialization", () =>
         endRollingCount(this);
     });
 
-
+/*
     test("Enable SideBar View", async function()
     {
         if (exitRollingCount(this)) return;
@@ -57,17 +49,16 @@ suite("Initialization", () =>
         await waitForTeIdle(tc.waitTime.explorerViewStartup);
         endRollingCount(this);
     });
+*/
 
-
-    // test("Focus SideBar Tree", async function()
-    // {
-    //     if (exitRollingCount(this)) return;
-    //     this.slow(tc.slowTime.refreshCommand);
-    //     await focusSidebarView();
-    //     await waitForTeIdle(tc.waitTime.refreshCommand);
-    //     endRollingCount(this);
-    //     await sleep(5000);
-    // });
+    test("Focus SideBar Tree", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.refreshCommand);
+        await focusSidebarView();
+        await waitForTeIdle(tc.waitTime.refreshCommand);
+        endRollingCount(this);
+    });
 
 
     test("Disable Explorer Views", async function()
@@ -113,26 +104,19 @@ suite("Initialization", () =>
     test("Disable SideBar View", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
-        teApi.sidebar?.setEnabled(false, ""); // cover getChildren new InitScripts() || new NoScripts()
-        // await teApi.sidebar?.getChildren(); // cover getChildren new InitScripts() || new NoScripts()
-        await teApi.sidebar?.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
-        await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
-        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        this.slow(tc.slowTime.config.registerExplorerEvent);
+        await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.registerExplorerEvent);
         endRollingCount(this);
     });
 
 
-    // test("Focus File Explorer View", async function()
-    // {
-    //     console.log("1");
-    //     if (exitRollingCount(this)) return;
-    //     this.slow(tc.slowTime.refreshCommandNoChanges);
-    //     await focusFileExplorer();
-    //     endRollingCount(this);
-    //     await sleep(3000);
-    //     console.log("2");
-    // });
+    test("Focus File Explorer View", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.focusCommandChangeViews);
+        await focusFileExplorer();
+        endRollingCount(this);
+    });
 
 
     test("Refresh Explorer Tree", async function()

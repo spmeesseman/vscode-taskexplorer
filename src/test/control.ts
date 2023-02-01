@@ -158,8 +158,8 @@ export const testControl: ITestControl =
             npmInstallCommand: 8600
         },
         taskCount: {
-            verify: 350,
-            verifyByTree: 400,
+            verify: 440,
+            verifyByTree: 490,
             verifyFirstCall: 550,
             verifyNpm: 700, // internal vscode npm task provider is slower than shit wtf
             verifyWorkspace: 900

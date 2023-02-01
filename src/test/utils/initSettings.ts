@@ -4,8 +4,9 @@ import { ConfigurationTarget, workspace } from "vscode";
 import figures from "../../lib/figures";
 import { getWsPath } from "./sharedUtils";
 import { testControl as tc } from "../control";
-import { isObject } from "../../lib/utils/utils";
+import { getTaskTypes, isObject } from "../../lib/utils/utils";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { readFileAsync } from "../../lib/utils/fs";
 
 
 const initSettings = async () =>
@@ -45,41 +46,24 @@ const initSettings = async () =>
     // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
     //
     await config.update("enableExplorerView", true, ConfigurationTarget.Workspace);
-    await config.update("enableSideBar", false, ConfigurationTarget.Workspace);
+    await config.update("enableSideBar", true, ConfigurationTarget.Workspace);
     //
     // Persistent file caching off.  Pretty intensive when enabled in tests.  Adds 1+
     // minute to overall tests completion time if set `true`.  Default is `false`.
     //
     await config.update("enablePersistentFileCaching", false, ConfigurationTarget.Workspace);
     //
-    // Set misc settings, use workspace level so that running this test from Code itself
-    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
+    // Enabled / disabled task defaults
     //
-    await config.update("enabledTasks",
-    {
-        ant: true,
-        apppublisher: false,
-        bash: true,
-        batch: true,
-        composer: false,
-        gradle: false,
-        grunt: true,
-        gulp: true,
-        jenkins: false,
-        make: true,
-        maven: false,
-        npm: true,
-        nsis: false,
-        perl: false,
-        pipenv: false,
-        powershell: false,
-        python: true,
-        ruby: false,
-        tsc: true,
-        webpack: false,
-        workspace: true
-    }, ConfigurationTarget.Workspace);
-
+    const packageJson = JSON.parse(await readFileAsync(getWsPath("../../package.json")));
+    const enabledTasks: IDictionary<boolean> = {};
+    getTaskTypes().map(t => t.toLowerCase()).forEach(t => {
+        enabledTasks[t] = packageJson.contributes.configuration.properties["taskExplorer.enabledTasks"].default[t];
+    });
+    await config.update("enabledTasks", enabledTasks, ConfigurationTarget.Workspace);
+    //
+    // Path to Programs Defaults
+    //
     await config.update("pathToPrograms",
     {
         ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
