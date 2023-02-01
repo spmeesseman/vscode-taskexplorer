@@ -8,6 +8,7 @@ import { expect } from "chai";
 import { isObjectEmpty } from "../../lib/utils/utils";
 import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "./commandUtils";
+import { Task } from "vscode";
 
 let didRefresh = false;
 let didSetGroupLevel = false;
@@ -21,14 +22,8 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
     let found = 0;
     Object.values(taskMap).forEach((taskItem) =>
     {
-        if (taskItem)
-        {
-            if (taskItem.id?.includes(id) && !taskItem.isUser) {
-                if (taskItem.id === ":ant") {
-                    console.error("ant: " + taskItem.resourceUri?.fsPath);
-                }
-                found++;
-            }
+        if (taskItem && taskItem.id?.includes(id) && !taskItem.isUser) {
+            found++;
         }
     });
     return found;
@@ -61,11 +56,12 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             if (retries === 0) {
-                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to walkTreeItems", figures.colors.grey)}`);
+                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to direct getChildren", figures.colors.grey)}`);
             }
             if (retries % 10 === 0)
             {
-                ({ taskMap } = await walkTreeItems(undefined));
+                await teApi.testsApi.explorer.getChildren();
+                taskMap = teApi.testsApi.explorer.getTaskMap();
             }
             if (!taskMap || isObjectEmpty(taskMap))
             {
@@ -134,148 +130,6 @@ export const refresh = async(instance?: any) =>
 };
 
 
-/**
- * @method walkTreeItems
- *
- * For test suites.
- * Returns a flat mapped list of tree items, or the tre item specified by taskId.
- *
- * @param taskId Task ID
- * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
- * @param executeOpenForTests For running mocha tests only.
- */
-export const walkTreeItems = async(taskId: string | undefined, executeOpenForTests = false) =>
-{
-    const teApi = utils.getTeApi(),
-          figures = utils.figures,
-          taskMap: TaskMap = {},
-          now = Date.now(),
-          filesOpened: string[] = [];
-    let done = false,
-        numOpened = 0,
-        numFilesOpened = 0;
-
-    let treeItems = await teApi.testsApi.explorer.getChildren();
-    if (!treeItems || treeItems.length === 0)
-    {
-        console.log(`    ${figures.color.warning} ${figures.withColor("No tree items!", figures.colors.grey)}`);
-        if (Date.now() - now < 500) {
-            console.log(`    ${figures.warning} ${figures.withColor("Trying again..." , figures.colors.grey)}`);
-            treeItems = await teApi.testsApi.explorer.getChildren();
-        }
-        if (!treeItems || treeItems.length === 0) {
-            console.log(`    ${figures.color.error} No tree items!!`);
-            return {
-                taskMap,
-                numOpened,
-                numFilesOpened
-            };
-        }
-    }
-
-    const processItem2g = async (pItem2: TaskFile) =>
-    {
-        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem2);
-        if (treeFiles.length > 0)
-        {
-            for (const item2 of treeFiles)
-            {
-                if (done) {
-                    break;
-                }
-                if (item2 instanceof TaskItem)
-                {
-                    await processItem2(item2);
-                }
-                else if (item2 instanceof TaskFile && item2.isGroup)
-                {
-                    await processItem2g(item2);
-                }
-                else if (item2 instanceof TaskFile && !item2.isGroup)
-                {
-                    await processItem2(item2);
-                }
-            }
-        }
-    };
-
-    const processItem2 = async (pItem2: any) =>
-    {
-        const treeTasks = await teApi.testsApi.explorer.getChildren(pItem2);
-        if (treeTasks.length > 0)
-        {
-            for (const item3 of treeTasks)
-            {
-                if (done) {
-                    break;
-                }
-
-                if (item3 instanceof TaskItem)
-                {
-                    if (executeOpenForTests) {
-                        await executeTeCommand2("open", [ item3 ], 4);
-                        if (!filesOpened.includes(item3.taskFile.resourceUri.fsPath)) {
-                            filesOpened.push(item3.taskFile.resourceUri.fsPath);
-                            ++numFilesOpened;
-                        }
-                        ++numOpened;
-                    }
-                    if (item3.task && item3.task.definition)
-                    {
-                        if (item3.id) {
-                            taskMap[item3.id] = item3;
-                            if (taskId && taskId === item3.id) {
-                                done = true;
-                            }
-                        }
-                    }
-                }
-                else if (item3 instanceof TaskFile && item3.isGroup)
-                {
-                    await processItem2(item3);
-                }
-            }
-        }
-    };
-
-    const processItem = async (pItem: any) =>
-    {
-        const treeFiles = await teApi.testsApi.explorer.getChildren(pItem);
-        if (treeFiles && treeFiles.length > 0)
-        {
-            for (const item2 of treeFiles)
-            {
-                if (done) {
-                    break;
-                }
-                if (item2 instanceof TaskFile && !item2.isGroup)
-                {
-                    await processItem2(item2);
-                }
-                else if (item2 instanceof TaskFile && item2.isGroup)
-                {
-                    await processItem2g(item2);
-                }
-                else if (item2 instanceof TaskItem)
-                {
-                    await processItem2(item2);
-                }
-            }
-        }
-    };
-
-    for (const item of treeItems.filter(i => i instanceof TaskFolder))
-    {
-        await processItem(item);
-    }
-
-    return {
-        taskMap,
-        numOpened,
-        numFilesOpened
-    };
-};
-
 
 export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, taskMap?: TaskMap) =>
 {
@@ -283,7 +137,11 @@ export const verifyTaskCountByTree = async(taskType: string, expectedCount: numb
 
     const _getCount = async() =>
     {
-        const tasksMap = (taskMap || (await walkTreeItems(undefined)).taskMap);
+        let tasksMap = taskMap;
+        if (!tasksMap || isObjectEmpty(tasksMap)) {
+            await utils.getTeApi().testsApi.explorer.getChildren();
+            tasksMap = utils.getTeApi().testsApi.explorer.getTaskMap();
+        }
           // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
         return findIdInTaskMap(`:${taskType}:`, tasksMap);
     };
