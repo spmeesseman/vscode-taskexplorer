@@ -1,14 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import * as utils from "./utils";
-import TaskItem from "../../tree/item";
-import TaskFile from "../../tree/file";
-import TaskFolder from "../../tree/folder";
 import { expect } from "chai";
 import { isObjectEmpty } from "../../lib/utils/utils";
 import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "./commandUtils";
-import { Task } from "vscode";
+import { executeSettingsUpdate, executeTeCommand } from "./commandUtils";
+import { figures, getTeApi, sleep, testControl as tc, verifyTaskCount, waitForTeIdle } from "./utils";
 
 let didRefresh = false;
 let didSetGroupLevel = false;
@@ -17,24 +13,12 @@ let didSetGroupLevel = false;
 export const hasRefreshed = () => didRefresh;
 
 
-export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
-{
-    let found = 0;
-    Object.values(taskMap).forEach((taskItem) =>
-    {
-        if (taskItem && taskItem.id?.includes(id) && !taskItem.isUser) {
-            found++;
-        }
-    });
-    return found;
-};
+export const findIdInTaskMap = (id: string, tMap: TaskMap) => Object.values(tMap).filter((t) => t && t.id?.includes(id) && !t.isUser).length;
 
 
 export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
-    const teApi = utils.getTeApi(),
-          figures = utils.figures,
-          tc = utils.testControl,
+    const teApi = getTeApi(),
           taskItems: ITaskItem[] = [];
 
     const _getTaskMap = async(retries: number) =>
@@ -43,7 +27,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
-            await utils.waitForTeIdle(tc.waitTime.getTreeMin, 1600);
+            await waitForTeIdle(150, 1600);
             taskMap = teApi.testsApi.explorer.getTaskMap();
         }
 
@@ -63,7 +47,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
                     console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
                 }
                 else {
-                    await utils.sleep(250);
+                    await sleep(250);
                     taskMap = await _getTaskMap(++retries);
                 }
             }
@@ -103,7 +87,6 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
  */
 export const refresh = async(instance?: any) =>
 {
-    const tc = utils.testControl;
     if (instance)
     {
         instance.slow(tc.slowTime.refreshCommand +
@@ -127,28 +110,24 @@ export const refresh = async(instance?: any) =>
 
 export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, taskMap?: TaskMap) =>
 {
-    let taskCount: number;
-
+    taskMap = taskMap || getTeApi().testsApi.explorer.getTaskMap();
     const _getCount = async() =>
     {
         let tasksMap = taskMap;
         if (!tasksMap || isObjectEmpty(tasksMap)) {
             await refresh();
-            tasksMap = utils.getTeApi().testsApi.explorer.getTaskMap();
+            tasksMap = getTeApi().testsApi.explorer.getTaskMap();
         }
-          // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
         return findIdInTaskMap(`:${taskType}:`, tasksMap);
     };
-
-    taskCount = await _getCount();
-    if (taskCount !== expectedCount)
-    {
-        try {
-            await utils.verifyTaskCount(taskType, expectedCount, 2);
-            taskCount = await _getCount();
-        }
-        catch {}
-    }
-
-    expect(taskCount).to.be.equal(expectedCount, `${utils.figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+    const taskCount = await _getCount();
+    // if (taskCount !== expectedCount)
+    // {
+    //     try {
+    //         await verifyTaskCount(taskType, expectedCount, 2);
+    //         taskCount = await _getCount();
+    //     }
+    //     catch {}
+    // }
+    expect(taskCount).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };
