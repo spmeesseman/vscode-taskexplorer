@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as treeUtils from "./treeUtils";
 import figures from "../../lib/figures";
-import initSettings from "./initSettings";
+import initSettings, { cleanupSettings } from "./initSettings";
 import constants from "../../lib/constants";
 import { expect } from "chai";
 import { testControl } from "../control";
@@ -205,6 +205,11 @@ export const cleanup = async () =>
     // Stop CTRL+C and set hasRollingCountError
     //
     stopInput();
+
+    //
+    // Cleanup or reset any settings
+    //
+    await cleanupSettings();
 
     console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension", figures.colors.grey)}`);
     try { await deactivate(); } catch {}

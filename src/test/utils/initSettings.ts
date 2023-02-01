@@ -1,12 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import { ConfigurationTarget, workspace } from "vscode";
 import figures from "../../lib/figures";
-import { getWsPath } from "./sharedUtils";
 import { testControl as tc } from "../control";
-import { getTaskTypes, isObject } from "../../lib/utils/utils";
+import { isObject } from "../../lib/utils/utils";
+import { ConfigurationTarget, workspace } from "vscode";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
-import { readFileAsync } from "../../lib/utils/fs";
 
 
 const initSettings = async () =>
@@ -16,6 +14,9 @@ const initSettings = async () =>
     //
     // This function runs BEFORE the extension is initialized, so any updates have no immediate
     // effect.  All settings set here will get read on on extension activation, coming up next.
+    //
+    // Update- Actually - VSCode reads thedefaultsettings from package.json b4 the extension is
+    // even activated.  Now creating a default config file in runTest.js, before VSCode is started.
     //
     // Create .vscode directory if it doesn't exist, so the we have perms to
     // remove it after tests are done
@@ -31,61 +32,7 @@ const initSettings = async () =>
     // }
     // await writeFile(settingsFile, "{}");
 
-
     tc.user.logLevel = config.get<number>("logging.level", 1);
-    await config.update("terminal.integrated.shell.windows", tc.defaultWindowsShell, ConfigurationTarget.Workspace);
-    //
-    // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
-    //
-    tc.vsCodeAutoDetectGrunt = workspace.getConfiguration("grunt").get<string>("autoDetect", "off") as "on" | "off";
-    tc.vsCodeAutoDetectGulp = workspace.getConfiguration("gulp").get<string>("autoDetect", "off") as "on" | "off";
-    await workspace.getConfiguration("grunt").update("autoDetect", "on", ConfigurationTarget.Global);
-    await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
-    //
-    // Enable views, use workspace level so that running this test from Code itself
-    // in development doesn't trigger the TaskExplorer instance installed in the dev IDE
-    //
-    await config.update("enableExplorerView", true, ConfigurationTarget.Workspace);
-    await config.update("enableSideBar", true, ConfigurationTarget.Workspace);
-    //
-    // Persistent file caching off.  Pretty intensive when enabled in tests.  Adds 1+
-    // minute to overall tests completion time if set `true`.  Default is `false`.
-    //
-    await config.update("enablePersistentFileCaching", false, ConfigurationTarget.Workspace);
-    //
-    // Enabled / disabled task defaults
-    //
-    const packageJson = JSON.parse(await readFileAsync(getWsPath("../../package.json")));
-    const enabledTasks: IDictionary<boolean> = {};
-    getTaskTypes().map(t => t.toLowerCase()).forEach(t => {
-        enabledTasks[t] = packageJson.contributes.configuration.properties["taskExplorer.enabledTasks"].default[t];
-    });
-    await config.update("enabledTasks", enabledTasks, ConfigurationTarget.Workspace);
-    //
-    // Path to Programs Defaults
-    //
-    await config.update("pathToPrograms",
-    {
-        ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"), // "c:\\Code\\ant\\bin\\ant.bat",
-        ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), // "c:\\Code\\ansicon\\x64\\ansicon.exe",
-        bash: "bash",
-        composer: "composer",
-        curl: "curl",
-        gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
-        jenkins: "",
-        make: "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
-        maven: "mvn",
-        nsis: "c:\\Code\\nsis\\makensis.exe",
-        perl: "perl",
-        pipenv: "pipenv",
-        powershell: "powershell",
-        python: "c:\\Code\\python\\python.exe",
-        ruby: "ruby"
-    }, ConfigurationTarget.Workspace);
-    // await config.update("pathToPrograms.ant", tc.userPathToAnt);
-    // await config.update("pathToPrograms.ansicon", tc.userPathToAnsicon);
-
-    await config.update("logging.enable", tc.log.enabled, ConfigurationTarget.Workspace);
     if (!tc.log.enabled){
         tc.log.file = false;
         tc.log.output = false;
@@ -93,43 +40,17 @@ const initSettings = async () =>
     else if (!tc.log.output && !tc.log.file && !tc.log.console) {
         tc.log.output = true;
     }
+    await config.update("logging.enable", tc.log.enabled, ConfigurationTarget.Workspace);
     await config.update("logging.level", tc.log.level, ConfigurationTarget.Workspace);
     await config.update("logging.enableFile", tc.log.file, ConfigurationTarget.Workspace);
     await config.update("logging.enableFileSymbols", tc.log.fileSymbols, ConfigurationTarget.Workspace);
     await config.update("logging.enableOutputWindow", tc.log.output, ConfigurationTarget.Workspace);
 
-    await config.update("specialFolders.numLastTasks", 10, ConfigurationTarget.Workspace);
-    await config.update("specialFolders.showFavorites", true, ConfigurationTarget.Workspace);
-    await config.update("specialFolders.showLastTasks", true, ConfigurationTarget.Workspace);
-    await config.update("specialFolders.showUserTasks", true, ConfigurationTarget.Workspace);
-    // await config.update("specialFolders.expanded", configuration.get<object>("specialFolders.expanded"));
-    await config.update("specialFolders.expanded", {
-        favorites: true,
-        lastTasks: true,
-        userTasks: true
-    }, ConfigurationTarget.Workspace);
-
-    await config.update("taskButtons.clickAction", "Open", ConfigurationTarget.Workspace);
-    await config.update("taskButtons.showFavoritesButton", true, ConfigurationTarget.Workspace);
-    await config.update("taskButtons.showExecuteWithArgumentsButton", false, ConfigurationTarget.Workspace);
-    await config.update("taskButtons.showExecuteWithNoTerminalButton", false, ConfigurationTarget.Workspace);
-
-    await config.update("visual.disableAnimatedIcons", true, ConfigurationTarget.Workspace);
-    await config.update("visual.enableAnsiconForAnt", false, ConfigurationTarget.Workspace);
-
-    await config.update("groupMaxLevel", 1, ConfigurationTarget.Workspace);
-    await config.update("groupSeparator", "-", ConfigurationTarget.Workspace);
-    await config.update("groupWithSeparator", true, ConfigurationTarget.Workspace);
-    await config.update("groupStripTaskLabel", true, ConfigurationTarget.Workspace);
-
-    await config.update("exclude", [], ConfigurationTarget.Workspace);
-    await config.update("includeAnt", [], ConfigurationTarget.Workspace); // Deprecated, use `globPatternsAnt`
-    await config.update("globPatternsAnt", [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ], ConfigurationTarget.Workspace);
-    await config.update("keepTermOnStop", false, ConfigurationTarget.Workspace);
-    await config.update("showHiddenWsTasks", true, ConfigurationTarget.Workspace);
-    await config.update("showRunningTask", true, ConfigurationTarget.Workspace);
-    await config.update("useGulp", false, ConfigurationTarget.Workspace);
-    await config.update("useAnt", false, ConfigurationTarget.Workspace);
+    //
+    // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
+    //
+    await workspace.getConfiguration("grunt").update("autoDetect", "on", ConfigurationTarget.Global);
+    await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
 
     if (tc.log.enabled)
     {
@@ -177,5 +98,15 @@ const initSettings = async () =>
     console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     console.log(`    ${figures.color.info} ${figures.withColor("Settings initialization completed", figures.colors.grey)}`);
 };
+
+
+export const cleanupSettings = async() =>
+{   //
+    // Grunt / Gulp VSCode internal task providers. Gulp suite will disable when done.
+    //
+    await workspace.getConfiguration("grunt").update("autoDetect", "off", ConfigurationTarget.Global);
+    await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
+};
+
 
 export default initSettings;

@@ -5,18 +5,18 @@
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
 import * as pathUtils from "../../lib/utils/pathUtils";
-import log, { logControl } from "../../lib/log/log";
+import { env } from "process";
 import { join } from "path";
 import { expect } from "chai";
 import { InitScripts } from "../../lib/noScripts";
+import log, { logControl } from "../../lib/log/log";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
+import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
-	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount,
-	getWsPath, endRollingCount, sleep
+	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
 } from "../utils/utils";
-import { env } from "process";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -442,8 +442,8 @@ suite("Util Tests", () =>
 		expect(util.properCase(undefined)).to.equal("");
 		expect(util.properCase("")).to.equal("");
 
-        expect(util.isScriptType("batch"));
-        expect(util.getScriptTaskTypes().length > 0);
+        expect(isScriptType("batch"));
+        expect(getScriptTaskTypes().length > 0);
 
         const arr = [ 1, 2, 3, 4, 5 ];
         util.removeFromArray(arr, 3);
@@ -463,14 +463,14 @@ suite("Util Tests", () =>
 		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
 		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
 
-		util.getTaskTypeFriendlyName("Workspace");
-		util.getTaskTypeFriendlyName("Workspace", true);
-		util.getTaskTypeFriendlyName("apppublisher");
-		util.getTaskTypeFriendlyName("apppublisher", true);
-		util.getTaskTypeFriendlyName("tsc");
-		util.getTaskTypeFriendlyName("tsc", true);
-		util.getTaskTypeFriendlyName("ant");
-		util.getTaskTypeFriendlyName("ant", true);
+		getTaskTypeFriendlyName("Workspace");
+		getTaskTypeFriendlyName("Workspace", true);
+		getTaskTypeFriendlyName("apppublisher");
+		getTaskTypeFriendlyName("apppublisher", true);
+		getTaskTypeFriendlyName("tsc");
+		getTaskTypeFriendlyName("tsc", true);
+		getTaskTypeFriendlyName("ant");
+		getTaskTypeFriendlyName("ant", true);
 
 		expect(util.isNumber(10)).to.equal(true);
 		expect(util.isNumber(0)).to.equal(true);

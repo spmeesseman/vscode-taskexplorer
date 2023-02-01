@@ -12,16 +12,6 @@ export const testControl: ITestControl =
     //
     keepSettingsFileChanges: false,
     //
-    // Global settings that will get set/unset
-    //
-    vsCodeAutoDetectGrunt: "off",
-    vsCodeAutoDetectGulp: "off",
-    //
-    // Default command shell to use
-    //
-    defaultWindowsShell: undefined,
-    // defaultWindowsShell: "C:\\Windows\\System32\\cmd.exe",
-    //
     // LOGGING DEFAULTS
     //
     log: {
@@ -561,15 +551,6 @@ export interface ITestControl extends IDictionary<any>
     // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: boolean;
-    //
-    // Global settings that will get set/unset
-    //
-    vsCodeAutoDetectGrunt: "on" | "off";
-    vsCodeAutoDetectGulp: "on" | "off";
-    //
-    //
-    //
-    defaultWindowsShell: string | undefined;
     //
     // LOGGING DEFAULTS
     //
