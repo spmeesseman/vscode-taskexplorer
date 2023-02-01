@@ -96,7 +96,7 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         teApi.sidebar?.setEnabled(false, ""); // cover getChildren new InitScripts() || new NoScripts()
-        await teApi.sidebar?.getChildren(); // cover getChildren new InitScripts() || new NoScripts()
+        await teApi.sidebar?.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         endRollingCount(this);

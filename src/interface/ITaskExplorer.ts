@@ -10,7 +10,6 @@ export interface ITaskExplorer
 {
     dispose(context: ExtensionContext): void;
     fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem): void;
-    getChildren(element?: TreeItem): Promise<TreeItem[]>;
     getName(): string;
     getTasks(): Task[];
     getTaskMap(): TaskMap;

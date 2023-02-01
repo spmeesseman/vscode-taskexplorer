@@ -30,12 +30,6 @@ export const findIdInTaskMap = (id: string, taskMap: TaskMap) =>
 };
 
 
-// async getTreeItem(taskId: string): Promise<TaskItem | undefined>
-// {
-//     return rteApi.explorer?.getTaskMap()[taskId];
-// }
-
-
 export const getTreeTasks = async(taskType: string, expectedCount: number) =>
 {
     const teApi = utils.getTeApi(),
@@ -56,11 +50,11 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             if (retries === 0) {
-                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, fall back to direct getChildren", figures.colors.grey)}`);
+                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, retry", figures.colors.grey)}`);
             }
             if (retries % 10 === 0)
             {
-                await teApi.testsApi.explorer.getChildren();
+                await refresh();
                 taskMap = teApi.testsApi.explorer.getTaskMap();
             }
             if (!taskMap || isObjectEmpty(taskMap))
@@ -139,7 +133,7 @@ export const verifyTaskCountByTree = async(taskType: string, expectedCount: numb
     {
         let tasksMap = taskMap;
         if (!tasksMap || isObjectEmpty(tasksMap)) {
-            await utils.getTeApi().testsApi.explorer.getChildren();
+            await refresh();
             tasksMap = utils.getTeApi().testsApi.explorer.getTaskMap();
         }
           // const tasksMap = (teApi.explorer as ITaskExplorer).getTaskMap(),
