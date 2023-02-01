@@ -63,7 +63,7 @@ suite("Initialization", () =>
     test("Focus SideBar Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand);
+        this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
@@ -84,7 +84,7 @@ suite("Initialization", () =>
     test("Refresh SideBar Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand);
+        this.slow(tc.slowTime.commands.refresh);
         await refreshTree(teApi, undefined, undefined, "");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
@@ -105,7 +105,7 @@ suite("Initialization", () =>
     test("Refresh Trees (Both Views Enabled)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.commands.refreshNoChanges);
         await refreshTree(teApi, undefined, undefined, "");
         endRollingCount(this);
     });
@@ -127,7 +127,7 @@ suite("Initialization", () =>
     test("Focus File Explorer View", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.commands.refreshNoChanges);
         await focusFileExplorer();
         endRollingCount(this);
     });
@@ -136,7 +136,7 @@ suite("Initialization", () =>
     test("Refresh Explorer Tree", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommandNoChanges);
+        this.slow(tc.slowTime.commands.refreshNoChanges);
         await refreshTree(teApi, undefined, undefined, "");
         endRollingCount(this);
     });

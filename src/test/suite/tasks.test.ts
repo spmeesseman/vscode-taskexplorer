@@ -168,7 +168,7 @@ suite("Task Tests", () =>
     test("Trigger Busy on Task Commands", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.commands.standard * 5) + 1200);
+        this.slow(tc.slowTime.commands.refresh + (tc.slowTime.commands.standard * 5) + 1200);
         utils.clearOverrideShowInfoBox();
         executeTeCommand("refresh", 500, 2000);               // don't await
         await utils.sleep(2);

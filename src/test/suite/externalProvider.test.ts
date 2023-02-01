@@ -107,7 +107,7 @@ suite("External Provider Tests", () =>
     test("Refresh External Task Provider", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.refreshCommandNoChanges + testControl.slowTime.taskCount.verify);
+        this.slow(testControl.slowTime.commands.refreshNoChanges + testControl.slowTime.taskCount.verify);
         await teApi.refreshExternalProvider("external", "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
         await verifyTaskCount("external", 2);

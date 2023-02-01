@@ -89,10 +89,10 @@ export const refresh = async(instance?: any) =>
 {
     if (instance)
     {
-        instance.slow(tc.slowTime.refreshCommand +
+        instance.slow(tc.slowTime.commands.refresh +
                       (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0) +
                       (!didRefresh ? 1000 : 0));
-        instance.timeout((tc.slowTime.refreshCommand  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
+        instance.timeout((tc.slowTime.commands.refresh  * 2) + (!didSetGroupLevel ? (tc.slowTime.config.groupingEvent * 2) : 0));
         if (!didSetGroupLevel)
         {
             // utils.getTeApi().testsApi.enableConfigWatcher(false);

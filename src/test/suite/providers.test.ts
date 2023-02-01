@@ -465,7 +465,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.config.eventFast + tc.slowTime.min +
-                  (tc.slowTime.refreshCommand* 2) + (tc.waitTime.refreshCommand* 2));
+                  (tc.slowTime.commands.refresh* 2) + (tc.waitTime.refreshCommand* 2));
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
         await executeSettingsUpdate("specialFolders.expanded.project1", false, tc.waitTime.config.event);
         await refresh();

@@ -29,7 +29,7 @@ export const startupFocus = async(instance: Mocha.Context, cb?: () => Promise<vo
 export const sidebarFocus = async(instance: Mocha.Context) =>
 {
     if (exitRollingCount(instance)) return;
-    instance.timeout(testControl.slowTime.focusCommand + testControl.slowTime.refreshCommand);
+    instance.timeout(testControl.slowTime.focusCommand + testControl.slowTime.commands.refresh);
     await focusSidebarView();
     endRollingCount(instance);
 };

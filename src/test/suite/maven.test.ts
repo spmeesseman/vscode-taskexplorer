@@ -127,7 +127,7 @@ suite("Maven Tests", () =>
     test("Invalid XML", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
@@ -148,7 +148,7 @@ suite("Maven Tests", () =>
     test("Fix Invalid XML", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +

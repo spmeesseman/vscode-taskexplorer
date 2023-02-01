@@ -72,6 +72,8 @@ export const testControl: ITestControl =
         closeEditors: 15,
         commands: {
             fast: 250,
+            refresh: 6250,
+            refreshNoChanges: 235,
             run: 4750,
             runPause: 3100,
             runStop: 3400,
@@ -127,8 +129,6 @@ export const testControl: ITestControl =
             setLicenseCmd: 210
         },
         min: 50,
-        refreshCommand: 6250,
-        refreshCommandNoChanges: 235,
         removeWorkspaceFolder: 550,
         removeWorkspaceFolderEmpty: 475,
         reorderWorkspaceFolders: 580,
@@ -179,6 +179,8 @@ export const testControl: ITestControl =
         closeEditors: 20,
         commands: {
             fast: 290,
+            refresh: 6250,
+            refreshNoChanges: 235,
             run: 5400,
             runPause: 3590,
             runStop: 3860,
@@ -399,6 +401,8 @@ export interface ISlowTimes
     closeEditors: number;
     commands: {
         fast: number;
+        refresh: number;
+        refreshNoChanges: number;
         run: number;
         runPause: number;
         runStop: number;
@@ -454,8 +458,6 @@ export interface ISlowTimes
         setLicenseCmd: number;
     };
     min: number;
-    refreshCommand: number;
-    refreshCommandNoChanges: number;
     removeWorkspaceFolder: number;
     removeWorkspaceFolderEmpty: number;
     reorderWorkspaceFolders: number;

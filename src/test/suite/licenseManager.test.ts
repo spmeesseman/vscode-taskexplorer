@@ -501,7 +501,7 @@ suite("License Manager Tests", () =>
 	test("Task Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow((Math.round(tc.slowTime.refreshCommand * 0.75)) + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
+		this.slow((Math.round(tc.slowTime.commands.refresh * 0.75)) + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
 		await utils.setLicensed(false, licMgr);
 		licMgr.setTestData({
 			maxFreeTasks: 25,
@@ -519,7 +519,7 @@ suite("License Manager Tests", () =>
 	test("Task Type Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(Math.round(tc.slowTime.refreshCommand * 0.9));
+		this.slow(Math.round(tc.slowTime.commands.refresh * 0.9));
 		licMgr.setTestData({
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -536,7 +536,7 @@ suite("License Manager Tests", () =>
 	test("Task Script Type Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(Math.round(tc.slowTime.refreshCommand * 0.9));
+		this.slow(Math.round(tc.slowTime.commands.refresh * 0.9));
 		licMgr.setTestData({
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -553,7 +553,7 @@ suite("License Manager Tests", () =>
 	test("Task File Limit Reached (Non-Licensed)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(Math.round(tc.slowTime.refreshCommand * 0.9) + tc.slowTime.fs.createFolderEvent);
+		this.slow(Math.round(tc.slowTime.commands.refresh * 0.9) + tc.slowTime.fs.createFolderEvent);
 		const outsideWsDir = utils.getProjectsPath("testA");
 		await fsApi.createDir(outsideWsDir);
 		await fsApi.writeFile(
@@ -585,7 +585,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
         if (licMgr)
 		{
-			this.slow(tc.slowTime.refreshCommand);
+			this.slow(tc.slowTime.commands.refresh);
 			await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 			utils.overrideNextShowInfoBox("Enter License Key");
 			utils.overrideNextShowInputBox("1234-5678-9098-7654321");
@@ -601,7 +601,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		if (licMgr)
 		{
-			this.slow(tc.slowTime.refreshCommand);
+			this.slow(tc.slowTime.commands.refresh);
 			await utils.setLicensed(true, licMgr);
 			licMgr.setTestData({
 				maxFreeTasks: licMgrMaxFreeTasks,

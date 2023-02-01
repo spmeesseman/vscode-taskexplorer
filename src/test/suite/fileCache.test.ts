@@ -324,7 +324,7 @@ suite("File Cache Tests", () =>
     test("Rebuild Cache and Invaldate Providers after Cancel", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + 200);
+        this.slow(tc.slowTime.commands.refresh + 200);
         await executeTeCommand("refresh", tc.waitTime.refreshCommand);
         await utils.sleep(100);
         utils.endRollingCount(this);

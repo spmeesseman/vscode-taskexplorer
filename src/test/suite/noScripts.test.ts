@@ -73,7 +73,7 @@ suite("NoScripts TreeItem Tests", () =>
     test("Disable All Task Types", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.taskCount.verify * 4));
+        this.slow(tc.slowTime.commands.refresh + (tc.slowTime.taskCount.verify * 4));
         await teApi.config.updateWs("enabledTasks",
         {
             ant: false,
@@ -115,7 +115,7 @@ suite("NoScripts TreeItem Tests", () =>
     test("Re-enable Task Types", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.taskCount.verify * 4));
+        this.slow(tc.slowTime.commands.refresh + (tc.slowTime.taskCount.verify * 4));
         await executeSettingsUpdate("enabledTasks", enabledTasks, tc.waitTime.refreshCommand);
         didResetEnabledTasks = true;
         const treeTasks = explorer.getTasks();

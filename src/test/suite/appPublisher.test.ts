@@ -131,7 +131,7 @@ suite("App-Publisher Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
@@ -158,7 +158,7 @@ suite("App-Publisher Tests", () =>
     test("Fix Invalid JSON", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.refreshCommand + tc.slowTime.taskCount.verify);
+        this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
         await fsApi.writeFile(
             fileUri.fsPath,
             "{\n" +
