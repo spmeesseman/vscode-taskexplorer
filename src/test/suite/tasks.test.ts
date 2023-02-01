@@ -77,7 +77,7 @@ suite("Task Tests", () =>
     test("Run Non-Existent Last Task", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.storageUpdate);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.storageUpdate);
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
@@ -91,7 +91,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (OFF)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 3000);
+        this.slow(tc.slowTime.config.event + (tc.slowTime.commands.run * 2) + tc.slowTime.commands.runStop + tc.slowTime.commands.runPause + 3000);
         await executeSettingsUpdate("keepTermOnStop", false);
         let exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
@@ -109,7 +109,7 @@ suite("Task Tests", () =>
     test("Run Pause and Run", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 7000);
+        this.slow((tc.slowTime.commands.run * 2) + tc.slowTime.commands.runStop + tc.slowTime.commands.runPause + 7000);
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 1750);
         await executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -125,7 +125,7 @@ suite("Task Tests", () =>
     test("Run Pause and Stop (Keep Terminal on Stop OFF)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 6400);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.commands.runStop + tc.slowTime.commands.runPause + 6400);
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 1750);
         await executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -140,7 +140,7 @@ suite("Task Tests", () =>
     test("Keep Terminal on Stop (ON)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 5000);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.commands.runStop + tc.slowTime.config.event + 5000);
         await executeSettingsUpdate("keepTermOnStop", true);
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         expect(exec).to.not.be.equal(undefined, "Starting the 'batch0' task did not return a valid TaskExecution");
@@ -154,7 +154,7 @@ suite("Task Tests", () =>
     test("Run Pause and Stop (Keep Terminal on Stop ON)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runStopCommand + tc.slowTime.runPauseCommand + 5400);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.commands.runStop + tc.slowTime.commands.runPause + 5400);
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 1750);
         await executeTeCommand2("pause", [ batch[0] ], tc.waitTime.taskCommand);
@@ -190,7 +190,7 @@ suite("Task Tests", () =>
     test("Pause", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.runPauseCommand + tc.slowTime.runStopCommand + tc.slowTime.config.event + 5600);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.commands.runPause + tc.slowTime.commands.runStop + tc.slowTime.config.event + 5600);
         await executeSettingsUpdate("keepTermOnStop", false);
         const exec = await executeTeCommand2("run", [ batch[0] ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
         await utils.waitForTaskExecution(exec, 2000);
@@ -205,7 +205,7 @@ suite("Task Tests", () =>
     test("Run Task (No Terminal)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + tc.slowTime.tasks.bashScript + tc.slowTime.runStopCommand  + 5200);
+        this.slow(tc.slowTime.commands.run + tc.slowTime.tasks.bashScript + tc.slowTime.commands.runStop  + 5200);
         const bashTask = bash[0];
         await startTask(bashTask as TaskItem, false);
         const exec = await executeTeCommand2("runNoTerm", [ bashTask ], tc.waitTime.runCommandMin) as TaskExecution | undefined;
@@ -221,7 +221,7 @@ suite("Task Tests", () =>
     test("Run Ant Task (w/ Ansicon)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.runCommand +
+        this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.commands.run +
                   tc.slowTime.tasks.antTaskWithAnsicon + 300 + tc.slowTime.focusCommandChangeViews);
         antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
@@ -241,7 +241,7 @@ suite("Task Tests", () =>
     test("Run Ant Task (w/o Ansicon)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.config.event * 2) + tc.slowTime.runCommand + tc.slowTime.tasks.antTask);
+        this.slow((tc.slowTime.config.event * 2) + tc.slowTime.commands.run + tc.slowTime.tasks.antTask);
         await executeSettingsUpdate("visual.enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
         await startTask(antTask, false);
@@ -255,7 +255,7 @@ suite("Task Tests", () =>
     test("Run Batch Task", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + 6500 +
+        const slowTime = (tc.slowTime.commands.run * 2) + tc.slowTime.commands.runStop + 6500 +
                           startTaskSlowTime + (tc.slowTime.config.event * 5) +
                           (tc.slowTime.commands.standard * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
@@ -311,7 +311,7 @@ suite("Task Tests", () =>
         // There are 2 batch file "tasks" - they both utils.sleep for 7 seconds, 1 second at a time
         //
         if (utils.exitRollingCount(this)) return;
-        const slowTime = (tc.slowTime.runCommand * 1) + 5000 /* 7500 */ + startTaskSlowTime + (tc.slowTime.runStopCommand * 1 /* 2 */) +
+        const slowTime = (tc.slowTime.commands.run * 1) + 5000 /* 7500 */ + startTaskSlowTime + (tc.slowTime.commands.runStop * 1 /* 2 */) +
                          (tc.slowTime.commands.standard * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
@@ -351,7 +351,7 @@ suite("Task Tests", () =>
     test("Run Non-Existent Last Task 2", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.runCommand + (tc.slowTime.storageUpdate * 2));
+        this.slow(tc.slowTime.commands.run + (tc.slowTime.storageUpdate * 2));
         const tree = explorer.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;

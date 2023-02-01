@@ -72,6 +72,9 @@ export const testControl: ITestControl =
         closeEditors: 15,
         commands: {
             fast: 250,
+            run: 4750,
+            runPause: 3100,
+            runStop: 3400,
             showOutput: 880,
             standard: 660
         },
@@ -129,9 +132,6 @@ export const testControl: ITestControl =
         removeWorkspaceFolder: 550,
         removeWorkspaceFolderEmpty: 475,
         reorderWorkspaceFolders: 580,
-        runCommand: 4750,
-        runPauseCommand: 3100,
-        runStopCommand: 3400,
         storageRead: 15,
         storageUpdate: 25,
         storageSecretRead: 35,
@@ -179,6 +179,9 @@ export const testControl: ITestControl =
         closeEditors: 20,
         commands: {
             fast: 290,
+            run: 5400,
+            runPause: 3590,
+            runStop: 3860,
             showOutput: 1250,
             standard: 725
         },
@@ -236,9 +239,6 @@ export const testControl: ITestControl =
         removeWorkspaceFolder: 2275,
         removeWorkspaceFolderEmpty: 1450,
         reorderWorkspaceFolders: 935,
-        runCommand: 5400,
-        runPauseCommand: 3590,
-        runStopCommand: 3860,
         storageRead: 20,
         storageUpdate: 30,
         storageSecretRead: 40,
@@ -399,6 +399,9 @@ export interface ISlowTimes
     closeEditors: number;
     commands: {
         fast: number;
+        run: number;
+        runPause: number;
+        runStop: number;
         showOutput: number;
         standard: number;
     };
@@ -456,9 +459,6 @@ export interface ISlowTimes
     removeWorkspaceFolder: number;
     removeWorkspaceFolderEmpty: number;
     reorderWorkspaceFolders: number;
-    runCommand: number;
-    runPauseCommand: number;
-    runStopCommand: number;
     storageRead: number;
     storageUpdate: number;
     storageSecretRead: number;
