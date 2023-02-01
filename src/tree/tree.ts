@@ -690,6 +690,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         TaskExplorerProvider.logPad = logPad + "   ";
         statusBarItem.show();
 
+        log.methodStart("create task tree", logLevel, logPad, true, [[ "current invalidation", this.currentInvalidation ]]);
+
         if (!this.tasks || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc") // || this.currentInvalidationUri)
         {
             log.write("   fetching all tasks via VSCode fetchTasks call", logLevel, logPad);
@@ -698,8 +700,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             //
             // Process the tasks cache array for any removals that might need to be made
             //
-            this.doTaskCacheRemovals(undefined, logPad);
-        }     //
+            this.doTaskCacheRemovals(undefined, logPad); // removes tasks that already exist that were just re-parsed
+        }     //                                         // as we will replace them a few lines down
         else // this.currentInvalidation guaranteed to be a string (task type) here
         {   //
             const taskName = getTaskTypeFriendlyName(this.currentInvalidation);
@@ -713,8 +715,8 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
             //
             // Process the tasks cache array for any removals that might need to be made
-            //
-            this.doTaskCacheRemovals(this.currentInvalidation, logPad);
+            //                                                          // removes tasks that already exist that were just re-parsed
+            this.doTaskCacheRemovals(this.currentInvalidation, logPad); // of the same task type (this.currentInvalidation)
             log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks`, logLevel + 1, logPad);
             this.tasks.push(...taskItems);
         }
@@ -725,10 +727,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // control over the provider returning them.  Internally provided Grunt and Gulp tasks
         // are differentiable from TE provided Gulp and Grunt tasks in that the VSCode provided
         // tasks do no not have task.definition.uri set.
-        //
-        this.cleanFetchedTasks(logPad + "   ");
-
-        //
+        //                                      //
+        this.cleanFetchedTasks(logPad + "   "); // good byte shitty ass Grunt and Gulp providers, whoever
+        //                                      // coded you should hang it up and retire, what a damn joke.
         // Check License Manager for any task count restrictions
         //
         const maxTasks = licMgr.getMaxNumberOfTasks();
@@ -747,9 +748,13 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         //
         this.taskTree = await this.buildTaskTree(this.tasks, logPad + "   ", logLevel + 1);
 
+        //
+        // All done...
+        //
         TaskExplorerProvider.logPad = "";
         statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
+        log.methodDone("create task tree", logLevel, logPad, [[ "current task count", this.tasks.length ]]);
     };
 
 
@@ -758,7 +763,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         let ctRmv = 0;
         const tasksCache = this.tasks as Task[];
         log.write("removing any ignored tasks from new fetch", 3, logPad);
-        tasksCache.slice().reverse().forEach((item, index, object) =>
+        tasksCache.slice().reverse().forEach((item, index, object) => // niftiest loop ever
         {   //
             // Make sure this task shouldn't be ignored based on various criteria...
             // Process only if this task type/source is enabled in settings or is scope is empty (VSCode provided task)
@@ -784,7 +789,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         const tasksCache = this.tasks as Task[];
         log.write("   removing current invalidated tasks from cache", 3, logPad);
         const showUserTasks = configuration.get<boolean>("specialFolders.showUserTasks");
-        tasksCache.slice().reverse().forEach((item, index, object) =>
+        tasksCache.slice().reverse().forEach((item, index, object) => // niftiest loop ever
         {   //
             // Note that requesting a task type can return Workspace tasks (tasks.json/vscode)
             // if the script type set for the task in tasks.json is of type 'currentInvalidation'.
@@ -808,7 +813,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                 tasksCache.splice(object.length - 1 - index, 1);
             }
         });
-        log.write(`   removed ${ctRmv} ${this.currentInvalidation} current tasks from cache`, 3, logPad);
+        log.write(`   removed ${ctRmv} ${invalidation} current tasks from cache`, 3, logPad);
     };
 
 
