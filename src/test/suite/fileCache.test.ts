@@ -7,7 +7,6 @@ import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 
 let testsApi: ITestsApi;
 const tc = utils.testControl;
-const checkTaskCountsTime = (4 * tc.slowTime.taskCount.verify) + tc.slowTime.taskCount.verifyNpm + tc.slowTime.taskCount.verifyWorkspace;
 
 
 suite("File Cache Tests", () =>
@@ -55,7 +54,7 @@ suite("File Cache Tests", () =>
     test("Enable Persistent Cache", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.event + tc.slowTime.fileCachePersist);
+        this.slow(tc.slowTime.config.event + tc.slowTime.cache.persist);
         await executeSettingsUpdate("enablePersistentFileCaching", true); // enabling setting willpersist *now*
         utils.endRollingCount(this);
     });
@@ -83,7 +82,7 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache w Empty Persisted Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuild + (tc.slowTime.config.event * 3) + checkTaskCountsTime);
+        this.slow(tc.slowTime.cache.rebuild + (tc.slowTime.config.event * 3) + (tc.slowTime.taskCount.verify * 6));
         await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
         await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
@@ -345,7 +344,7 @@ suite("File Cache Tests", () =>
 const checkTaskCounts = async (instance?: Mocha.Context) =>
 {
     if (instance) {
-        instance.slow(checkTaskCountsTime);
+        instance.slow(tc.slowTime.taskCount.verify * 6);
     }
     await utils.verifyTaskCount("bash", 1);
     await utils.verifyTaskCount("batch", 2);

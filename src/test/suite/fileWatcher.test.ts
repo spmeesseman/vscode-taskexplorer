@@ -483,7 +483,7 @@ suite("File Watcher Tests", () =>
 
 const checkTaskCounts = async (instance: Mocha.Context) =>
 {
-    instance.slow((4 * utils.testControl.slowTime.taskCount.verify) + utils.testControl.slowTime.taskCount.verifyNpm + utils.testControl.slowTime.taskCount.verifyWorkspace);
+    instance.slow(6 * utils.testControl.slowTime.taskCount.verify);
     await utils.verifyTaskCount("bash", startTaskCountBash);
     await utils.verifyTaskCount("batch", startTaskCountBatch);
     await utils.verifyTaskCount("npm", startTaskCountNpm);

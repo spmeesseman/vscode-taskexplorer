@@ -1,5 +1,5 @@
 
-import { activate, cleanup, endRollingCount, exitRollingCount } from "../utils/utils";
+import { activate, cleanup, endRollingCount, exitRollingCount, testControl } from "../utils/utils";
 
 
 suite("Deactivate Extension", () =>
@@ -11,8 +11,9 @@ suite("Deactivate Extension", () =>
         endRollingCount(this, true);
 	});
 
-	test("Cleanup", async () =>
+	test("Cleanup", async function()
 	{
+		this.slow(testControl.slowTime.cleanup);
 		await cleanup();
 	});
 

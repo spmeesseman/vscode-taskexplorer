@@ -58,15 +58,17 @@ export const testControl: ITestControl =
     // markers significantly reduce the overall speed of everything.
     //
     slowTime: {
-        addWorkspaceFolder: 1475,
-        addWorkspaceFolderEmpty: 1420,
+        addWorkspaceFolder: 1485,
+        addWorkspaceFolderEmpty: 1430,
         cache: {
             build: 480,
-            buildCancel: 290,
+            buildCancel: 300,
+            persist: 245,
             rebuild: 3825,
-            rebuildCancel: 490,
+            rebuildCancel: 500,
             rebuildNoChanges: 880,
         },
+        cleanup: 320,
         closeEditors: 15,
         command: 660,
         commandFast: 250,
@@ -85,31 +87,30 @@ export const testControl: ITestControl =
             pathToProgramsEvent: 710,
             readEvent: 25,
             shellChange: 1325,
-            showHideSpecialFolder: 520,
+            showHideSpecialFolder: 525,
             showHideUserTasks: 975,
             sortingEvent: 815,
             terminalEvent: 250
         },
         excludeCommand: 1350,
         explorerViewStartup: 9500,
-        fetchTasksCommand: 1835,
-        fileCachePersist: 245,
-        findTaskPosition: 275,
+        fetchTasksCommand: 350,
+        findTaskPosition: 280,
         findTaskPositionDocOpen: 30,
         focusCommand: 2330,
         focusCommandAlreadyFocused: 375,
         focusCommandChangeViews: 775,
         fs: {
             createEvent: 1550,
-            createEventTsc: 1725,
+            createEventTsc: 1835,
             createFolderEvent: 1600,
             deleteEvent: 1325,
-            deleteEventTsc: 1600,
+            deleteEventTsc: 1655,
             deleteFolderEvent: 1400,
             modifyEvent: 1140,
             modifyEventAnt: 1200
         },
-        getTreeTasks: 195,
+        getTreeTasks: 205,
         getTreeTasksNpm: 470, // npm task provider is slower than shit on a turtle
         licenseMgr: {
             page: 220,
@@ -136,7 +137,7 @@ export const testControl: ITestControl =
         taskCommand: 950,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 400,
+            antParser: 1535,
             antTask: 3300,
             antTaskWithAnsicon: 3375,
             bashScript: 3075,
@@ -148,11 +149,9 @@ export const testControl: ITestControl =
             npmInstallCommand: 8600
         },
         taskCount: {
-            verify: 440,
-            verifyByTree: 490,
-            verifyFirstCall: 550,
-            verifyNpm: 700, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 900
+            verify: 375,
+            verifyByTree: 425,
+            verifyFirstCall: 550
         },
         viewReleaseNotes: 415,
         viewReport: 380
@@ -169,10 +168,12 @@ export const testControl: ITestControl =
         cache: {
             build: 540,
             buildCancel: 330,
+            persist: 275,
             rebuild: 4500,
             rebuildCancel: 540,
             rebuildNoChanges: 980,
         },
+        cleanup: 375,
         closeEditors: 20,
         command: 725,
         commandFast: 290,
@@ -197,9 +198,8 @@ export const testControl: ITestControl =
             terminalEvent: 300
         },
         excludeCommand: 1510,
-        explorerViewStartup: 8250,
-        fetchTasksCommand: 2020,
-        fileCachePersist: 275,
+        explorerViewStartup: 9500,
+        fetchTasksCommand: 375,
         findTaskPosition: 355,
         findTaskPositionDocOpen: 45,
         focusCommand: 2575,
@@ -242,7 +242,7 @@ export const testControl: ITestControl =
         taskCommand: 1155,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 440,
+            antParser: 1600,
             antTask: 3740,
             antTaskWithAnsicon: 3795,
             bashScript: 3375,
@@ -254,11 +254,9 @@ export const testControl: ITestControl =
             npmInstallCommand: 10400
         },
         taskCount: {
-            verify: 450,
-            verifyByTree: 500,
+            verify: 400,
+            verifyByTree: 450,
             verifyFirstCall: 750,
-            verifyNpm: 1140, // internal vscode npm task provider is slower than shit wtf
-            verifyWorkspace: 1380
         },
         viewReleaseNotes: 655,
         viewReport: 390
@@ -270,52 +268,50 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 225,
-        blurCommand: 250,
+        addWorkspaceFolder: 220,
+        blurCommand: 225,
         command: 70,
         commandFast: 45,
         config: {
             event: 75,
             eventFast: 40,
-            excludesEvent: 95,
-            excludeTasksEvent: 165,
-            disableEvent: 105,
-            enableEvent: 125,
-            globEvent: 110,
+            excludesEvent: 90,
+            excludeTasksEvent: 160,
+            disableEvent: 100,
+            enableEvent: 120,
+            globEvent: 105,
             groupingEvent: 95,
-            pathToProgramsEvent: 120,
-            registerExplorerEvent: 130,
+            pathToProgramsEvent: 115,
+            registerExplorerEvent: 125,
             shellChange: 95,
             showHideSpecialFolder: 95,
-            showHideUserTasks: 105,
+            showHideUserTasks: 100,
             sortingEvent: 95
         },
-        explorerViewStartup: 2000,
-        focusCommand: 220,
+        explorerViewStartup: 1700,
+        focusCommand: 210,
         fs: {
-            createEvent: 200,
-            createFolderEvent: 225,
-            deleteEvent: 190,
-            deleteFolderEvent: 210,
-            modifyEvent: 185
+            createEvent: 195,
+            createFolderEvent: 215,
+            createEventTsc: 240,
+            deleteEvent: 185,
+            deleteFolderEvent: 205,
+            modifyEvent: 180
         },
-        getTreeMin: 170,
         getTreeTasks: 50,
         licenseMgr: {
             get30DayLicense: 250
         },
         max: 12000,
         min: 35,
-        npmCommandMin: 1100,
-        refreshCommand: 140,
+        npmCommandMin: 1000,
+        refreshCommand: 135,
         refreshCommandNoChanges: 75,
-        refreshTaskTypeCommand: 125,
-        removeWorkspaceFolder: 200,
+        refreshTaskTypeCommand: 120,
+        removeWorkspaceFolder: 185,
         reorderWorkspaceFolders: 100,
-        runCommandMin: 500,
-        taskCommand: 450,
-        verifyTaskCountRetry: 70,
-        verifyTaskCountRetryInterval: 100,
+        runCommandMin: 425,
+        taskCommand: 375,
         viewReport: 80
     },
     waitTimeMultiRoot:
@@ -347,11 +343,11 @@ export const testControl: ITestControl =
         fs: {
             createEvent: 500,
             createFolderEvent: 565,
+            createEventTsc: 550,
             deleteEvent: 485,
             deleteFolderEvent: 525,
             modifyEvent: 475
         },
-        getTreeMin: 250,
         getTreeTasks: 80,
         licenseMgr: {
             get30DayLicense: 300
@@ -366,8 +362,6 @@ export const testControl: ITestControl =
         reorderWorkspaceFolders: 150,
         runCommandMin: 775,
         taskCommand: 700,
-        verifyTaskCountRetry: 110,
-        verifyTaskCountRetryInterval: 160,
         viewReport: 130
     }
 };
@@ -392,10 +386,12 @@ export interface ISlowTimes
     cache: {
         build: number;
         buildCancel: number;
+        persist: number;
         rebuild: number;
         rebuildCancel: number;
         rebuildNoChanges: number;
     };
+    cleanup: number;
     closeEditors: number;
     command: number;
     commandFast: number;
@@ -422,7 +418,6 @@ export interface ISlowTimes
     excludeCommand: number;
     explorerViewStartup: number;
     fetchTasksCommand: number;
-    fileCachePersist: number;
     findTaskPosition: number;
     findTaskPositionDocOpen: number;
     focusCommand: number;
@@ -480,8 +475,6 @@ export interface ISlowTimes
         verify: number;
         verifyByTree: number;
         verifyFirstCall: number;
-        verifyNpm: number; // internal vscode npm task provider is slower than shit wtf
-        verifyWorkspace: number;
     };
     viewReleaseNotes: number;
     viewReport: number;
@@ -516,12 +509,12 @@ export interface IWaitTimes
     focusCommand: number;
     fs: {
         createEvent: number;
+        createEventTsc: number;
         createFolderEvent: number;
         deleteEvent: number;
         deleteFolderEvent: number;
         modifyEvent: number;
     };
-    getTreeMin: number;
     getTreeTasks: number;
     licenseMgr: {
         get30DayLicense: number;
@@ -536,8 +529,6 @@ export interface IWaitTimes
     reorderWorkspaceFolders: number;
     runCommandMin: number;
     taskCommand: number;
-    verifyTaskCountRetry: number;
-    verifyTaskCountRetryInterval: number;
     viewReport: number;
 };
 

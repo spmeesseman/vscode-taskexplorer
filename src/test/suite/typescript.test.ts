@@ -75,7 +75,7 @@ suite("Typescript Tests", () =>
     test("Create Empty Directory", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.waitTime.fs.createFolderEvent + testControl.slowTime.taskCount.verifyByTree);
+        this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verifyByTree);
         await fsApi.createDir(dirName);
         await utils.waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
@@ -107,7 +107,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fs.createEvent here too
-        await utils.waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fs.createEventTsc);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         utils.endRollingCount(this);
     });
@@ -116,7 +116,7 @@ suite("Typescript Tests", () =>
     test("Document Position", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.findTaskPosition * 2));
+        this.slow(testControl.slowTime.getTreeTasks + (testControl.slowTime.findTaskPosition * 2) + (testControl.slowTime.closeEditors * 2));
         //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
@@ -132,7 +132,7 @@ suite("Typescript Tests", () =>
     test("Create File 2", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.fs.createEventTsc + testControl.slowTime.taskCount.verifyByTree + 100);
+        this.slow(testControl.slowTime.fs.createEventTsc + testControl.slowTime.taskCount.verifyByTree);
         await fsApi.writeFile(
             fileUri2.fsPath,
             "{\n" +
@@ -153,7 +153,7 @@ suite("Typescript Tests", () =>
             "}\n"
         );
         // the 'create file 2' test fails 1/50 runs, so add a lil bit on to fs.createEvent
-        await utils.waitForTeIdle(testControl.waitTime.fs.createEvent + 100);
+        await utils.waitForTeIdle(testControl.waitTime.fs.createEventTsc);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });
@@ -252,7 +252,7 @@ suite("Typescript Tests", () =>
             '  "exclude": ["node_modules"]\n' +
             "}\n"
         );
-        await utils.waitForTeIdle(testControl.waitTime.fs.createEvent);
+        await utils.waitForTeIdle(testControl.waitTime.fs.modifyEvent);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });

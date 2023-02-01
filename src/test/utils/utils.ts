@@ -507,7 +507,7 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
     }
     while (--retries >= 0 && tTasks.length !== expectedCount)
     {
-        await sleep(retryWait > 0 ? retryWait : tc.waitTime.verifyTaskCountRetryInterval);
+        await sleep(retryWait > 0 ? retryWait : 100);
         tTasks = await tasks.fetchTasks({ type: taskType !== "Workspace" ? taskType : undefined });
         if (taskType === "Workspace") {
             tTasks = tTasks.filter(t => t.source === "Workspace");
