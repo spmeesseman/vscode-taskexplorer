@@ -124,7 +124,7 @@ suite("Multi-Root Workspace Tests", () =>
     test("Add Undefined Workspace", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         await teApi.testsApi.fileCache.addWsFolders(undefined);
         await waitForTeIdle(tc.waitTime.command);
         endRollingCount(this);

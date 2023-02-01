@@ -125,7 +125,7 @@ suite("NPM Tests", () =>
     test("Document Position", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.findTaskPosition + (tc.slowTime.findTaskPositionDocOpen * (npmTaskItems.length - 1)) + (tc.slowTime.commandFast * npmTaskItems.length));
+        this.slow(tc.slowTime.findTaskPosition + (tc.slowTime.findTaskPositionDocOpen * (npmTaskItems.length - 1)) + (tc.slowTime.commands.fast * npmTaskItems.length));
         for (const taskItem of npmTaskItems) {
             await executeTeCommand2("open", [ taskItem ], tc.waitTime.commandFast);
         }

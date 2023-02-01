@@ -40,7 +40,7 @@ suite("Initialization", () =>
     test("Show/Hide Output Window", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.commandShowOutput * 3) + 300);
+        this.slow((tc.slowTime.commands.showOutput * 3) + 300);
         await executeTeCommand2("showOutput", [ true ]);
         await sleep(75);
         await executeTeCommand2("showOutput", [ false ]);

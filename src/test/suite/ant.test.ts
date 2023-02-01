@@ -153,7 +153,7 @@ suite("Ant Tests", () =>
     test("Win32 Create Task", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.config.event * 2) + (tc.slowTime.commandFast * 2));
+        this.slow((tc.slowTime.config.event * 2) + (tc.slowTime.commands.fast * 2));
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant.bat"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ant", getWsPath("..\\tools\\ant\\bin\\ant"));

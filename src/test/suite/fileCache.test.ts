@@ -105,7 +105,7 @@ suite("File Cache Tests", () =>
     test("Rebuild File Cache (Mimic Startup)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.cache.rebuild + tc.slowTime.commandFast);
+        this.slow(tc.slowTime.cache.rebuild + tc.slowTime.commands.fast);
         // await treeUtils.refresh(this);
         await testsApi.fileCache.rebuildCache("", true);
         await utils.waitForTeIdle(tc.waitTime.commandFast);

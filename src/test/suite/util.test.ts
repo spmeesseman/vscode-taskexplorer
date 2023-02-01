@@ -57,7 +57,7 @@ suite("Util Tests", () =>
     test("Hide / Show Output Window", async function()
     {
         if (exitRollingCount(this)) return;
-		this.slow((testControl.slowTime.commandShowOutput * 2) + 50);
+		this.slow((testControl.slowTime.commands.showOutput * 2) + 50);
         await executeTeCommand2("showOutput", [ false ]);
 		await sleep(25);
         await executeTeCommand2("showOutput", [ true ]);

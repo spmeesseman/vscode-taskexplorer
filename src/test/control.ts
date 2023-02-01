@@ -70,9 +70,11 @@ export const testControl: ITestControl =
         },
         cleanup: 320,
         closeEditors: 15,
-        command: 660,
-        commandFast: 250,
-        commandShowOutput: 880,
+        commands: {
+            fast: 250,
+            showOutput: 880,
+            standard: 660
+        },
         config: {
             event: 270,
             eventFast: 90,
@@ -175,9 +177,11 @@ export const testControl: ITestControl =
         },
         cleanup: 375,
         closeEditors: 20,
-        command: 725,
-        commandFast: 290,
-        commandShowOutput: 1250,
+        commands: {
+            fast: 290,
+            showOutput: 1250,
+            standard: 725
+        },
         config: {
             event: 310,
             eventFast: 105,
@@ -393,9 +397,11 @@ export interface ISlowTimes
     };
     cleanup: number;
     closeEditors: number;
-    command: number;
-    commandFast: number;
-    commandShowOutput: number;
+    commands: {
+        fast: number;
+        showOutput: number;
+        standard: number;
+    };
     config: {
         event: number;
         eventFast: number;

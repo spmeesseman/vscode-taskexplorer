@@ -59,7 +59,7 @@ suite("External Provider Tests", () =>
     test("Get API", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(testControl.slowTime.commandFast + 75);
+        this.slow(testControl.slowTime.commands.fast + 75);
         teApi = await executeTeCommand("getApi") as ITaskExplorerApi;
         endRollingCount(this);
     });

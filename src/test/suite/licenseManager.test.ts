@@ -486,7 +486,7 @@ suite("License Manager Tests", () =>
 	test("Re-request a 30-Day License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.command + tc.slowTime.closeEditors + tc.slowTime.storageSecretUpdate);
+		this.slow(tc.slowTime.commands.standard + tc.slowTime.closeEditors + tc.slowTime.storageSecretUpdate);
 		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
 		licMgr.dispose();
 		await utils.closeEditors();

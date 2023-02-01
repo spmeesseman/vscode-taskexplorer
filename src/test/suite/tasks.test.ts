@@ -13,7 +13,7 @@ import { ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } fr
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView, focusSearchView } from "../utils/commandUtils";
 
 const tc = utils.testControl;
-const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.command * 2);
+const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.commands.standard * 2);
 
 let teApi: ITaskExplorerApi;
 let explorer: ITaskExplorer;
@@ -168,7 +168,7 @@ suite("Task Tests", () =>
     test("Trigger Busy on Task Commands", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.command * 5) + 1200);
+        this.slow(tc.slowTime.refreshCommand + (tc.slowTime.commands.standard * 5) + 1200);
         utils.clearOverrideShowInfoBox();
         executeTeCommand("refresh", 500, 2000);               // don't await
         await utils.sleep(2);
@@ -257,7 +257,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 2) + tc.slowTime.runStopCommand + 6500 +
                           startTaskSlowTime + (tc.slowTime.config.event * 5) +
-                          (tc.slowTime.command * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
+                          (tc.slowTime.commands.standard * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
         await focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
         const batchTask = batch[0];
@@ -312,7 +312,7 @@ suite("Task Tests", () =>
         //
         if (utils.exitRollingCount(this)) return;
         const slowTime = (tc.slowTime.runCommand * 1) + 5000 /* 7500 */ + startTaskSlowTime + (tc.slowTime.runStopCommand * 1 /* 2 */) +
-                         (tc.slowTime.command * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
+                         (tc.slowTime.commands.standard * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
         await startTask(batchTask as TaskItem, true);

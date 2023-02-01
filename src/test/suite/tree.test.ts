@@ -74,7 +74,7 @@ suite("Tree Tests", () =>
     test("Remove from Favorites", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command * 6);
+        this.slow(tc.slowTime.commands.standard * 6);
         await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         await executeTeCommand2("addRemoveFavorite", [ batch[1] ]);
         await executeTeCommand2("addRemoveFavorite", [ ant[0] ]);
@@ -104,7 +104,7 @@ suite("Tree Tests", () =>
     test("Add to Favorites", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command * 13);
+        this.slow(tc.slowTime.commands.standard * 13);
         let removed = await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ batch[0] ]);
@@ -136,7 +136,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 1", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -162,7 +162,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 2", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -188,7 +188,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 3", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -214,7 +214,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 4", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -240,7 +240,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 5", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if(taskTree)
         {
@@ -266,7 +266,7 @@ suite("Tree Tests", () =>
     test("Add Custom Label 6", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow(tc.slowTime.command);
+        this.slow(tc.slowTime.commands.standard);
         const taskTree = explorer.getTaskTree();
         if (taskTree)
         {
@@ -293,7 +293,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem1) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
         }
         utils.endRollingCount(this);
@@ -304,7 +304,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem2) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem2 ]);
         }
         utils.endRollingCount(this);
@@ -315,7 +315,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem3) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem3 ]);
         }
         utils.endRollingCount(this);
@@ -326,7 +326,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem4) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem4 ]);
         }
         utils.endRollingCount(this);
@@ -337,7 +337,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem5) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem5 ]);
         }
         utils.endRollingCount(this);
@@ -348,7 +348,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         if (cstItem6) {
-            this.slow(tc.slowTime.command);
+            this.slow(tc.slowTime.commands.standard);
             await executeTeCommand2("addRemoveCustomLabel", [ cstItem6 ]);
         }
         utils.endRollingCount(this);
@@ -358,7 +358,7 @@ suite("Tree Tests", () =>
     test("Cancel Add Custom Label", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.command * 3) + (tc.waitTime.command * 3));
+        this.slow((tc.slowTime.commands.standard * 3) + (tc.waitTime.command * 3));
         utils.overrideNextShowInputBox(undefined);
         await executeTeCommand2("addRemoveCustomLabel", [ cstItem1 ]);
         //
@@ -474,7 +474,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         utils.clearOverrideShowInfoBox();
-        this.slow(tc.slowTime.command * 4);
+        this.slow(tc.slowTime.commands.standard * 4);
         utils.overrideNextShowInfoBox("No");
         await executeTeCommand("clearLastTasks");
         utils.overrideNextShowInfoBox("No");
