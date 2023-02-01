@@ -5,12 +5,13 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, sleep, suiteFinished, testControl as tc,
-    testInvDocPositions, treeUtils, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 const testsName = "grunt";
@@ -45,15 +46,10 @@ suite("Grunt Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
-        }
-        endRollingCount(this);
-    });
-
+	test("Focus Tree View", async function()
+	{
+        await startupFocus(this);
+	});
 
 
     test("Document Position", async function()

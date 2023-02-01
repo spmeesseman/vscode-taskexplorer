@@ -7,14 +7,15 @@
 //
 import * as path from "path";
 import { Uri } from "vscode";
-import { ComposerTaskProvider } from "../../providers/composer";
+import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate } from "../utils/commandUtils";
+import { ComposerTaskProvider } from "../../providers/composer";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
-    suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
+    testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { expect } from "chai";
 
 const testsName = "composer";
 const startTaskCount = 2;
@@ -55,14 +56,10 @@ suite("Composer Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
-        }
-        endRollingCount(this);
-    });
+	test("Focus Tree View", async function()
+	{
+        await startupFocus(this);
+	});
 
 
     test("Start", async function()

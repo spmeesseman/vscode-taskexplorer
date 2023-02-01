@@ -5,12 +5,13 @@
 import { join } from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { BatchTaskProvider } from "../../providers/batch";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, getWsPath, testControl, treeUtils, verifyTaskCount, suiteFinished, exitRollingCount,
-    waitForTeIdle, endRollingCount, needsTreeBuild
+    activate, getWsPath, testControl, verifyTaskCount, suiteFinished, exitRollingCount,
+    waitForTeIdle, endRollingCount
 } from "../utils/utils";
 
 const testsName = "batch";
@@ -42,14 +43,10 @@ suite("Batch Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
-        }
-        endRollingCount(this);
-    });
+	test("Focus Tree View", async function()
+	{
+        await startupFocus(this);
+	});
 
 
     test("Document Position", async function()

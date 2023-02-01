@@ -3,6 +3,7 @@
 /* tslint:disable */
 
 import { expect } from "chai";
+import { startupFocus } from "../utils/suiteUtils";
 import { AntTaskProvider } from "../../providers/ant";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi } from "../../interface/IFilesystemApi";
@@ -10,7 +11,7 @@ import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine, suiteFinished,
-    exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild, testInvDocPositions
+    exitRollingCount, waitForTeIdle, overrideNextShowInfoBox, endRollingCount, testInvDocPositions
 } from "../utils/utils";
 
 const testsName = "ant";
@@ -55,14 +56,10 @@ suite("Ant Tests", () =>
     });
 
 
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        if (needsTreeBuild()) {
-            await treeUtils.refresh(this);
-        }
-        endRollingCount(this);
-    });
+	test("Focus Tree View", async function()
+	{
+        await startupFocus(this);
+	});
 
 
     test("Start", async function()

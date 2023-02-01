@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import * as path from "path";
-import { Uri, workspace } from "vscode";
+import { Uri } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { executeSettingsUpdate } from "../utils/commandUtils";
@@ -15,7 +15,6 @@ import {
 
 const testsName = "gulp";
 const startTaskCount = 17;
-const gulpConfig = workspace.getConfiguration("gulp");
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
