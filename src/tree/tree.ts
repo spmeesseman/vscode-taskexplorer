@@ -63,7 +63,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     private eventQueue: IEvent[] = [];
     private name: string;
     private disposables: Disposable[];
-    private subscriptionIndex: number;
     private tasks: Task[] | null = null;
     private refreshPending = false;
     private visible = false;
@@ -129,7 +128,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.disposables.push(commands.registerCommand(name + ".addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
         this.disposables.push(commands.registerCommand(name + ".addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
 
-        this.subscriptionIndex = context.subscriptions.push(this);
+        context.subscriptions.push(this);
     }
 
 
@@ -138,7 +137,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         this.disposables.forEach((d) => {
             d.dispose();
         });
-        this.extensionContext.subscriptions.splice(this.subscriptionIndex, 1);
+        // this.extensionContext.subscriptions.splice(this.subscriptionIndex, 1);
         this.disposables = [];
     };
 
@@ -942,7 +941,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             log.write("   Return taskfile (tasks/scripts)", logLevel + 1, logPad);
             items = element.treeNodes;
         }
-        else if (!element)
+        else
         {
             log.write("   Return full task tree", logLevel + 1, logPad);
             items = this.taskTree as TaskFolder[] | NoScripts[];
@@ -984,6 +983,38 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
 
     getName = () => this.name;
+
+
+//     /* istanbul ignore next */  // will be needed for TaskResolve API??
+//     public getParent(element: TreeItem): TreeItem | null
+//     {
+//         /* istanbul ignore next */
+//         if (element instanceof TaskFolder)
+//         {
+//             /* istanbul ignore next */
+//             return null;
+//         }
+//         /* istanbul ignore next */
+//         if (element instanceof TaskFile)
+//         {
+//             /* istanbul ignore next */
+//             return element.folder;
+//         }
+//         /* istanbul ignore next */
+//         if (element instanceof TaskItem)
+//         {
+//             /* istanbul ignore next */
+//             return element.taskFile;
+//         }
+//         /* istanbul ignore next */
+//         if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
+//         {
+//             /* istanbul ignore next */
+//             return null;
+//         }
+//         /* istanbul ignore next */
+//         return null;
+//     }
 
 
     getTasks = () => this.tasks || /* istanbul ignore next */[];

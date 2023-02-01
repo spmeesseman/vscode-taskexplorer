@@ -372,7 +372,7 @@ suite("Provider Tests", () =>
     test("Verify Task Counts", async function()
     {
         if (exitRollingCount(this)) return;
-        const taskMap = teApi.testsApi.explorer.getTaskMap();
+        taskMap = teApi.testsApi.explorer.getTaskMap();
         let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
         expect(taskCount).to.be.equal(7, `Unexpected Ant task count (Found ${taskCount} of 7)`);
         taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);

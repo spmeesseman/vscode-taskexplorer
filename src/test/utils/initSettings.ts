@@ -133,7 +133,7 @@ const initSettings = async () =>
     await config.update("visual.disableAnimatedIcons", true, ConfigurationTarget.Workspace);
     await config.update("visual.enableAnsiconForAnt", false, ConfigurationTarget.Workspace);
 
-    await config.update("groupMaxLevel", 5, ConfigurationTarget.Workspace);
+    await config.update("groupMaxLevel", 1, ConfigurationTarget.Workspace);
     await config.update("groupSeparator", "-", ConfigurationTarget.Workspace);
     await config.update("groupWithSeparator", true, ConfigurationTarget.Workspace);
     await config.update("groupStripTaskLabel", true, ConfigurationTarget.Workspace);

@@ -213,7 +213,8 @@
                     "id": "taskExplorer",
                     "name": "%view.name%",
                     "when": "config.taskExplorer.enableExplorerView",
-                    "icon": "res/gears-r.svg"
+                    "icon": "res/gears-r.svg",
+                    "visibility": "visible"
                 }
             ],
             "taskActivity": [
@@ -221,7 +222,8 @@
                     "id": "taskExplorerSideBar",
                     "name": "",
                     "when": "config.taskExplorer.enableSideBar",
-                    "icon": "res/gears-r.svg"
+                    "icon": "res/gears-r.svg",
+                    "visibility": "hidden"
                 }
             ]
         },

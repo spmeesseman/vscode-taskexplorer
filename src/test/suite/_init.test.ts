@@ -4,9 +4,9 @@
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, treeUtils, waitForTeIdle
 } from "../utils/utils";
-import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
+import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
 
 let teApi: ITaskExplorerApi;
 
@@ -26,6 +26,14 @@ suite("Initialization", () =>
         if (exitRollingCount(this, false, true)) return;
         suiteFinished(this);
     });
+
+
+    // test("Build Tree", async function()
+    // {
+    //     if (exitRollingCount(this)) return;
+    //     await treeUtils.refresh(this);
+    //     endRollingCount(this);
+    // });
 
 
     test("Show/Hide Output Window", async function()
@@ -49,6 +57,17 @@ suite("Initialization", () =>
         await waitForTeIdle(tc.waitTime.explorerViewStartup);
         endRollingCount(this);
     });
+
+
+    // test("Focus SideBar Tree", async function()
+    // {
+    //     if (exitRollingCount(this)) return;
+    //     this.slow(tc.slowTime.refreshCommand);
+    //     await focusSidebarView();
+    //     await waitForTeIdle(tc.waitTime.refreshCommand);
+    //     endRollingCount(this);
+    //     await sleep(5000);
+    // });
 
 
     test("Disable Explorer Views", async function()
@@ -102,6 +121,18 @@ suite("Initialization", () =>
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         endRollingCount(this);
     });
+
+
+    // test("Focus File Explorer View", async function()
+    // {
+    //     console.log("1");
+    //     if (exitRollingCount(this)) return;
+    //     this.slow(tc.slowTime.refreshCommandNoChanges);
+    //     await focusFileExplorer();
+    //     endRollingCount(this);
+    //     await sleep(3000);
+    //     console.log("2");
+    // });
 
 
     test("Refresh Explorer Tree", async function()

@@ -54,10 +54,13 @@ export const focusExplorerView = async (instance?: any) =>
 };
 
 
-export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
+export const focusFileExplorer = () => commands.executeCommand("workbench.files.action.focusFilesExplorer");
 
 
 export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus");
+
+
+export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
 
 
 const getCmdGroup = (command: string) =>
