@@ -987,36 +987,36 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     getName = () => this.name;
 
 
-//     /* istanbul ignore next */  // will be needed for TaskResolve API and/or TreeView/Reveal API??
-//     public getParent(element: TreeItem): TreeItem | null
-//     {
-//         /* istanbul ignore next */
-//         if (element instanceof TaskFolder)
-//         {
-//             /* istanbul ignore next */
-//             return null;
-//         }
-//         /* istanbul ignore next */
-//         if (element instanceof TaskFile)
-//         {
-//             /* istanbul ignore next */
-//             return element.folder;
-//         }
-//         /* istanbul ignore next */
-//         if (element instanceof TaskItem)
-//         {
-//             /* istanbul ignore next */
-//             return element.taskFile;
-//         }
-//         /* istanbul ignore next */
-//         if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
-//         {
-//             /* istanbul ignore next */
-//             return null;
-//         }
-//         /* istanbul ignore next */
-//         return null;
-//     }
+    /* istanbul ignore next */  // Needed for TaskResolve API and/or TreeView/Reveal API?
+    public getParent(element: TreeItem): TreeItem | null
+    {
+        /* istanbul ignore next */
+        if (element instanceof TaskFolder)
+        {
+            /* istanbul ignore next */
+            return null;
+        }
+        /* istanbul ignore next */
+        if (element instanceof TaskFile)
+        {
+            /* istanbul ignore next */
+            return element.folder;
+        }
+        /* istanbul ignore next */
+        if (element instanceof TaskItem)
+        {
+            /* istanbul ignore next */
+            return element.taskFile;
+        }
+        /* istanbul ignore next */
+        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
+        {
+            /* istanbul ignore next */
+            return null;
+        }
+        /* istanbul ignore next */
+        return null;
+    }
 
 
     getTasks = () => this.tasks || /* istanbul ignore next */[];
@@ -1080,14 +1080,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
     getTreeItem = (element: TaskItem | TaskFile | TaskFolder) =>
     {
-        /* istanbul ignore else */
+        log.methodStart("get tree item", 4, "", true, [[ "label", element.label ], [ "id", element.id ]]);
         if (element instanceof TaskItem)
         {
-            log.methodStart("get tree item", 3, "", true, [[ "label", element.label ]]);
-            log.write("   refresh task item state", 3);
-            element.refreshState("   ", 3);
-            log.methodDone("get tree item", 3);
+            log.write("   refresh task item state", 4);
+            element.refreshState("   ", 4);
         }
+        else {
+            log.write("   get tree file/folder", 4);
+        }
+        log.methodDone("get tree item", 4);
         return element;
     };
 
@@ -1696,6 +1698,12 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
             }
         }
     };
+
+
+    // resolveTreeItem = (item: TreeItem, element: TaskItem | TaskFile | TaskFolder, token: CancellationToken): ProviderResult<TreeItem> =>
+    // {
+    //
+    // };
 
 
     setEnabled = (enable: boolean, logPad: string) =>
