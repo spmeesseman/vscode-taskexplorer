@@ -1,10 +1,10 @@
 
 import log from "./log/log";
 import { join } from "path";
+import { Task } from "vscode";
+import { readFileSync } from "./utils/fs";
 import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
-import { Task } from "vscode";
-import { pathExistsSync, readFileSync } from "./utils/fs";
 import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
 //
 // FOr JSON5, if I don't specifically import index.js with 'require', then the
