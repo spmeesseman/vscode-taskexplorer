@@ -3,6 +3,7 @@
 /* tslint:disable */
 
 import * as path from "path";
+import fsUtils from  "../utils/fsUtils";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { startupFocus } from "../utils/suiteUtils";
@@ -11,7 +12,7 @@ import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
-    testInvDocPositions, verifyTaskCount, waitForTeIdle
+    testInvDocPositions, verifyTaskCount
 } from "../utils/utils";
 
 const testsName = "pipenv";
@@ -34,8 +35,7 @@ suite("Pipenv Tests", () =>
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "Pipfile"));
-        await fsApi.createDir(dirName);
-        await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+        await fsUtils.createDir(dirName);
         endRollingCount(this, true);
     });
 
@@ -108,7 +108,7 @@ suite("Pipenv Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.createFile(
             fileUri.fsPath,
 `[[source]]
 url = "https://pypi.org/simple"
@@ -134,7 +134,6 @@ convert-ui2 = "pyside6-uic ui_mainwindow.ui > ui_mainwindow.py"
 build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.py"
 `
         );
-        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
@@ -144,7 +143,7 @@ build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.writeFile(
             fileUri.fsPath,
 `[[source]]
 url = "https://pypi.org/simple"
@@ -171,7 +170,6 @@ build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.
 run-dev = "python main.py"
 `
         );
-        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 3);
         endRollingCount(this);
     });
@@ -181,7 +179,7 @@ run-dev = "python main.py"
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.writeFile(
             fileUri.fsPath,
 `[[source]]
 url = "https://pypi.org/simple"
@@ -207,7 +205,6 @@ convert-ui2 = "pyside6-uic ui_mainwindow.ui > ui_mainwindow.py"
 build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.py"
 `
         );
-        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
@@ -217,7 +214,7 @@ build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.writeFile(
             fileUri.fsPath,
 `[[src]]
 url = "https://pypi.org/simple"
@@ -228,7 +225,6 @@ convert-ui2 = "pyside6-uic ui_mainwindow.ui > ui_mainwindow.py"
 build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.py"
 `
         );
-        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });
@@ -238,8 +234,7 @@ build-exe2 = "pyinstaller --name='RobPySide6SSHgui' --windowed --onefile ./main.
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await fsUtils.deleteFile(fileUri.fsPath);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });

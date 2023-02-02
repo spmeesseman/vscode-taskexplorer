@@ -502,6 +502,16 @@ suite("Tree Tests", () =>
     });
 
 
+    test("Get Parent (Reveal API)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        await executeSettingsUpdate("specialFolders.expanded.project1", false);
+        await explorer.refresh(undefined, undefined, "");
+        await executeSettingsUpdate("specialFolders.expanded.project1", true);
+        utils.endRollingCount(this);
+    });
+
+
     test("Folder Sort Type Explorer Order", async function()
     {
         if (utils.exitRollingCount(this)) return;
