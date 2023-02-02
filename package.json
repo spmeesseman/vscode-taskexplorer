@@ -141,7 +141,6 @@
         "@sgarciac/bombadil": "^2.3.0",
         "glob": "^8.1.0",
         "json5": "^2.2.2",
-        "jsonc-parser": "^2.3.1",
         "marked": "^4.2.12",
         "minimatch": "^5.1.2",
         "node-fetch": "^3.3.0",

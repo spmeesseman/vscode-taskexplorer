@@ -1,86 +1,41 @@
 
 import log from "./log/log";
-import { visit, JSONVisitor } from "jsonc-parser";
 import { TextDocument } from "vscode";
 import TaskItem from "../tree/item";
 import { providers, providersExternal } from "../extension";
 import { isWatchTask } from "./utils/utils";
+import { IDictionary } from "../interface";
+
+
+const jsonMap: IDictionary<{object: string; preKey: string; postKey: string}> = {
+    npm: {
+        object: "\"scripts\"",
+        preKey: "(?<=\\s)+\"",
+        postKey: "\" *\\:"
+    },
+    workspace: {
+        object: "\"tasks\"",
+        preKey: "\"(?:script|label)\" *\\: *\"",
+        postKey: "\"(?:\\s|,|$)*"
+    }
+};
 
 
 const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): number =>
 {
-    let inScripts = false;
-    let inTasks = false;
-    let inTaskLabel: any;
-    let scriptOffset = 0;
-
     log.methodStart("find json document position", 3, "   ", false, [[ "task name", taskItem.task.name ]]);
 
-    const visitor: JSONVisitor =
-    {
-        onError: /* istanbul ignore next */() =>
-        {
-            /* istanbul ignore next */
-            return scriptOffset;
-        },
-        onObjectEnd: () =>
-        {
-            if (inScripts)
-            {
-                inScripts = false;
-            }
-        },
-        onLiteralValue: (value: any, offset: number, _length: number) =>
-        {
-            if (inTaskLabel)
-            {
-                /* istanbul ignore else */
-                if (typeof value === "string" && (inTaskLabel === "label" || /* istanbul ignore next */inTaskLabel === "script"))
-                {
-                    log.value("   check string property", value, 4, "   ");
-                    if (taskItem.task.name === value)
-                    {
-                        scriptOffset = offset;
-                    }
-                }
-                inTaskLabel = undefined;
-            }
-        },
-        onObjectProperty: (property: string, offset: number, _length: number) =>
-        {
-            if (property === "scripts")
-            {
-                inScripts = true;
-            }
-            else if (inScripts && taskItem)
-            {
-                log.value("   check object property", property, 4, "   ");
-                if (taskItem.task.name === property || taskItem.task.name.startsWith(property + " - "))
-                {
-                    scriptOffset = offset;
-                }
-            }
-            else if (property === "tasks")
-            {
-                inTasks = true;
-                /* istanbul ignore else */
-                if (!inTaskLabel)
-                { // select the script section
-                    scriptOffset = offset;
-                }
-            }
-            else if ((property === "label" || property === "script") && inTasks && !inTaskLabel)
-            {
-                inTaskLabel = "label";
-            }
-            else
-            { // nested object which is invalid, ignore the script
-                inTaskLabel = undefined;
-            }
-        }
-    };
+    const props = jsonMap[taskItem.taskSource.toLowerCase()],
+          blockOffset = documentText.indexOf(props.object),
+          regex = new RegExp("(" + props.preKey + taskItem.task.name + props.postKey + ")", "gm");
 
-    visit(documentText, visitor);
+    let scriptOffset = blockOffset,
+        match: RegExpExecArray | null;
+
+    if ((match = regex.exec(documentText.substring(blockOffset))) !== null)
+    {
+        scriptOffset = match.index + match[0].indexOf(taskItem.task.name) + blockOffset;
+    }
 
     log.methodDone("find json document position", 3, "   ", [[ "position", scriptOffset ]]);
     return scriptOffset;
@@ -97,7 +52,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     );
 
     const def = taskItem.task.definition;
-    if (taskItem.taskSource === "npm" || taskItem.taskSource === "Workspace")
+    if (taskItem.taskSource === "npm" || taskItem.taskSource === "Workspace") // JSON
     {
         log.write("   find json position", 2);
         scriptOffset = findJsonDocumentPosition(documentText, taskItem);
