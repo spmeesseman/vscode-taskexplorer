@@ -1,0 +1,38 @@
+{
+    "name": "project2",
+    "version": "0.0.1",
+    "description": "Project 2",
+    "license": "MIT",
+    "author": {
+        "name": "Scott Meesseman",
+        "email": "spmeesseman@gmail.com"
+    },
+    "scripts": {
+        "build": "webpack --mode production --progress",
+        "build:dev": "webpack --env environment=dev --progress",
+        "prepack": "node .\\script\\npm-hooks.js",
+        "postpack": "node .\\script\\npm-hooks.js",
+        "preinstall": "node .\\script\\npm-hooks.js",
+        "postinstall": "node .\\script\\npm-hooks.js",
+        "preuninstall": "node .\\script\\npm-hooks.js",
+        "postuninstall": "node .\\script\\npm-hooks.js",
+        "preupdate": "node .\\script\\npm-hooks.js",
+        "postupdate": "node .\\script\\npm-hooks.js",
+        "rebuild": "npm run clean-build && npm run build",
+        "test-karma": "karma start --single-run=true --prod-test",
+        "test-dev-all": "npm run clean-coverage && npx ./src/test/runTest.js --dev",
+        "u_ugly": "uglifyjs ./build/pjm-server.js --mangle -o ./build/pjm-server.min.js"
+    },
+    "devDependencies": {},
+    "dependencies": {},
+    "main": "./project2.js",
+    "bin": {
+        "spm-project2": "./spm-project2.js"
+    },
+    "files": [
+        "etc",
+        "spm-project2.js",
+        "res",
+        "runtime.js"
+    ]
+}

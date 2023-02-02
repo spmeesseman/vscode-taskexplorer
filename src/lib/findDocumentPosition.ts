@@ -10,7 +10,7 @@ import { IDictionary } from "../interface";
 const jsonMap: IDictionary<{object: string; preKey: string; postKey: string}> = {
     npm: {
         object: "\"scripts\"",
-        preKey: "(?<=\\s)+\"",
+        preKey: "(?<=\\s)\"",
         postKey: "\" *\\:"
     },
     workspace: {
@@ -23,21 +23,25 @@ const jsonMap: IDictionary<{object: string; preKey: string; postKey: string}> = 
 
 const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): number =>
 {
-    log.methodStart("find json document position", 3, "   ", false, [[ "task name", taskItem.task.name ]]);
+    log.methodStart("find json document position", 2, "   ", false, [
+        [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ]
+    ]);
 
     const props = jsonMap[taskItem.taskSource.toLowerCase()],
           blockOffset = documentText.indexOf(props.object),
           regex = new RegExp("(" + props.preKey + taskItem.task.name + props.postKey + ")", "gm");
 
     let scriptOffset = blockOffset,
-        match: RegExpExecArray | null;
+        match: RegExpExecArray | null,
+        matches = 0;
 
-    if ((match = regex.exec(documentText.substring(blockOffset))) !== null)
+    while ((match = regex.exec(documentText.substring(blockOffset))) !== null)
     {
+        ++matches;
         scriptOffset = match.index + match[0].indexOf(taskItem.task.name) + blockOffset;
     }
 
-    log.methodDone("find json document position", 3, "   ", [[ "position", scriptOffset ]]);
+    log.methodDone("find json document position", 2, "   ", [[ "position", scriptOffset ], [ "# of matches", matches ]]);
     return scriptOffset;
 };
 
@@ -59,6 +63,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     }
     else if (!isWatchTask(taskItem.taskSource))
     {
+        log.write("   find custom provider position", 2);
         const provider = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
