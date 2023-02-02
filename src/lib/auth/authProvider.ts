@@ -1,19 +1,23 @@
-export {};
-/*
+
+
+import { v4 as uuid } from "uuid";
+import fetch from "node-fetch";
+import { URLSearchParams } from "url";
+import { IDictionary } from "../../interface";
+import { PromiseAdapter, promiseFromEvent } from "../utils/promiseUtils";
 import {
     authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession,
     Disposable, env, EventEmitter, ExtensionContext, ProgressLocation, Uri, UriHandler, window
 } from "vscode";
-import { v4 as uuid } from "uuid";
-import { PromiseAdapter, promiseFromEvent } from "../utils/promiseUtils";
-import fetch from "node-fetch";
-import { URLSearchParams } from "url";
+import { configuration } from "../utils/configuration";
+import { storage } from "../utils/storage";
 
 export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
 const CLIENT_ID = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 const TEAUTH_DOMAIN = "app1.spmeesseman.com";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
+
 
 class UriEventHandler extends EventEmitter<Uri> implements UriHandler
 {
@@ -25,11 +29,12 @@ class UriEventHandler extends EventEmitter<Uri> implements UriHandler
 
 export class TeAuthenticationProvider implements AuthenticationProvider, Disposable
 {
-    private _sessionChangeEmitter = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
+
     private _disposable: Disposable;
     private _pendingStates: string[] = [];
-    private _codeExchangePromises = new Map<string, { promise: Promise<string>; cancel: EventEmitter<void> }>();
     private _uriHandler = new UriEventHandler();
+    private _codeExchangePromises: IDictionary<{ promise: Promise<string>; cancel: EventEmitter<void> }> = {};
+    private _onSessionChange = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
 
 
     constructor(private readonly context: ExtensionContext)
@@ -40,10 +45,12 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
         );
     }
 
+
     get onDidChangeSessions()
     {
-        return this._sessionChangeEmitter.event;
+        return this._onSessionChange.event;
     }
+
 
     get redirectUri()
     {
@@ -55,7 +62,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
 
     public async getSessions(scopes?: string[]): Promise<readonly AuthenticationSession[]>
     {
-        const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
+        const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
 
         if (allSessions)
         {
@@ -90,7 +97,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
 
             await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([ session ]));
 
-            this._sessionChangeEmitter.fire({ added: [ session ], removed: [], changed: [] });
+            this._onSessionChange.fire({ added: [ session ], removed: [], changed: [] });
 
             return session;
         } catch (e)
@@ -103,7 +110,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
 
     public async removeSession(sessionId: string): Promise<void>
     {
-        const allSessions = await this.context.secrets.get(SESSIONS_SECRET_KEY);
+        const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
         if (allSessions)
         {
             const sessions = JSON.parse(allSessions) as AuthenticationSession[];
@@ -111,11 +118,11 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             const session = sessions[sessionIdx];
             sessions.splice(sessionIdx, 1);
 
-            await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify(sessions));
+            await storage.updateSecret(SESSIONS_SECRET_KEY, JSON.stringify(sessions));
 
             if (session)
             {
-                this._sessionChangeEmitter.fire({ added: [], removed: [ session ], changed: [] });
+                this._onSessionChange.fire({ added: [], removed: [ session ], changed: [] });
             }
         }
     }
@@ -166,11 +173,11 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             const uri = Uri.parse(`https://${TEAUTH_DOMAIN}/authorize?${searchParams.toString()}`);
             await env.openExternal(uri);
 
-            let codeExchangePromise = this._codeExchangePromises.get(scopeString);
+            let codeExchangePromise = this._codeExchangePromises[scopeString];
             if (!codeExchangePromise)
             {
                 codeExchangePromise = promiseFromEvent(this._uriHandler.event, this.handleUri(scopes));
-                this._codeExchangePromises.set(scopeString, codeExchangePromise);
+                this._codeExchangePromises[scopeString] = codeExchangePromise;
             }
 
             try
@@ -184,7 +191,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             {
                 this._pendingStates = this._pendingStates.filter(n => n !== stateId);
                 codeExchangePromise?.cancel.fire();
-                this._codeExchangePromises.delete(scopeString);
+                delete this._codeExchangePromises[scopeString];
             }
         });
     }
@@ -194,10 +201,10 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
         (scopes) => async (uri, resolve, reject) =>
         {
             const query = new URLSearchParams(uri.fragment);
-            const access_token = query.get("access_token");
+            const token = query.get("access_token");
             const state = query.get("state");
 
-            if (!access_token)
+            if (!token)
             {
                 reject(new Error("No token"));
                 return;
@@ -215,7 +222,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
                 return;
             }
 
-            resolve(access_token);
+            resolve(token);
         };
 
 
@@ -230,4 +237,3 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
         return response.json() as Promise<{ name: string; email: string }>;
     }
 }
-*/
