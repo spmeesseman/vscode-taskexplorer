@@ -55,7 +55,7 @@
     "preview": false,
     "pricing": "Trial",
     "scripts": {
-        "clean": "rimraf dist && npm run test:clean",
+        "clean": "rimraf dist && rimraf out && npm run test:clean",
         "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
         "copy-pkgjson-to-code": "cmd /c copy /Y .\\package*.json ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2",
         "create-release-notes-html": "npx marked -i CHANGELOG.md -o res/release-notes.html",
@@ -1840,7 +1840,7 @@
                         "**/examples/**",
                         "**/ext/**",
                         "**/obj/**",
-                        "**/out/**",
+                        "**/dist/**",
                         "**/output/**",
                         "**/packages/**",
                         "**/release/**",

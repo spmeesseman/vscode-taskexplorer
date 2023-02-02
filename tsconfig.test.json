@@ -1,17 +1,6 @@
 {
-	"extends": "./tsconfig.base.json",
-	"compilerOptions": {
-		"module": "commonjs",
-		"outDir": "out",
-		"paths": {
-			"@env/*": ["src/env/node/*"]
-		},
-		"tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
-	},
-	"include": ["src/**/*"],
-	"exclude": [
-        "src/webviews/apps/**/*",
-        "src/env/browser/**/*",
+    "extends": "./tsconfig.json",
+    "exclude": [
         "node_modules",
         ".vscode-test",
         "test-fixture"

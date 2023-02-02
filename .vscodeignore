@@ -8,6 +8,8 @@
 **/*.ts
 dist/test/**
 dist/**/*.map
+out/test/**
+out/**/*.map
 src
 **/test/**
 coverage

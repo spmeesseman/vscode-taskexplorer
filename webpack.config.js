@@ -131,7 +131,6 @@ const devTool = (env, wpConfig) =>
  * @param {WebpackBuildEnv} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-// @ts-ignore
 const entryPoints = (env, wpConfig) =>
 {
 	wpConfig.entry = {
@@ -152,7 +151,7 @@ const externals = (wpConfig) =>
 	wpConfig.externals =
 	{   //
 		// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
-		// be webpack"ed, -> https://webpack.js.org/configuration/externals/
+		// be webpack'ed, -> https://webpack.js.org/configuration/externals/
 		//
 		vscode: "commonjs vscode"
 	};
@@ -381,10 +380,10 @@ const plugins = (env, wpConfig) =>
 	if (wpConfig.mode === "production")
 	{
 		wpConfig.plugins = [
-			new CleanPlugin(
-			{
-				cleanOnceBeforeBuildPatterns: [ "!dist/lib/page/**" ]
-			}),
+			// new CleanPlugin(
+			// {
+			// 	cleanOnceBeforeBuildPatterns: [ "!dist/lib/page/**" ]
+			// }),
 			{
 				/** @param {PluginInstance} compiler Compiler */
 				apply: (compiler) =>   // add AfterDone plugin at the end of the plugins array

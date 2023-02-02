@@ -9,16 +9,14 @@
 		"incremental": true,
 		"isolatedModules": true,
 		"lib": [ "es2020" ],
-        // "target": "es6",
-        // "lib": [ "es6" ],
-		// "module": "esnext",
         "module": "commonjs",
+		// "module": "esnext",
 		// "moduleResolution": "node",
 		// "noFallthroughCasesInSwitch": true,
 		"noImplicitOverride": true,
 		// "noImplicitReturns": true,
 		"noUnusedLocals": false,
-        // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+        // "noUnusedParameters": true,
 		"outDir": "dist",
 		"resolveJsonModule": true,
 		"rootDir": "src",
@@ -26,9 +24,8 @@
 		"sourceMap": true,
 		"strict": true,
 		"target": "es2020",
-        // "target": "es6",x
 		"useDefineForClassFields": true,
-		"useUnknownInCatchVariables": false
+		// "useUnknownInCatchVariables": false
 	},
 	"include": ["src/**/*"]
 }

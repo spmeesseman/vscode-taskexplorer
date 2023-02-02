@@ -1,7 +1,9 @@
 node_modules
 dist
+out
 *.vsix
 *.vscode-test
+*.buildinfo
 coverage
 .nyc_output
 install_extensions.bat
