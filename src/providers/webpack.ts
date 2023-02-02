@@ -20,7 +20,7 @@ export class WebpackTaskProvider extends TaskExplorerProvider implements TaskExp
         const args = [ cmd, ...xArgs, "--config", "./" + def.fileName ];
         const options: ShellExecutionOptions = { cwd: dirname(uri.fsPath) };
         const execution = new ShellExecution("npx", args, options);
-        return new Task(def, folder, target, "webpack", execution, "$webpackte");
+        return new Task(def, folder, target, "webpack", execution, "$webpackTe");
     }
 
 

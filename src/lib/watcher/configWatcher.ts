@@ -4,7 +4,7 @@ import { persistCache } from "../fileCache";
 import { refreshTree } from "../refreshTree";
 import { ITaskExplorerApi } from "../../interface";
 import { registerFileWatcher } from "./fileWatcher";
-import { registerExplorer } from "../registerExplorer";
+import { enableExplorer } from "../registerExplorer";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
@@ -273,14 +273,14 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enableExplorerView");
         teApi.log.write("   the 'enableExplorerView' setting has changed", 1);
         teApi.log.value("      new value", newValue, 1);
-        registerExplorer("taskExplorer", ctx, newValue, teApi, false);
+        enableExplorer("taskExplorer", newValue, "   ");
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
         const newValue = configuration.get<boolean>("enableSideBar");
         teApi.log.write("   the 'enableSideBar' setting has changed", 1);
         teApi.log.value("      new value", newValue, 1);
-        registerExplorer("taskExplorerSideBar", ctx, newValue, teApi, false);
+        enableExplorer("taskExplorerSideBar", newValue, "   ");
     }
 
     //

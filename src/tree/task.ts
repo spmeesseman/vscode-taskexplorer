@@ -99,6 +99,7 @@ export const pause = (tree: TaskTreeDataProvider, taskItem: TaskItem) =>
     log.methodDone("pause", 1);
 };
 
+
 export const restart = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTasks: SpecialTaskFolder) =>
 {
     let exec: TaskExecution | undefined;

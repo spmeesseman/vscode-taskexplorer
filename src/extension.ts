@@ -38,7 +38,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/ILicenseManager";
 import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
-import { registerExplorer } from "./lib/registerExplorer";
+import { registerTreeProviders } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env, /* authentication, window*/ } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
@@ -167,8 +167,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     // Register the tree providers
     //
-    registerExplorer("taskExplorer", context, configuration.get<boolean>("enableExplorerView", true), teApi, true);
-    registerExplorer("taskExplorerSideBar", context, configuration.get<boolean>("enableSideBar", false), teApi, true);
+    registerTreeProviders(context, teApi);
 
     //
     // Register configurations/settings change watcher
