@@ -52,17 +52,16 @@ const createExplorer = (name: "taskExplorer"|"taskExplorerSideBar", enable: bool
         extensionContext.subscriptions.push(view);
         if (name === "taskExplorer")
         {
-            teApi.explorer = treeDataProvider;
+            teApi.testsApi.explorer = teApi.explorer = treeDataProvider;
             teApi.explorer.setEnabled(enable, logPad + "   ");
             teApi.explorerView = view;
         }
         else // name === "taskExplorerSideBar"
         {
-            teApi.sidebar = treeDataProvider;
+            teApi.testsApi.explorer = teApi.sidebar = treeDataProvider;
             teApi.sidebar.setEnabled(enable, logPad + "   ");
             teApi.sidebarView = view;
         }
-        teApi.testsApi.explorer = (teApi.explorer || teApi.sidebar) as ITaskExplorer;
         log.write("   tree data provider '" + name + "' registered", 1, logPad);
     }
     log.methodDone("create explorer view / tree provider", 1, logPad);
