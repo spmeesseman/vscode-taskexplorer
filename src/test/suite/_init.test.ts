@@ -11,8 +11,6 @@ import {
 
 let teApi: ITaskExplorerApi;
 let testsApi: ITestsApi;
-let favoritesExpanded: boolean;
-let lastTasksExpanded: boolean;
 
 
 suite("Initialization", () =>
@@ -21,10 +19,11 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, testsApi } = await activate(this));
-        favoritesExpanded = teApi.config.get<boolean>("specialFolders.expanded.favorites");
-        lastTasksExpanded = teApi.config.get<boolean>("specialFolders.expanded.lastTasks");
+        testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("specialFolders.expanded.favorites", false);
         await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
+        await executeSettingsUpdate("specialFolders.expanded.userTasks", false);
+        testsApi.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
 
@@ -32,8 +31,11 @@ suite("Initialization", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await executeSettingsUpdate("specialFolders.expanded.favorites", favoritesExpanded);
-        await executeSettingsUpdate("specialFolders.expanded.lastTasks", lastTasksExpanded);
+        testsApi.enableConfigWatcher(false);
+        await executeSettingsUpdate("specialFolders.expanded.favorites", true);
+        await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
+        await executeSettingsUpdate("specialFolders.expanded.userTasks", true);
+        testsApi.enableConfigWatcher(true);
         await closeEditors();
         suiteFinished(this);
     });

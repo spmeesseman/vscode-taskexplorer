@@ -71,8 +71,8 @@ const createExplorer = (name: "taskExplorer"|"taskExplorerSideBar", enable: bool
 
 const disposeExplorer = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
 {
-    const view = views[name];
     log.methodStart("dispose explorer view / tree provider", 1, logPad, false, [[ "name", name ]]);
+    const view = views[name];
     if (view)
     {
         if (name === "taskExplorer")
@@ -95,7 +95,7 @@ const disposeExplorer = (name: "taskExplorer"|"taskExplorerSideBar", logPad: str
         view.dispose();
         views[name] = undefined;
         teApi.testsApi.explorer = (teApi.explorer || teApi.sidebar) as ITaskExplorer;
-        extensionContext.subscriptions.find(s => isObject(s) && Object.hasOwnProperty.call(s, name))?.dispose();
+        extensionContext.subscriptions.splice(extensionContext.subscriptions.findIndex(s => isObject(s) && Object.hasOwnProperty.call(s, name)), 1);
         log.write("   tree data provider '" + name + "' un-registered", 1, "   ");
     }
     log.methodDone("dispose explorer view / tree provider", 1, logPad);
