@@ -428,7 +428,8 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         // Ignore modification events for some task types (script type, e.g. 'bash', 'python' etc)
         // app-publisher and maven only get watched for invalid syntax.  they always have same # of tasks for a file.
         //
-        const ignoreModify = isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" || taskType === "tsc";
+        const ignoreModify = isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" ||
+                             taskType === "tsc" || taskType === "jenkins" || taskType === "webpack";
         if (!watcher) {
             watcher = workspace.createFileSystemWatcher(util.getGlobPattern(taskType));
             watchers[taskType] = watcher;
