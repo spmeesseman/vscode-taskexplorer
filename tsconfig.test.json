@@ -3,6 +3,13 @@
     "exclude": [
         "node_modules",
         ".vscode-test",
-        "test-fixture"
+        ".vscode",
+        "test-fixture",
+        "script",
+        "types",
+        "res",
+        "dist",
+        ".nyc_output",
+        "coverage"
     ]
 }

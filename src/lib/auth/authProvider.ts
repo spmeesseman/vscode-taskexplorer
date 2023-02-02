@@ -1,16 +1,15 @@
 
 
-import { v4 as uuid } from "uuid";
 import fetch from "node-fetch";
+import { v4 as uuid } from "uuid";
 import { URLSearchParams } from "url";
+import { storage } from "../utils/storage";
 import { IDictionary } from "../../interface";
 import { PromiseAdapter, promiseFromEvent } from "../utils/promiseUtils";
 import {
     authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession,
     Disposable, env, EventEmitter, ExtensionContext, ProgressLocation, Uri, UriHandler, window
 } from "vscode";
-import { configuration } from "../utils/configuration";
-import { storage } from "../utils/storage";
 
 export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
