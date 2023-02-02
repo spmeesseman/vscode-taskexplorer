@@ -41,14 +41,14 @@ export const focusExplorerView = async (instance?: any) =>
     if (!teExplorer.isVisible())
     {
         if (instance) {
-            instance.slow(tc.slowTime.focusCommand + tc.slowTime.commands.refresh);
+            instance.slow(tc.slowTime.commands.focus + tc.slowTime.commands.refresh);
         }
         await executeTeCommand("focus", tc.waitTime.focusCommand);
         await waitForTeIdle(tc.waitTime.focusCommand);
         explorerHasFocused = true;
     }
     else if (instance) {
-        instance.slow(tc.slowTime.focusCommandAlreadyFocused);
+        instance.slow(tc.slowTime.commands.focusAlreadyFocused);
         await waitForTeIdle(tc.waitTime.min);
     }
 };

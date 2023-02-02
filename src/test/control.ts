@@ -301,12 +301,12 @@ export const testControl: ITestControl =
         explorerViewStartup: 1700,
         focusCommand: 210,
         fs: {
-            createEvent: 195,
-            createFolderEvent: 215,
+            createEvent: 205,
+            createFolderEvent: 220,
             createEventTsc: 240,
-            deleteEvent: 185,
-            deleteFolderEvent: 205,
-            modifyEvent: 180,
+            deleteEvent: 200,
+            deleteFolderEvent: 210,
+            modifyEvent: 190,
             modifyEventTsc: 240
         },
         getTreeTasks: 50,

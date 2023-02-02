@@ -5,7 +5,7 @@
 import * as utils from "../utils/utils";
 import { join } from "path";
 import { expect } from "chai";
-import { Task } from "vscode";
+import { Task, workspace } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { getLicenseManager } from "../../extension";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -191,6 +191,9 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(50);
 		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
+		// if (workspace.textDocuments.length > 0) {
+		// 	await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
+		// }
 		await utils.sleep(500);
         utils.endRollingCount(this);
 	});

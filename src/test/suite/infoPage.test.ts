@@ -1,15 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Extension, Uri, ViewColumn, WebviewPanel, window } from "vscode";
+import { Uri, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
+import { getViewTitle, getViewType } from "../../lib/page/infoPage";
+import { getParsingReportSerializer } from "../../commands/viewReport";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
-	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
+	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle,
+	endRollingCount, createwebviewForRevive
 } from "../utils/utils";
-import { getViewTitle, getViewType, reviveParsingReport } from "../../lib/page/infoPage";
-import { getParsingReportSerializer } from "../../commands/viewReport";
 
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;

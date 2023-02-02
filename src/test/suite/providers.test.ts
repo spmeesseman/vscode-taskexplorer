@@ -195,7 +195,7 @@ suite("Provider Tests", () =>
             await focusExplorerView(this);
         }
         else {
-            this.slow(tc.slowTime.focusCommandAlreadyFocused + tc.slowTime.min);
+            this.slow(tc.slowTime.commands.focusAlreadyFocused + tc.slowTime.min);
             await waitForTeIdle(tc.waitTime.min);
         }
         endRollingCount(this);
