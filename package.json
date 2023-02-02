@@ -128,7 +128,10 @@
         "tsc-watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",
         "webpack-build": "webpack --mode production --config ./webpack.config.js",
+        "webpack-build_analyze": "webpack --mode production --env analyze=true --config ./webpack.config.js",
+        "webpack-build_ww": "webpack --mode production --env target=webworker --config ./webpack.config.js",
         "webpack-rebuild": "webpack --mode production --env clean=true --config ./webpack.config.js",
+        "webpack-rebuild_ww": "webpack --mode production --env clean=true --env target=webworker --config ./webpack.config.js",
         "webpack-build:verbose": "webpack --stats verbose --mode production --config ./webpack.config.js",
         "webpack-build:dev": "webpack --mode development --env environment=dev --config ./webpack.config.js",
         "webpack-rebuild:dev": "npm run webpack-build:dev --env clean=true --config ./webpack.config.js",
@@ -164,8 +167,12 @@
         "@vscode/test-electron": "^2.2.2",
         "@vscode/vsce": "^2.17.0",
         "chai": "^4.3.7",
+        "circular-dependency-plugin": "^5.2.2",
+        "clean-webpack-plugin": "^4.0.0",
         "codecov": "^3.8.3",
         "cross-env": "^7.0.3",
+        "csp-html-webpack-plugin": "^5.1.0",
+        "css-minimizer-webpack-plugin": "^4.2.2",
         "eslint": "^7.32.0",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jsdoc": "^31.6.0",
@@ -174,6 +181,7 @@
         "eslint-plugin-prettier": "^3.3.1",
         "grunt": "^1.5.3",
         "gulp": "^4.0.2",
+        "image-minimizer-webpack-plugin": "^3.8.1",
         "mocha": "^9.2.0",
         "nyc": "^15.1.0",
         "rimraf": "^3.0.2",
@@ -185,6 +193,7 @@
         "typescript": "^4.5.5",
         "vscode-nls-dev": "^4.0.0",
         "webpack": "^5.68.0",
+        "webpack-bundle-analyzer": "^4.7.0",
         "webpack-cli": "^4.9.2"
     },
     "greenkeeper": {
@@ -2875,7 +2884,7 @@
                         "code": 3,
                         "file": 2,
                         "message": 1,
-                        "kind":"file",
+                        "kind": "file",
                         "regexp": "^The terminal process *[\"']?([A-Za-z\\.0-9\\/\\-_\\\\]+) +([A-Za-z \\.0-9\\/\\-_\\\\\"']+) +(?:failed to launch \\(|terminated with )exit code\\:? *([0-9]+)\\s*(?:\\.|\\))[\r\n]{2,3}^(.+)"
                     }
                 ]
@@ -2889,7 +2898,7 @@
                     {
                         "file": 2,
                         "message": 1,
-                        "kind":"file",
+                        "kind": "file",
                         "regexp": "^('(.+)' is not recognized as an internal or external command)"
                     }
                 ]
