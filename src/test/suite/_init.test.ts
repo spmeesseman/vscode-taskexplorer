@@ -2,14 +2,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { refreshTree } from "../../lib/refreshTree";
+import { enableExplorer } from "../../lib/registerExplorer";
 import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, treeUtils, waitForTeIdle
-} from "../utils/utils";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
-import { ExtensionContext } from "vscode";
+import {
+    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
+} from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
+let favoritesExpanded: boolean;
+let lastTasksExpanded: boolean;
 
 
 suite("Initialization", () =>
@@ -25,16 +27,10 @@ suite("Initialization", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
+        await teApi.config.update("specialFolders.expanded.favorites", favoritesExpanded);
+        await teApi.config.update("specialFolders.expanded.lastTasks", lastTasksExpanded);
         await closeEditors();
         suiteFinished(this);
-    });
-
-
-    test("Build Tree", async function()
-    {
-        if (exitRollingCount(this)) return;
-        // await treeUtils.refresh(this);
-        endRollingCount(this);
     });
 
 
@@ -51,16 +47,6 @@ suite("Initialization", () =>
     });
 
 
-    test("Enable SideBar View", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.explorerViewStartup + tc.slowTime.config.enableEvent);
-        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
-        await waitForTeIdle(tc.waitTime.explorerViewStartup);
-        endRollingCount(this);
-    });
-
-
     test("Focus SideBar Tree", async function()
     {
         if (exitRollingCount(this)) return;
@@ -68,7 +54,6 @@ suite("Initialization", () =>
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
-        await sleep(5000);
     });
 
 
@@ -78,6 +63,16 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        enableExplorer("taskExplorer", false, "");
+        endRollingCount(this);
+    });
+
+
+    test("Set Folders Collapsed for Tree Construction", async function()
+    {
+        if (exitRollingCount(this)) return;
+        await teApi.config.update("specialFolders.expanded.favorites", false);
+        await teApi.config.update("specialFolders.expanded.lastTasks", false);
         endRollingCount(this);
     });
 
@@ -99,6 +94,7 @@ suite("Initialization", () =>
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
         setExplorer(teApi.explorer as ITaskExplorer);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        enableExplorer("taskExplorer", true, "");
         endRollingCount(this);
     });
 
@@ -121,6 +117,7 @@ suite("Initialization", () =>
         await teApi.sidebar?.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        enableExplorer("taskExplorerSideBar", false, "");
         endRollingCount(this);
     });
 
