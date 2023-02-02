@@ -1,14 +1,13 @@
 
-import log from "../log/log";
-import TeWebviewPanel from "./teWebviewPanel";
+import log from "../lib/log/log";
 import { join } from "path";
 import { marked } from "marked";
-import { readFileAsync } from "../utils/fs";
-import { ITaskExplorerApi } from "../../interface";
-import { getInstallPath } from "../utils/pathUtils";
+import { timeout } from "../lib/utils/utils";
+import TeWebviewPanel from "./teWebviewPanel";
+import { readFileAsync } from "../lib/utils/fs";
+import { ITaskExplorerApi } from "../interface";
+import { getInstallPath } from "../lib/utils/pathUtils";
 import { ExtensionContext, WebviewPanel } from "vscode";
-import { teApi } from "../../extension";
-import { timeout } from "../utils/utils";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";

@@ -4,21 +4,21 @@ import * as util from "../utils/utils";
 import log from "../log/log";
 import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
-import { ITaskExplorer } from "../../interface";
+import { IDictionary, ITaskExplorer } from "../../interface";
 import { configuration } from "../utils/configuration";
 import {
-    Disposable, ExtensionContext, WorkspaceFolder, tasks, TaskStartEvent,
-    StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
+    Disposable, WorkspaceFolder, tasks, TaskStartEvent, StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";
 
 
 export class TaskWatcher implements Disposable
 {
+
     private static statusBarSpace: StatusBarItem;
     private tree: ITaskExplorer;
     private disposables: Disposable[];
     private babysitterCt = 0;
-    private babysitterTimers: { [taskType: string]:  NodeJS.Timeout } = {};
+    private babysitterTimers: IDictionary<NodeJS.Timeout> = {};
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 

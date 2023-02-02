@@ -1,8 +1,8 @@
 
 import log from "../lib/log/log";
-import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
-import { displayReleaseNotes, getViewType, reviveReleaseNotes } from "../lib/page/releaseNotes";
 import { ITaskExplorerApi } from "../interface";
+import { displayReleaseNotes, getViewType, reviveReleaseNotes } from "../page/releaseNotes";
+import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
 
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;

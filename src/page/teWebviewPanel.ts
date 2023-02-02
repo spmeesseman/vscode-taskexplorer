@@ -1,11 +1,13 @@
 
 import { join } from "path";
-import { getTaskFiles } from "../fileCache";
-import { readFileAsync } from "../utils/fs";
-import { getInstallPath } from "../utils/pathUtils";
-import { getTaskTypes } from "../utils/taskTypeUtils";
-import { IDictionary, ITaskExplorerApi } from "../../interface";
-import { commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
+import { readFileAsync } from "../lib/utils/fs";
+import { getTaskFiles } from "../lib/fileCache";
+import { getInstallPath } from "../lib/utils/pathUtils";
+import { getTaskTypes } from "../lib/utils/taskTypeUtils";
+import { IDictionary, ITaskExplorerApi } from "../interface";
+import {
+    commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace
+} from "vscode";
 
 
 export default class TeWebviewPanel
