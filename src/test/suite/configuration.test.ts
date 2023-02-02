@@ -317,15 +317,6 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Path to Programs Set Bash", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.pathToProgramsEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", "c:\\unix\\sh.exe");
-        endRollingCount(this);
-    });
-
-
     test("Path to Programs Set Composer", async function()
     {
         if (exitRollingCount(this)) return;
@@ -335,29 +326,11 @@ suite("Configuration / Settings Tests", () =>
     });
 
 
-    test("Path to Programs Clear Bash", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.pathToProgramsEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", undefined);
-        endRollingCount(this);
-    });
-
-
     test("Path to Programs Clear Composer", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.pathToProgramsEvent);
         await executeSettingsUpdate("pathToPrograms.composer", undefined);
-        endRollingCount(this);
-    });
-
-
-    test("Path to Programs Restore Bash", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.config.pathToProgramsEvent);
-        await executeSettingsUpdate("pathToPrograms.bash", pathToPrograms.bash);
         endRollingCount(this);
     });
 

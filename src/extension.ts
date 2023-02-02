@@ -143,7 +143,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     //
     await tempRemapSettingsToNewLayout();
     await tempResetGroupingSep();
-    await tempDeleteAppPublisherPathToProgram();
+    await tempDeleteSomePathToPrograms();
     //
     // !!! End temporary !!!
     //
@@ -293,10 +293,12 @@ const tempResetGroupingSep = async () =>
 // !!! Remove sometime down the road (from 1/18/22)  !!!
 // !!! Remove call in method activate() too          !!!
 //
-const tempDeleteAppPublisherPathToProgram = async () =>
+const tempDeleteSomePathToPrograms = async () =>
 {
     await configuration.update("pathToPrograms.apppublisher", undefined);
     await configuration.updateWs("pathToPrograms.apppublisher", undefined);
+    await configuration.update("pathToPrograms.bash", undefined);
+    await configuration.updateWs("pathToPrograms.bash", undefined);
 };
 
 

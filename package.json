@@ -1976,10 +1976,6 @@
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAnsicon%"
                         },
-                        "bash": {
-                            "type": "string",
-                            "description": "%config.taskExplorer.pathToBash%"
-                        },
                         "composer": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToComposer%"
@@ -2032,7 +2028,6 @@
                     "default": {
                         "ant": "ant.bat",
                         "ansicon": "ansicon",
-                        "bash": "bash",
                         "composer": "composer",
                         "curl": "curl",
                         "gradle": "gradle.bat",
@@ -2880,6 +2875,7 @@
                         "code": 3,
                         "file": 2,
                         "message": 1,
+                        "kind":"file",
                         "regexp": "^The terminal process *[\"']?([A-Za-z\\.0-9\\/\\-_\\\\]+) +([A-Za-z \\.0-9\\/\\-_\\\\\"']+) +(?:failed to launch \\(|terminated with )exit code\\:? *([0-9]+)\\s*(?:\\.|\\))[\r\n]{2,3}^(.+)"
                     }
                 ]
@@ -2893,6 +2889,7 @@
                     {
                         "file": 2,
                         "message": 1,
+                        "kind":"file",
                         "regexp": "^('(.+)' is not recognized as an internal or external command)"
                     }
                 ]
