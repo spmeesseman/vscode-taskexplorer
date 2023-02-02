@@ -1,10 +1,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import log from "./log/log";
-import { TaskTreeDataProvider } from "../tree/tree";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi } from "../interface";
-import { ExtensionContext, window, TreeView, TreeItem, Disposable } from "vscode";
 import { isObject } from "./utils/utils";
+import { TaskTreeDataProvider } from "../tree/tree";
+import { ExtensionContext, window, TreeView, TreeItem } from "vscode";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi } from "../interface";
 
 let teApi: ITaskExplorerApi;
 let extensionContext: ExtensionContext;
@@ -14,7 +14,7 @@ const views: IDictionary<TreeView<TreeItem>|undefined> = {
 };
 
 
-export function registerTreeProviders(context: ExtensionContext, api: ITaskExplorerApi)
+export const registerTreeProviders = (context: ExtensionContext, api: ITaskExplorerApi) =>
 {
     log.methodStart("register explorer tree providers", 1, "   ");
     teApi = api;
@@ -22,10 +22,10 @@ export function registerTreeProviders(context: ExtensionContext, api: ITaskExplo
     createExplorer("taskExplorer", false, "      ");
     createExplorer("taskExplorerSideBar", false,  "      ");
     log.methodDone("register explorer tree providers", 1, "   ");
-}
+};
 
 
-export function enableExplorer(name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string)
+export const enableExplorer = (name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string) =>
 {
     log.methodStart("enable explorer view / tree provider", 1, logPad, false, [[ "name", name ], [ "enable", enable ]]);
     if (enable) {
@@ -35,10 +35,10 @@ export function enableExplorer(name: "taskExplorer"|"taskExplorerSideBar", enabl
         disposeExplorer(name, logPad + "   ");
     }
     log.methodDone("enable explorer view / tree provider", 1, logPad);
-}
+};
 
 
-function createExplorer(name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string)
+const createExplorer = (name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string) =>
 {
     let view = views[name];
     log.methodStart("create explorer view / tree provider", 1, logPad);
@@ -66,10 +66,10 @@ function createExplorer(name: "taskExplorer"|"taskExplorerSideBar", enable: bool
         log.write("   tree data provider '" + name + "' registered", 1, logPad);
     }
     log.methodDone("create explorer view / tree provider", 1, logPad);
-}
+};
 
 
-function disposeExplorer(name: "taskExplorer"|"taskExplorerSideBar", logPad: string)
+const disposeExplorer = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
 {
     const view = views[name];
     log.methodStart("dispose explorer view / tree provider", 1, logPad, false, [[ "name", name ]]);
@@ -99,4 +99,4 @@ function disposeExplorer(name: "taskExplorer"|"taskExplorerSideBar", logPad: str
         log.write("   tree data provider '" + name + "' un-registered", 1, "   ");
     }
     log.methodDone("dispose explorer view / tree provider", 1, logPad);
-}
+};

@@ -38,7 +38,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { ILicenseManager } from "./interface/ILicenseManager";
 import { LicenseManager } from "./lib/licenseManager";
 import { refreshTree } from "./lib/refreshTree";
-import { registerTreeProviders } from "./lib/registerExplorer";
+import { enableExplorer, registerTreeProviders } from "./lib/registerExplorer";
 import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env, /* authentication, window*/ } from "vscode";
 import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
@@ -81,6 +81,7 @@ export const teApi: ITaskExplorerApi =
         isBusy: false,
         storage,
         enableConfigWatcher,
+        enableExplorer,
         onWsFoldersChange,
         extensionContext: undefined as unknown as ExtensionContext,
         wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]

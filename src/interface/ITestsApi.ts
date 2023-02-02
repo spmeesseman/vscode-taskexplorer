@@ -15,5 +15,6 @@ export interface ITestsApi
     wsFolder: WorkspaceFolder;
     extensionContext: ExtensionContext;
     enableConfigWatcher(enable: boolean): void;
+    enableExplorer (name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string): void;
     onWsFoldersChange(e: WorkspaceFoldersChangeEvent): Promise<void>;
 }
