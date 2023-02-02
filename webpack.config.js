@@ -1,14 +1,14 @@
 //@ts-check
-
 // const fs = require("fs");
 const path = require("path");
 const JSON5 = require("json5");
+const webpack = require('webpack');
 const { renameSync } = require("fs");
 const { validate } = require("schema-utils");
 const { spawnSync } = require("child_process");
 // const { IgnorePlugin } = require("webpack");
 const CopyPlugin = require("copy-webpack-plugin");
-const { WebpackError, webpack, optimize } = require("webpack");
+const { WebpackError, optimize } = require("webpack");
 // const ShebangPlugin = require("webpack-shebang-plugin");
 // const CopyWebpackPlugin = require("copy-webpack-plugin");
 // const FilterWarningsPlugin = require("webpack-filter-warnings-plugin");
@@ -348,8 +348,9 @@ const optimization = (env, wpConfig) =>
 const output = (env, wpConfig) =>
 {
 	wpConfig.output = {
-		clean: env.clean === true,
-		path: wpConfig.target === "webworker" ? path.join(__dirname, "dist", "browser") : path.join(__dirname, "dist"),
+		clean: env.clean,
+		path: wpConfig.target === "webworker" ? path.join(__dirname, "dist", "browser") :
+											    path.join(__dirname, "dist"),
 		libraryTarget: "commonjs2",
 		filename: "[name].js",
 		chunkFilename: "feature-[name].js",
@@ -380,22 +381,11 @@ const plugins = (env, wpConfig) =>
 	if (wpConfig.mode === "production")
 	{
 		wpConfig.plugins = [
+			// new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
 			// new CleanPlugin(
 			// {
 			// 	cleanOnceBeforeBuildPatterns: [ "!dist/lib/page/**" ]
 			// }),
-			{
-				/** @param {PluginInstance} compiler Compiler */
-				apply: (compiler) =>   // add AfterDone plugin at the end of the plugins array
-				{
-					compiler.hooks.done.tap("AfterDonePlugin", () =>
-					{
-						try {
-							renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
-						} catch {}
-					});
-				}
-			},
 			// new ForkTsCheckerPlugin({
 			// 	async: false,
 			// 	// @ts-ignore
@@ -429,7 +419,19 @@ const plugins = (env, wpConfig) =>
 			// 			{ discardUnused: false, mergeIdents: false, reduceIdents: false },
 			// 		],
 			// 	},
-			// })
+			// }),
+			{   // 'AfterDonePlugin' MUST BE LAST IN THE PLUGINS ARRAY!!
+				/** @param {PluginInstance} compiler Compiler */
+				apply: (compiler) =>   
+				{
+					compiler.hooks.done.tap("AfterDonePlugin", () =>
+					{
+						try {
+							renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
+						} catch {}
+					});
+				}
+			},
 		];
 	}
 

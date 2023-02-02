@@ -1,23 +1,5 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2020",
-		"lib": [ "es2020" ],
-        // "target": "es6",
-        // "lib": [ "es6" ],
-        "outDir": "dist",
-		"rootDir": "src",
-        "sourceMap": true,
-        "strict": true,
-        "noUnusedLocals": false,
-        // "moduleResolution": "node"
-		// "allowSyntheticDefaultImports":true,
-        // "allowSyntheticDefaultImports": true,
-        // "esModuleInterop": true,
-        // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-        // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-        // "noUnusedParameters": true,  /* Report errors on unused parameters. */
-    },
+    "extends": "./tsconfig.base.json",
     "include": ["src/**/*"],
     "exclude": [
         "node_modules",
@@ -31,8 +13,5 @@
         "dist",
         ".nyc_output",
         "coverage"
-    ] //,
-	// "references": [
-	// 	{ "path": "./src/interface" }
-	// ]
+    ]
 }

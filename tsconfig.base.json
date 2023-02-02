@@ -1,31 +1,67 @@
 {
-	"compilerOptions": {
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2020",
+		"lib": [ "es2020" ],
+		"noImplicitOverride": true,
+        "outDir": "dist",
+		"rootDir": "src",
+        "sourceMap": true,
+        "strict": true,
+        "noUnusedLocals": false,
+		"forceConsistentCasingInFileNames": true,
+        // "moduleResolution": "node"
 		// "allowSyntheticDefaultImports":true,
         // "allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
-		// "esModuleInterop": true,
-		"experimentalDecorators": true,
-		"forceConsistentCasingInFileNames": true,
-		"incremental": true,
-		"isolatedModules": true,
-		"lib": [ "es2020" ],
-        "module": "commonjs",
-		// "module": "esnext",
-		// "moduleResolution": "node",
-		// "noFallthroughCasesInSwitch": true,
-		"noImplicitOverride": true,
-		// "noImplicitReturns": true,
-		"noUnusedLocals": false,
-        // "noUnusedParameters": true,
-		"outDir": "dist",
-		"resolveJsonModule": true,
-		"rootDir": "src",
-		"skipLibCheck": true,
-		"sourceMap": true,
-		"strict": true,
-		"target": "es2020",
-		"useDefineForClassFields": true,
-		// "useUnknownInCatchVariables": false
-	},
-	"include": ["src/**/*"]
+        // "esModuleInterop": true,
+        // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
+        // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
+        // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+    },
+    "include": [ "src/**/*" ],
+    "exclude": [
+        "node_modules",
+        ".vscode-test",
+        ".vscode",
+        "test-fixture",
+        "tools",
+        "types",
+        "src/test",
+        "res",
+        "dist",
+        ".nyc_output",
+        "coverage"
+    ]
 }
+// {
+// 	"compilerOptions": {
+// 		// "allowSyntheticDefaultImports":true,
+//         // "allowSyntheticDefaultImports": true,
+// 		"baseUrl": ".",
+// 		// "esModuleInterop": true,
+// 		"experimentalDecorators": true,
+// 		"forceConsistentCasingInFileNames": true,
+// 		"incremental": true,
+// 		"isolatedModules": true,
+// 		"lib": [ "es2020" ],
+//         "module": "commonjs",
+// 		// "module": "esnext",
+// 		// "moduleResolution": "node",
+// 		// "noFallthroughCasesInSwitch": true,
+// 		"noImplicitOverride": true,
+// 		// "noImplicitReturns": true,
+// 		"noUnusedLocals": false,
+//         // "noUnusedParameters": true,
+// 		"outDir": "dist",
+// 		"resolveJsonModule": true,
+// 		"rootDir": "src",
+// 		"skipLibCheck": true,
+// 		"sourceMap": true,
+// 		"strict": true,
+// 		"target": "es2020",
+// 		"useDefineForClassFields": true,
+// 		// "useUnknownInCatchVariables": false
+// 	},
+// 	"include": ["src/**/*"]
+// }
+// 
