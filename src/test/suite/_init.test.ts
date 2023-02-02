@@ -7,7 +7,6 @@ import {
     activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, treeUtils, waitForTeIdle
 } from "../utils/utils";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
-import { registerExplorer } from "../../lib/registerExplorer";
 import { ExtensionContext } from "vscode";
 
 let teApi: ITaskExplorerApi;
@@ -58,7 +57,6 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.explorerViewStartup + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.explorerViewStartup);
-        registerExplorer("taskExplorerSideBar", null as unknown as ExtensionContext, true, teApi, false);
         endRollingCount(this);
     });
 
@@ -80,7 +78,6 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        registerExplorer("taskExplorer", null as unknown as ExtensionContext, false, teApi, false);
         endRollingCount(this);
     });
 
@@ -102,7 +99,6 @@ suite("Initialization", () =>
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
         setExplorer(teApi.explorer as ITaskExplorer);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        registerExplorer("taskExplorer", null as unknown as ExtensionContext, true, teApi, false);
         endRollingCount(this);
     });
 
@@ -125,7 +121,6 @@ suite("Initialization", () =>
         await teApi.sidebar?.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        registerExplorer("taskExplorerSideBar", null as unknown as ExtensionContext, false, teApi, false);
         endRollingCount(this);
     });
 
