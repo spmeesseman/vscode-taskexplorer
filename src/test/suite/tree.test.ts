@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
@@ -10,7 +11,8 @@ import SpecialTaskFolder from "../../tree/specialFolder";
 import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { expect } from "chai";
 
 const tc = utils.testControl;
 let teApi: ITaskExplorerApi;
@@ -483,6 +485,19 @@ suite("Tree Tests", () =>
         await executeTeCommand("clearLastTasks");
         utils.overrideNextShowInfoBox("Yes");
         await executeTeCommand("clearFavorites");
+        utils.endRollingCount(this);
+    });
+
+
+    test("Get Parent (Reveal API)", async function()
+    {
+        if (utils.exitRollingCount(this)) return;
+        const taskTree = explorer.getTaskTree() as ITaskFolder[];
+        expect(await explorer.getParent!(taskTree[0])).to.be.null; // Last Tasks
+        expect(await explorer.getParent!(taskTree[1])).to.be.null; // Last Tasks
+        expect(await explorer.getParent!(taskTree[2])).to.be.null; // Project Folder
+        expect(await explorer.getParent!(batch[0])).to.not.be.null;
+        expect(await explorer.getParent!(batch[0].taskFile)).to.not.be.null;
         utils.endRollingCount(this);
     });
 

@@ -55,7 +55,7 @@ import { ILicenseManager } from "../interface/ILicenseManager";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskExplorer, Disposable
+export class TaskTreeDataProvider implements ITaskExplorer, Disposable
 {
     private static firstTreeBuildDone = false;
     private defaultGetChildrenLogLevel = 1;
@@ -97,9 +97,9 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
 
         const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
         const favoritesExpanded = nodeExpandedeMap.favorites !== false ?
-                                  TreeItemCollapsibleState.Expanded : /* istanbul ignore next */TreeItemCollapsibleState.Collapsed;
+                                  TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
         const lastTaskExpanded = nodeExpandedeMap.lastTasks !== false ?
-                                TreeItemCollapsibleState.Expanded : /* istanbul ignore next */TreeItemCollapsibleState.Collapsed;
+                                TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
         this.specialFolders = {
             favorites: new SpecialTaskFolder(context, name, this, constants.FAV_TASKS_LABEL, favoritesExpanded),
             lastTasks: new SpecialTaskFolder(context, name, this, constants.LAST_TASKS_LABEL, lastTaskExpanded)
@@ -336,7 +336,6 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
         //
-        /* istanbul ignore else */
         if (util.isWorkspaceFolder(each.scope))
         {
             scopeName = each.scope.name;
@@ -457,10 +456,7 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
                         subfolder.addTreeNode(prevTaskFile); // addScript will set the group level on the TaskItem
                     }
                 }
-                /* istanbul ignore else */
-                if (subfolder && subfolder.nodePath !== taskFile.nodePath) {
-                    subfolder.addTreeNode(taskFile); // addScript will set the group level on the TaskItem
-                }
+                subfolder.addTreeNode(taskFile);
             }
             prevTaskFile = taskFile;
             //
@@ -992,34 +988,16 @@ export class TaskTreeDataProvider implements TreeDataProvider<TreeItem>, ITaskEx
     getName = () => this.name;
 
 
-    /* istanbul ignore next */  // Needed for TaskResolve API and/or TreeView/Reveal API?
     public getParent(element: TreeItem): TreeItem | null
     {
-        /* istanbul ignore next */
-        if (element instanceof TaskFolder)
-        {
-            /* istanbul ignore next */
-            return null;
-        }
-        /* istanbul ignore next */
-        if (element instanceof TaskFile)
-        {
-            /* istanbul ignore next */
-            return element.folder;
-        }
-        /* istanbul ignore next */
         if (element instanceof TaskItem)
         {
-            /* istanbul ignore next */
             return element.taskFile;
         }
-        /* istanbul ignore next */
-        if (element instanceof NoScripts || element instanceof InitScripts || element instanceof LoadScripts)
+        else if (element instanceof TaskFile)
         {
-            /* istanbul ignore next */
-            return null;
+            return element.folder;
         }
-        /* istanbul ignore next */
         return null;
     }
 

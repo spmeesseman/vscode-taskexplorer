@@ -1,14 +1,15 @@
 
-import { ExtensionContext, Task, TreeItem, Uri } from "vscode";
-import { ITaskFolder } from "./ITaskFolder";
+
 import { ITaskItem } from "./ITaskItem";
+import { ITaskFolder } from "./ITaskFolder";
+import { Task, TreeDataProvider, TreeItem, Uri } from "vscode";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type TaskMap = { [id: string]: ITaskItem | undefined };
 
-export interface ITaskExplorer
+export interface ITaskExplorer extends TreeDataProvider<TreeItem>
 {
-    dispose(context: ExtensionContext): void;
+    dispose(): void;
     fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem): void;
     getName(): string;
     getTasks(): Task[];
