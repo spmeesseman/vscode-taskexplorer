@@ -5,12 +5,13 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import fsUtils from "../utils/fsUtils";
 import { startupFocus } from "../utils/suiteUtils";
 import { GruntTaskProvider } from "../../providers/grunt";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
+    activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
@@ -40,8 +41,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         await updateInternalProviderAutoDetect("grunt", "off"); // turned on in tests initSettings()
-        await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent + tc.waitTime.config.disableEvent);
+        await fsUtils.deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });
 
@@ -96,14 +96,13 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.createFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
             '    grunt.registerTask("upload2", ["s3"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
     });
@@ -113,7 +112,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
@@ -124,7 +123,6 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 6);
         endRollingCount(this);
     });
@@ -134,7 +132,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await fsUtils.writeFile(
             fileUri.fsPath,
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
@@ -143,7 +141,6 @@ suite("Grunt Tests", () =>
             '    grunt.registerTask("upload6", ["s7"]);\n' +
             "};\n"
         );
-        await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount(testsName, startTaskCount + 4);
         endRollingCount(this);
     });
@@ -153,8 +150,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
-        await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+        await fsUtils.deleteFile(fileUri.fsPath);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
     });

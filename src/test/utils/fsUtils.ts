@@ -2,34 +2,49 @@ import * as fs from "../../lib/utils/fs";
 import { testControl as tc, waitForTeIdle } from "./utils";
 
 
-const writeFile = async(fsPath: string, content: string) =>
+const createFile = async(fsPath: string, content: string, waitTime?: number) =>
 {
     await fs.writeFile(fsPath, content);
-    await waitForTeIdle(tc.waitTime.fs.createEvent);
-};
-
-const deleteFile = async(fsPath: string) =>
-{
-    await fs.deleteFile(fsPath);
-    await waitForTeIdle(tc.waitTime.fs.deleteEvent);
+    await waitForTeIdle(waitTime || tc.waitTime.fs.createEvent);
 };
 
 
-const createDir = async(fsPath: string) =>
+const writeFile = async(fsPath: string, content: string, waitTime?: number) =>
 {
-    await fs.createDir(fsPath);
-    await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+    await fs.writeFile(fsPath, content);
+    await waitForTeIdle(waitTime || tc.waitTime.fs.modifyEvent);
 };
 
 
-const deleteDir = async(fsPath: string) =>
+const deleteFile = async(fsPath: string, waitTime?: number) =>
 {
-    await fs.deleteDir(fsPath);
-    await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
+    if (await fs.pathExists(fsPath)) {
+        await fs.deleteFile(fsPath);
+        await waitForTeIdle(waitTime || tc.waitTime.fs.deleteEvent);
+    }
+};
+
+
+const createDir = async(fsPath: string, waitTime?: number) =>
+{
+    if (!(await fs.pathExists(fsPath))) {
+        await fs.createDir(fsPath);
+        await waitForTeIdle(waitTime || tc.waitTime.fs.createFolderEvent);
+    }
+};
+
+
+const deleteDir = async(fsPath: string, waitTime?: number) =>
+{
+    if (await fs.pathExists(fsPath)) {
+        await fs.deleteDir(fsPath);
+        await waitForTeIdle(waitTime || tc.waitTime.fs.createFolderEvent);
+    }
 };
 
 export default {
     createDir,
+    createFile,
     deleteDir,
     deleteFile,
     writeFile

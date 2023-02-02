@@ -120,14 +120,15 @@ export const verifyTaskCountByTree = async(taskType: string, expectedCount: numb
         }
         return findIdInTaskMap(`:${taskType}:`, tasksMap);
     };
-    const taskCount = await _getCount();
-    // if (taskCount !== expectedCount)
-    // {
-    //     try {
-    //         await verifyTaskCount(taskType, expectedCount, 2);
-    //         taskCount = await _getCount();
-    //     }
-    //     catch {}
-    // }
+    let taskCount = await _getCount();
+    if (taskCount !== expectedCount)
+    {
+        try {
+            const msg = `Found ${taskCount} of ${expectedCount} expected tasks in Tree, trying 'Verify Task Count'`;
+            console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
+            taskCount = await verifyTaskCount(taskType, expectedCount, 2);
+        }
+        catch {}
+    }
     expect(taskCount).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };

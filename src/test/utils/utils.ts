@@ -4,7 +4,6 @@
 import * as path from "path";
 import * as treeUtils from "./treeUtils";
 import figures from "../../lib/figures";
-import initSettings, { cleanupSettings } from "./initSettings";
 import constants from "../../lib/constants";
 import { expect } from "chai";
 import { testControl } from "../control";
@@ -14,11 +13,12 @@ import { hasExplorerFocused } from "./commandUtils";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
+import initSettings, { cleanupSettings } from "./initSettings";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
-import { ILicenseManager } from "../../interface/ILicenseManager";
+import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
