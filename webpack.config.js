@@ -29,8 +29,12 @@ const { renameSync } = require("fs");
  */
 module.exports = (env) =>
 {
-	if (!env) {                      // Default Webpack build environment
+	if (!env) {
 		env = { clean: false, environment: "test" };
+	}
+
+	if (env.clean.toString() === "true") {
+		env.clean = true;
 	}
 
 	/**@type {WebpackConfig}*/

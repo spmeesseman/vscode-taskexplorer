@@ -127,13 +127,11 @@
         "tsc-rebuild_types": "rimraf types/tsconfig.tsbuildinfo && rimraf types/lib && rimraf node_modules/@spmeesseman/vscode-taskexplorer-types/lib && npm run tsc-build_types",
         "tsc-watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",
-        "webpack-build": "npm run webpack-build:extension",
-        "webpack-rebuild": "rimraf dist && npm run webpack-build:extension",
-        "webpack-rebuild:extension": "rimraf dist && npm run webpack-build:extension --config ./webpack.config.js",
-        "webpack-build:extension": "webpack --mode production --config ./webpack.config.js",
-        "webpack-build:extension:verbose": "webpack --stats verbose --mode production --config ./webpack.config.js",
+        "webpack-build": "webpack --mode production --config ./webpack.config.js",
+        "webpack-rebuild": "webpack --mode production --env clean=true --config ./webpack.config.js",
+        "webpack-build:verbose": "webpack --stats verbose --mode production --config ./webpack.config.js",
         "webpack-build:dev": "webpack --mode development --env environment=dev --config ./webpack.config.js",
-        "webpack-rebuild:dev": "rimraf dist && npm run webpack-build:dev --config ./webpack.config.js",
+        "webpack-rebuild:dev": "npm run webpack-build:dev --env clean=true --config ./webpack.config.js",
         "webpack-build:test": "webpack --env environment=test --config ./webpack.config.test.js"
     },
     "dependencies": {
@@ -167,6 +165,7 @@
         "@vscode/vsce": "^2.17.0",
         "chai": "^4.3.7",
         "codecov": "^3.8.3",
+        "cross-env": "^7.0.3",
         "eslint": "^7.32.0",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-jsdoc": "^31.6.0",
@@ -2836,9 +2835,9 @@
         ],
         "problemMatchers": [
             {
-                "name": "gccte",
+                "name": "gccTe",
                 "owner": "cpp",
-                "label": "Task Explorer gcc",
+                "label": "Task Explorer GCC",
                 "fileLocation": [
                     "relative",
                     "${workspaceRoot}"
@@ -2853,8 +2852,10 @@
                 }
             },
             {
-                "name": "webpackte",
+                "name": "webpackTe",
                 "owner": "typescript",
+                "source": "typescript",
+                "label": "Task Explorer WebPack Watch",
                 "pattern": [
                     {
                         "regexp": "\\[tsl\\] ERROR",
@@ -2868,6 +2869,33 @@
                     "beginsPattern": "Entrypoint\\s+extension",
                     "endsPattern": "compiled\\s+successfully\\s+in\\s+[0-9]+\\s+ms"
                 }
+            },
+            {
+                "name": "bashTe",
+                "owner": "bash",
+                "source": "bash",
+                "label": "Task Explorer Bash",
+                "pattern": [
+                    {
+                        "code": 3,
+                        "file": 2,
+                        "message": 1,
+                        "regexp": "^The terminal process *[\"']?([A-Za-z\\.0-9\\/\\-_\\\\]+) +([A-Za-z \\.0-9\\/\\-_\\\\\"']+) +(?:failed to launch \\(|terminated with )exit code\\:? *([0-9]+)\\s*(?:\\.|\\))[\r\n]{2,3}^(.+)"
+                    }
+                ]
+            },
+            {
+                "name": "batTe",
+                "owner": "batch",
+                "source": "batch",
+                "label": "Task Explorer Batch",
+                "pattern": [
+                    {
+                        "file": 2,
+                        "message": 1,
+                        "regexp": "^('(.+)' is not recognized as an internal or external command)"
+                    }
+                ]
             }
         ]
     }

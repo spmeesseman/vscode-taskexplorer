@@ -67,7 +67,7 @@ export class MakeTaskProvider extends TaskExplorerProvider implements TaskExplor
         };
 
         const execution = new ShellExecution(getCommand(), args, options);
-        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? /* istanbul ignore next */"$gcc" : "$gccte";
+        const problemMatcher = extensions.getExtension("ms-vscode.cpptools") ? /* istanbul ignore next */"$gcc" : "$gccTe";
 
         log.methodDone("create make task", 4, logPad, undefined, this.logQueueId);
         return new Task(kind, folder, target, "make", execution, problemMatcher);
