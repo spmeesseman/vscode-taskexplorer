@@ -1,12 +1,12 @@
 
 import log from "../lib/log/log";
 import constants from "../lib/constants";
-import { basename, dirname, sep, extname } from "path";
+import { basename, dirname, sep, extname, join } from "path";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
-import { pathExistsSync, readFileSync } from "../lib/utils/fs";
+import { readFileSync } from "../lib/utils/fs";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
@@ -33,42 +33,49 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             exec: "",
             type: "bash",
             args: [],
+            pm: "$bashTe",
             enabled: configuration.get("enabledTasks.bash")
         },
         py: {
             exec: configuration.get("pathToPrograms.python"),
             type: "python",
             args: [],
+            pm: "$msCompile",
             enabled: configuration.get("enabledTasks.python")
         },
         rb: {
             exec: configuration.get("pathToPrograms.ruby"),
             type: "ruby",
             args: [],
+            pm: "$msCompile",
             enabled: configuration.get("enabledTasks.ruby")
         },
         ps1: {
             exec: configuration.get("pathToPrograms.powershell"),
             type: "powershell",
             args: [],
+            pm: "$msCompile",
             enabled: configuration.get("enabledTasks.powershell")
         },
         pl: {
             exec: configuration.get("pathToPrograms.perl"),
             type: "perl",
             args: [],
+            pm: "$msCompile",
             enabled: configuration.get("enabledTasks.perl")
         },
         bat: {
             exec: "cmd",
             type: "batch",
             args: [ "/c" ],
+            pm: "$batchTe",
             enabled: configuration.get("enabledTasks.batch")
         },
         cmd: {
             exec: "cmd",
             type: "batch",
             args: [ "/c" ],
+            pm: "$batchTe",
             enabled: configuration.get("enabledTasks.batch")
         },
         nsi: {
@@ -80,9 +87,11 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     };
 
 
-    public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined
+    public createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs: string[] = [], logPad?: string): Task | undefined
     {
-        log.methodStart("create script task", 4, logPad, false, [[ "target", target ], [ "cmd", cmd ], [ "path", uri.fsPath ]], this.logQueueId);
+        log.methodStart("create script task", 4, logPad, false, [
+            [ "target", target ], [ "cmd", cmd ],  [ "project", folder.name ], [ "path", uri.fsPath ]
+        ], this.logQueueId);
 
         const extension = target.toLowerCase(),
               scriptDef = this.scriptTable[extension],
@@ -96,112 +105,58 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
             return;
         }
 
-        let isWinShell = false,
-            exec: string = scriptDef.exec,
-            fileName = basename(uri.fsPath),
-            separator: string = sep;
+        let exec: string = scriptDef.exec,
+            fileName = def.fileName as string;
 
-        //
-        // If the default terminal cmd/powershell?  On linux and darwin, no, on windows, maybe...
-        //
-        /* istanbul ignore else */
-        if (process.platform === "win32")
-        {
-            isWinShell = true;
-            const winShell = configuration.getVs<string>("terminal.integrated.shell.windows", "");
-            /* istanbul ignore if */ /* istanbul ignore next */
-            if (winShell && winShell.includes("bash.exe")) {
-                separator = "/";
-                isWinShell = false;
-            }
-        }
-
-        //
-        // Handle bash script on windows - set the shell executable as bash.exe if it isnt the default.
-        // This can be set by users in settings, otherwise Git Bash will be tried in the default install
-        // location ("C:\Program Files\Git\bin). Otherwise, use "bash.exe" and assume the command and
-        // other shell commands are in PATH
-        //
-        /* istanbul ignore else */
-        if (isWinShell)
-        {
-            if (scriptDef.type === "bash")
-            {
-                let bash = configuration.get<string>("pathToPrograms.bash");
-                /* istanbul ignore if */
-                if (!bash) {
-                    bash = "C:\\Program Files\\Git\\bin\\bash.exe";
-                }
-                /* istanbul ignore else */
-                if (!pathExistsSync(bash)) {
-                    bash = "bash.exe";
-                }
-                options.executable = bash;
-                separator = "/"; // convert path separator to unix-style
-            }
-        }
-
-        //
-        // Identify the 'executable'
-        //
-        const fileNamePathPre = "." + separator + fileName;
+        const fileNamePathPre = join(".", fileName);
         if (scriptDef.type === "bash")
         {
             exec = fileNamePathPre;
         }
-        else { // All scripts except for 'bash'
-            //
+        else // All scripts except for 'bash'
+        {   //
             // Add any defined arguments to the command line exec
             //
-            /* istanbul ignore else */
-            if (scriptDef.args) {
-                args.push(...scriptDef.args);
-            }
+            args.push(...scriptDef.args);
             //
             // Add the filename as an argument to the script exe (i.e. 'powershell', 'cmd', etc)
+            // For Powershell,it must be in '.\...' format (fileNamePathPre)
             //
             args.push(scriptDef.type !== "powershell" ? fileName : fileNamePathPre);
         }
-
         //
-        // For python setup.py scripts, use the bdist_egg argument - the egg will be built and stored
-        // at dist/PackageName-Version.egg
+        // For python setup.py scripts, use the bdist_egg argument - the egg will be built and
+        // stored at dist/PackageName-Version.egg
         //
         if (scriptDef.type === "python" && fileName.toLowerCase() === "setup.py")
         {
             args.push("bdist_egg");
             fileName = "build egg";
         }
-
         //
-        // Add extra arguments is specified
+        // Add any additional arguments to the end of the arguments list
         //
-        if (xArgs) {
-            args.push(...xArgs);
-        }
-
+        args.push(...xArgs);
         //
         // Make sure there are no windows style slashes in any configured path to an executable
         // if this isnt running in a windows shell
         //
-        /* istanbul ignore if */
-        if (!isWinShell)
-        {
-            exec = exec.replace(/\\/g, "/");
-        }
-
+        exec = exec.replace(/\\/g, sep);
         //
-        // TODO - match a problem matcher to script type
-        //
-        const problemMatcher = "$msCompile";
-
-
-        log.methodDone("create script task", 4, logPad, undefined, this.logQueueId);
-        //
-        // Create the shell execution object and task
+        // Create the shell execution object
         //
         const execution = new ShellExecution(exec, args, options);
-        return new Task(def, folder, fileName, scriptDef.type, execution, problemMatcher);
+        //
+        // Create the task
+        //
+        const task = new Task(def, folder, fileName, scriptDef.type, execution, scriptDef.pm);
+        //
+        // All done
+        //
+        log.methodDone("create script task", 4, logPad, [
+            [ "type", scriptDef.type ], [ "file name", fileName ], [ "project", folder.name ], [ "args", args ]
+        ], this.logQueueId);
+        return task;
     }
 
 
