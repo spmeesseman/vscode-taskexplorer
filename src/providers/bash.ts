@@ -9,7 +9,7 @@ export class BashTaskProvider extends ScriptTaskProvider implements TaskExplorer
 {
     constructor() { super("bash"); }
 
-    public getGlobPattern()
+    public override getGlobPattern()
     {
         return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
     }

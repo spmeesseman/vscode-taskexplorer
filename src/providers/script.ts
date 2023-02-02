@@ -203,7 +203,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
     }
 
 
-    public getGlobPattern()
+    public override getGlobPattern()
     {
         return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }

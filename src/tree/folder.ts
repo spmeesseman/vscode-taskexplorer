@@ -14,7 +14,7 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, WorkspaceFolder } from "
  */
 export default class TaskFolder extends TreeItem implements ITaskFolder
 {
-    public id: string;
+    public override id: string;
     public taskFiles: (TaskFile|TaskItem)[] = [];
     public workspaceFolder: WorkspaceFolder | undefined;
 

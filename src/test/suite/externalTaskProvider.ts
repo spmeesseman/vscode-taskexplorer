@@ -14,7 +14,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
  */
 export class ExternalTaskProvider extends IExternalProvider implements IExternalProvider
 {
-    public providerName = "external";
+    public override providerName = "external";
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

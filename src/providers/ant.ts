@@ -269,7 +269,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
     }
 
 
-    public getGlobPattern()
+    public override getGlobPattern()
     {
         return getCombinedGlobPattern(constants.GLOB_ANT,
                                       [ ...configuration.get<string[]>("includeAnt", []),

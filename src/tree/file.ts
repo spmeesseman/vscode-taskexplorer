@@ -77,9 +77,9 @@ export default class TaskFile extends TreeItem implements ITaskFile
      */
     public readonly isUser: boolean;
 
-    resourceUri: Uri;
+    override resourceUri: Uri;
 
-    public id: string;
+    public override id: string;
 
     /**
      * @constructor

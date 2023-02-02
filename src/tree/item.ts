@@ -35,8 +35,8 @@ export default class TaskItem extends TreeItem implements ITaskItem
      */
     public nodePath: string;
     public groupLevel: number;
-    public id: string;
-    public command: Command;
+    public override id: string;
+    public override command: Command;
     // public resourceUri?: Uri;
 
 

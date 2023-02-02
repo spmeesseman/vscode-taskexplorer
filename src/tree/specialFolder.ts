@@ -24,7 +24,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
     private storeName: string;
     private isFavorites: boolean;
     private extensionContext: ExtensionContext;
-    public taskFiles: TaskItem[];
+    public override taskFiles: TaskItem[];
     private store: string[];
     private enabled: boolean;
     private settingNameEnabled: string;
@@ -58,7 +58,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
     }
 
 
-    async addTaskFile(taskItem: TaskItem, logPad?: string)
+    override async addTaskFile(taskItem: TaskItem, logPad?: string)
     {
         if (this.store.includes(taskItem.id))
         {
@@ -396,7 +396,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
     }
 
 
-    async removeTaskFile(taskFile: TaskItem|string, logPad: string, persist?: boolean)
+    override async removeTaskFile(taskFile: TaskItem|string, logPad: string, persist?: boolean)
     {
         const id = isString(taskFile) ? taskFile : taskFile.id, // getTaskItemId(taskFile);
               idx = this.taskFiles.findIndex(f => f.id === id);

@@ -9,7 +9,7 @@ import { IExternalProvider, ITaskDefinition } from "../../interface";
 
 export class ExternalTaskProviderBase extends IExternalProvider implements IExternalProvider
 {
-    public providerName = "external2";
+    public override providerName = "external2";
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

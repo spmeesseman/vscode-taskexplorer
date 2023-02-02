@@ -571,7 +571,7 @@ export class TaskTreeDataProvider implements ITaskExplorer, Disposable
 
         for (const each of taskFile.treeNodes)
         {
-            if (!(each instanceof TaskItem) || !each.task || !each.label) {
+            if (!each || !(each instanceof TaskItem) || !each.task || !each.label) {
                 continue;
             }
             const label = each.label.toString();

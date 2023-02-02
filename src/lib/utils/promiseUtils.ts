@@ -1,3 +1,4 @@
+export {};
 /*
 import { Disposable, Event, EventEmitter } from "vscode";
 
