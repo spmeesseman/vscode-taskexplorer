@@ -33,7 +33,7 @@ module.exports = (env) =>
 		env = { clean: false, environment: "test" };
 	}
 
-	if (env.clean.toString() === "true") {
+	if (env.clean?.toString() === "true") {
 		env.clean = true;
 	}
 
