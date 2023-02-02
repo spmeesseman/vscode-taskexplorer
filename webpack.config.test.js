@@ -79,7 +79,7 @@ const getWsConfig = (target, mode, env)  =>
 	// externals: {
 	// 	vscode: 'commonjs vscode'
 	// },
-	externals: [{ vscode: 'commonjs vscode' }, /** @type {import("webpack-node-externals").ExternalItem}*/(nodeExternals())],
+	externals: [{ vscode: 'commonjs vscode' }, /** @type {import("webpack").WebpackPluginInstance}*/(nodeExternals())],
 	// resolve:
 	// {
 	// 	extensions: ['.ts', '.js']
