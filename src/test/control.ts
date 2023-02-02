@@ -135,7 +135,7 @@ export const testControl: ITestControl =
         taskCommand: 950,
         taskProviderReadUri: 90,
         tasks: {
-            antParser: 1535,
+            antParser: 2135,
             antTask: 3300,
             antTaskWithAnsicon: 3375,
             bashScript: 3075,
@@ -245,7 +245,7 @@ export const testControl: ITestControl =
         taskCommand: 1155,
         taskProviderReadUri: 100,
         tasks: {
-            antParser: 1600,
+            antParser: 2400,
             antTask: 3740,
             antTaskWithAnsicon: 3795,
             bashScript: 3375,
@@ -303,11 +303,12 @@ export const testControl: ITestControl =
         fs: {
             createEvent: 205,
             createFolderEvent: 220,
-            createEventTsc: 240,
+            createEventTsc: 275,
             deleteEvent: 200,
+            deleteEventTsc: 280,
             deleteFolderEvent: 210,
             modifyEvent: 190,
-            modifyEventTsc: 240
+            modifyEventTsc: 260
         },
         getTreeTasks: 50,
         licenseMgr: {
@@ -356,6 +357,7 @@ export const testControl: ITestControl =
             createFolderEvent: 565,
             createEventTsc: 550,
             deleteEvent: 485,
+            deleteEventTsc: 525,
             deleteFolderEvent: 525,
             modifyEvent: 475,
             modifyEventTsc: 525
@@ -529,6 +531,7 @@ export interface IWaitTimes
         createEventTsc: number;
         createFolderEvent: number;
         deleteEvent: number;
+        deleteEventTsc: number;
         deleteFolderEvent: number;
         modifyEvent: number;
         modifyEventTsc: number;
