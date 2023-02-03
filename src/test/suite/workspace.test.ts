@@ -24,7 +24,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
-        wsEnable = teApi.config.get<boolean>("showHiddenWsTasks");
+        wsEnable = teApi.testsApi.config.get<boolean>("showHiddenWsTasks");
         endRollingCount(this, true);
     });
 
@@ -32,7 +32,7 @@ suite("Workspace / VSCode Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teApi.config.updateWs("showHiddenWsTasks", wsEnable);
+        await teApi.testsApi.config.updateWs("showHiddenWsTasks", wsEnable);
         suiteFinished(this);
     });
 

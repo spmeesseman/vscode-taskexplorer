@@ -50,8 +50,8 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, fsApi, testsApi } = await activate(this));
 
-        sortAlpha = teApi.config.get<boolean>("sortProjectFoldersAlpha");
-        await teApi.config.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
+        sortAlpha = teApi.testsApi.config.get<boolean>("sortProjectFoldersAlpha");
+        await teApi.testsApi.config.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
                                                                 // so make sure they're off for the verifyTaskCount() calls
         testsPath = getProjectsPath(".");
         wsf1DirName = join(testsPath, "wsf1");
@@ -100,7 +100,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (!testsApi.explorer.isVisible()) {
             await focusExplorerView();
         }
-        await teApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+        await teApi.testsApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         }
@@ -349,8 +349,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.remove + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.explorer.getTaskMap(),
-                  tasks = testsApi.explorer.getTasks();
+            const taskMap = testsApi.treeManager.getTaskMap(),
+                  tasks = testsApi.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -395,8 +395,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.remove + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.explorer.getTaskMap(),
-                  tasks = testsApi.explorer.getTasks();
+            const taskMap = testsApi.treeManager.getTaskMap(),
+                  tasks = testsApi.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -429,8 +429,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow((tc.slowTime.wsFolder.remove * 2) + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push tasks and task items, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.explorer.getTaskMap(),
-                  tasks = testsApi.explorer.getTasks();
+            const taskMap = testsApi.treeManager.getTaskMap(),
+                  tasks = testsApi.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",

@@ -51,7 +51,7 @@ suite("Provider Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
+        await teApi.testsApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks", {
@@ -251,8 +251,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -276,8 +276,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -301,8 +301,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.expanded.favorites", false);
@@ -327,8 +327,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
@@ -352,7 +352,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         let numOpened = 0,
             numFilesOpened = 0;
-        const taskMap = teApi.testsApi.explorer.getTaskMap(),
+        const taskMap = teApi.testsApi.treeManager.getTaskMap(),
               filesOpened: string[] = [];
         for (const t of Object.keys(taskMap))
         {
@@ -372,7 +372,7 @@ suite("Provider Tests", () =>
     test("Verify Task Counts", async function()
     {
         if (exitRollingCount(this)) return;
-        taskMap = teApi.testsApi.explorer.getTaskMap();
+        taskMap = teApi.testsApi.treeManager.getTaskMap();
         let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
         expect(taskCount).to.be.equal(7, `Unexpected Ant task count (Found ${taskCount} of 7)`);
         taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);

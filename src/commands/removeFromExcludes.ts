@@ -10,7 +10,6 @@ import { removeFromExcludes } from "../lib/addToExcludes";
 import { commands, ExtensionContext, Uri, window } from "vscode";
 
 const localize = loadMessageBundle();
-let teApi: ITaskExplorerApi;
 
 
 const removeUriFromExcludes = async(uri: Uri) =>
@@ -23,7 +22,7 @@ const removeUriFromExcludes = async(uri: Uri) =>
         {
             const taskType = globKey.replace("GLOB_", "").toLowerCase();
             await removeFromExcludes([ uri.path ], "exclude", true, "   ");
-            await refreshTree(teApi, taskType, uri, "   ");
+            await refreshTree(taskType, uri, "   ");
         }
         else{
             const msg = "This file does not appear to be associated to any known task type";
@@ -38,9 +37,8 @@ const removeUriFromExcludes = async(uri: Uri) =>
 };
 
 
-const registerRemoveFromExcludesCommand = (context: ExtensionContext, api: ITaskExplorerApi) =>
+const registerRemoveFromExcludesCommand = (context: ExtensionContext) =>
 {
-    teApi = api;
 	context.subscriptions.push(
         commands.registerCommand("vscode-taskexplorer.removeFromExcludes", async (uri: Uri) => { await removeUriFromExcludes(uri); })
     );

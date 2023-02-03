@@ -37,3 +37,34 @@ const constants: IDictionary<string> =
 };
 
 export default constants;
+
+export const enum VsCodeCommands
+{
+	CloseActiveEditor = "workbench.action.closeActiveEditor",
+	CloseAllEditors = "workbench.action.closeAllEditors",
+	CursorMove = "cursorMove",
+	CustomEditorShowFindWidget = "editor.action.webvieweditor.showFind",
+	Diff = "vscode.diff",
+	EditorScroll = "editorScroll",
+	EditorShowHover = "editor.action.showHover",
+	ExecuteDocumentSymbolProvider = "vscode.executeDocumentSymbolProvider",
+	ExecuteCodeLensProvider = "vscode.executeCodeLensProvider",
+	FocusFilesExplorer = "workbench.files.action.focusFilesExplorer",
+	InstallExtension = "workbench.extensions.installExtension",
+	MoveViews = "vscode.moveViews",
+	Open = "vscode.open",
+	OpenFolder = "vscode.openFolder",
+	OpenInTerminal = "openInTerminal",
+	OpenWalkthrough = "workbench.action.openWalkthrough",
+	OpenWith = "vscode.openWith",
+	NextEditor = "workbench.action.nextEditor",
+	PreviewHtml = "vscode.previewHtml",
+	RevealLine = "revealLine",
+	RevealInExplorer = "revealInExplorer",
+	RevealInFileExplorer = "revealFileInOS",
+	SetContext = "setContext",
+	ShowExplorer = "workbench.view.explorer",
+	ShowReferences = "editor.action.showReferences",
+	ShowSCM = "workbench.view.scm",
+	UninstallExtension = "workbench.extensions.uninstallExtension",
+}

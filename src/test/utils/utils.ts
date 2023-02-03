@@ -17,7 +17,7 @@ import initSettings, { cleanupSettings } from "./initSettings";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { ITaskExplorer, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskTree, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 
 const { symbols } = require("mocha/lib/reporters/base");
@@ -27,7 +27,7 @@ export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
-export let teExplorer: ITaskExplorer;
+export let teExplorer: ITaskTree;
 
 let activated = false;
 let caughtControlC = false;
@@ -151,7 +151,7 @@ export const activate = async (instance?: Mocha.Context) =>
         // _api pre-test suite will reset after disable/enable
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
-        setExplorer(teApi.explorer as ITaskExplorer);
+        setExplorer(teApi.explorer as ITaskTree);
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
@@ -174,13 +174,13 @@ export const activate = async (instance?: Mocha.Context) =>
 		console.log(`    ${figures.color.warningTests} ${figures.withColor(disableSSLMsg, figures.colors.grey)}`);
     }
     return {
+        teApi,
         extension: ext as Extension<any>,
-        teApi, testsApi:
-        teApi.testsApi,
+        testsApi: teApi.testsApi,
         fsApi: teApi.testsApi.fs,
-        configApi: teApi.config,
+        configApi: teApi.testsApi.config,
         explorer: teApi.testsApi.explorer,
-        utils: teApi.utilities
+        utils: teApi.testsApi.utilities
     };
 };
 
@@ -387,7 +387,7 @@ const isReady = (taskType?: string) =>
 
 export const logErrorsAreFine = (willFail = true) =>
 {
-    if (willFail && tc.log.enabled && teApi.config.get<boolean>("logging.enabled"))
+    if (willFail && tc.log.enabled && teApi.testsApi.config.get<boolean>("logging.enabled"))
     {
         console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
                     `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
@@ -412,7 +412,7 @@ export const overrideNextShowInputBox = (value: any) => overridesShowInputBox.pu
 export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push(value);
 
 
-export const setExplorer = (explorer: ITaskExplorer) => teExplorer = explorer;
+export const setExplorer = (explorer: ITaskTree) => teExplorer = explorer;
 
 
 export const setFailed = (ctrlc = true) =>

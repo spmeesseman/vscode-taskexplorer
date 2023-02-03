@@ -42,7 +42,7 @@ suite("Maven Tests", () =>
         //
         // Store / set initial settings
         //
-        pathToProgram = teApi.config.get<string>(`pathToPrograms.${testsName}`);
+        pathToProgram = teApi.testsApi.config.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
         endRollingCount(this, true);
     });

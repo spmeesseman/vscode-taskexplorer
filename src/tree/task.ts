@@ -1,12 +1,12 @@
 
 import TaskFile from "./file";
 import TaskItem from "./item";
+import TaskTree from "./tree";
 import log from "../lib/log/log";
 import SpecialTaskFolder from "./specialFolder";
 import { dirname } from "path";
 import { TaskMap } from "../interface";
 import { pathExists } from "../lib/utils/fs";
-import { TaskTreeDataProvider } from "./tree";
 import { getTerminal } from "../lib/getTerminal";
 import { ScriptTaskProvider } from "../providers/script";
 import { configuration } from "../lib/utils/configuration";
@@ -18,11 +18,12 @@ import {
     CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
     TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace, WorkspaceFolder
 } from "vscode";
+import { TaskTreeManager } from "./treeManager";
 
 // const views: IDictionary<any> = {};
 
 
-export const open = async(tree: TaskTreeDataProvider, selection: TaskItem, lastTasks: SpecialTaskFolder, itemClick = false) =>
+export const open = async(selection: TaskItem, itemClick = false) =>
 {
     const clickAction = configuration.get<string>("taskButtons.clickAction", "Open");
 
@@ -31,7 +32,7 @@ export const open = async(tree: TaskTreeDataProvider, selection: TaskItem, lastT
     // to re-register the handler when the setting changes, we just re-route the request here
     //
     if (clickAction === "Execute" && itemClick === true) {
-        return run(tree, selection, lastTasks);
+        return run(selection);
     }
 
     const uri = !isScriptType(selection.taskSource) ?
@@ -53,7 +54,7 @@ export const open = async(tree: TaskTreeDataProvider, selection: TaskItem, lastT
 };
 
 
-// export const registerTreeTasks = (tree: TaskTreeDataProvider, lastTasks: SpecialTaskFolder, disposables: Disposable[]) =>
+// export const registerTreeTasks = (tree: TaskTreeDataProvider, disposables: Disposable[]) =>
 // {
 //     const name = tree.getName();
 //     views[tree.getName()] = { tree, lastTasks };
@@ -67,9 +68,9 @@ export const open = async(tree: TaskTreeDataProvider, selection: TaskItem, lastT
 // };
 
 
-export const pause = (tree: TaskTreeDataProvider, taskItem: TaskItem) =>
+export const pause = (taskItem: TaskItem) =>
 {
-    if (taskItem.paused || tree.isBusy())
+    if (taskItem.paused || TaskTreeManager.isBusy())
     {
         window.showInformationMessage("Busy, please wait...");
         return;
@@ -100,17 +101,17 @@ export const pause = (tree: TaskTreeDataProvider, taskItem: TaskItem) =>
 };
 
 
-export const restart = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTasks: SpecialTaskFolder) =>
+export const restart = async(taskItem: TaskItem) =>
 {
     let exec: TaskExecution | undefined;
     log.methodStart("restart task", 1, "", true);
-    if (tree.isBusy())
+    if (TaskTreeManager.isBusy())
     {
         window.showInformationMessage("Busy, please wait...");
     }
     else {
-        await stop(tree, taskItem);
-        exec = await run(tree, taskItem, lastTasks);
+        await stop(taskItem);
+        exec = await run(taskItem);
     }
     log.methodDone("restart task", 1);
     return exec;
@@ -151,11 +152,11 @@ const resumeTask = (taskItem: TaskItem) =>
  * @param withArgs Whether or not to prompt for arguments
  * Note that only script type tasks use arguments (and Gradle, ref ticket #88)
  */
-export const run = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTasks: SpecialTaskFolder, noTerminal = false, withArgs = false, args?: string) =>
+export const run = async(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string) =>
 {
     let exec: TaskExecution | undefined;
 
-    if (tree.isBusy())
+    if (TaskTreeManager.isBusy())
     {
         window.showInformationMessage("Busy, please wait...");
         return exec;
@@ -166,7 +167,7 @@ export const run = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTas
 
     if (withArgs === true)
     {
-        exec = await runWithArgs(taskItem, lastTasks, args, noTerminal);
+        exec = await runWithArgs(taskItem, args, noTerminal);
     }
     else if (taskItem.paused)
     {
@@ -207,7 +208,7 @@ export const run = async(tree: TaskTreeDataProvider, taskItem: TaskItem, lastTas
                 }
             }
         }
-        exec = await runTask(newTask, taskItem, lastTasks, noTerminal);
+        exec = await runTask(newTask, taskItem, noTerminal);
     }
 
     log.methodDone("run task", 1);
@@ -256,14 +257,15 @@ export const runNpmCommand = async(taskFile: TaskFile, command: string) =>
 };
 
 
-export const runLastTask = async(tree: TaskTreeDataProvider, taskMap: TaskMap, lastTasks: SpecialTaskFolder) =>
+export const runLastTask = async(taskMap: TaskMap) =>
 {
-    if (tree.isBusy())
+    if (TaskTreeManager.isBusy())
     {
         window.showInformationMessage("Busy, please wait...");
         return;
     }
 
+    const lastTasks = TaskTreeManager.getlastTasksFolder();
     const lastTaskId = lastTasks.getLastRanId();
     if (!lastTaskId) { return; }
 
@@ -274,7 +276,7 @@ export const runLastTask = async(tree: TaskTreeDataProvider, taskMap: TaskMap, l
 
     if (taskItem && taskItem instanceof TaskItem)
     {
-        exec = await run(tree, taskItem, lastTasks);
+        exec = await run(taskItem);
     }
     else {
         window.showInformationMessage("Task not found!  Check log for details");
@@ -286,11 +288,12 @@ export const runLastTask = async(tree: TaskTreeDataProvider, taskMap: TaskMap, l
 };
 
 
-export const runTask = async (task: Task, taskItem: TaskItem, lastTasks: SpecialTaskFolder, noTerminal?: boolean, logPad = "   ") =>
+export const runTask = async (task: Task, taskItem: TaskItem, noTerminal?: boolean, logPad = "   ") =>
 {
     log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
     task.presentationOptions.reveal = noTerminal !== true ? TaskRevealKind.Always : TaskRevealKind.Silent;
     const exec = await tasks.executeTask(task);
+    const lastTasks = TaskTreeManager.getlastTasksFolder();
     await lastTasks.saveTask(taskItem, logPad);
     log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
     return exec;
@@ -304,7 +307,7 @@ export const runTask = async (task: Task, taskItem: TaskItem, lastTasks: Special
  * @param noTerminal Whether or not to show the terminal
  * Note that the terminal will be shown if there is an error
  */
-export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolder, args?: string, noTerminal?: boolean, logPad = "   ") =>
+export const runWithArgs = async(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ") =>
 {
     let exec: TaskExecution | undefined;
     log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
@@ -328,7 +331,7 @@ export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolde
                     ) as Task;
                     newTask.definition.taskItemId = def.taskItemId;
                 // }
-                exec = await runTask(newTask, taskItem, lastTasks, noTerminal, logPad + "   ");
+                exec = await runTask(newTask, taskItem, noTerminal, logPad + "   ");
             }
             return exec;
         };
@@ -349,11 +352,11 @@ export const runWithArgs = async(taskItem: TaskItem, lastTasks: SpecialTaskFolde
 };
 
 
-export const stop = async(tree: TaskTreeDataProvider, taskItem: TaskItem) =>
+export const stop = async(taskItem: TaskItem) =>
 {
     log.methodStart("stop", 1, "", true);
 
-    if (tree.isBusy())
+    if (TaskTreeManager.isBusy())
     {
         window.showInformationMessage("Busy, please wait...");
         return;

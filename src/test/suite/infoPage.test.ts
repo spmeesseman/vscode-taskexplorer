@@ -3,9 +3,9 @@
 
 import { Uri, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
-import { getViewTitle, getViewType } from "../../lib/page/infoPage";
+import { getViewTitle, getViewType } from "../../page/infoPage";
 import { getParsingReportSerializer } from "../../commands/viewReport";
-import { ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle,
@@ -15,8 +15,8 @@ import {
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;
 let userTasks: boolean;
-let origExplorer: ITaskExplorer | undefined;
-let origSidebar: ITaskExplorer | undefined;
+let origExplorer: ITaskTree | undefined;
+let origSidebar: ITaskTree | undefined;
 let pkgMgr: string;
 
 
@@ -29,8 +29,8 @@ suite("Info Report Tests", () =>
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teApi.explorer;
 		origSidebar = teApi.sidebar;
-		pkgMgr = teApi.config.getVs<string>("npm.packageManager");
-		userTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
+		pkgMgr = teApi.testsApi.config.getVs<string>("npm.packageManager");
+		userTasks = teApi.testsApi.config.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);
 	});
 
@@ -41,7 +41,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = origExplorer;
 		teApi.sidebar = origSidebar;
 		await closeEditors();
-		await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
+		await teApi.testsApi.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
 		await executeSettingsUpdate("specialFolders.showUserTasks", userTasks);
         suiteFinished(this);
@@ -96,12 +96,12 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
-        await teApi.config.updateVsWs("npm.packageManager", "yarn");
+        await teApi.testsApi.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(75);
 		panel.dispose();
-        await teApi.config.updateVsWs("npm.packageManager", pkgMgr);
+        await teApi.testsApi.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeEditors();
         endRollingCount(this);

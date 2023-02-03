@@ -39,13 +39,14 @@ import { registerStatusBarItem } from "./lib/statusBarItem";
 import { ILicenseManager } from "./interface/ILicenseManager";
 import { PowershellTaskProvider } from "./providers/powershell";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
-import { enableExplorer, registerTreeProviders } from "./lib/registerExplorer";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env } from "vscode";
-import { IDictionary, IExternalProvider, ITaskExplorer, ITaskExplorerApi, ITestsApi } from "./interface";
+import { IDictionary, IExternalProvider, ITaskTree, ITaskExplorerApi, ITestsApi, ITaskTreeManager } from "./interface";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
+import { TaskTreeManager } from "./tree/treeManager";
+import TaskTree from "./tree/tree";
 
 
 export const providers: IDictionary<TaskExplorerProvider> = {};
@@ -55,16 +56,13 @@ let ready = false;
 let tests = false;
 let dev = false;
 let licenseManager: ILicenseManager;
+let treeManager: TaskTreeManager;
 
 export const teApi: ITaskExplorerApi =
 {
-    config: configuration,
     explorer: undefined,
     explorerView: undefined,
     isBusy,
-    isLicensed: () => licenseManager.isLicensed(),
-    isTests: () => tests,
-    setTests: (isTests) => { tests = isTests; },
     log,
     providers,
     providersExternal,
@@ -73,19 +71,10 @@ export const teApi: ITaskExplorerApi =
     sidebar: undefined,
     sidebarView: undefined,
     unregister: unregisterExternalProvider,
-    utilities: util,
-    testsApi: { // Will get removed on activation if not tests environment
-        fs,
-        explorer: {} as ITaskExplorer, // registerExplorer() will set
-        fileCache,
-        isBusy: false,
-        storage,
-        enableConfigWatcher,
-        enableExplorer,
-        onWsFoldersChange,
-        extensionContext: undefined as unknown as ExtensionContext,
-        wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]
-    }
+    testsApi: {} as unknown as ITestsApi,
+    isLicensed: () => licenseManager.isLicensed(),
+    isTests: () => tests,
+    setTests: () => {}
 };
 
 
@@ -95,17 +84,6 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Set 'tests' flag if tests are running and this is not a user runtime
     //
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
-    /* istanbul ignore if */
-    if (!tests) {
-        teApi.setTests = () => {};
-        teApi.testsApi = {} as unknown as ITestsApi;
-        teApi.config = undefined as unknown as IConfiguration;
-        teApi.utilities = undefined;
-    }
-    else {
-        teApi.testsApi.extensionContext = context;
-        teApi.isBusy = () => isBusy() || teApi.testsApi.isBusy;
-    }
 
     //
     // Set 'dev' flag if running a debugging session from vSCode
@@ -131,10 +109,6 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     // Initialize persistent storage
     //
     await initStorage(context, dev, tests);
-    /* istanbul ignore else */
-    if (tests) {
-        teApi.testsApi.storage = storage;
-    }
 
     log.methodStart("activation", 1, "", true);
 
@@ -166,14 +140,14 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
     registerCommands(context);
 
     //
-    // Register the tree providers
+    // Create task tree manager and register the tree providers
     //
-    registerTreeProviders(context, teApi);
+    treeManager = new TaskTreeManager(context, teApi);
 
     //
     // Register configurations/settings change watcher
     //
-    registerConfigWatcher(context, teApi);
+    registerConfigWatcher(context);
 
     //
     // Create license manager instance
@@ -187,11 +161,31 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
 	// 	new TeAuthenticationProvider(context)
 	// );
 
+    if (tests)
+    {
+        teApi.testsApi = { // Will get removed on activation if not tests environment
+            fs,
+            config: configuration,
+            explorer: {} as ITaskTree, // registerExplorer() will set
+            fileCache,
+            isBusy: false,
+            storage,
+            enableConfigWatcher,
+            onWsFoldersChange,
+            utilities: util,
+            treeManager,
+            extensionContext: context,
+            wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]
+        };
+        teApi.setTests = (isTests) => { tests = isTests; };
+        teApi.isBusy = () => isBusy() || teApi.testsApi.isBusy;
+    }
+
     //
     // Use a delayed initialization so we can display an 'Initializing...' message
     // in the tree on startup.  Really no good way to do that w/o this.
     //
-    setTimeout(initialize, 25, context, teApi);
+    setTimeout(initialize, 25, context);
 
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
@@ -200,7 +194,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
 }
 
 
-const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
+const initialize = async(context: ExtensionContext) =>
 {
     const now = Date.now(),
           lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
@@ -225,7 +219,7 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     // are enabled or disabled in settings after startup, then the individual calls to
     // registerFileWatcher() will perform the scan for that task type.
     //
-    await registerFileWatchers(context, api, "   ");
+    await registerFileWatchers(context, "   ");
     //
     // Build the file cache, this kicks off the whole process as refreshTree() will be called
     // down the line in the initialization process.
@@ -253,12 +247,9 @@ const initialize = async(context: ExtensionContext, api: ITaskExplorerApi) =>
     await storage.update2("lastDeactivated", 0);
     await storage.update2("lastWsRootPathChange", 0);
     //
-    // TaskTreeDataProvider fires event for engine to make tree provider to refresh on setEnabled()
+    // Start the first tree build
     //
-    /* istanbul ignore next */
-    api.explorer?.setEnabled(true, "   ");
-    /* istanbul ignore next */
-    api.sidebar?.setEnabled(true, "   ");
+    await treeManager.initialize("   ");
     //
     // Log the environment
     //
@@ -394,9 +385,12 @@ export async function deactivate()
 export const getLicenseManager = () => licenseManager;
 
 
+export const getTaskTreeManager = () => treeManager;
+
+
 function isBusy()
 {
-    return !ready || fileCache.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange() || licenseManager.isBusy();
 }
 
@@ -405,19 +399,19 @@ async function refreshExternalProvider(providerName: string)
 {
     if (providersExternal[providerName])
     {
-        await refreshTree(teApi, providerName, undefined, "");
+        await refreshTree(providerName, undefined, "");
     }
 }
 
 
 function registerCommands(context: ExtensionContext)
 {
-    registerAddToExcludesCommand(context, teApi);
+    registerAddToExcludesCommand(context);
     registerDisableTaskTypeCommand(context);
     registerEnableTaskTypeCommand(context);
     registerEnterLicenseCommand(context);
     registerGetLicenseCommand(context, teApi);
-    registerRemoveFromExcludesCommand(context, teApi);
+    registerRemoveFromExcludesCommand(context);
     registerViewLicenseCommand(context, teApi);
     registerViewReportCommand(context, teApi);
     registerViewReleaseNotesCommand(context, teApi);
@@ -431,7 +425,7 @@ function registerCommands(context: ExtensionContext)
 async function registerExternalProvider(providerName: string, provider: IExternalProvider, logPad: string)
 {
     providersExternal[providerName] = provider;
-    await refreshTree(teApi, providerName, undefined, logPad);
+    await refreshTree(providerName, undefined, logPad);
 }
 
 
@@ -478,5 +472,5 @@ function registerTaskProviders(context: ExtensionContext)
 async function unregisterExternalProvider(providerName: string, logPad: string)
 {
     delete providersExternal[providerName];
-    await refreshTree(teApi, providerName, undefined, logPad);
+    await refreshTree(providerName, undefined, logPad);
 }

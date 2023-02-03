@@ -2,7 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { refreshTree } from "../../lib/refreshTree";
-import { ITaskExplorer, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskTree, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
 import {
     activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
@@ -60,7 +60,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        testsApi.enableExplorer("taskExplorerSideBar", true, ""); // cover edge if
+        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
         endRollingCount(this);
     });
 
@@ -71,7 +71,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.enableExplorer("taskExplorer", false, "");
+        testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
         endRollingCount(this);
     });
 
@@ -80,7 +80,7 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh);
-        await refreshTree(teApi, undefined, undefined, "");
+        await refreshTree(undefined, undefined, "");
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
     });
@@ -91,9 +91,9 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
-        setExplorer(teApi.explorer as ITaskExplorer);
+        setExplorer(teApi.explorer as ITaskTree);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.enableExplorer("taskExplorer", true, ""); // cover edge if
+        testsApi.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
         endRollingCount(this);
     });
 
@@ -102,7 +102,7 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refreshNoChanges);
-        await refreshTree(teApi, undefined, undefined, "");
+        await refreshTree(undefined, undefined, "");
         endRollingCount(this);
     });
 
@@ -111,11 +111,11 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
-        teApi.sidebar?.setEnabled(false, "");
-        await teApi.sidebar?.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
+        // teApi.sidebar?.setEnabled(false, "");
+        testsApi.treeManager.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.enableExplorer("taskExplorerSideBar", false, ""); // cover edge if
+        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
         endRollingCount(this);
     });
 

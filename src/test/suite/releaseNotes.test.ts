@@ -4,12 +4,12 @@
 import { Extension, Uri, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
+import { getViewTitle, getViewType } from "../../page/releaseNotes";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { getViewTitle, getViewType, reviveReleaseNotes } from "../../lib/page/releaseNotes";
+import { getReleaseNotesSerializer } from "../../commands/viewReleaseNotes";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
-import { getReleaseNotesSerializer } from "../../commands/viewReleaseNotes";
 
 let teApi: ITaskExplorerApi;
 let extension: Extension<any>;

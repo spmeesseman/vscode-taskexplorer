@@ -45,8 +45,8 @@ suite("Python Tests", () =>
         //
         // Store / set initial settings
         //
-        pathToTaskProgram = teApi.config.get<string>("pathToPrograms." + testsName);
-        enableTaskType = teApi.config.get<boolean>("enabledTasks." + testsName);
+        pathToTaskProgram = teApi.testsApi.config.get<string>("pathToPrograms." + testsName);
+        enableTaskType = teApi.testsApi.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         endRollingCount(this, true);

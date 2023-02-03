@@ -1,20 +1,24 @@
 
-import { ITaskExplorer } from "./ITaskExplorer";
-import { IFilesystemApi } from "./IFilesystemApi";
-import { ExtensionContext, WorkspaceFolder, WorkspaceFoldersChangeEvent } from "vscode";
-import { IFileCache } from "./IFileCache";
+import ITaskTree from "./ITaskTree";
+import ITaskTreeManager from "./ITaskTreeManager";
 import { IStorage } from "./IStorage";
+import { IFileCache } from "./IFileCache";
+import { IFilesystemApi } from "./IFilesystemApi";
+import { IConfiguration } from "./IConfiguration";
+import { ExtensionContext, WorkspaceFolder, WorkspaceFoldersChangeEvent } from "vscode";
 
 export interface ITestsApi
 {
     isBusy: boolean;
-    explorer: ITaskExplorer;
+    config: IConfiguration;
+    utilities: any;
+    explorer: ITaskTree;
+    treeManager: ITaskTreeManager;
     fileCache: IFileCache; // for tests use only
     fs: IFilesystemApi;
     storage: IStorage;
     wsFolder: WorkspaceFolder;
     extensionContext: ExtensionContext;
     enableConfigWatcher(enable: boolean): void;
-    enableExplorer (name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string): void;
     onWsFoldersChange(e: WorkspaceFoldersChangeEvent): Promise<void>;
 }

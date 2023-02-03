@@ -10,8 +10,8 @@ import { startupFocus } from "../utils/suiteUtils";
 import { getLicenseManager } from "../../extension";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { executeTeCommand } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { getViewTitle, getViewType, reviveLicensePage } from "../../lib/page/licensePage";
+import { IFilesystemApi, ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { getViewTitle, getViewType, reviveLicensePage } from "../../page/licensePage";
 import { getLicensePageSerializer } from "../../commands/viewLicense";
 
 const tc = utils.testControl;
@@ -22,7 +22,7 @@ const licMgrMaxFreeTasksForScriptType = 50; // Should be set to what the constan
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let explorer: ITaskExplorer;
+let explorer: ITaskTree;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
@@ -91,7 +91,7 @@ suite("License Manager Tests", () =>
 	test("Focus Explorer View", async function()
 	{
         await startupFocus(this, async () => {
-			tasks = explorer.getTasks();
+			tasks = teApi.testsApi.treeManager.getTasks();
 			await licMgr.setTasks(tasks, ""); // covers checking same # of tasks onsetTasks() calls
 			await licMgr.setTasks(tasks);     // covers checking same # of tasks onsetTasks() calls
 		});
@@ -514,7 +514,7 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(explorer.getTasks().length).to.be.equal(25);
+		expect(teApi.testsApi.treeManager.getTasks().length).to.be.equal(25);
         utils.endRollingCount(this);
 	});
 
@@ -531,7 +531,7 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(explorer.getTasks().filter(t => t.source === "gulp").length).to.be.equal(10);
+		expect(teApi.testsApi.treeManager.getTasks().filter(t => t.source === "gulp").length).to.be.equal(10);
         utils.endRollingCount(this);
 	});
 
@@ -548,7 +548,7 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(explorer.getTasks().filter(t => t.source === "batch").length).to.be.equal(1);
+		expect(teApi.testsApi.treeManager.getTasks().filter(t => t.source === "batch").length).to.be.equal(1);
         utils.endRollingCount(this);
 	});
 
@@ -626,20 +626,20 @@ suite("License Manager Tests", () =>
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox(undefined);
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, undefined, true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, undefined, true);
 		utils.overrideNextShowInfoBox("Info");
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "npm", true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, "npm", true);
 		utils.overrideNextShowInfoBox("Not Now");
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "ant", true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, "ant", true);
 		utils.overrideNextShowInfoBox(undefined);
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "gulp", true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, "gulp", true);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox(undefined);
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
 		utils.overrideNextShowInfoBox("Info");
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr, "grunt", true);
 		utils.overrideNextShowInfoBox("Info");
-		await teApi.utilities.showMaxTasksReachedMessage(licMgr);
+		await teApi.testsApi.utilities.showMaxTasksReachedMessage(licMgr);
         utils.endRollingCount(this);
 	});
 

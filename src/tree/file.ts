@@ -5,10 +5,10 @@ import log from "../lib/log/log";
 import TaskFolder  from "./folder";
 import { pathExistsSync } from "../lib/utils/fs";
 import { properCase } from "../lib/utils/commonUtils";
-import { getUserDataPath } from "../lib/utils/pathUtils";
+import { getInstallPath, getInstallPathSync, getUserDataPath } from "../lib/utils/pathUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri } from "vscode";
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri, env } from "vscode";
 
 
 /**
@@ -94,8 +94,8 @@ export default class TaskFile extends TreeItem implements ITaskFile
      * @param label The display label.
      * @param logPad Padding to prepend to log entries.  Should be a string of any # of space characters.
      */
-    constructor(context: ExtensionContext, folder: TaskFolder, taskDef: ITaskDefinition, source: string,
-                relativePath: string, groupLevel: number, groupId: string | undefined, label: string | undefined, logPad: string)
+    constructor(folder: TaskFolder, taskDef: ITaskDefinition, source: string, relativePath: string,
+                groupLevel: number, groupId: string | undefined, label: string | undefined, logPad: string)
     {
         super(TaskFile.getLabel(taskDef, label ? label : source, relativePath, groupId), TreeItemCollapsibleState.Collapsed);
 
@@ -170,58 +170,56 @@ export default class TaskFile extends TreeItem implements ITaskFile
         }
 
         //
-        // Set context icons
+        // Set unique id
         //
-        this.iconPath = ThemeIcon.File;
-        let src = this.taskSource,
-            iconLight: string | undefined, iconDark: string | undefined;
+        this.id = ("treeFileId-" + folder.id.replace("treeFolderId-", ":") + this.nodePath + ":" + this.fileName +
+                  ":" + this.groupLevel + ":" + groupId + ":" + this.label + ":" + source).replace(/ /g, "");
+
         //
         // If npm TaskFile, check package manager set in vscode settings, (npm, pnpm, or yarn) to determine
         // which icon to display
         //
+        let src = this.taskSource;
         if (src === "npm") {
             src = util.getPackageManager();
         }
 
-        /* istanbul ignore else */
+        //
+        // Set context icons
+        //
+        this.iconPath = ThemeIcon.File;
         if (!taskDef.icon)
         {
-            if (pathExistsSync(context.asAbsolutePath(path.join("res", "sources", src + ".svg"))))
+            const installPath = getInstallPathSync(),
+                  icon = path.join(installPath, "res", "sources", src + ".svg");
+            if (pathExistsSync(icon))
             {
-                iconLight = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
-                iconDark = context.asAbsolutePath(path.join("res", "sources", src + ".svg"));
-                this.iconPath = { light: iconLight, dark: iconDark };
+                this.iconPath = { light: icon, dark: icon };
             }
-            else if (pathExistsSync(context.asAbsolutePath(path.join("res", "light", src + ".svg"))) &&
-                     pathExistsSync(context.asAbsolutePath(path.join("res", "dark", src + ".svg"))))
+            else
             {
-                iconLight = context.asAbsolutePath(path.join("res", "light", src + ".svg"));
-                iconDark = context.asAbsolutePath(path.join("res", "dark", src + ".svg"));
-                this.iconPath = { light: iconLight, dark: iconDark };
+                const iconDark = path.join(installPath, "res", "sources", "light", src + ".svg");
+                const iconLight = path.join(installPath, "res", "sources", "light", src + ".svg");
+                if (pathExistsSync(iconDark) && pathExistsSync(iconDark))
+                {
+                    this.iconPath = { light: iconLight, dark: iconDark };
+                }
             }
-            log.write(`   icons read for task source '${source}'`, 4, logPad);
-            log.value("      light", iconLight, 4, logPad);
-            log.value("      dark", iconDark, 4, logPad);
         }
         else if (pathExistsSync(taskDef.icon) && path.extname(taskDef.icon) === ".svg")
         {
-            iconLight = taskDef.icon;
-            iconDark = taskDef.iconDark && pathExistsSync(taskDef.iconDark) && path.extname(taskDef.iconDark) === ".svg" ?
-                        taskDef.iconDark : taskDef.icon;
+            const iconLight = taskDef.icon;
+            const iconDark = taskDef.iconDark && pathExistsSync(taskDef.iconDark) && path.extname(taskDef.iconDark) === ".svg" ?
+                             taskDef.iconDark : taskDef.icon;
             this.iconPath = { light: iconLight, dark: iconDark };
-            log.write(`   custom icons read for task source '${source}'`, 4, logPad);
-            log.value("      light", iconLight, 4, logPad);
-            log.value("      dark", iconDark, 4, logPad);
         }
 
-        this.id = ("treeFileId-" + folder.id.replace("treeFolderId-", ":") + this.nodePath + ":" + this.fileName +
-                  ":" + this.groupLevel + ":" + groupId + ":" + this.label + ":" + source).replace(/ /g, "");
-
+        const iconPath = this.iconPath as { light: string | Uri; dark: string | Uri };
         log.methodDone("construct tree file", 4, logPad, [
             [ "id", this.id ], [ "label", this.label ], [ "Node Path", this.nodePath ], [ "is usertask", this.isUser ],
             [ "context value", this.contextValue ], [ "is group", this.isGroup ], [ "groupLevel", this.groupLevel ],
             [ "filename", this.fileName ], [ "resource uri path", this.resourceUri.fsPath ],
-            [ "path", this.path  ], [ "icon light", iconLight ], [ "icon dark", iconDark ]
+            [ "path", this.path  ], [ "icon light", iconPath.light ], [ "icon dark", iconPath.dark ]
         ]);
     }
 
@@ -252,7 +250,6 @@ export default class TaskFile extends TreeItem implements ITaskFile
         id += file.resourceUri.fsPath.replace(/\W/gi, "");
         return folder.label + file.taskSource + id + treeLevel.toString();
     };
-
 
 
     /**

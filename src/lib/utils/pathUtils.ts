@@ -1,9 +1,10 @@
 
 import log from "../log/log";
 import { dirname, join, relative, resolve, sep } from "path";
-import { Uri, WorkspaceFolder } from "vscode";
+import { Task, Uri, WorkspaceFolder } from "vscode";
 import { pathExists, pathExistsSync } from "./fs";
 import { homedir } from "os";
+import { isWorkspaceFolder } from "./utils";
 
 
 export const getCwd = (uri: Uri): string =>
@@ -19,6 +20,16 @@ export const getInstallPath = async() =>
 {
     let dir = __dirname;
     while (dir.length > 3 && !(await pathExists(join(dir, "package.json")))) {
+        dir = dirname(dir);
+    }
+    return dir;
+};
+
+
+export const getInstallPathSync = () =>
+{
+    let dir = __dirname;
+    while (dir.length > 3 && !(pathExistsSync(join(dir, "package.json")))) {
         dir = dirname(dir);
     }
     return dir;
@@ -57,6 +68,20 @@ export const getRelativePath = (folder: WorkspaceFolder, uri: Uri): string =>
     const rootUri = folder.uri;
     const absolutePath = uri.path.substring(0, uri.path.lastIndexOf("/") + 1);
     return absolutePath.substring(rootUri.path.length + 1);
+};
+
+
+export const getTaskRelativePath = (task: Task) =>
+{
+    let relativePath = task.definition.path ?? "";
+    if (task.source === "tsc" && isWorkspaceFolder(task.scope))
+    {
+        if (task.name.indexOf(" - ") !== -1 && task.name.indexOf(" - tsconfig.json") === -1)
+        {
+            relativePath = dirname(task.name.substring(task.name.indexOf(" - ") + 3));
+        }
+    }
+    return relativePath;
 };
 
 

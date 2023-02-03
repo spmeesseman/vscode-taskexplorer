@@ -7,14 +7,12 @@ import { expect } from "chai";
 import { TreeItem } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, needsTreeBuild, sleep, suiteFinished, testControl as tc,
-    verifyTaskCount, waitForTeIdle
+    activate, endRollingCount, exitRollingCount, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let explorer: ITaskExplorer;
 let didDisableTasks = false;
 let didResetEnabledTasks = false;
 let showFavorites = false;
@@ -33,11 +31,11 @@ suite("NoScripts TreeItem Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ explorer, teApi } = await activate(this));
-        showFavorites = teApi.config.get<boolean>("specialFolders.showFavorites");
-        showLastTasks = teApi.config.get<boolean>("specialFolders.showLastTasks");
-        showUserTasks = teApi.config.get<boolean>("specialFolders.showUserTasks");
-        enabledTasks = { ...teApi.config.get<IDictionary<boolean>>("enabledTasks") };
+        ({ teApi } = await activate(this));
+        showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
+        showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
+        showUserTasks = teApi.testsApi.config.get<boolean>("specialFolders.showUserTasks");
+        enabledTasks = { ...teApi.testsApi.config.get<IDictionary<boolean>>("enabledTasks") };
         if (showUserTasks) {
             await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -74,7 +72,7 @@ suite("NoScripts TreeItem Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh + (tc.slowTime.taskCount.verify * 4));
-        await teApi.config.updateWs("enabledTasks",
+        await teApi.testsApi.config.updateWs("enabledTasks",
         {
             ant: false,
             apppublisher: false,
@@ -100,7 +98,7 @@ suite("NoScripts TreeItem Tests", () =>
         });
         didDisableTasks = true;
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        const treeTasks = explorer.getTaskTree() as TreeItem[];
+        const treeTasks = teApi.testsApi.treeManager.getTaskTree() as TreeItem[];
         expect(treeTasks).to.not.be.undefined;
         expect(treeTasks.length).to.be.equal(1);
         expect(treeTasks[0].label).to.be.equal("No tasks found");
@@ -118,8 +116,8 @@ suite("NoScripts TreeItem Tests", () =>
         this.slow(tc.slowTime.commands.refresh + (tc.slowTime.taskCount.verify * 4));
         await executeSettingsUpdate("enabledTasks", enabledTasks, tc.waitTime.refreshCommand);
         didResetEnabledTasks = true;
-        const treeTasks = explorer.getTasks();
-        const treeFolders = explorer.getTaskTree() as TreeItem[];
+        const treeTasks = teApi.testsApi.treeManager.getTasks();
+        const treeFolders = teApi.testsApi.treeManager.getTaskTree() as TreeItem[];
         expect(treeFolders).to.not.be.undefined;
         expect(treeFolders.length).to.be.equal(1);
         expect(treeFolders[0].label).to.not.be.equal("No tasks found");

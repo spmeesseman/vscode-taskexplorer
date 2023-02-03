@@ -74,7 +74,7 @@ suite("Perl Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
-        // await teApi.config.updateWs("enabledTasks.perl", false);
+        // await teApi.testsApi.config.updateWs("enabledTasks.perl", false);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
@@ -86,7 +86,7 @@ suite("Perl Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
-        // await teApi.config.updateWs("enabledTasks.perl", true);
+        // await teApi.testsApi.config.updateWs("enabledTasks.perl", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);

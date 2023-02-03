@@ -5,6 +5,8 @@ import { timeout } from "../lib/utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { getLicenseManager } from "../extension";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
+import TaskTree from "../tree/tree";
+import { TaskTreeManager } from "../tree/treeManager";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
@@ -27,11 +29,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 
 	if (!tasks)
 	{
-		const explorer = api.explorer || api.sidebar;
-		/* istanbul ignore else */
-		if (explorer) {
-			tasks = explorer.getTasks();
-		}
+		tasks = TaskTreeManager.getTasks();
 	}
 
 	/* istanbul ignore else */

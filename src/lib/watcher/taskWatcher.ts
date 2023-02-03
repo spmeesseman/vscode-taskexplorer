@@ -3,9 +3,9 @@
 import * as util from "../utils/utils";
 import log from "../log/log";
 import TaskItem from "../../tree/item";
-import SpecialTaskFolder from "../../tree/specialFolder";
-import { IDictionary, ITaskExplorer } from "../../interface";
 import { configuration } from "../utils/configuration";
+import SpecialTaskFolder from "../../tree/specialFolder";
+import { IDictionary, ITaskTreeManager } from "../../interface";
 import {
     Disposable, WorkspaceFolder, tasks, TaskStartEvent, StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";
@@ -15,16 +15,16 @@ export class TaskWatcher implements Disposable
 {
 
     private static statusBarSpace: StatusBarItem;
-    private tree: ITaskExplorer;
+    private treeManager: ITaskTreeManager;
     private disposables: Disposable[];
     private babysitterCt = 0;
     private babysitterTimers: IDictionary<NodeJS.Timeout> = {};
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
-    constructor(tree: ITaskExplorer, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
+    constructor(treeManager: ITaskTreeManager, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
     {
-        this.tree = tree;
+        this.treeManager = treeManager;
         this.specialFolders = specialFolders;
         if (!TaskWatcher.statusBarSpace) {
             TaskWatcher.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
@@ -103,7 +103,7 @@ export class TaskWatcher implements Disposable
 
     fireTaskChangeEvents(taskItem: TaskItem, logPad: string, logLevel: number)
     {
-        const taskTree = this.tree.getTaskTree();
+        const taskTree = this.treeManager.getTaskTree();
         /* istanbul ignore if */
         if (!taskItem || !taskItem.task || !taskItem.taskFile) {
             log.error(`fire task change event type invalid, received ${typeof taskItem}`);
@@ -118,7 +118,7 @@ export class TaskWatcher implements Disposable
         const isTaskItem = taskItem instanceof TaskItem;
         log.methodStart("fire task change events", logLevel, logPad, false, [
             [ "task name", taskItem.task.name ], [ "task type", taskItem.task.source ],
-            [ "resource path", taskItem.taskFile.resourceUri.fsPath ], [ "view", this.tree.getName() ]
+            [ "resource path", taskItem.taskFile.resourceUri.fsPath ]
         ]);
 
         /* istanbul ignore if */
@@ -142,7 +142,7 @@ export class TaskWatcher implements Disposable
         // tree, so this is still good.  TODO possibly this gets fixed in the future to be able to
         // invalidate just the TaskItem, so check back on this sometime.
         //
-        this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskItem.taskFile);
+        this.treeManager.fireTreeRefreshEvent(logPad + "   ", logLevel, taskItem.taskFile);
 
         //
         // Fire change event for the 'Last Tasks' folder if the task exists there
@@ -151,7 +151,7 @@ export class TaskWatcher implements Disposable
         {   //
             // 'Last Tasks' folder, if enabled, will always be the 1st tree item
             //
-            this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
+            this.treeManager.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
         }
 
         //
@@ -164,10 +164,10 @@ export class TaskWatcher implements Disposable
             //
             if (taskTree[0] && taskTree[0].label === this.specialFolders.favorites.label)
             {
-                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
+                this.treeManager.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[0]);
             }
             else {
-                this.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[1]);
+                this.treeManager.fireTreeRefreshEvent(logPad + "   ", logLevel, taskTree[1]);
             }
         }
 
@@ -204,13 +204,13 @@ export class TaskWatcher implements Disposable
 
     private async taskStartEvent(e: TaskStartEvent)
     {
-        const taskMap = this.tree.getTaskMap(),
-              taskTree = this.tree.getTaskTree(),
+        const taskMap = this.treeManager.getTaskMap(),
+              taskTree = this.treeManager.getTaskTree(),
               task = e.execution.task,
               taskId = task.definition.taskItemId,
               isMapEmpty = util.isObjectEmpty(taskMap);
 
-        log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+        log.methodStart("task started event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
 
         //
         // If taskMap is empty, then this view has not yet been made visible, an there's nothing
@@ -248,13 +248,13 @@ export class TaskWatcher implements Disposable
 
     private async taskFinishedEvent(e: TaskEndEvent)
     {
-        const taskMap = this.tree.getTaskMap(),
-              taskTree = this.tree.getTaskTree(),
+        const taskMap = this.treeManager.getTaskMap(),
+              taskTree = this.treeManager.getTaskTree(),
               task = e.execution.task,
               taskId = task.definition.taskItemId,
               isMapEmpty = util.isObjectEmpty(taskMap);
 
-        log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ], [ "view", this.tree.getName() ]]);
+        log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
 
         this.fireBabySitter(taskId);        // fire the babysitter
         this.showStatusMessage(task, "  "); // hides

@@ -1,14 +1,18 @@
 
-import constants from "../lib/constants";
-import log from "../lib/log/log";
 import TaskItem from "./item";
+import log from "../lib/log/log";
 import TaskFolder from "./folder";
+import constants from "../lib/constants";
+import { ITaskTree, ITaskTreeManager } from "../interface";
 import { sortTasks } from "../lib/sortTasks";
-import { isString, removeFromArray } from "../lib/utils/utils";
-import { configuration } from "../lib/utils/configuration";
 import { storage } from "../lib/utils/storage";
-import { commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon, TreeItem, TreeItemCollapsibleState, window, workspace } from "vscode";
-import { ITaskExplorer } from "../interface";
+import { TaskTreeManager } from "./treeManager";
+import { configuration } from "../lib/utils/configuration";
+import { isString, removeFromArray } from "../lib/utils/utils";
+import {
+    commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon,
+    TreeItem, TreeItemCollapsibleState, window, workspace
+} from "vscode";
 
 
 /**
@@ -19,24 +23,22 @@ import { ITaskExplorer } from "../interface";
 export default class SpecialTaskFolder extends TaskFolder implements Disposable
 {
 
-    public explorer: ITaskExplorer;
+    public treeManager: ITaskTreeManager;
     public disposables: Disposable[];
     private storeName: string;
     private isFavorites: boolean;
-    private extensionContext: ExtensionContext;
     public override taskFiles: TaskItem[];
     private store: string[];
     private enabled: boolean;
     private settingNameEnabled: string;
 
 
-    constructor(context: ExtensionContext, treeName: "taskExplorer"|"taskExplorerSideBar", treeProvider: ITaskExplorer, label: string, state: TreeItemCollapsibleState)
+    constructor(treeManager: ITaskTreeManager, label: string, state: TreeItemCollapsibleState)
     {
         super(label, state);
+        this.treeManager = treeManager;
         this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.iconPath = ThemeIcon.Folder;
-        this.explorer = treeProvider;
-        this.extensionContext = context;
         this.isFavorites = label === constants.FAV_TASKS_LABEL;
         this.storeName = this.isFavorites ? constants.FAV_TASKS_STORE : constants.LAST_TASKS_STORE;
         this.store = storage.get<string[]>(this.storeName, []);
@@ -47,13 +49,13 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         this.taskFiles = [];
         if (this.isFavorites)
         {
-            this.disposables.push(commands.registerCommand(treeName + ".addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
-            this.disposables.push(commands.registerCommand(treeName + ".clearFavorites", () => this.clearSavedTasks(), this));
+            this.disposables.push(commands.registerCommand("vscode-taskexplorer.addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+            this.disposables.push(commands.registerCommand("vscode-taskexplorer.clearFavorites", () => this.clearSavedTasks(), this));
         }
         else {
-            this.disposables.push(commands.registerCommand(treeName + ".clearLastTasks", () => this.clearSavedTasks(), this));
+            this.disposables.push(commands.registerCommand("vscode-taskexplorer.clearLastTasks", () => this.clearSavedTasks(), this));
         }
-        const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(context, e); }, this);
+        const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(e); }, this);
         this.disposables.push(d);
     }
 
@@ -64,7 +66,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         {
             log.methodStart(`add tree taskitem to ${this.label}`, 3, logPad);
 
-            const taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task, logPad + "   ");
+            const taskItem2 = new TaskItem(taskItem.taskFile, taskItem.task, logPad + "   ");
             taskItem2.id = this.label + ":" + taskItem2.id; // note 'label:' + taskItem2.id === id
             taskItem2.label = this.getRenamedTaskName(taskItem2);
             taskItem2.folder = this;
@@ -147,7 +149,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         // Persist to storage and refresh this tree node
         //
         await storage.update(constants.TASKS_RENAME_STORE, renames);
-        this.explorer.fireTreeRefreshEvent("   ", 1, this);
+        this.treeManager.fireTreeRefreshEvent("   ", 1, this);
 
         log.methodDone("add/remove rename special", 1, "", [[ "new # of items in store", renames.length ]]);
         return rmvIdx !== -1;
@@ -168,7 +170,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
     {
         log.methodStart("create special tasks folder", 1, logPad, false, [[ "name", this.label ]]);
 
-        const tree = this.explorer.getTaskTree() as TreeItem[], // Guaranted not to be undefined - checked in .refresh
+        const tree = this.treeManager.getTaskTree() as TreeItem[], // Guaranted not to be undefined - checked in .refresh
               showLastTasks = configuration.get<boolean>("specialFolders.showLastTasks"),
               favIdx = showLastTasks ? 1 : 0,
               treeIdx = !this.isFavorites ? 0 : favIdx;
@@ -183,11 +185,11 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         this.clearTaskItems();
         for (const tId of this.store)
         {
-            const taskItem2 = this.explorer.getTaskMap()[tId];
+            const taskItem2 = TaskTreeManager.getTaskMap()[tId];
             /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
-                const taskItem3 = new TaskItem(this.extensionContext, taskItem2.taskFile, taskItem2.task, logPad + "   ");
+                const taskItem3 = new TaskItem(taskItem2.taskFile, taskItem2.task, logPad + "   ");
                 taskItem3.id = this.label + ":" + taskItem3.id;
                 taskItem3.label = this.getRenamedTaskName(taskItem3);
                 taskItem3.folder = this;
@@ -313,7 +315,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
     isEnabled = () => this.enabled;
 
 
-    async processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
+    async processConfigChanges(e: ConfigurationChangeEvent)
     {
         if (e.affectsConfiguration("taskExplorer." + this.settingNameEnabled))
         {
@@ -346,7 +348,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
 
         if (!taskItem2)
         {
-            taskItem2 = new TaskItem(this.extensionContext, taskItem.taskFile, taskItem.task, logPad + "   ");
+            taskItem2 = new TaskItem(taskItem.taskFile, taskItem.task, logPad + "   ");
             taskItem2.id = taskId;
             taskItem2.label = this.getRenamedTaskName(taskItem2);
             taskItem2.folder = this;
@@ -354,14 +356,14 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
 
         log.value(logPad + "   add item", taskItem2.id, 2);
         this.insertTaskFile(taskItem2, 0);
-        this.explorer.fireTreeRefreshEvent("   ", 1, this);
+        this.treeManager.fireTreeRefreshEvent("   ", 1, this);
     }
 
 
     private refresh(show: boolean, logPad = "")
     {
         let changed = false;
-        const tree = this.explorer.getTaskTree();
+        const tree = this.treeManager.getTaskTree();
         const empty = !tree || tree.length === 0 || (tree[0].contextValue === "noscripts" || tree[0].contextValue === "initscripts" || tree[0].contextValue === "loadscripts");
         log.methodStart("show special tasks", 1, logPad, false, [[ "is favorite", this.isFavorites ], [ "show", show ]]);
 
@@ -389,7 +391,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         }
 
         if (changed) {
-            this.explorer.fireTreeRefreshEvent(logPad + "   ", 1);
+            this.treeManager.fireTreeRefreshEvent(logPad + "   ", 1);
         }
 
         log.methodDone("show special tasks", 1, logPad);
@@ -409,7 +411,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
                 this.store.splice(idx, 1);
                 await storage.update(constants.LAST_TASKS_STORE, this.store);
             }
-            this.explorer.fireTreeRefreshEvent(logPad, 1, this);
+            this.treeManager.fireTreeRefreshEvent(logPad, 1, this);
         }
     }
 

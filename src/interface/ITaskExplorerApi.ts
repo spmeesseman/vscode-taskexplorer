@@ -1,21 +1,18 @@
 
+import ITaskTree from "./ITaskTree";
 import { ILog } from "./ILog";
 import { ITestsApi } from "./ITestsApi";
-import { ITaskExplorer } from "./ITaskExplorer";
 import { TreeItem, TreeView } from "vscode";
-import { IConfiguration } from "./IConfiguration";
 import { IExternalProvider } from "./IExternalProvider";
 import { ITaskExplorerProvider } from "./ITaskProvider";
 import { IDictionary } from "./IDictionary";
 
 export interface ITaskExplorerApi
 {
-    config: IConfiguration;
     log: ILog;
-    utilities: any;
-    explorer: ITaskExplorer | undefined;
+    explorer: ITaskTree | undefined;
     explorerView: TreeView<TreeItem> | undefined;
-    sidebar: ITaskExplorer | undefined;
+    sidebar: ITaskTree | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
     providers: IDictionary<ITaskExplorerProvider>;
     providersExternal: IDictionary<IExternalProvider>;

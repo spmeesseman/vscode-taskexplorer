@@ -11,12 +11,13 @@ import SpecialTaskFolder from "../../tree/specialFolder";
 import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
-import { IDictionary, ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITaskTree, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { expect } from "chai";
 
 const tc = utils.testControl;
 let teApi: ITaskExplorerApi;
-let explorer: ITaskExplorer;
+let explorer: ITaskTree;
+let testsApi: ITestsApi;
 let ant: ITaskItem[];
 let bash: ITaskItem[];
 let batch: ITaskItem[];
@@ -35,8 +36,7 @@ suite("Tree Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ teApi } = await utils.activate(this));
-        explorer = teApi.testsApi.explorer;
+        ({ teApi, testsApi, explorer } = await utils.activate(this));
         utils.endRollingCount(this, true);
     });
 
@@ -139,7 +139,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if(taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -165,7 +165,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if(taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -191,7 +191,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if(taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -217,7 +217,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if(taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -243,7 +243,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if(taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -269,7 +269,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if (taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
@@ -492,7 +492,7 @@ suite("Tree Tests", () =>
     test("Get Parent (Reveal API)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        const taskTree = explorer.getTaskTree() as ITaskFolder[];
+        const taskTree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
         expect(await explorer.getParent!(taskTree[0])).to.be.null; // Last Tasks
         expect(await explorer.getParent!(taskTree[1])).to.be.null; // Last Tasks
         expect(await explorer.getParent!(taskTree[2])).to.be.null; // Project Folder
@@ -506,7 +506,7 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         await executeSettingsUpdate("specialFolders.expanded.project1", false);
-        await explorer.refresh(undefined, undefined, "");
+        await testsApi.treeManager.refresh(undefined, undefined, "");
         await executeSettingsUpdate("specialFolders.expanded.project1", true);
         utils.endRollingCount(this);
     });

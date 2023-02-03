@@ -83,7 +83,7 @@ suite("Makefile Tests", () =>
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(join(testsName, "makefile")),
               fileUri = Uri.file(filePath);
-        const pathToMake = teApi.config.get<string>("pathToPrograms." + testsName, "nmake");
+        const pathToMake = teApi.testsApi.config.get<string>("pathToPrograms." + testsName, "nmake");
         try {
             await executeSettingsUpdate("pathToPrograms." + testsName, "nmake");
             provider.createTask("test", "test", rootWorkspace, fileUri, []);

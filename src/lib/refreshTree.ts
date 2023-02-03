@@ -1,18 +1,7 @@
 import { Uri } from "vscode";
-import { ITaskExplorerApi } from "../interface";
+import { getTaskTreeManager } from "../extension";
 
-
-export const refreshTree = async(teApi: ITaskExplorerApi, taskType: string | boolean | undefined, uri: Uri | false | undefined, logPad: string) =>
-{   //
-    // Refresh tree(s)
-    //
-    // Note the static task cache only needs to be refreshed once if both the explorer view
-    // and the sidebar view are being used and/or enabled
-    //
-    if (teApi.explorer) {
-        await teApi.explorer.refresh(taskType, uri, logPad);
-    }
-    if (teApi.sidebar) {
-        await teApi.sidebar.refresh(taskType, uri, logPad);
-    }
+export const refreshTree = async(taskType: string | boolean | undefined, uri: Uri | false | undefined, logPad: string) =>
+{
+    getTaskTreeManager().refresh(taskType, uri, logPad);
 };

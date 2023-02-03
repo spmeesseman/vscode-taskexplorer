@@ -9,14 +9,13 @@ import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
 import { TaskExecution } from "vscode";
-import { ITaskExplorer, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskTree, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView, focusSearchView } from "../utils/commandUtils";
 
 const tc = utils.testControl;
 const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.commands.standard * 2);
 
 let teApi: ITaskExplorerApi;
-let explorer: ITaskExplorer;
 let testsApi: ITestsApi;
 let lastTask: ITaskItem | null = null;
 let ant: ITaskItem[];
@@ -33,8 +32,8 @@ suite("Task Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ teApi, testsApi, explorer } = await utils.activate(this));
-        clickAction = teApi.config.get<string>("taskButtons.clickAction");
+        ({ teApi, testsApi } = await utils.activate(this));
+        clickAction = teApi.testsApi.config.get<string>("taskButtons.clickAction");
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         utils.endRollingCount(this, true);
     });
@@ -78,7 +77,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.run + tc.slowTime.storageUpdate);
-        const tree = explorer.getTaskTree() as ITaskFolder[];
+        const tree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         lastTasksFolder.clearTaskItems();
@@ -352,7 +351,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.run + (tc.slowTime.storageUpdate * 2));
-        const tree = explorer.getTaskTree() as ITaskFolder[];
+        const tree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
         const lastTasksStore = lastTasksFolder.getStore();
@@ -379,10 +378,10 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder + (tc.slowTime.config.event * 2));
-        const tree = explorer.getTaskTree() as ITaskFolder[];
+        const tree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
-        const maxLastTasks = teApi.config.get<number>("specialFolders.numLastTasks");
+        const maxLastTasks = teApi.testsApi.config.get<number>("specialFolders.numLastTasks");
         testsApi.enableConfigWatcher(false);
         await executeSettingsUpdate("specialFolders.numLastTasks", 6);
         try {
@@ -418,7 +417,7 @@ async function startTask(taskItem: TaskItem, addToSpecial: boolean)
         if (removed) {
             await executeTeCommand2("addRemoveFavorite", [ taskItem ]);
         }
-        const taskTree = explorer.getTaskTree();
+        const taskTree = testsApi.treeManager.getTaskTree();
         if (taskTree)
         {
             const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :

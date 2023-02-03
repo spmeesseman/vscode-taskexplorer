@@ -101,7 +101,7 @@ export class LicenseManager implements ILicenseManager
 					{
 						window.showInformationMessage("License key validated, thank you for your support!");
 						if (this.maxTasksReached) {
-							await refreshTree(this.teApi, true, false, "   ");
+							await refreshTree(true, false, "   ");
 						}
 					}
 				}
@@ -431,5 +431,63 @@ export class LicenseManager implements ILicenseManager
 			});
 		});
 	};
+
+	/*
+	async resendVerification(): Promise<boolean> {
+		if (this._subscription.account?.verified) return true;
+
+		const scope = getLogScope();
+
+		void this.showHomeView(true);
+
+		const session = await this.ensureSession(false);
+		if (session == null) return false;
+
+		try {
+			const rsp = await fetch(Uri.joinPath(this.baseApiUri, 'resend-email').toString(), {
+				method: 'POST',
+				agent: getProxyAgent(),
+				headers: {
+					Authorization: `Bearer ${session.accessToken}`,
+					'User-Agent': userAgent,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ id: session.account.id }),
+			});
+
+			if (!rsp.ok) {
+				debugger;
+				Logger.error(
+					'',
+					scope,
+					`Unable to resend verification email; status=(${rsp.status}): ${rsp.statusText}`,
+				);
+
+				void window.showErrorMessage(`Unable to resend verification email; Status: ${rsp.statusText}`, 'OK');
+
+				return false;
+			}
+
+			const confirm = { title: 'Recheck' };
+			const cancel = { title: 'Cancel' };
+			const result = await window.showInformationMessage(
+				"Once you have verified your email address, click 'Recheck'.",
+				confirm,
+				cancel,
+			);
+
+			if (result === confirm) {
+				await this.validate();
+				return true;
+			}
+		} catch (ex) {
+			Logger.error(ex, scope);
+			debugger;
+
+			void window.showErrorMessage('Unable to resend verification email', 'OK');
+		}
+
+		return false;
+	}*/
 
 }

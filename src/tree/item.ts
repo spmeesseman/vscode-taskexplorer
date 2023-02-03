@@ -11,6 +11,7 @@ import {
     Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command, Uri
 }
 from "vscode";
+import { getInstallPath, getInstallPathSync } from "../lib/utils/pathUtils";
 
 
 /**
@@ -21,7 +22,6 @@ from "vscode";
  */
 export default class TaskItem extends TreeItem implements ITaskItem
 {
-    public readonly context: ExtensionContext; // Note:  Making this field private bombs the types
     public readonly taskSource: string;
     public readonly isUser: boolean;
     readonly taskFile: TaskFile;
@@ -40,7 +40,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
     // public resourceUri?: Uri;
 
 
-    constructor(context: ExtensionContext, taskFile: TaskFile, task: Task, logPad: string)
+    constructor(taskFile: TaskFile, task: Task, logPad: string)
     {
         const taskDef = task.definition;
         const getDisplayName = (taskName: string): string =>
@@ -63,10 +63,6 @@ export default class TaskItem extends TreeItem implements ITaskItem
             [ "taskDef file name", taskDef.fileName ], [ "taskDef icon light", taskDef.icon ], [ "taskDef icon dark", taskDef.iconDark ],
             [ "taskDef script", taskDef.script ], [ "taskDef target", taskDef.target ], [ "taskDef path", taskDef.path ]
         ]);
-        //
-        // Save extension context, we need it in a few of the classes functions
-        //
-        this.context = context;
         //
         // Task group indicates the TaskFile group name (double check this???)
         //
@@ -170,7 +166,7 @@ export default class TaskItem extends TreeItem implements ITaskItem
         ]);
         log.value("id", this.id, logLevel + 1);
         this.setContextValue(this.task, isExecuting);
-        this.setIconPath(this.context, isExecuting);
+        this.setIconPath(isExecuting);
     }
 
 
@@ -210,22 +206,24 @@ export default class TaskItem extends TreeItem implements ITaskItem
     }
 
 
-    private setIconPath(context: ExtensionContext, running: boolean)
+    private setIconPath(running: boolean)
     {   //
         // Type "$empty" is a composite tasks
         //
+        const installPath = getInstallPathSync();
         if (running) // && task.definition.type !== "$empty")
         {
             const disableAnimated = configuration.get<boolean>("visual.disableAnimatedIcons");
             this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg")),
-                dark: context.asAbsolutePath(path.join("res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg"))
+                light: path.join(installPath, "res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg"),
+                dark: path.join(installPath, "res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg")
             };
-        } else
+        }
+        else
         {
             this.iconPath = {
-                light: context.asAbsolutePath(path.join("res", "light", "script.svg")),
-                dark: context.asAbsolutePath(path.join("res", "dark", "script.svg"))
+                light: path.join(installPath, "res", "light", "script.svg"),
+                dark: path.join(installPath, "res", "dark", "script.svg")
             };
         }
     }

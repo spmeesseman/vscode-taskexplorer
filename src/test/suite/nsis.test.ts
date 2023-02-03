@@ -73,7 +73,7 @@ suite("Nullsoft NSIS Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
-        // await teApi.config.updateWs("enabledTasks.nsis", false);
+        // await teApi.testsApi.config.updateWs("enabledTasks.nsis", false);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, 0);
         // await waitForTeIdle(testControl.waitTime.min);
@@ -85,7 +85,7 @@ suite("Nullsoft NSIS Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.config.enableEvent + testControl.waitTime.min);
-        // await teApi.config.updateWs("enabledTasks.nsis", true);
+        // await teApi.testsApi.config.updateWs("enabledTasks.nsis", true);
         // await waitForTeIdle(testControl.waitTime.config.enableEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);

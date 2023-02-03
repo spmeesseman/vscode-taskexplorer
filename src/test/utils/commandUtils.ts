@@ -6,7 +6,7 @@ let explorerHasFocused = false;
 
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
-    const rc = await teApi.config.updateWs(key, value);
+    const rc = await teApi.testsApi.config.updateWs(key, value);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
@@ -15,7 +15,7 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 
 export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
+    commands.executeCommand(`vscode-taskexplorer.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
 };
@@ -26,7 +26,7 @@ export const executeTeCommand2Async = (command: string, args: any[], minWait?: n
 
 export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    const rc = await commands.executeCommand(`${getCmdGroup(command)}.${command}`, ...args);
+    const rc = await commands.executeCommand(`vscode-taskexplorer.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
@@ -61,20 +61,6 @@ export const focusSearchView = () => commands.executeCommand("workbench.view.sea
 
 
 export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
-
-
-const getCmdGroup = (command: string) =>
-{
-    let cmdGroup = "taskExplorer";        // Tree command
-    if (command === "addToExcludesEx" || command === "enterLicense" || command === "getApi" ||
-        command === "disableTaskType" || command === "getLicense" || command === "enableTaskType" ||
-        command === "removeFromExcludes" || command === "showOutput" || command === "viewLicense" ||
-        command === "viewReleaseNotes" || command === "viewReport")
-    {
-        cmdGroup = "vscode-taskexplorer"; // Global command
-    }
-    return cmdGroup;
-};
 
 
 export const hasExplorerFocused = () => explorerHasFocused;

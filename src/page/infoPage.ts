@@ -5,6 +5,8 @@ import TeWebviewPanel from "./teWebviewPanel";
 import { ITaskExplorerApi } from "../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../lib/utils/utils";
+import TaskTree from "../tree/tree";
+import { TaskTreeManager } from "../tree/treeManager";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
@@ -29,7 +31,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 
 	if (explorer)
 	{
-		const tasks = explorer.getTasks() // Filter out 'User' tasks for project/folder reports
+		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
 							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
 		html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
