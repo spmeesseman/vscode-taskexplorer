@@ -51,8 +51,8 @@
     "activationEvents": [
         "onView:taskExplorer",
         "onView:taskExplorerSideBar",
-		"onView:taskExplorer.views.home",
-		"onView:taskExplorer.views.taskCount"
+        "onView:taskExplorer.views.home",
+        "onView:taskExplorer.views.taskCount"
     ],
     "preview": false,
     "pricing": "Trial",

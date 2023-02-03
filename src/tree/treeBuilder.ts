@@ -87,11 +87,6 @@ export default class TaskTreeBuilder implements Disposable
         log.methodStart("build task tree", logLevel, logPad);
 
         //
-        // Set a busy flag for all external functions
-        //
-        TaskTreeBuilder.treeBuilding = true;
-
-        //
         // The 'Last Tasks' folder will be 1st in the tree
         //
         this.specialFolders.lastTasks.clearTaskItems();
@@ -142,7 +137,6 @@ export default class TaskTreeBuilder implements Disposable
         // Done!
         //
         log.methodDone("build task tree", logLevel, logPad);
-        TaskTreeBuilder.treeBuilding = false;
 
         return sortedFolders;
     };
@@ -243,20 +237,13 @@ export default class TaskTreeBuilder implements Disposable
 
     createTaskItemTree = async(logPad: string, logLevel: number) =>
     {
-        statusBarItem.show();
-
         log.methodStart("create task tree", logLevel, logPad);
-
-        //
-        // Instantiate/construct the ui tree
-        //
+        TaskTreeBuilder.treeBuilding = true;
+        statusBarItem.show();
         this.taskTree = await this.buildTaskItemTree(logPad + "   ", logLevel + 1);
-
-        //
-        // All done...
-        //
         statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
+        TaskTreeBuilder.treeBuilding = false;
         log.methodDone("create task tree", logLevel, logPad, [[ "current task count", this.treeManager.getTasks().length ]]);
     };
 
