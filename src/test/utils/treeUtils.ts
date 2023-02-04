@@ -108,27 +108,22 @@ export const refresh = async(instance?: any) =>
 
 
 
-export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, taskMap?: TaskMap) =>
+export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, retries = 2) =>
 {
-    taskMap = taskMap || getTeApi().testsApi.treeManager.getTaskMap();
+    let taskMap = getTeApi().testsApi.treeManager.getTaskMap();
     const _getCount = async() =>
     {
-        let tasksMap = taskMap;
-        if (!tasksMap || isObjectEmpty(tasksMap)) {
+        if (!taskMap || isObjectEmpty(taskMap)) {
             await refresh();
-            tasksMap = getTeApi().testsApi.treeManager.getTaskMap();
+            taskMap = getTeApi().testsApi.treeManager.getTaskMap();
         }
-        return findIdInTaskMap(`:${taskType}:`, tasksMap);
+        return findIdInTaskMap(`:${taskType}:`, taskMap);
     };
+    let retry = 0;
     let taskCount = await _getCount();
-    if (taskCount !== expectedCount)
-    {
-        try {
-            const msg = `Found ${taskCount} of ${expectedCount} expected tasks in Tree, trying 'Verify Task Count'`;
-            console.log(`    ${figures.color.warning} ${figures.withColor(msg, figures.colors.grey)}`);
-            taskCount = await verifyTaskCount(taskType, expectedCount, 2);
-        }
-        catch {}
+    while (expectedCount !== taskCount && ++retry <= retries) {
+        await sleep(300);
+        taskCount = await _getCount();
     }
     expect(taskCount).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };
