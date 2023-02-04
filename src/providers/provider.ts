@@ -21,18 +21,15 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
 
 
     public cachedTasks: Task[] | undefined;
-    public invalidating = false;
     public providerName = "***";
     public readonly isExternal = false;
     public static logPad = "";
-    private queue: Uri[];
     protected callCount = 0;
     protected logQueueId: string | undefined;
 
 
     constructor(name: string) {
         this.providerName = name;
-        this.queue = [];
     }
 
 
@@ -132,6 +129,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
 
     public async invalidate(uri?: Uri, logPad?: string): Promise<void>
     {
+        const cachedTasks = this.cachedTasks as Task[];
         //
         // Note that 'taskType' may be different than 'this.providerName' for 'script' type tasks (e.g.
         // batch, bash, python, etc...)
@@ -141,65 +139,42 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
             [ "current # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
         ]);
 
-        //
-        // All of a sudden the queue is no longer filling up.  I think it's from removing the try/catch
-        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23.
-        // 1/15 - Nope, it's not that. Hmmmm...
-        //
-        /* istanbul ignore if */
-        if (uri && this.invalidating) {
-            this.queue.push(uri);
-            return;
-        }
-        this.invalidating = true;
-
-        if (this.cachedTasks)
+        const enabled = isTaskTypeEnabled(this.providerName);
+        if (enabled && uri)
         {
-            const enabled = isTaskTypeEnabled(this.providerName);
-            if (enabled && uri)
+            const pathExists = pathExistsSync(uri.fsPath) && !!workspace.getWorkspaceFolder(uri) ;
+            //
+            // Remove tasks of type '' from the 'tasks'array
+            //
+            cachedTasks.slice().reverse().forEach((item, index, object) =>
             {
-                const pathExists = pathExistsSync(uri.fsPath) && !!workspace.getWorkspaceFolder(uri) ;
-                //
-                // Remove tasks of type '' from the 'tasks'array
-                //
-                this.cachedTasks.slice().reverse().forEach((item, index, object) =>
+                if (this.needsRemoval(item, uri) && (item.source !== "Workspace" || /* istanbul ignore next */item.definition.type === this.providerName))
                 {
-                    if (this.needsRemoval(item, uri) && (item.source !== "Workspace" || /* istanbul ignore next */item.definition.type === this.providerName))
-                    {
-                        log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
-                        (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
-                    }
-                });
-
-                //
-                // Check `excludes` for exact path which would have been entered via the context menu in
-                // the the tree ui.  The check for excluded path patterns also found in the `excludes` array
-                // is done by the file caching layer.
-                //
-                if (pathExists && !isDirectory(uri.fsPath) && !configuration.get<string[]>("exclude", []).includes(uri.path))
-                {
-                    const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
-                    //
-                    // If the implementation of the readUri() method awaits, it can theoretically reset
-                    // this.cachedTasks under certain circumstances via invalidation by the tree that's
-                    // called into by the main VSCode thread. So ensure it's defined before the push()...
-                    //
-                    /* istanbul ignore next */
-                    this.cachedTasks?.push(...tasks);
+                    log.write(`   removing cached task '${item.source}/${item.name}'`, 4, logPad);
+                    (this.cachedTasks as Task[]).splice(object.length - 1 - index, 1);
                 }
+            });
 
-                this.cachedTasks = this.cachedTasks && this.cachedTasks.length > 0 ? this.cachedTasks : undefined;
+            //
+            // Check `excludes` for exact path which would have been entered via the context menu in
+            // the the tree ui.  The check for excluded path patterns also found in the `excludes` array
+            // is done by the file caching layer.
+            //
+            if (pathExists && !isDirectory(uri.fsPath) && !configuration.get<string[]>("exclude", []).includes(uri.path))
+            {
+                const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
+                cachedTasks.push(...tasks);
             }
-            else {
-                this.cachedTasks = undefined;
-            }
+
+            this.cachedTasks = cachedTasks.length > 0 ? cachedTasks : undefined;
+        }
+        else {
+            this.cachedTasks = undefined;
         }
 
         log.methodDone(`invalidate ${this.providerName} tasks cache`, 1, logPad, [
             [ "new # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
         ]);
-        this.invalidating = false;
-        await this.processQueue();
     }
 
 
@@ -220,18 +195,6 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
                  (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* istanbul ignore next */!extname(uri.fsPath) /* ouch */) ||
                  //
                  !isTaskIncluded(item, cstDef.uri.path)));
-    }
-
-
-    private async processQueue()
-    {   //
-        // Allof a sudden the queue is no longer filling up.I think it's from removing the try/catch
-        // in Tree.ts.getChildren() around the buildTaskTree() call.  ~ line 932 as of 1/9/23
-        //
-        /* istanbul ignore if */
-        if (this.queue.length > 0) {
-            await this.invalidate(this.queue.shift());
-        }
     }
 
 }
