@@ -260,7 +260,7 @@ export const testControl: ITestControl =
             batchScriptBat: 4550,
             batchScriptCmd: 5650,
             gulpParser: 4300,
-            npmCommand: 9600,
+            npmCommand: 9650,
             npmCommandPkg: 8200,
             npmInstallCommand: 10400
         },
@@ -338,53 +338,53 @@ export const testControl: ITestControl =
     {   //
         // MINIMUM WAIT TIMES
         //
-        addWorkspaceFolder: 565,
-        blurCommand: 250,
-        command: 115,
-        commandFast: 70,
+        addWorkspaceFolder: 465,
+        blurCommand: 210,
+        command: 100,
+        commandFast: 65,
         config: {
-            event: 120,
+            event: 105,
             eventFast: 65,
-            excludesEvent: 160,
-            excludeTasksEvent: 250,
-            disableEvent: 170,
-            enableEvent: 195,
-            globEvent: 175,
-            groupingEvent: 155,
-            pathToProgramsEvent: 190,
-            registerExplorerEvent: 205,
-            shellChange: 130,
-            showHideSpecialFolder: 150,
-            showHideUserTasks: 160,
-            sortingEvent: 150
+            excludesEvent: 140,
+            excludeTasksEvent: 210,
+            disableEvent: 150,
+            enableEvent: 165,
+            globEvent: 150,
+            groupingEvent: 135,
+            pathToProgramsEvent: 160,
+            registerExplorerEvent: 175,
+            shellChange: 115,
+            showHideSpecialFolder: 130,
+            showHideUserTasks: 140,
+            sortingEvent: 130
         },
-        explorerViewStartup: 3200,
-        focusCommand: 350,
+        explorerViewStartup: 2600,
+        focusCommand: 310,
         fs: {
-            createEvent: 500,
-            createFolderEvent: 565,
-            createEventTsc: 550,
-            deleteEvent: 485,
-            deleteEventTsc: 525,
-            deleteFolderEvent: 525,
-            modifyEvent: 475,
-            modifyEventTsc: 525
+            createEvent: 400,
+            createFolderEvent: 450,
+            createEventTsc: 425,
+            deleteEvent: 385,
+            deleteEventTsc: 425,
+            deleteFolderEvent: 425,
+            modifyEvent: 375,
+            modifyEventTsc: 420
         },
         getTreeTasks: 80,
         licenseMgr: {
-            get30DayLicense: 300
+            get30DayLicense: 290
         },
         max: 15000,
-        min: 55,
-        npmCommandMin: 1700,
-        refreshCommand: 225,
-        refreshCommandNoChanges: 115,
-        refreshTaskTypeCommand: 200,
-        removeWorkspaceFolder: 500,
-        reorderWorkspaceFolders: 150,
-        runCommandMin: 775,
-        taskCommand: 700,
-        viewReport: 130
+        min: 50,
+        npmCommandMin: 1400,
+        refreshCommand: 190,
+        refreshCommandNoChanges: 105,
+        refreshTaskTypeCommand: 175,
+        removeWorkspaceFolder: 425,
+        reorderWorkspaceFolders: 130,
+        runCommandMin: 650,
+        taskCommand: 525,
+        viewReport: 120
     }
 };
 
