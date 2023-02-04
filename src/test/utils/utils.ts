@@ -560,15 +560,14 @@ export const waitForTeIdle = async (minWait = 1, maxWait = 15000) =>
     let waited = 0;
     const _wait = async (iterationsIdle: number) =>
     {
-        // let gotNotIdle = false;
-        while (((iterationsIdle < 3 && waited < minWait /* && !gotNotIdle */) || teApi.isBusy()) && waited < maxWait)
+        let iteration = 0;
+        while (((iteration < iterationsIdle && waited < minWait /* && !gotNotIdle */) || teApi.isBusy()) && waited < maxWait)
         {
             await sleep(20);
             waited += 20;
-            ++iterationsIdle;
+            ++iteration;
             if (teApi.isBusy()) {
-                // gotNotIdle = true;
-                iterationsIdle = 0;
+                iteration = 0;
             }
         }
     };
