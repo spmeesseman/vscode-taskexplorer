@@ -2,25 +2,27 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
+import fsUtils from "../../utils/fsUtils";
+import { join } from "path";
 import { refresh } from "../../utils/treeUtils";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";
 import { ExternalTaskProvider3 } from "./externalProvider3";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
-    activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished,
+    activate, endRollingCount, exitRollingCount, getProjectsPath, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../../utils/utils";
 
 let teApi: ITaskExplorerApi;
+let fsApi: IFilesystemApi;
 let dispose: Disposable;
 let dispose2: Disposable;
 let dispose3: Disposable;
+let insideWsDir: string;
+let outsideWsDir: string;
 let taskProvider: ExternalTaskProvider1;
 let taskProvider2: ExternalTaskProvider2;
 let taskProvider3: ExternalTaskProvider3;
@@ -32,7 +34,9 @@ suite("External Provider Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi } = await activate(this));
+        ({ fsApi, teApi } = await activate(this));
+        insideWsDir = getWsPath("tasks_test_");
+        outsideWsDir = getProjectsPath("testA");
         taskProvider = new ExternalTaskProvider1();
         taskProvider2 = new ExternalTaskProvider2();
         taskProvider3 = new ExternalTaskProvider3();
@@ -49,6 +53,8 @@ suite("External Provider Tests", () =>
         dispose?.dispose();
         dispose2?.dispose();
         dispose3?.dispose();
+        await fsUtils.deleteDir(insideWsDir);
+        await fsUtils.deleteDir(outsideWsDir);
         suiteFinished(this);
     });
 
@@ -184,6 +190,28 @@ suite("External Provider Tests", () =>
         await teApi.unregister("external2", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external2", 0);
+        endRollingCount(this);
+    });
+
+
+    test("Add a Non-Empty Folder to Workspace Folder", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow((testControl.slowTime.fs.createFolderEvent * 2) + testControl.slowTime.fs.createEvent + (testControl.slowTime.taskCount.verify * 2));
+        await fsUtils.createDir(outsideWsDir);
+        await fsUtils.createFile(join(outsideWsDir, "Somefile.js"), "a = {\na: b\n};\n");
+        await fsApi.copyDir(outsideWsDir, insideWsDir, /Somefile\.js/, true); // copy folder
+        await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
+        endRollingCount(this);
+    });
+
+
+    test("Delete New Non-Empty Folder", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
+        await fsUtils.deleteDir(join(insideWsDir, "testA"));
+        await waitForTeIdle(testControl.waitTime.fs.deleteFolderEvent);
         endRollingCount(this);
     });
 

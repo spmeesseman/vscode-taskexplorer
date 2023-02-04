@@ -93,7 +93,6 @@ export async function addFolder(folder: Uri, logPad: string)
                 const dspTaskType = taskTypeUtils.getTaskTypeFriendlyName(providerName);
                 statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`);
 
-                /* istanbul ignore else */
                 if (!isExternal)
                 {
                     let numFilesAdded = 0;
@@ -129,7 +128,7 @@ export async function addFolder(folder: Uri, logPad: string)
                     log.write(`   finished adding new directory to '${providerName}' file cache`, 3, logPad);
                 }
                 else {
-                    await util.timeout(150);
+                    await util.timeout(50);
                 }
             }
         }
