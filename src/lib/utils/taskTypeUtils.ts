@@ -45,6 +45,11 @@ export function getTaskTypes()
         "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc", "webpack",  "Workspace"
     ];
 }
+// Will bomb because we reference the fn in runTest. Just keep a static list i guess.  leaving commented for now...
+// export function getTaskTypes(includeExternal = false)
+// {
+//     return [ ...Object.keys(providers).filter(k => includeExternal || !providers[k].isExternal), ...getWatchTaskTypes() ];
+// }
 
 
 export function getTaskTypeFriendlyName(taskType: string, lowerCase = false)
