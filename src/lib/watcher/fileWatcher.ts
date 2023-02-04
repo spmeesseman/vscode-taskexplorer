@@ -98,18 +98,21 @@ export function disposeFileWatchers()
 }
 
 
+const isSameEvent = (q: any[], kind: string, uri: Uri) => q.find(e => e.event === kind && e.fsPath === uri.fsPath);
+
+
 const eventNeedsToBeQueued = (eventKind: string, uri: Uri) =>
 {
     let needs = true;
     if (eventKind === "modify file") // only check the queue for 'modify', not the current event
     {
-        needs = !eventQueue.find(e => e.event === eventKind && e.fsPath === uri.fsPath);
+        needs = !isSameEvent(eventQueue, eventKind, uri);
     }
     else if (eventKind === "create file")
     {
         const events = [ currentEvent, ...eventQueue ];
         needs = !events.find(e => e.event === "create directory" && uri.fsPath.startsWith(e.fsPath)) &&
-                !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+                !isSameEvent(events, eventKind, uri);
     }
     //
     // VSCode doesn't trigger file delete event when a dir is deleted
@@ -121,7 +124,7 @@ const eventNeedsToBeQueued = (eventKind: string, uri: Uri) =>
     // }
     else {
         const events = [ currentEvent, ...eventQueue ];
-        needs = !events.find(e => e.event === eventKind && uri.fsPath === e.fsPath);
+        needs = !isSameEvent(events, eventKind, uri);
     }
     return needs;
 };
@@ -216,10 +219,7 @@ const onFileChange = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileChangeEvent(taskType, uri, "");
         }
-        else if (eventNeedsToBeQueued(e.event, uri))
-        {
-            eventQueue.push(e);
-        }
+        else { queueEventIfNeeded(e, uri); }
     }
 };
 
@@ -239,10 +239,7 @@ const onFileCreate = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileCreateEvent(taskType, uri, "");
         }
-        else if (eventNeedsToBeQueued(e.event, uri))
-        {
-            eventQueue.push(e);
-        }
+        else { queueEventIfNeeded(e, uri); }
     }
 };
 
@@ -262,10 +259,7 @@ const onFileDelete = async(taskType: string, uri: Uri) =>
             currentEvent = e;
             await _procFileDeleteEvent(taskType, uri, "");
         }
-        else if (eventNeedsToBeQueued(e.event, uri))
-        {
-            eventQueue.push(e);
-        }
+        else { queueEventIfNeeded(e, uri); }
     }
 };
 
@@ -381,6 +375,15 @@ const processQueue = async () =>
     }
     else {
         currentEvent = undefined;
+    }
+};
+
+
+const queueEventIfNeeded = (e: any, uri: Uri) =>
+{
+    if (eventNeedsToBeQueued(e.event, uri))
+    {
+        eventQueue.push(e);
     }
 };
 

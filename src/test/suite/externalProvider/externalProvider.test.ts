@@ -5,6 +5,7 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
+import { refresh } from "../../utils/treeUtils";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";
@@ -183,6 +184,16 @@ suite("External Provider Tests", () =>
         await teApi.unregister("external2", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external2", 0);
+        endRollingCount(this);
+    });
+
+
+    test("Refresh Tree", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.commands.refresh + testControl.slowTime.taskCount.verify);
+        await refresh();
+        await verifyTaskCount("external3", 2);
         endRollingCount(this);
     });
 

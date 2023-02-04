@@ -204,36 +204,19 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
 function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 {
     log.methodStart("add item to mappings", 4, logPad, false, [[ "task type", taskType ], [ "file", item.uri.fsPath ]]);
-
     initMaps(taskType, item.project);
-    const added = {
-        c1: 0, c2: 0
-    };
-
+    const added = { c1: 0, c2: 0 };
     if (!taskFilesMap[taskType].find(i => i.uri.fsPath.toLowerCase() === item.uri.fsPath.toLowerCase()))
     {
         taskFilesMap[taskType].push(item);
         ++added.c1;
     }
-
     if (!projectFilesMap[item.project][taskType].find(fsPath => fsPath.toLowerCase() === item.uri.fsPath.toLowerCase()))
     {
         projectFilesMap[item.project][taskType].push(item.uri.fsPath);
         ++added.c2;
     }
-
-    log.values(4, logPad + "      ", [[ "cache1 count", added.c1 ], [ "cache2 count", added.c2 ]]);
-
-    /* istanbul ignore else */
-    if (added.c1 > 0)
-    {
-        log.value("   added to cache", item.uri.fsPath, 4, logPad);
-    }
-    else {
-        log.write("   already exists in cache", 4, logPad);
-    }
-
-    log.methodDone("add item to mappings", 4, logPad);
+    log.methodDone("add item to mappings", 4, logPad, [[ "items added", added.c1 ], [ "counts equal", added.c1 === added.c2 ]]);
     return added.c1;
 }
 
@@ -294,7 +277,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         }
         catch (e: any) { /* istanbul ignore next */ log.error(e); }
     }
-    else /* istanbul ignore next */if (isExternal) {
+    else if (isExternal) {
         await util.timeout(150);
     }
 
@@ -719,23 +702,13 @@ function removeFromMappings(taskType: string, uri: Uri | WorkspaceFolder | undef
         });
     }
 
-    log.values(4, logPad + "   ", [[ "cache1 rmv count", removed.c1 ], [ "cache2 rmv count", removed.c2 ]]);
-
-    /* istanbul ignore else */
     if (uri === undefined && taskFilesMap[taskType])
     {
         log.write("   clear task files map", 4, logPad);
         taskFilesMap[taskType] = [];
     }
-    else if (folderUri && removed.c2 > 0)
-    {
-        log.value("   removed from cache", folderUri.fsPath, 4, logPad);
-    }
-    else if (folderUri) {
-        log.write("   doesnt exist in cache", 4, logPad);
-    }
 
-    log.methodDone("remove item from mappings", 3, logPad);
+    log.methodDone("remove item from mappings", 4, logPad, [[ "items added", removed.c2 ], [ "counts equal", removed.c1 === removed.c2 ]]);
     return removed.c2;
 }
 
