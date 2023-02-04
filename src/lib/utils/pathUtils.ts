@@ -94,16 +94,11 @@ export const getUserDataPath = (platform?: string, padding = "") =>
     //
     // Check if data path was passed on the command line
     //
-    /* istanbul ignore else */
-    if (process.argv)
-    {
-        let argvIdx = process.argv.includes("--user-data-dir");
-        /* istanbul ignore next */
-        if (argvIdx !== false && typeof argvIdx === "number" && argvIdx >= 0 && argvIdx < process.argv.length) {
-            userPath = resolve(process.argv[++argvIdx]);
-            log.value(padding + "user path is", userPath, 4);
-            return userPath;
-        }
+    let argvIdx = process.argv.indexOf("--user-data-dir");
+    if (argvIdx !== -1) {
+        userPath = resolve(process.argv[++argvIdx]);
+        log.value(padding + "user path is", userPath, 4);
+        return userPath;
     }
     //
     // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
@@ -132,7 +127,6 @@ const getDefaultUserDataPath = (platform?: string) =>
     //
     if (!appDataPath)
     {
-        /* istanbul ignore next */
         switch (platform || process.platform)
         {
             case "win32":
