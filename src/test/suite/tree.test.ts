@@ -502,9 +502,10 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Get Parent (Reveal API)", async function()
+    test("Project Folder State Collapsed", async function()
     {
         if (utils.exitRollingCount(this)) return;
+        this.slow((tc.slowTime.config.event * 2) + tc.slowTime.commands.refreshNoChanges);
         await executeSettingsUpdate("specialFolders.folderState.project1", "Collapsed");
         await testsApi.treeManager.refresh(undefined, undefined, "");
         await executeSettingsUpdate("specialFolders.folderState.project1", "Expanded");

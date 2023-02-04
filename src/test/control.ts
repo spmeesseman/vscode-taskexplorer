@@ -68,10 +68,10 @@ export const testControl: ITestControl =
     slowTime: {
         cache: {
             build: 480,
-            buildCancel: 300,
+            buildCancel: 305,
             persist: 245,
             rebuild: 3825,
-            rebuildCancel: 500,
+            rebuildCancel: 510,
             rebuildNoChanges: 880,
         },
         cleanup: 320,
@@ -162,11 +162,11 @@ export const testControl: ITestControl =
         viewReleaseNotes: 415,
         viewReport: 380,
         wsFolder: {
-            add: 1600,
+            add: 1625,
             addEmpty: 1500,
             remove: 550,
             removeEmpty: 475,
-            reorder: 450
+            reorder: 505
         }
     },
     //
