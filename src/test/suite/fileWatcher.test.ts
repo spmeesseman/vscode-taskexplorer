@@ -13,10 +13,10 @@ import { getLicenseManager } from "../../extension";
 const tc = utils.testControl;
 const startTaskCountBash = 1;
 const startTaskCountBatch = 2;
-const startTaskCountNpm = 17;
 const startTaskCountGrunt = 7;
 const startTaskCountGulp = 17;
 const startTaskCountWs = 13; // 10 + 3 User Tasks
+let startTaskCountNpm = 2;  // set in suiteSetup() as it will change depending on single or multi root ws
 let fsApi: IFilesystemApi;
 let configApi: IConfiguration;
 let insideWsDir: string;
@@ -35,6 +35,7 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this, true)) return;
         ({ fsApi, configApi } = await utils.activate(this));
+        startTaskCountNpm = tc.isMultiRootWorkspace ? 17 : 2;
         rootPath = utils.getWsPath(".");
         insideWsDir = join(rootPath, "tasks_test_");
         insideWsDir2 = join(rootPath, "tasks_test2_");

@@ -347,7 +347,7 @@ const checkTaskCounts = async (instance?: Mocha.Context) =>
     }
     await utils.verifyTaskCount("bash", 1);
     await utils.verifyTaskCount("batch", 2);
-    await utils.verifyTaskCount("npm", 17);
+    await utils.verifyTaskCount("npm", tc.isMultiRootWorkspace ? 17 : 2);
     await utils.verifyTaskCount("grunt", 7);
     await utils.verifyTaskCount("gulp", 17);
     await utils.verifyTaskCount("Workspace", 13); // 10 + 3 User Tasks

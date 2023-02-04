@@ -106,8 +106,8 @@ suite("NPM Tests", () =>
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
-        // tagLog("NPM", "Get NPM Task Items [DoWorkSon]"); / -1 for install task not in tree
-        npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, startTaskCount - 1 + 2) as TaskItem[];
+        // tagLog("NPM", "Get NPM Task Items [DoWorkSon]"); / -1 for install task not in tree for multi-root ws
+        npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, startTaskCount - (tc.isMultiRootWorkspace ? 1 : 0) + 2) as TaskItem[];
         // tagLog("NPM", "Get NPM Task Items [Complete]");
         utils.endRollingCount(this);
     });

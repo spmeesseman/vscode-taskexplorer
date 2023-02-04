@@ -500,6 +500,7 @@ suite("Tree Tests", () =>
         expect(await explorer.getParent!(batch[0].taskFile)).to.not.be.null;
         expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[0])).to.not.be.null;
         expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[1])).to.not.be.null;
+        expect(explorer.getName()).to.be.oneOf([ "taskExplorer", "taskExplorerSideBar" ]);
         utils.endRollingCount(this);
     });
 
