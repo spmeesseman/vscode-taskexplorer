@@ -234,6 +234,14 @@
             ],
             "taskActivity": [
                 {
+					"type": "webview",
+					"id": "taskExplorer.views.home",
+					"name": "Home",
+					"contextualTitle": "TaskExplorer",
+                    "icon": "res/gears-r.svg",
+					"visibility": "collapsed"
+				},
+                {
                     "type": "tree",
                     "id": "taskExplorerSideBar",
                     "name": "Explorer",
@@ -241,7 +249,16 @@
 					"contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
                     "visibility": "visible"
-                }
+                },
+                {
+					"type": "webview",
+					"id": "taskExplorer.views.taskCount",
+					"name": "Task Count",
+                    "when": "config.taskExplorer.enableSideBar",
+					"contextualTitle": "TaskExplorer",
+					"icon": "$(gitlens-gitlens)",
+					"visibility": "collapsed"
+				}
             ]
         },
         "commands": [
@@ -307,13 +324,21 @@
             },
             {
                 "command": "vscode-taskexplorer.clearFavorites",
-                "title": "CLR",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "title": "%command.clearFavorites%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/clear.svg",
+                    "dark": "res/dark/clear.svg"
+                }
             },
             {
                 "command": "vscode-taskexplorer.clearLastTasks",
-                "title": "CLR",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "title": "%command.clearLastTasks%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/light/clear.svg",
+                    "dark": "res/dark/clear.svg"
+                }
             },
             {
                 "command": "vscode-taskexplorer.addRemoveCustomLabel",
