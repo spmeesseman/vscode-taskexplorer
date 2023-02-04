@@ -65,7 +65,7 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
         relPath = relPath.substring(0, relPath.length - 1);
     }
 
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     if (taskItem.taskFile.folder.workspaceFolder)
     {
         const lblString = taskItem.task.name;
@@ -73,15 +73,13 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
                         " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
         term = check(taskName);
 
-        /* istanbul ignore if */
-        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
+        if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString +
@@ -89,14 +87,12 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
         if (!term)
         {
             taskName = taskItem.taskSource + ": " + lblString +
@@ -104,32 +100,28 @@ export const getTerminal = (taskItem: TaskItem, logPad = ""): Terminal | undefin
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
-        if (!term && /* istanbul ignore next */ taskItem.taskSource === "Workspace")
+        if (!term && taskItem.taskSource === "Workspace")
         {
             taskName = "npm: " + lblString +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
-        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
+        if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
-        if (!term && /* istanbul ignore next */ lblString.indexOf("(") !== -1)
+        if (!term && lblString.indexOf("(") !== -1)
         {
             taskName = taskItem.taskSource + ": " + lblString.substring(0, lblString.indexOf("(")).trim() +
                        (relPath ? " - " : "") + relPath + " (" + taskItem.taskFile.folder.workspaceFolder.name + ")";
             term = check(taskName);
         }
 
-        /* istanbul ignore if */
-        if (!term && /* istanbul ignore next */ relPath)
+        if (!term && relPath)
         {
             const folder = taskItem.getFolder();
             if (folder) {
