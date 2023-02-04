@@ -1,14 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import constants from "../../lib/constants";
-import { getRelativePath } from "../../lib/utils/pathUtils";
+import constants from "../../../lib/constants";
+import { getDevPath } from "../../utils/sharedUtils";
+import { getRelativePath } from "../../../lib/utils/pathUtils";
+import { IExternalProvider, ITaskDefinition } from "../../../interface";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, TaskGroup } from "vscode";
-import { IExternalProvider, ITaskDefinition } from "../../interface";
-import { getDevPath } from "../utils/sharedUtils";
 
 
-export class ExternalTaskProviderBase extends IExternalProvider implements IExternalProvider
+export class ExternalTaskProvider2 extends IExternalProvider implements IExternalProvider
 {
     public override providerName = "external2";
 

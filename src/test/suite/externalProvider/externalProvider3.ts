@@ -13,7 +13,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider extends IExternalProvider implements IExternalProvider
+export class ExternalTaskProvider3 extends IExternalProvider implements IExternalProvider
 {
     public override providerName = "external3";
 

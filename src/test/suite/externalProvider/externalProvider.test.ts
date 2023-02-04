@@ -5,21 +5,24 @@
 //
 // Documentation on https://mochajs.org/ for help.
 //
-import { executeTeCommand } from "../utils/commandUtils";
-import { ExternalTaskProvider } from "./externalTaskProvider";
-import { ExternalTaskProviderBase } from "./externalTaskProviderBase";
+import { executeTeCommand } from "../../utils/commandUtils";
+import { ExternalTaskProvider1 } from "./externalProvider1";
+import { ExternalTaskProvider2 } from "./externalProvider2";
+import { ExternalTaskProvider3 } from "./externalProvider3";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount, waitForTeIdle
-} from "../utils/utils";
+} from "../../utils/utils";
 
 let teApi: ITaskExplorerApi;
 let dispose: Disposable;
 let dispose2: Disposable;
-let taskProvider: ExternalTaskProvider;
-let taskProvider2: ExternalTaskProviderBase;
+let dispose3: Disposable;
+let taskProvider: ExternalTaskProvider1;
+let taskProvider2: ExternalTaskProvider2;
+let taskProvider3: ExternalTaskProvider3;
 
 
 suite("External Provider Tests", () =>
@@ -29,10 +32,12 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi } = await activate(this));
-        taskProvider = new ExternalTaskProvider();
-        taskProvider2 = new ExternalTaskProviderBase();
+        taskProvider = new ExternalTaskProvider1();
+        taskProvider2 = new ExternalTaskProvider2();
+        taskProvider3 = new ExternalTaskProvider3();
         dispose = tasks.registerTaskProvider("external", taskProvider);
         dispose2 = tasks.registerTaskProvider("external2", taskProvider2);
+        dispose3 = tasks.registerTaskProvider("external3", taskProvider3);
         endRollingCount(this, true);
     });
 
@@ -42,6 +47,7 @@ suite("External Provider Tests", () =>
         if (exitRollingCount(this, false, true)) return;
         dispose?.dispose();
         dispose2?.dispose();
+        dispose3?.dispose();
         suiteFinished(this);
     });
 
@@ -81,9 +87,20 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
-        await teApi.register("external2", taskProvider, "");
+        await teApi.register("external2", taskProvider2, "");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
         await verifyTaskCount("external2", 2);
+        endRollingCount(this);
+    });
+
+
+    test("Register External Task Provider 3", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
+        await teApi.register("external3", taskProvider3, "");
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        await verifyTaskCount("external3", 2);
         endRollingCount(this);
     });
 
@@ -92,7 +109,7 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
-        const provider = teApi.providers.external as ExternalTaskProvider;
+        const provider = teApi.providers.external as ExternalTaskProvider1;
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         provider.resolveTask(task);
@@ -137,6 +154,17 @@ suite("External Provider Tests", () =>
     });
 
 
+    test("Refresh External Task Provider 3", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.commands.refreshNoChanges + testControl.slowTime.taskCount.verify);
+        await teApi.refreshExternalProvider("external3", "");
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        await verifyTaskCount("external3", 2);
+        endRollingCount(this);
+    });
+
+
     test("Unregister External Task Provider 1", async function()
     {
         if (exitRollingCount(this)) return;
@@ -155,6 +183,17 @@ suite("External Provider Tests", () =>
         await teApi.unregister("external2", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external2", 0);
+        endRollingCount(this);
+    });
+
+
+    test("Unregister External Task Provider 3", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
+        await teApi.unregister("external3", "");
+        await waitForTeIdle(testControl.waitTime.config.event);
+        await verifyTaskCount("external3", 0);
         endRollingCount(this);
     });
 

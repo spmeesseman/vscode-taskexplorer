@@ -1,10 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import constants from "../../lib/constants";
-import { getDevPath } from "../utils/sharedUtils";
-import { getRelativePath } from "../../lib/utils/pathUtils";
-import { IExternalProvider, ITaskDefinition } from "../../interface";
+import constants from "../../../lib/constants";
+import { getDevPath } from "../../utils/sharedUtils";
+import { getRelativePath } from "../../../lib/utils/pathUtils";
+import { IExternalProvider, ITaskDefinition } from "../../../interface";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 // import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
 //  Test bombs with this reference ^^^
@@ -13,7 +13,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider extends IExternalProvider implements IExternalProvider
+export class ExternalTaskProvider1 extends IExternalProvider implements IExternalProvider
 {
     public override providerName = "external";
 
