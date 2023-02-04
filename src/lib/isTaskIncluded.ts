@@ -2,8 +2,8 @@
 import log from "./log/log";
 import { join } from "path";
 import { Task } from "vscode";
+import { providers } from "../extension";
 import { readFileSync } from "./utils/fs";
-import { providersExternal } from "../extension";
 import { configuration } from "./utils/configuration";
 import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
 //
@@ -70,7 +70,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     // TODO - remove coverage ignore tags when external providers test suite can be done
     //
     /* istanbul ignore if */
-    if (providersExternal[task.source]) {
+    if (providers[task.source] && providers[task.source].isExternal) {
         return !!task.definition && !!task.name && !!task.execution;
     }
 

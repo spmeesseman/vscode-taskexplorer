@@ -38,6 +38,7 @@ import { TaskExplorerProvider } from "./providers/provider";
 import { registerStatusBarItem } from "./lib/statusBarItem";
 import { ILicenseManager } from "./interface/ILicenseManager";
 import { PowershellTaskProvider } from "./providers/powershell";
+import { ITaskExplorerProvider } from "./interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env } from "vscode";
@@ -46,8 +47,7 @@ import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } f
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
 
-export const providers: IDictionary<TaskExplorerProvider> = {};
-export const providersExternal: IDictionary<IExternalProvider> = {};
+export const providers: IDictionary<ITaskExplorerProvider> = {};
 
 let ready = false;
 let tests = false;
@@ -64,7 +64,6 @@ export const teApi: ITaskExplorerApi =
     isBusy,
     log,
     providers,
-    providersExternal,
     refreshExternalProvider,
     register: registerExternalProvider,
     sidebar: undefined,
@@ -404,7 +403,7 @@ function isBusy()
 
 async function refreshExternalProvider(providerName: string)
 {
-    if (providersExternal[providerName])
+    if (providers[providerName])
     {
         await refreshTree(providerName, undefined, "");
     }
@@ -431,7 +430,7 @@ function registerCommands(context: ExtensionContext)
 
 async function registerExternalProvider(providerName: string, provider: IExternalProvider, logPad: string)
 {
-    providersExternal[providerName] = provider;
+    providers[providerName] = provider;
     await refreshTree(providerName, undefined, logPad);
 }
 
@@ -478,6 +477,6 @@ function registerTaskProviders(context: ExtensionContext)
 
 async function unregisterExternalProvider(providerName: string, logPad: string)
 {
-    delete providersExternal[providerName];
+    delete providers[providerName];
     await refreshTree(providerName, undefined, logPad);
 }

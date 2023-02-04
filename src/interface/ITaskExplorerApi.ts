@@ -15,7 +15,6 @@ export interface ITaskExplorerApi
     sidebar: ITaskTree | undefined;
     sidebarView: TreeView<TreeItem> | undefined;
     providers: IDictionary<ITaskExplorerProvider>;
-    providersExternal: IDictionary<IExternalProvider>;
     testsApi: ITestsApi;
 
     isBusy(): boolean;

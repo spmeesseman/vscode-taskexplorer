@@ -10,6 +10,7 @@ export abstract class ITaskExplorerProvider implements TaskProvider
     abstract getGlobPattern(): string;
 
     public providerName = "external";
+    public readonly isExternal: boolean = false;
 
     provideTasks(): ProviderResult<Task[]>
     {

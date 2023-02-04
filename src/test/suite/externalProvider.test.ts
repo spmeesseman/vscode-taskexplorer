@@ -81,7 +81,7 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
-        const provider = teApi.providersExternal.external as ExternalTaskProvider;
+        const provider = teApi.providers.external as ExternalTaskProvider;
         const task = provider.createTask("test", "test", (workspace.workspaceFolders as WorkspaceFolder[])[0], Uri.file("dummy_path"));
         provider.getDocumentPosition("test_1_task_name", "test_1_task_name");
         provider.resolveTask(task);

@@ -9,7 +9,7 @@ import { storage } from "./utils/storage";
 import { configuration } from "./utils/configuration";
 import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
-import { getLicenseManager, providers, providersExternal } from "../extension";
+import { getLicenseManager, providers } from "../extension";
 import { workspace, RelativePattern, WorkspaceFolder, Uri, ExtensionContext, commands } from "vscode";
 
 
@@ -71,19 +71,19 @@ export async function addFolder(folder: Uri, logPad: string)
     {
         await startBuild();
 
-        const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+        const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providers).filter(k => providers[k].isExternal) ]).sort((a, b) => {
             return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
         });
 
         for (const providerName of taskProviders)
         {
-            const externalProvider = providersExternal[providerName];
-            if (!cancel && numFilesFound < numFiles && (externalProvider || util.isTaskTypeEnabled(providerName)))
+            const isExternal = providers[providerName] && providers[providerName].isExternal;
+            if (!cancel && numFilesFound < numFiles && (isExternal || util.isTaskTypeEnabled(providerName)))
             {
                 let glob;
                 if (!util.isWatchTask(providerName))
                 {
-                    const provider = providers[providerName] || /* istanbul ignore next */externalProvider;
+                    const provider = providers[providerName];
                     glob = provider?.getGlobPattern();
                 }
                 if (!glob) {
@@ -94,7 +94,7 @@ export async function addFolder(folder: Uri, logPad: string)
                 statusBarItem.update(`Scanning for ${dspTaskType} tasks in project ${wsFolder.name}`);
 
                 /* istanbul ignore else */
-                if (!providersExternal[providerName])
+                if (!isExternal)
                 {
                     let numFilesAdded = 0;
                     log.write(`   adding new directory to '${providerName}' file cache`, 2, logPad);
@@ -146,7 +146,7 @@ async function addWsFolder(folder: WorkspaceFolder, taskType: string, logPad: st
     let numFilesFound = 0;
     log.methodStart(`scan workspace project folder for ${taskType} tasks`, 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
-    const externalProvider = providersExternal[taskType];
+    const externalProvider = providers[taskType]  && providers[taskType].isExternal;
     if (!cancel && (externalProvider || util.isTaskTypeEnabled(taskType)))
     {
         log.value(`   building workspace project ${taskType} task file cache`, taskType, 3, logPad);
@@ -171,7 +171,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         await startBuild();
         if (!cancel)
         {
-            const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providersExternal) ]).sort((a, b) => {
+            const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providers).filter(k => providers[k].isExternal) ]).sort((a, b) => {
                 return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
             });
 
@@ -250,7 +250,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
     initMaps(taskType, folder.name);
 
-    const isExternal = providersExternal[taskType],
+    const isExternal = providers[taskType] && providers[taskType].isExternal,
           fsChanged = isFsChanged(taskType, folder.name),
           globChanged = isGlobChanged(taskType, fileGlob);
 
@@ -320,9 +320,7 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
     let glob;
     if (!util.isWatchTask(taskType))
     {
-        const externalProvider = providersExternal[taskType];
-        const provider = providers[taskType] || /* istanbul ignore next */externalProvider;
-        glob = provider.getGlobPattern();
+        glob = providers[taskType].getGlobPattern();
     }
     if (!glob) {
         glob = util.getGlobPattern(taskType);

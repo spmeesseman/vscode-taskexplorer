@@ -7,12 +7,13 @@ import { getLicenseManager } from "../extension";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
 import { isDirectory, pathExistsSync } from "../lib/utils/fs";
+import { Uri, Task, WorkspaceFolder, workspace } from "vscode";
+import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
-import { Uri, Task, WorkspaceFolder, TaskProvider, workspace } from "vscode";
 import { isExcluded, isTaskTypeEnabled, showMaxTasksReachedMessage } from "../lib/utils/utils";
 
 
-export abstract class TaskExplorerProvider implements TaskProvider
+export abstract class TaskExplorerProvider implements ITaskExplorerProvider
 {
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
@@ -22,6 +23,7 @@ export abstract class TaskExplorerProvider implements TaskProvider
     public cachedTasks: Task[] | undefined;
     public invalidating = false;
     public providerName = "***";
+    public readonly isExternal = false;
     public static logPad = "";
     private queue: Uri[];
     protected callCount = 0;

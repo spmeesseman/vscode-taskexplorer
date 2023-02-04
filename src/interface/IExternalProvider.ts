@@ -1,9 +1,10 @@
 
 import { commands, ProviderResult, Task, TaskProvider, Uri, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "./ITaskExplorerApi";
+import { ITaskExplorerProvider } from "./ITaskProvider";
 
 
-export abstract class IExternalProvider implements TaskProvider
+export abstract class IExternalProvider implements ITaskExplorerProvider
 {
     abstract getTasks(): ProviderResult<Task[]>;
     abstract invalidate(uri?: Uri, logPad?: string): Promise<void>;
@@ -12,11 +13,12 @@ export abstract class IExternalProvider implements TaskProvider
     abstract getGlobPattern(): string;
 
     public providerName = "external";
+    public readonly isExternal = true;
 
     async provideTasks()
     {
         const teApi = await commands.executeCommand<ITaskExplorerApi>("vscode-taskexplorer.getApi");
-        if (teApi.providersExternal[this.providerName])
+        if (teApi.providers[this.providerName])
         {
             return this.getTasks();
         }

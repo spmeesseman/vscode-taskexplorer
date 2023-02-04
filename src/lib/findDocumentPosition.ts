@@ -1,8 +1,8 @@
 
 import log from "./log/log";
-import { TextDocument } from "vscode";
 import TaskItem from "../tree/item";
-import { providers, providersExternal } from "../extension";
+import { TextDocument } from "vscode";
+import { providers } from "../extension";
 import { isWatchTask } from "./utils/utils";
 import { IDictionary } from "../interface";
 
@@ -64,7 +64,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     else if (!isWatchTask(taskItem.taskSource))
     {
         log.write("   find custom provider position", 2);
-        const provider = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
+        const provider = providers[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 

@@ -1,24 +1,22 @@
 
 import TaskFile from "./file";
 import TaskItem from "./item";
-import TaskTree from "./tree";
 import log from "../lib/log/log";
-import SpecialTaskFolder from "./specialFolder";
 import { dirname } from "path";
 import { TaskMap } from "../interface";
+import { providers } from "../extension";
 import { pathExists } from "../lib/utils/fs";
+import { TaskTreeManager } from "./treeManager";
 import { getTerminal } from "../lib/getTerminal";
 import { ScriptTaskProvider } from "../providers/script";
 import { configuration } from "../lib/utils/configuration";
 import { isScriptType } from "../lib/utils/taskTypeUtils";
 import { getPackageManager, timeout } from "../lib/utils/utils";
-import { providers, providersExternal } from "../extension";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import {
     CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
     TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace, WorkspaceFolder
 } from "vscode";
-import { TaskTreeManager } from "./treeManager";
 
 // const views: IDictionary<any> = {};
 
@@ -189,7 +187,7 @@ export const run = async(taskItem: TaskItem, noTerminal = false, withArgs = fals
             //
             const def = newTask.definition,
                   folder = taskItem.getFolder(),
-                  p = providers[def.type] || /* istanbul ignore next */providersExternal[def.type];
+                  p = providers[def.type];
             /* istanbul ignore else */
             if (folder && p)
             {
