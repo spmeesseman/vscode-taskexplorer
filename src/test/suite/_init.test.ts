@@ -19,8 +19,6 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, testsApi } = await activate(this));
-        testsApi.enableConfigWatcher(false);
-        testsApi.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
 
@@ -28,8 +26,6 @@ suite("Initialization", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        testsApi.enableConfigWatcher(false);
-        testsApi.enableConfigWatcher(true);
         await closeEditors();
         suiteFinished(this);
     });
@@ -38,11 +34,11 @@ suite("Initialization", () =>
     test("Show/Hide Output Window", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow((tc.slowTime.commands.showOutput * 3) + 300);
+        this.slow((tc.slowTime.commands.showOutput * 3) + 100);
         await executeTeCommand2("showOutput", [ true ]);
-        await sleep(75);
+        await sleep(25);
         await executeTeCommand2("showOutput", [ false ]);
-        await sleep(75);
+        await sleep(25);
         await executeTeCommand2("showOutput", [ tc.log.enabled && tc.log.output ]);
         endRollingCount(this);
     });
@@ -114,10 +110,10 @@ suite("Initialization", () =>
     });
 
 
-    test("Focus File Explorer View", async function()
+    test("Focus FileExplorer View", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.refreshNoChanges);
+        this.slow(tc.slowTime.commands.focusChangeViews);
         await focusFileExplorer();
         endRollingCount(this);
     });
