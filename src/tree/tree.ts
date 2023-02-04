@@ -88,30 +88,25 @@ export default class TaskTree implements ITaskTree, Disposable
         {   // if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             if (id !== this.currentRefreshEvent && !this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             {
-                if (!treeItem || !this.eventQueue.find(e => e.type === "refresh" && !e.args[0]))
+                if (!treeItem)
+                {   // if this is a global refresh, remove all other refresh events from the q
+                    //  this.eventQueue.slice().reverse().forEach((value, index, obj) => {
+                    //      // As of v3.0, there's only one event type, "refresh"
+                    //      // if (value.type === "wsFolderRemove" || value.type === "refresh") {
+                    //          this.eventQueue.splice(obj.length - 1 - index, 1);
+                    //      // }
+                    //  });
+                    this.eventQueue.splice(0);
+                }
+                this.eventQueue.push(
                 {
-                    if (!treeItem)
-                    {   // if this is a global refresh, remove all other refresh events from the q
-                        this.eventQueue.slice().reverse().forEach((value, index, obj) => {
-                            // As of v3.0, there's only one event type, "refresh"
-                            // if (value.type === "wsFolderRemove" || value.type === "refresh") {
-                                this.eventQueue.splice(obj.length - 1 - index, 1);
-                            // }
-                        });
-                    }
-                    this.eventQueue.push(
-                    {
-                        id,
-                        delay: 1,
-                        fn: this.fireTreeRefreshEvent,
-                        args: [ treeItem ],
-                        type: "refresh"
-                    });
-                    log.write("   refresh event has been queued", logLevel, logPad);
-                }
-                else {
-                    log.write("   a global refresh event is already queued, skip", logLevel, logPad);
-                }
+                    id,
+                    delay: 1,
+                    fn: this.fireTreeRefreshEvent,
+                    args: [ treeItem ],
+                    type: "refresh"
+                });
+                log.write("   refresh event has been queued", logLevel, logPad);
             }
             else {
                 ++TaskTree.loadStage;
