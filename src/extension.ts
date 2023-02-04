@@ -390,7 +390,7 @@ export const getTaskTreeManager = () => treeManager;
 
 function isBusy()
 {
-    return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() ||
+    return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange() || licenseManager.isBusy();
 }
 

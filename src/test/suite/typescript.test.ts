@@ -7,7 +7,6 @@
 import * as utils from "../utils/utils";
 import fsUtils from "../utils/fsUtils";
 import { Uri } from "vscode";
-import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { join } from "path";
 import { ITestControl } from "../control";
 import { startupFocus } from "../utils/suiteUtils";
@@ -241,7 +240,7 @@ suite("Typescript Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEventTsc + testControl.slowTime.taskCount.verifyByTree);
-        await fsUtils.deleteFile(fileUri.fsPath, testControl.waitTime.fs.deleteEventTsc)
+        await fsUtils.deleteFile(fileUri.fsPath, testControl.waitTime.fs.deleteEventTsc);
         await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
         utils.endRollingCount(this);
     });
