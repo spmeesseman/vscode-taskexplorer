@@ -62,10 +62,15 @@ export default class TaskTree implements ITaskTree, Disposable
 
 
     dispose = () =>
-    {
-        this.disposables.forEach((d) => {
-            d.dispose();
-        });
+    {   //
+        // Don't have any disposables anymore after tree manager extraction, but the disposal
+        // indexing in tree manager is based on where the instance TaskTree is located, so
+        // we keep the dispose() event here.  Who knows maybe we'll need it again someday. I
+        // know if I removed it, i 100% would need it again.
+        //
+        // this.disposables.forEach((d) => {
+        //     d.dispose();
+        // });
         this.disposables = [];
     };
 
@@ -302,19 +307,6 @@ export default class TaskTree implements ITaskTree, Disposable
 
         log.methodDone("process task explorer main event queue", 1, logPad);
         return firedEvent;
-    };
-
-
-    waitForRefreshComplete = async(maxWait = 15000, logPad = "   ") =>
-    {
-        let waited = 0;
-        if (this.refreshPending) {
-            log.write("waiting for previous refresh to complete...", 1, logPad);
-        }
-        while (this.refreshPending && waited < maxWait) {
-            await timeout(250);
-            waited += 250;
-        }
     };
 
 }

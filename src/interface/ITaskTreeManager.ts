@@ -6,7 +6,7 @@ import { Task, TreeItem, Uri } from "vscode";
 export default interface ITaskTreeManager
 {
     enableTaskTree(name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string): void;
-    fireTreeRefreshEvent(logPad: string, logLevel: number, taskFile?: TreeItem): void;
+    fireTreeRefreshEvent(logPad: string, logLevel: number, treeItem?: TreeItem): void;
     getTasks(): Task[];
     getTaskMap(): TaskMap;
     getTaskTree(): ITaskFolder[] | TreeItem[] | undefined | null | void;

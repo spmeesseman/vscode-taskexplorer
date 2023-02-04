@@ -14,7 +14,7 @@ import {
 export class TaskWatcher implements Disposable
 {
 
-    private static statusBarSpace: StatusBarItem;
+    private statusBarSpace: StatusBarItem;
     private treeManager: ITaskTreeManager;
     private disposables: Disposable[];
     private babysitterCt = 0;
@@ -26,12 +26,10 @@ export class TaskWatcher implements Disposable
     {
         this.treeManager = treeManager;
         this.specialFolders = specialFolders;
-        if (!TaskWatcher.statusBarSpace) {
-            TaskWatcher.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
-            TaskWatcher.statusBarSpace.tooltip = "Task Explorer Running Task";
-        }
+        this.statusBarSpace = window.createStatusBarItem(StatusBarAlignment.Left, -10000);
+        this.statusBarSpace.tooltip = "Task Explorer Running Task";
         this.disposables = [
-            TaskWatcher.statusBarSpace,
+            this.statusBarSpace,
             tasks.onDidStartTask(async (_e) => this.taskStartEvent(_e)),
             tasks.onDidEndTask(async (_e) => this.taskFinishedEvent(_e))
         ];
@@ -190,12 +188,12 @@ export class TaskWatcher implements Disposable
                 if ((task.scope as WorkspaceFolder).name) {
                     statusMsg += " (" + (task.scope as WorkspaceFolder).name + ")";
                 }
-                TaskWatcher.statusBarSpace.text = "$(loading~spin) " + statusMsg;
-                TaskWatcher.statusBarSpace.show();
+                this.statusBarSpace.text = "$(loading~spin) " + statusMsg;
+                this.statusBarSpace.show();
             }
             else {
                 log.methodStart("   found idle/stopped task, hide status message", 2, logPad);
-                TaskWatcher.statusBarSpace.hide();
+                this.statusBarSpace.hide();
             }
         }
         log.methodDone("task start/stop show/hide message", 2, logPad);
