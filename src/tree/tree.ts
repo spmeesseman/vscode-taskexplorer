@@ -109,12 +109,18 @@ export default class TaskTree implements ITaskTree, Disposable
                 log.write("   refresh event has been queued", logLevel, logPad);
             }
             else {
-                ++TaskTree.loadStage;
                 log.write("   a refresh event for this item is already running or queued, skip", logLevel, logPad);
             }
         }
-        else {
-            ++TaskTree.loadStage;
+        else
+        {
+            if (TaskTree.loadStage <= 1) {
+                this.getChildren(treeItem);
+            }
+            else {
+                ++TaskTree.loadStage;
+            }
+            log.write("   a refresh event will be skipped as the view has not yet been made visible", logLevel, logPad);
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
     };
@@ -146,7 +152,7 @@ export default class TaskTree implements ITaskTree, Disposable
         {
             ++TaskTree.loadStage;
             this.refreshPending = false;
-            if (!taskItemTree && TaskTree.loadStage > 1) {
+            if (!taskItemTree && TaskTree.loadStage > 2) {
                 this.refreshPending = true;
                 setTimeout(() => this._onDidChangeTreeData.fire(), 50);
             }

@@ -45,16 +45,6 @@ export class TaskWatcher implements Disposable
     }
 
 
-    private fireBabySitter(taskId: string)
-    {
-        let taskTimerId: NodeJS.Timeout | undefined;
-        if (taskTimerId = this.babysitterTimers[taskId]) {
-            clearTimeout(taskTimerId);
-            delete this.babysitterTimers[taskId];
-        }
-    }
-
-
     fireTaskChangeEvents(taskItem: TaskItem, logPad: string, logLevel: number)
     {
         const taskTree = this.treeManager.getTaskTree();
@@ -209,7 +199,6 @@ export class TaskWatcher implements Disposable
 
         log.methodStart("task finished event", 1, "", false, [[ "task name", task.name ], [ "task id", taskId ]]);
 
-        this.fireBabySitter(taskId);        // fire the babysitter
         this.showStatusMessage(task, "  "); // hides
 
         //

@@ -283,7 +283,7 @@ suite("File Watcher Tests", () =>
     test("Add/Delete New Files Repetitively", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 3800);
+        this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 3850);
 
         await writeGruntFile("grunt2_0", 1, " ");
         writeGruntFile("grunt2_0", 1, "");
@@ -291,7 +291,11 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("grunt2_2", 10, "");
         await writeGruntFile("grunt2_3", 1, "");
         await writeGruntFile("grunt2_4", 125, "");
-        await writeGruntFile("grunt2_5", 1, "");
+        writeGruntFile("grunt2_5", 1, "");
+        writeGruntFile("grunt2_5", 1, " ");
+        writeGruntFile("grunt2_5", 1, "");
+        writeGruntFile("grunt2_5", 1, " ");
+        await writeGruntFile("grunt2_5", 25, "");
         await writeGruntFile("grunt2_6", 125, "");
         await writeGruntFile("grunt2_7", 1, "");
         await writeGruntFile("grunt1_0", 125, "");

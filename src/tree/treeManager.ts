@@ -14,7 +14,6 @@ import statusBarItem from "../lib/statusBarItem";
 import ITaskTreeManager from "../interface/ITaskTreeManager";
 import { isDirectory } from "../lib/utils/fs";
 import { rebuildCache } from "../lib/fileCache";
-import { IEvent } from "../interface/IEvent";
 import { getTerminal } from "../lib/getTerminal";
 import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
@@ -50,11 +49,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private tasks: Task[];
     private taskWatcher: TaskWatcher;
     private treeBuilder: TaskTreeBuilder;
-    private eventQueue: IEvent[] = [];
     private firstTreeBuildDone = false;
     private currentInvalidation: string | undefined;
-    private currentInvalidationUri: Uri | undefined;
-    private currentRefreshEvent: string | undefined;
     private disposables: Disposable[] = [];
     private views: IDictionary<TeTreeView|undefined> = {
         taskExplorer: undefined,
@@ -327,7 +323,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private fetchTasks = async(logPad: string) =>
     {
         log.methodStart("fetch tasks", 1, logPad);
-        if (this.tasks.length === 0 || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc") // || this.currentInvalidationUri)
+        if (this.tasks.length === 0 || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc")
         {
             log.write("   fetching all tasks via VSCode fetchTasks call", 1, logPad);
             statusBarItem.update("Requesting all tasks from all providers");
@@ -674,6 +670,11 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             //
             this.onWorkspaceFolderRemoved(opt, logPad);
         }
+        // else if (utils.isString(invalidate, true) && utils.isUri(opt))
+        // {
+        //     // TODO = Performance enhancement.  Handle a file deletejust like we do a workspace folder
+        //     //        delete above.  And we can avoid the task refresh/fetch and tree rebuild.
+        // }
         else
         {
             if (invalidate !== false) {
@@ -683,7 +684,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             {
                 log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
                 this.currentInvalidation = invalidate; // 'invalidate' will be taskType if 'opt' is undefined or uri of add/remove resource
-                this.currentInvalidationUri = opt;     // 'invalidate' will be undefined if 'opt' is uri of add/remove ws folder
             }
             else //
             {   // Re-ask for all tasks from all providers and rebuild tree
@@ -691,7 +691,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 log.write("   invalidation is for all types", 1, logPad);
                 this.currentInvalidation = undefined;
                 this.tasks = TaskTreeManager.tasks = [];
-                this.currentInvalidationUri = utils.isUri(opt)  ? opt : undefined;
             }
             log.write("   fire tree data change event", 2, logPad);
             await this.loadTasks(logPad + "   "); // loadTasks invalidates treeBuilder, sets taskMap to {} and taskTree to null

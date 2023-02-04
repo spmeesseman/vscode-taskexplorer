@@ -11,6 +11,5 @@ export interface ITaskItem extends TreeItem
     taskFile: ITaskFile;
     taskSource: string;
     isExecuting(logPad?: string): TaskExecution | undefined;
-    isRunning(): boolean;
     refreshState(logPad: string, logLevel: number): void;
 }

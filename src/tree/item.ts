@@ -6,12 +6,12 @@ import TaskFile from "./file";
 import TaskFolder from "./folder";
 import { ITaskItem } from "../interface";
 import { configuration } from "../lib/utils/configuration";
+import { getInstallPathSync } from "../lib/utils/pathUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import {
-    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, ExtensionContext, tasks, Command, Uri
+    Task, TaskExecution, TreeItem, TreeItemCollapsibleState, WorkspaceFolder, tasks, Command, Uri
 }
 from "vscode";
-import { getInstallPath, getInstallPathSync } from "../lib/utils/pathUtils";
 
 
 /**
@@ -149,12 +149,6 @@ export default class TaskItem extends TreeItem implements ITaskItem
             [ "is executing", !!exec ], [ "task execution count", execs.length ], [ "total execution count", tasks.taskExecutions.length ]
         ]);
         return exec;
-    }
-
-
-    isRunning()
-    {
-        return !!this.contextValue?.includes("Running");
     }
 
 
