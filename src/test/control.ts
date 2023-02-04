@@ -163,7 +163,7 @@ export const testControl: ITestControl =
         viewReport: 380,
         wsFolder: {
             add: 1625,
-            addEmpty: 1500,
+            addEmpty: 1555,
             remove: 550,
             removeEmpty: 475,
             reorder: 505

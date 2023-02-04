@@ -285,7 +285,8 @@ suite("File Watcher Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.fs.createEvent * 2) + tc.slowTime.taskCount.verify + 3800);
 
-        await writeGruntFile("grunt2_0", 1, "");
+        await writeGruntFile("grunt2_0", 1, " ");
+        writeGruntFile("grunt2_0", 1, "");
         await writeGruntFile("grunt2_1", 1, "");
         await writeGruntFile("grunt2_2", 10, "");
         await writeGruntFile("grunt2_3", 1, "");
@@ -308,7 +309,7 @@ suite("File Watcher Tests", () =>
         );
         await utils.sleep(50);
         await writeGruntFile("grunt2_0", 100, " ");
-        await writeGruntFile("grunt2_0", 1, "");
+        writeGruntFile("grunt2_0", 1, "");
         await writeGulpFile("gulp2_0", 50, "");
         await writeGruntFile("grunt2_0", 1, " ");
         await fsApi.writeFile(
@@ -338,7 +339,7 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("grunt2_1", 50, "");
         await writeGruntFile("gruntIgn_0", 1, "  ");
         await writeGruntFile("grunt1_5", 1, "");
-        await writeGruntFile("grunt1_5", 1, " ");
+        writeGruntFile("grunt1_5", 1, " ");
         await writeGruntFile("grunt1_5", 50, "");
         await writeGruntFile("grunt2_6", 1, "");
         await writeGruntFile("grunt2_7", 50, "");
