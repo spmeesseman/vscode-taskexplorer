@@ -166,7 +166,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
         teApi.testsApi = { // Will get removed on activation if not tests environment
             fs,
             config: configuration,
-            explorer: {} as ITaskTree, // registerExplorer() will set
+            explorer: teApi.explorer as ITaskTree, // TaskTreeManager has set
             fileCache,
             isBusy: false,
             storage,

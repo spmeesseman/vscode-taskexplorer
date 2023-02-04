@@ -49,10 +49,7 @@
     ],
     "main": "./dist/extension",
     "activationEvents": [
-        "onView:taskExplorer",
-        "onView:taskExplorerSideBar",
-        "onView:taskExplorer.views.home",
-        "onView:taskExplorer.views.taskCount"
+        "*"
     ],
     "preview": false,
     "pricing": "Trial",
@@ -237,14 +234,6 @@
             ],
             "taskActivity": [
                 {
-					"type": "webview",
-					"id": "taskExplorer.views.home",
-					"name": "Home",
-					"contextualTitle": "TaskExplorer",
-                    "icon": "res/gears-r.svg",
-					"visibility": "collapsed"
-				},
-                {
                     "type": "tree",
                     "id": "taskExplorerSideBar",
                     "name": "Explorer",
@@ -252,16 +241,7 @@
 					"contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
                     "visibility": "visible"
-                },
-                {
-					"type": "webview",
-					"id": "taskExplorer.views.taskCount",
-					"name": "Task Count",
-                    "when": "config.taskExplorer.enableSideBar",
-					"contextualTitle": "TaskExplorer",
-					"icon": "$(gitlens-gitlens)",
-					"visibility": "collapsed"
-				}
+                }
             ]
         },
         "commands": [
