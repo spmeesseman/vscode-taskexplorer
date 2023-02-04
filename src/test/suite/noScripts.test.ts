@@ -119,7 +119,7 @@ suite("NoScripts TreeItem Tests", () =>
         const treeTasks = teApi.testsApi.treeManager.getTasks();
         const treeFolders = teApi.testsApi.treeManager.getTaskTree() as TreeItem[];
         expect(treeFolders).to.not.be.undefined;
-        expect(treeFolders.length).to.be.equal(1);
+        expect(treeFolders.length).to.be.equal(tc.isMultiRootWorkspace ? 2 : 1);
         expect(treeFolders[0].label).to.not.be.equal("No tasks found");
         expect(treeTasks.length).to.be.greaterThan(antStartCount + gruntStartCount + gulpStartCount + pythonStartCount);
         await verifyTaskCount("ant", antStartCount);

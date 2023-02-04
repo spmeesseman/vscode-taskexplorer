@@ -489,7 +489,7 @@ suite("Tree Tests", () =>
     });
 
 
-    test("Get Parent (Reveal API)", async function()
+    test("Reveal API", async function()
     {
         if (utils.exitRollingCount(this)) return;
         const taskTree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
@@ -498,6 +498,8 @@ suite("Tree Tests", () =>
         expect(await explorer.getParent!(taskTree[2])).to.be.null; // Project Folder
         expect(await explorer.getParent!(batch[0])).to.not.be.null;
         expect(await explorer.getParent!(batch[0].taskFile)).to.not.be.null;
+        expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[0])).to.not.be.null;
+        expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[1])).to.not.be.null;
         utils.endRollingCount(this);
     });
 

@@ -20,9 +20,6 @@ suite("Initialization", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, testsApi } = await activate(this));
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
-        await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Collapsed");
-        await executeSettingsUpdate("specialFolders.folderState.userTasks", "Collapsed");
         testsApi.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
@@ -32,9 +29,6 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("specialFolders.folderState.favorites", "Expanded");
-        await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Expanded");
-        await executeSettingsUpdate("specialFolders.folderState.userTasks", "Expanded");
         testsApi.enableConfigWatcher(true);
         await closeEditors();
         suiteFinished(this);
@@ -101,7 +95,7 @@ suite("Initialization", () =>
     test("Refresh Trees (Both Views Enabled)", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.refreshNoChanges);
+        this.slow(tc.slowTime.commands.refreshNoChanges * 2);
         await refreshTree(undefined, undefined, "");
         endRollingCount(this);
     });

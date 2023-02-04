@@ -11,9 +11,9 @@ import { executeTeCommand2 } from "../utils/commandUtils";
 import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const testsName = "npm";
-const startTaskCount = 0;
 const tc = utils.testControl;
 let fsApi: IFilesystemApi;
+let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
 
@@ -25,6 +25,7 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this, true)) return;
         ({ fsApi } = await utils.activate(this));
+        startTaskCount = tc.isMultiRootWorkspace ? 15 : 0;
         utils.endRollingCount(this, true);
     });
 
@@ -105,8 +106,8 @@ suite("NPM Tests", () =>
         // are the 'build' and 'watch' tasks are registered in tasks.json and will show in
         // the tree under the VSCode tasks node, not the npm node)
         //
-        // tagLog("NPM", "Get NPM Task Items [DoWorkSon]");
-        npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, 2) as TaskItem[];
+        // tagLog("NPM", "Get NPM Task Items [DoWorkSon]"); / -1 for install task not in tree
+        npmTaskItems = await utils.treeUtils.getTreeTasks(testsName, startTaskCount - 1 + 2) as TaskItem[];
         // tagLog("NPM", "Get NPM Task Items [Complete]");
         utils.endRollingCount(this);
     });

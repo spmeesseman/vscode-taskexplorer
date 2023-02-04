@@ -216,7 +216,7 @@ export const testControl: ITestControl =
             shellChange: 1490,
             showHideSpecialFolder: 625,
             showHideUserTasks: 1100,
-            sortingEvent: 800,
+            sortingEvent: 845,
             terminalEvent: 300
         },
         explorerViewStartup: 9500,
@@ -260,7 +260,7 @@ export const testControl: ITestControl =
             batchScriptBat: 4550,
             batchScriptCmd: 5650,
             gulpParser: 4300,
-            npmCommand: 9500,
+            npmCommand: 9600,
             npmCommandPkg: 8200,
             npmInstallCommand: 10400
         },

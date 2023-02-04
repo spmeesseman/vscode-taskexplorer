@@ -13,7 +13,7 @@ import { getLicenseManager } from "../../extension";
 const tc = utils.testControl;
 const startTaskCountBash = 1;
 const startTaskCountBatch = 2;
-const startTaskCountNpm = 2;
+const startTaskCountNpm = 17;
 const startTaskCountGrunt = 7;
 const startTaskCountGulp = 17;
 const startTaskCountWs = 13; // 10 + 3 User Tasks
