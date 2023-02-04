@@ -21,7 +21,7 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
     {
         const def: ITaskDefinition = {
-            type: "external",
+            type: this.providerName,
             script: target,
             target,
             icon: getDevPath("res/sources/ant.svg"),
@@ -31,7 +31,7 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
         };
 
         const execution = new ShellExecution("cmd", [ "/c", "test.bat" ]);
-        return new Task(def, folder, target, "external", execution, "$msCompile");
+        return new Task(def, folder, target, this.providerName, execution, "$msCompile");
     }
 
 

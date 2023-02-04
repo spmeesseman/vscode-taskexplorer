@@ -65,7 +65,7 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Register External Task Provider", async function()
+    test("Register External Task Provider 1", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
@@ -77,7 +77,18 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Access External Task Provider", async function()
+    test("Register External Task Provider 2", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.enableEvent + testControl.slowTime.taskCount.verify);
+        await teApi.register("external2", taskProvider, "");
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        await verifyTaskCount("external2", 2);
+        endRollingCount(this);
+    });
+
+
+    test("Access External Task Provider 1", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
@@ -89,7 +100,7 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Access Base External Task Provider", async function()
+    test("Access External Task Provider 2", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent);
@@ -104,7 +115,7 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Refresh External Task Provider", async function()
+    test("Refresh External Task Provider 1", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.commands.refreshNoChanges + testControl.slowTime.taskCount.verify);
@@ -115,13 +126,35 @@ suite("External Provider Tests", () =>
     });
 
 
-    test("Unregister External Task Provider", async function()
+    test("Refresh External Task Provider 2", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.commands.refreshNoChanges + testControl.slowTime.taskCount.verify);
+        await teApi.refreshExternalProvider("external2", "");
+        await waitForTeIdle(testControl.waitTime.config.enableEvent);
+        await verifyTaskCount("external2", 2);
+        endRollingCount(this);
+    });
+
+
+    test("Unregister External Task Provider 1", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
         await teApi.unregister("external", "");
         await waitForTeIdle(testControl.waitTime.config.event);
         await verifyTaskCount("external", 0);
+        endRollingCount(this);
+    });
+
+
+    test("Unregister External Task Provider 2", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(testControl.slowTime.config.enableEvent + testControl.waitTime.config.event + testControl.slowTime.taskCount.verify);
+        await teApi.unregister("external2", "");
+        await waitForTeIdle(testControl.waitTime.config.event);
+        await verifyTaskCount("external2", 0);
         endRollingCount(this);
     });
 
