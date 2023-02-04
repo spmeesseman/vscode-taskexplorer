@@ -134,9 +134,8 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
         // Note that 'taskType' may be different than 'this.providerName' for 'script' type tasks (e.g.
         // batch, bash, python, etc...)
         //
-        log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false,
-            [[ "uri", uri?.path ], [ "has cached tasks", !!this.cachedTasks ],
-            [ "current # of cached tasks", this.cachedTasks ? this.cachedTasks.length : 0 ]
+        log.methodStart(`invalidate ${this.providerName} tasks cache`, 1, logPad, false, [
+            [ "uri", uri?.path ], [ "current # of cached tasks", cachedTasks.length ]
         ]);
 
         const enabled = isTaskTypeEnabled(this.providerName);
