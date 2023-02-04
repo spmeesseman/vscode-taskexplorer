@@ -78,7 +78,7 @@ export class TaskWatcher implements Disposable
                     this.babysitRunningTask(t);
                 }
             }
-        }, 1000, taskItem);
+        }, 750, taskItem);
         this.babysitterTimers[taskId] = taskTimerId;
     }
 

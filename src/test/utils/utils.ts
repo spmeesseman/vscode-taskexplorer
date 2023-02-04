@@ -573,7 +573,7 @@ export const waitForTeIdle = async (minWait = 1, maxWait = 15000) =>
     };
     await _wait(3);
     await sleep(1);
-    await _wait(3);
+    await _wait(2);
     if (minWait > waited)
     {
         const sleepTime = Math.round((minWait - waited) / 3);

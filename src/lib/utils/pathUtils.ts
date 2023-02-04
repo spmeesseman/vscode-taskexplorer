@@ -152,7 +152,6 @@ const getDefaultUserDataPath = (platform?: string) =>
 
 const logUserDataEnv = (padding: string) =>
 {
-    /* istanbul ignore else */
     if (log.isLoggingEnabled())
     {
         log.value(padding + "os", process.platform, 4);
@@ -160,9 +159,6 @@ const logUserDataEnv = (padding: string) =>
         log.value(padding + "env:VSCODE_APPDATA", process.env.VSCODE_APPDATA, 4);
         log.value(padding + "env:VSCODE_APPDATA", process.env.APPDATA, 4);
         log.value(padding + "env:VSCODE_APPDATA", process.env.USERPROFILE, 4);
-        /* istanbul ignore if */
-        if (process.platform === "linux") {
-            log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 4);
-        }
+        log.value("env:XDG_CONFIG_HOME", process.env.XDG_CONFIG_HOME, 4); // linux
     }
 };

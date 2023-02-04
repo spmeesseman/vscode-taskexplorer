@@ -1937,21 +1937,21 @@
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.folderStateLastTasks%"
+                            "description": "%config.taskExplorer.specialFolders.folderState.lastTasks%"
                         },
                         "favorites": {
                             "enum": [
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.folderStateFavorites%"
+                            "description": "%config.taskExplorer.specialFolders.folderState.favorites%"
                         },
                         "userTasks": {
                             "enum": [
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.folderStateUserTasks%"
+                            "description": "%config.taskExplorer.specialFolders.folderState.userTasks%"
                         }
                     },
                     "default": {
