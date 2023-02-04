@@ -682,7 +682,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             if (opt !== false && utils.isString(invalidate, true))
             {
                 log.write(`   invalidation is for type '${invalidate}'`, 1, logPad);
-                this.currentInvalidation = invalidate; // 'invalidate' will be taskType if 'opt' is uri of add/remove resource
+                this.currentInvalidation = invalidate; // 'invalidate' will be taskType if 'opt' is undefined or uri of add/remove resource
                 this.currentInvalidationUri = opt;     // 'invalidate' will be undefined if 'opt' is uri of add/remove ws folder
             }
             else //

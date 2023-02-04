@@ -37,6 +37,14 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     }
 
     //
+    // External tasks registered via Task Explorer API
+    //
+    if (providers[task.source] && providers[task.source].isExternal) {
+        return !!task.definition && !!task.name && !!task.execution;
+    }
+
+
+    //
     // Check enabled and npm install task
     // This will ignore tasks from other providers as well, unless it has registered
     // as an external provider via Task Explorer API
@@ -62,16 +70,6 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
             log.methodDone("Check task inclusion", 4, logPad, undefined, logQueueId);
             return false;
         }
-    }
-
-    //
-    // External tasks registered via Task Explorer API
-    //
-    // TODO - remove coverage ignore tags when external providers test suite can be done
-    //
-    /* istanbul ignore if */
-    if (providers[task.source] && providers[task.source].isExternal) {
-        return !!task.definition && !!task.name && !!task.execution;
     }
 
     //
