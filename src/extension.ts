@@ -22,6 +22,7 @@ import { MakeTaskProvider } from "./providers/make";
 import { RubyTaskProvider } from "./providers/ruby";
 import { NsisTaskProvider } from "./providers/nsis";
 import { PerlTaskProvider } from "./providers/perl";
+import { TaskTreeManager } from "./tree/treeManager";
 import { BatchTaskProvider } from "./providers/batch";
 import { MavenTaskProvider } from "./providers/maven";
 import { GruntTaskProvider } from "./providers/grunt";
@@ -34,7 +35,6 @@ import { initStorage, storage } from "./lib/utils/storage";
 import { LicenseManager } from "./lib/auth/licenseManager";
 import { ComposerTaskProvider } from "./providers/composer";
 import { TaskExplorerProvider } from "./providers/provider";
-import { IConfiguration } from "./interface/IConfiguration";
 import { registerStatusBarItem } from "./lib/statusBarItem";
 import { ILicenseManager } from "./interface/ILicenseManager";
 import { PowershellTaskProvider } from "./providers/powershell";
@@ -45,9 +45,6 @@ import { IDictionary, IExternalProvider, ITaskTree, ITaskExplorerApi, ITestsApi,
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
-import { TaskTreeManager } from "./tree/treeManager";
-import TaskTree from "./tree/tree";
-
 
 export const providers: IDictionary<TaskExplorerProvider> = {};
 export const providersExternal: IDictionary<IExternalProvider> = {};
@@ -57,6 +54,8 @@ let tests = false;
 let dev = false;
 let licenseManager: ILicenseManager;
 let treeManager: TaskTreeManager;
+let extensionContext: ExtensionContext;
+
 
 export const teApi: ITaskExplorerApi =
 {
@@ -80,6 +79,7 @@ export const teApi: ITaskExplorerApi =
 
 export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
 {
+    extensionContext = context;
     //
     // Set 'tests' flag if tests are running and this is not a user runtime
     //
@@ -161,6 +161,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
 	// 	new TeAuthenticationProvider(context)
 	// );
 
+    /* istanbul ignore else */
     if (tests)
     {
         teApi.testsApi = { // Will get removed on activation if not tests environment
@@ -177,6 +178,7 @@ export async function activate(context: ExtensionContext) // , disposables: Disp
             extensionContext: context,
             wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]
         };
+        teApi.setTests(true); // lol, damn istanbul.  cover the initial empty fn
         teApi.setTests = (isTests) => { tests = isTests; };
         teApi.isBusy = () => isBusy() || teApi.testsApi.isBusy;
     }
@@ -269,12 +271,11 @@ const initialize = async(context: ExtensionContext) =>
 // !!! Remove sometime down the road (from 1/18/22)  !!!
 // !!! Remove call in method activate() too          !!!
 //
+/* istanbul ignore next */
 const tempResetGroupingSep = async () =>
 {
     const groupSep = configuration.get<string>("groupSeparator", "-");
-    /* istanbul ignore next */
     if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
-        /* istanbul ignore next */
         await configuration.update("groupSeparator", "-");
     }
 };
@@ -285,12 +286,19 @@ const tempResetGroupingSep = async () =>
 // !!! Remove sometime down the road (from 1/18/22)  !!!
 // !!! Remove call in method activate() too          !!!
 //
+/* istanbul ignore next */
 const tempDeleteSomePathToPrograms = async () =>
 {
-    await configuration.update("pathToPrograms.apppublisher", undefined);
-    await configuration.updateWs("pathToPrograms.apppublisher", undefined);
-    await configuration.update("pathToPrograms.bash", undefined);
-    await configuration.updateWs("pathToPrograms.bash", undefined);
+    let ptp = configuration.get<string>("pathToPrograms.apppublisher");
+    if (ptp !== undefined) {
+        await configuration.update("pathToPrograms.apppublisher", undefined);
+        await configuration.updateWs("pathToPrograms.apppublisher", undefined);
+    }
+    ptp = configuration.get<string>("pathToPrograms.bash");
+    if (ptp !== undefined) {
+        await configuration.update("pathToPrograms.bash", undefined);
+        await configuration.updateWs("pathToPrograms.bash", undefined);
+    }
 };
 
 
@@ -299,53 +307,39 @@ const tempDeleteSomePathToPrograms = async () =>
 // !!! Remove sometime down the road (from 12/22/22) !!!
 // !!! Remove call in method activate() too          !!!
 //
+/* istanbul ignore next */
 const tempRemapSettingsToNewLayout = async() =>
 {
     const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
-    /* istanbul ignore next */
     if (didSettingUpgrade)
-    {   /* istanbul ignore next */
+    {
         const taskTypes = getTaskTypes();
-        /* istanbul ignore next */
         taskTypes.push("ansicon");
-        /* istanbul ignore next */
         for (const taskType of taskTypes)
-        {   /* istanbul ignore next */
+        {
             let oldEnabledSetting = getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = getTaskTypeEnabledSettingName(taskType);
-            /* istanbul ignore next */
             if (taskType !== "ansicon" && taskType !== "curl")
-            {   /* istanbul ignore next */
+            {
                 const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
-                /* istanbul ignore next */
                 if (oldSettingValue1 !== undefined)
-                {   /* istanbul ignore next */
+                {
                     await configuration.update(newEnabledSetting, oldSettingValue1);
-                    /* istanbul ignore next */
                     await configuration.update(oldEnabledSetting, undefined);
-                    /* istanbul ignore next */
                     await configuration.updateWs(oldEnabledSetting, undefined);
                 }
             }
 
-            /* istanbul ignore next */
             oldEnabledSetting = getTaskTypeSettingName(taskType, "pathTo");
-            /* istanbul ignore next */
             newEnabledSetting = getTaskTypeSettingName(taskType, "pathToPrograms.");
-            /* istanbul ignore next */
             const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
-            /* istanbul ignore next */
             if (oldSettingValue2 !== undefined)
             {
-                /* istanbul ignore next */
                 await configuration.update(newEnabledSetting, oldSettingValue2);
-                /* istanbul ignore next */
                 await configuration.update(oldEnabledSetting, undefined);
-                /* istanbul ignore next */
                 await configuration.updateWs(oldEnabledSetting, undefined);
             }
         }
-        /* istanbul ignore next */
         await storage.update("DID_SETTINGS_UPGRADE", true);
     }
 };
@@ -379,6 +373,19 @@ export async function deactivate()
         }
     }
     storage.update2Sync("lastDeactivated", Date.now());
+    //
+    // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
+    // everything here, it doesn't seem to cause any issue with Code exiting.  But...
+    // TODO - Add local disposables[] array to pass to each module on instantiation so we
+    //        don't have to mess with context.subscriptions here, as I'm not sure if VSCode
+    //        does anything with it internally.  If we have a local disposables array, we can
+    //        set it to empty here when done andnot have to worry about it, since subscriptions
+    //        is read-only I don't want to set it to a new array instance or clear it and
+    //        @ts-ignore the error that TS complains about.
+    //
+    extensionContext.subscriptions.forEach((s) => {
+        s.dispose();
+    });
 }
 
 
