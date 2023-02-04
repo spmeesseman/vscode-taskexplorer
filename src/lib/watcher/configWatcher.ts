@@ -3,17 +3,18 @@
 import log from "../log/log";
 import { persistCache } from "../fileCache";
 import { refreshTree } from "../refreshTree";
-import { ITaskExplorerApi } from "../../interface";
 import { registerFileWatcher } from "./fileWatcher";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
 import { getTaskTreeManager } from "../../extension";
+import { pushIfNotExists } from "../utils/utils";
+import { IDictionary } from "../../interface";
 
 let watcherEnabled = true;
 let processingConfigEvent = false;
-const enabledTasks = configuration.get<any>("enabledTasks", {});
-const pathToPrograms = configuration.get<any>("pathToPrograms", {});
+const enabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks", {});
+const pathToPrograms = configuration.get<IDictionary<string>>("pathToPrograms", {});
 
 
 export function enableConfigWatcher(enable: boolean)
@@ -27,22 +28,15 @@ export const isProcessingConfigChange = () => processingConfigEvent;
 
 async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
+    log.methodStart("Process config changes", 1, "", true);
+
     // context = ctx;
     processingConfigEvent = true;
 
     let refresh = false;
     let refresh2 = false; // Uses 1st param 'false' in refresh(), for cases where task files have not changed
     const refreshTaskTypes: string[] = [];
-
-    const registerChange = (taskType: string) =>
-    {
-        /* istanbul ignore else */
-        if (!refreshTaskTypes.includes(taskType)) {
-            refreshTaskTypes.push(taskType);
-        }
-    };
-
-    log.methodStart("Process config changes", 1, "", true);
+    const registerChange = (taskType: string) => pushIfNotExists(refreshTaskTypes, taskType);
 
     //
     // if the application has called 'enableConfigWatcher' to disable, then there's nothing to do
@@ -54,10 +48,6 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         processingConfigEvent = false;
         return;
     }
-
-    //
-    // Check configs that may require a tree refresh...
-    //
 
     //
     // Main excludes list changes requires global refresh
@@ -90,21 +80,18 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskExplorer.enabledTasks"))
         {
-            const newEnabledTasks = configuration.get<any>("enabledTasks");
-            for (const p in enabledTasks)
-            {   /* istanbul ignore else */
-                if ({}.hasOwnProperty.call(enabledTasks, p))
+            const newEnabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks");
+            for (const p of Object.keys(enabledTasks))
+            {
+                const taskType = getTaskTypeRealName(p),
+                      oldValue = enabledTasks[p],
+                      newValue = newEnabledTasks[p];
+                if (newValue !== oldValue)
                 {
-                    const taskType = getTaskTypeRealName(p),
-                          oldValue = enabledTasks[p],
-                          newValue = newEnabledTasks[p];
-                    if (newValue !== oldValue)
-                    {
-                        log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
-                        log.value("      new value", newValue, 1);
-                        await registerFileWatcher(ctx, taskType, false, newValue, "   ");
-                        registerChange(taskType);
-                    }
+                    log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
+                    log.value("      new value", newValue, 1);
+                    await registerFileWatcher(ctx, taskType, false, newValue, "   ");
+                    registerChange(taskType);
                 }
             }
             Object.assign(enabledTasks, newEnabledTasks);
@@ -139,26 +126,23 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
         {
-            const newPathToPrograms = configuration.get<any>("pathToPrograms");
-            for (const p in pathToPrograms)
-            {   /* istanbul ignore else */
-                if ({}.hasOwnProperty.call(pathToPrograms, p))
+            const newPathToPrograms = configuration.get<IDictionary<string>>("pathToPrograms");
+            for (const p of Object.keys(pathToPrograms))
+            {
+                const taskType = getTaskTypeRealName(p),
+                      oldValue = pathToPrograms[p],
+                      newValue = newPathToPrograms[p];
+                if (newValue !== oldValue)
                 {
-                    const taskType = getTaskTypeRealName(p),
-                          oldValue = pathToPrograms[p],
-                          newValue = newPathToPrograms[p];
-                    if (newValue !== oldValue)
-                    {
-                        log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
-                        log.value("      new value", newValue, 1);
-                        if (taskType !== "ansicon" && taskType !== "curl") {// these paths are ont 'task types'
-                            registerChange(taskType);
-                        }
-                        else if (taskType === "curl") {
-                            registerChange("jenkins");
-                        }
-                        else { registerChange("ant"); }
+                    log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
+                    log.value("      new value", newValue, 1);
+                    if (taskType !== "ansicon" && taskType !== "curl") {// these paths are ont 'task types'
+                        registerChange(taskType);
                     }
+                    else if (taskType === "curl") {
+                        registerChange("jenkins");
+                    }
+                    else { registerChange("ant"); }
                 }
             }
             Object.assign(pathToPrograms, newPathToPrograms);
@@ -167,27 +151,21 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Extra Bash Globs (for extensionless script files)
         //
-        if (e.affectsConfiguration("taskExplorer.globPatternsBash"))
-        {   /* istanbul ignore else */
-            if (!refreshTaskTypes.includes("bash"))
-            {
-                log.write("   the 'globPatternsBash' setting has changed", 1);
-                await registerFileWatcher(ctx, "bash", false, configuration.get<boolean>("enabledTasks.bash"), "   ");
-                registerChange("bash");
-            }
+        if (e.affectsConfiguration("taskExplorer.globPatternsBash") && !refreshTaskTypes.includes("bash"))
+        {
+            log.write("   the 'globPatternsBash' setting has changed", 1);
+            await registerFileWatcher(ctx, "bash", false, configuration.get<boolean>("enabledTasks.bash"), "   ");
+            registerChange("bash");
         }
 
         //
         // Extra Apache Ant Globs (for non- build.xml files)s
         //
-        if (e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt"))
-        {   /* istanbul ignore else */
-            if (!refreshTaskTypes.includes("ant"))
-            {
-                log.write("   the 'globPatternsAnt' setting has changed", 1);
-                await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
-                registerChange("ant");
-            }
+        if ((e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt")) && !refreshTaskTypes.includes("ant"))
+        {
+            log.write("   the 'globPatternsAnt' setting has changed", 1);
+            await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
+            registerChange("ant");
         }
 
         //

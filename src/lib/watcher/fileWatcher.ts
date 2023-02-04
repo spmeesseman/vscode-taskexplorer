@@ -1,33 +1,32 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+//
+// TODO - Localize a disposables[] array and make only one push to context.subscriptions
+//
+
 import * as cache from "../fileCache";
 import * as util from "../utils/utils";
 import log from "../log/log";
 import { extname } from "path";
-import { storage } from "../utils/storage";
 import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";
+import { storage } from "../utils/storage";
 import { refreshTree } from "../refreshTree";
-import { ITaskExplorerApi } from "../../interface";
-import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import { configuration } from "../utils/configuration";
+import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
 
+let currentEvent: any;
 let extContext: ExtensionContext;
 let rootPath: string | undefined;
+let workspaceWatcher: Disposable | undefined;
 let currentNumWorkspaceFolders: number | undefined;
-let currentEvent: any;
 const eventQueue: any[] = [];
 const watchers: { [taskType: string]: FileSystemWatcher } = {};
 const watcherDisposables: { [taskType: string]: Disposable } = {};
-let workspaceWatcher: Disposable | undefined;
-const dirWatcher: {
-    watcher?: FileSystemWatcher;
-    onDidCreate?: Disposable;
-    onDidDelete?: Disposable;
-} = {};
+const dirWatcher: { watcher?: FileSystemWatcher; onDidCreate?: Disposable; onDidDelete?: Disposable } = {};
 
 
 function createDirWatcher(context: ExtensionContext)
@@ -68,21 +67,8 @@ async function createFileWatchers(context: ExtensionContext, logPad: string)
 
 
 function createWorkspaceWatcher(context: ExtensionContext)
-{   //
-    // TODO - Remove ignore tags when tests for adding/removing workspace is implemented
-    //        Te updateWorkSpaceFolders() call does not work when running tests, the testing
-    //        instance of VSCode even pops up an info message saying so.  So for now we mimic
-    //        as best we can by exporting onWsFoldersChange() to be added to the ITestsApi so
-    //        that the test suites can mimic the add ws folder event.  But...  When I first
-    //        started messing with the updateWorkspaceFolders() function, it saved the state
-    //        and on subsequent loads it was trying to load the ws folders that had "failed"
-    //        to be added.  Loading because of cache data in /.vscode-test.  And when it did
-    //        that, it opened as a multi-root ws, I could then keep that instance open (it also
-    //        launched the normal test instance), and, the ws folder adds succeed.  Unfortunately
-    //        i can;t figure out how to start tests using a multi-root workspace, doesn't seem
-    //        like its supported :(  SO this is the best we can do...
-    //
-    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(/* istanbul ignore next */(e) => onWsFoldersChange(e));
+{
+    workspaceWatcher = workspace.onDidChangeWorkspaceFolders(onWsFoldersChange);
     context.subscriptions.push(workspaceWatcher);
 }
 
@@ -96,9 +82,6 @@ export function disposeFileWatchers()
         w.dispose();
     });
 }
-
-
-const isSameEvent = (q: any[], kind: string, uri: Uri) => q.find(e => e.event === kind && e.fsPath === uri.fsPath);
 
 
 const eventNeedsToBeQueued = (eventKind: string, uri: Uri) =>
@@ -148,27 +131,25 @@ function getDirWatchGlob(wsFolders: readonly WorkspaceFolder[])
 export const isProcessingFsEvent = () => !!currentEvent;
 
 
+const isSameEvent = (q: any[], kind: string, uri: Uri) => q.find(e => e.event === kind && e.fsPath === uri.fsPath);
+
+
 async function onDirCreate(uri: Uri)
 {
     if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
     {
-        const wsf = workspace.getWorkspaceFolder(uri);
-        /* istanbul ignore else */
-        if (!wsf || wsf.uri.fsPath !== uri.fsPath)
-        {
-            const e = {
-                fn: _procDirCreateEvent,
-                args: [ uri, "   " ],
-                event: "create directory",
-                fsPath: uri.fsPath
-            };
-            if (currentEvent) {
-                eventQueue.push(e);
-            }
-            else {
-                currentEvent = e;
-                await _procDirCreateEvent(uri, "");
-            }
+        const e = {
+            fn: _procDirCreateEvent,
+            args: [ uri, "   " ],
+            event: "create directory",
+            fsPath: uri.fsPath
+        };
+        if (currentEvent) {
+            eventQueue.push(e);
+        }
+        else {
+            currentEvent = e;
+            await _procDirCreateEvent(uri, "");
         }
     }
 }
@@ -182,23 +163,18 @@ async function onDirDelete(uri: Uri)
     //
     if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
     {
-        const wsf = workspace.getWorkspaceFolder(uri);
-        /* istanbul ignore else */
-        if (wsf && wsf.uri.fsPath !== uri.fsPath)
-        {
-            const e = {
-                fn: _procDirDeleteEvent,
-                args: [ uri, "   " ],
-                event: "delete directory",
-                fsPath: uri.fsPath
-            };
-            if (currentEvent) {
-                eventQueue.push(e);
-            }
-            else {
-                currentEvent = e;
-                await _procDirDeleteEvent(uri, "");
-            }
+        const e = {
+            fn: _procDirDeleteEvent,
+            args: [ uri, "   " ],
+            event: "delete directory",
+            fsPath: uri.fsPath
+        };
+        if (currentEvent) {
+            eventQueue.push(e);
+        }
+        else {
+            currentEvent = e;
+            await _procDirDeleteEvent(uri, "");
         }
     }
 }
