@@ -2,9 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
 import { join } from "path";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";

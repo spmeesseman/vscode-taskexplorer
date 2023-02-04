@@ -2,9 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
 import * as path from "path";
 import { Uri } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";

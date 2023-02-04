@@ -2,9 +2,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
 import TaskItem from "../../tree/item";
 import TaskFile from "../../tree/file";
 import { join } from "path";

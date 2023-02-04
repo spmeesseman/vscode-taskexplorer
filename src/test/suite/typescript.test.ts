@@ -1,9 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-//
-// Documentation on https://mochajs.org/ for help.
-//
 import * as utils from "../utils/utils";
 import fsUtils from "../utils/fsUtils";
 import { Uri } from "vscode";

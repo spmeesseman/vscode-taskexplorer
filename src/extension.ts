@@ -365,12 +365,11 @@ export async function deactivate()
     // of this scenario, in which case we'll load from this stored file cache so that the tree
     // reload is much quicker, especially in large workspaces.
     //
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     if (!fileCache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching"))
     {
         const now = Date.now(),
               lastWsRootPathChange = storage.get2Sync<number>("lastWsRootPathChange", 0);
-        /* istanbul ignore if */
         if (now < lastWsRootPathChange + 3000)
         {
             fileCache.persistCache(false, true);
