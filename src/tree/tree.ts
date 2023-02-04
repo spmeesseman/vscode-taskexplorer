@@ -43,6 +43,7 @@ export default class TaskTree implements ITaskTree, Disposable
     private name: string;
     private disposables: Disposable[];
     private visible = false;
+    private wasVisible = false;
     private refreshPending = false;
     private currentRefreshEvent: string | undefined;
     private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
@@ -78,7 +79,7 @@ export default class TaskTree implements ITaskTree, Disposable
             this.refreshPending = true;
             this._onDidChangeTreeData.fire(treeItem);
         }
-        else
+        else if (this.wasVisible)
         {   // if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             if (id !== this.currentRefreshEvent && !this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
             {
@@ -108,8 +109,12 @@ export default class TaskTree implements ITaskTree, Disposable
                 }
             }
             else {
+                ++TaskTree.loadStage;
                 log.write("   a refresh event for this item is already running or queued, skip", logLevel, logPad);
             }
+        }
+        else {
+            ++TaskTree.loadStage;
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
     };
@@ -124,28 +129,32 @@ export default class TaskTree implements ITaskTree, Disposable
      */
     getChildren = async(element?: TreeItem): Promise<TreeItem[]> =>
     {
+        const logPad = this.getChildrenLogPad,
+              logLevel = this.getChildrenLogLevel,
+              tasks = this.treeManager.getTasks(),
+              taskItemTree = this.treeManager.getTaskTree();
+
+        this.refreshPending = true;
+
         if (TaskTree.loadStage === 0)
         {
             ++TaskTree.loadStage;
             this.refreshPending = false;
             return [ new InitScripts(this) ];
         }
-        else if (TaskTree.loadStage === 1)
+        else if (TaskTree.loadStage === 1 || !taskItemTree)
         {
             ++TaskTree.loadStage;
             this.refreshPending = false;
+            if (!taskItemTree && TaskTree.loadStage > 1) {
+                this.refreshPending = true;
+                setTimeout(() => this._onDidChangeTreeData.fire(), 50);
+            }
             return [ new LoadScripts(this) ];
         }
 
-        this.refreshPending = true;
-
         this.getChildrenLogPad = "";  // just can't see a nice way to ever line this up unless we use the log queue
         this.getChildrenLogLevel = 1; // just can't see a nice way to ever line this up unless we use the log queue
-
-        const logPad = this.getChildrenLogPad,
-              logLevel = this.getChildrenLogLevel,
-              tasks = this.treeManager.getTasks(),
-              taskItemTree = this.treeManager.getTaskTree();
 
         this.logGetChildrenStart(element, tasks, logPad, logLevel);
 
@@ -166,7 +175,7 @@ export default class TaskTree implements ITaskTree, Disposable
         else
         {
             log.write("   Return full task tree", logLevel + 1, logPad);
-            items = taskItemTree as TaskFolder[] | NoScripts[];
+            items = taskItemTree;
         }
 
         this.getChildrenLogPad = this.defaultGetChildrenLogPad;
@@ -178,8 +187,8 @@ export default class TaskTree implements ITaskTree, Disposable
         this.refreshPending = this.processEventQueue(logPad + "   ");
 
         log.methodDone("get tree children", logLevel, logPad, [
-            [ "# of tasks total", tasks ? tasks.length : /* istanbul ignore next */0 ],
-            [ "# of tree task items returned", items.length ], [ "pending event", this.refreshPending ]
+            [ "# of tasks total", tasks.length ], [ "# of tree task items returned", items.length ],
+            [ "pending event", this.refreshPending ]
         ]);
 
         return items;
@@ -258,13 +267,11 @@ export default class TaskTree implements ITaskTree, Disposable
     {
         log.methodStart("visibility event received", 1, "", true, [[ "is visible", visible ], [ "data changed", dataChanged ]]);
         this.visible = visible;
-        if (dataChanged && this.visible)
-        {   //
-            // Firing the _onDidChangeTreeData event tells VSCode to call getChildren() to refresh the view
-            //
-            log.write("   firing tree data changed event", 1);
-            this._onDidChangeTreeData.fire();
+        if (dataChanged && this.visible && this.wasVisible)
+        {
+            this.processEventQueue("   ");
         }
+        this.wasVisible = true;
         log.methodDone("visibility event received", 1);
         log.blank(1);
     };
@@ -289,6 +296,7 @@ export default class TaskTree implements ITaskTree, Disposable
             firedEvent = true;
             setTimeout(async () => {
                 await next.fn.call(this, ...next.args);
+                // this.refreshPending = this.processEventQueue(logPad);
             }, next.delay);
         }
 

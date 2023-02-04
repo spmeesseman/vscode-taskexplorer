@@ -333,8 +333,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         {
             log.write("   fetching all tasks via VSCode fetchTasks call", 1, logPad);
             statusBarItem.update("Requesting all tasks from all providers");
-            const taskItems = await tasks.fetchTasks();
-            this.tasks.push(...taskItems);
+            this.tasks = TaskTreeManager.tasks = await tasks.fetchTasks();
             //
             // Process the tasks cache array for any removals that might need to be made
             //
@@ -397,10 +396,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         {
             if (!this.firstTreeBuildDone)
             {
-                Object.values(this.views).filter(v => !!v && v.tree).forEach((v) =>
-                {
-                    (v as TeTreeView).tree.fireTreeRefreshEvent(logPad + "   ", 2);
-                });
+                this.fireTreeRefreshEvent(logPad + "   ", 2);
             }
             await this.treeBuilder.createTaskItemTree(logPad, 2);
         }
@@ -419,7 +415,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    private fireTreeRefreshEvent2 = async(logPad: string, logLevel: number, taskFile?: TreeItem) =>
+    private fireTreeManagerRefreshEvent = async(logPad: string, logLevel: number, taskFile?: TreeItem) =>
     {
         const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
         log.methodStart("fire tree refresh event", logLevel, logPad, false, [[ "node id", id ]]);
@@ -428,6 +424,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             TaskTreeManager.refreshPending = true;
             this.currentRefreshEvent = id;
             await this.fetchTasks(logPad);
+            this.fireTreeRefreshEvent(logPad + "   ", 2, taskFile);
         }
         else
         {   // if (!this.eventQueue.find((e => e.type === "refresh" && e.id === id)))
@@ -448,7 +445,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                     {
                         id,
                         delay: 1,
-                        fn: this.fireTreeRefreshEvent,
+                        fn: this.fireTreeManagerRefreshEvent,
                         args: [ taskFile ],
                         type: "refresh"
                     });
@@ -609,7 +606,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private onWorkspaceFolderRemoved = (uri: Uri, logPad: string) =>
     {
         log.methodStart("workspace folder removed event", 1, logPad, false, [[ "path", uri.fsPath ]]);
-        if (!TaskTreeManager.isBusy())
+        if (!this.currentRefreshEvent)
         {
             let ctRmv = 0;
             const tasks = this.tasks,
@@ -645,6 +642,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             log.values(1, logPad + "      ", [
                 [ "new # of tasks", tasks.length ], [ "new # of tree folders", taskTree.length ]
             ]);
+            this.fireTreeRefreshEvent(logPad + "   ", 1);
+            TaskTreeManager.refreshPending = false;
             log.write("   workspace folder event has been processed", 1, logPad);
         }
         else {
@@ -693,10 +692,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             }, next.delay);
         }
         else {
-            Object.values(this.views).filter(v => !!v && v.tree).forEach((v) =>
-            {
-                (v as TeTreeView).tree.fireTreeRefreshEvent(logPad + "   ", 1);
-            });
+            this.currentRefreshEvent = undefined;
+            this.fireTreeRefreshEvent(logPad + "   ", 1);
         }
 
         log.methodDone("process task explorer main event queue", 1, logPad);
@@ -776,9 +773,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             // significantly for this specific event.
             //
             this.onWorkspaceFolderRemoved(opt, logPad);
-            log.write("   fire tree data change event", 2, logPad);
-            this.fireTreeRefreshEvent(logPad + "   ", 1, refreshItem);
-            TaskTreeManager.refreshPending = false;
         }
         else
         {
@@ -801,7 +795,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             }
             this.treeBuilder.invalidate();
             log.write("   fire tree data change event", 2, logPad);
-            await this.fireTreeRefreshEvent2(logPad,  1, refreshItem);
+            await this.fireTreeManagerRefreshEvent(logPad,  1, refreshItem);
         }
 
         log.methodDone("refresh task tree", 1, logPad);
