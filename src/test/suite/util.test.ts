@@ -520,9 +520,9 @@ suite("Util Tests", () =>
 		//
 		const oArgv = process.argv;
 		process.argv = [ "--user-data-dir", dataPath ];
-		dataPath = pathUtils.getUserDataPath("linux");
-		dataPath = pathUtils.getUserDataPath("win32");
-		dataPath = pathUtils.getUserDataPath("darwin");
+		expect(pathUtils.getUserDataPath("linux")).to.be.equal(dataPath);
+		expect(pathUtils.getUserDataPath("win32")).to.be.equal(dataPath);
+		expect(pathUtils.getUserDataPath("darwin")).to.be.equal(dataPath);
 
 		//
 		// 0 args, which would probably never happen but the pathUtils.getUserDataPath() call

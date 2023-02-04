@@ -5,6 +5,7 @@ import constants from "../../lib/constants";
 import { getRelativePath } from "../../lib/utils/pathUtils";
 import { IExternalProvider, ITaskDefinition } from "../../interface";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
+import { getDevPath, getWsPath } from "../utils/sharedUtils";
 // import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
 //  Test bombs with this reference ^^^
 
@@ -23,7 +24,7 @@ export class ExternalTaskProvider extends IExternalProvider implements IExternal
             type: "external",
             script: target,
             target,
-            icon: undefined,
+            icon: getDevPath("res/sources/ant.svg"),
             path: getRelativePath(folder, uri),
             fileName: path.basename(uri.path),
             uri

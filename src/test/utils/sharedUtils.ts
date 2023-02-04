@@ -11,3 +11,6 @@ export const getWsPath = (p: string) => normalize(resolve(__dirname, join("..", 
 
 
 export const getProjectsPath = (p: string) => normalize(resolve(testsProjectsDir, p));
+
+
+export const getDevPath = (p: string) => normalize(resolve(__dirname, join("..", "..", ".."), p));
