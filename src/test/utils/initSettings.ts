@@ -87,12 +87,7 @@ const initSettings = async () =>
         console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
     }
 
-    if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1)
-    {
-        tc.isMultiRootWorkspace = true;
-        Object.assign(tc.slowTime as IDictionary<any>, tc.slowTimeMultiRoot);
-        Object.assign(tc.waitTime as IDictionary<any>, tc.waitTimeMultiRoot);
-    }
+    tc.isMultiRootWorkspace = !!workspace.workspaceFolders && workspace.workspaceFolders.length > 1;
 
     const msg = `The test environment is a '${tc.isMultiRootWorkspace ? "multi-root" : "single-root"}' workspace`;
     console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
