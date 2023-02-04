@@ -73,8 +73,20 @@ export function getTaskTypeRealName(taskType: string)
 }
 
 
+export function getWatchTaskTypes()
+{
+    return [ "npm", "tsc", "Workspace" ];
+}
+
+
 export function isScriptType(source: string)
 {
     return getScriptTaskTypes().includes(source);
+}
+
+
+export function isWatchTask(source: string)
+{
+    return getWatchTaskTypes().includes(source);
 }
 

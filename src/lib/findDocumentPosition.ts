@@ -3,8 +3,8 @@ import log from "./log/log";
 import TaskItem from "../tree/item";
 import { TextDocument } from "vscode";
 import { providers } from "../extension";
-import { isWatchTask } from "./utils/utils";
 import { IDictionary } from "../interface";
+import { isWatchTask } from "./utils/taskTypeUtils";
 
 
 const jsonMap: IDictionary<{object: string; preKey: string; postKey: string}> = {

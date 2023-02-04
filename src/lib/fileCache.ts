@@ -71,7 +71,7 @@ export async function addFolder(folder: Uri, logPad: string)
     {
         await startBuild();
 
-        const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providers).filter(k => providers[k].isExternal) ]).sort((a, b) => {
+        const taskProviders = ([ ...Object.keys(providers), ...taskTypeUtils.getWatchTaskTypes() ]).sort((a, b) => {
             return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
         });
 
@@ -81,7 +81,7 @@ export async function addFolder(folder: Uri, logPad: string)
             if (!cancel && numFilesFound < numFiles && (isExternal || util.isTaskTypeEnabled(providerName)))
             {
                 let glob;
-                if (!util.isWatchTask(providerName))
+                if (!taskTypeUtils.isWatchTask(providerName))
                 {
                     const provider = providers[providerName];
                     glob = provider?.getGlobPattern();
@@ -171,7 +171,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         await startBuild();
         if (!cancel)
         {
-            const taskProviders = ([ ...taskTypeUtils.getTaskTypes(), ...Object.keys(providers).filter(k => providers[k].isExternal) ]).sort((a, b) => {
+            const taskProviders = ([ ...Object.keys(providers), ...taskTypeUtils.getWatchTaskTypes() ]).sort((a, b) => {
                 return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
             });
 
@@ -318,7 +318,7 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
 
     // const glob = util.getGlobPattern(taskType);
     let glob;
-    if (!util.isWatchTask(taskType))
+    if (!taskTypeUtils.isWatchTask(taskType))
     {
         glob = providers[taskType].getGlobPattern();
     }

@@ -180,12 +180,6 @@ export function isTaskTypeEnabled(taskType: string)
 export const isUri = (u: any): u is Uri => !!u && u instanceof Uri;
 
 
-export function isWatchTask(source: string)
-{
-    return [ "npm", "tsc", "Workspace" ].includes(source);
-}
-
-
 export function isWorkspaceFolder(value: any): value is WorkspaceFolder
 {
     return value && typeof value !== "number";

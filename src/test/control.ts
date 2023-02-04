@@ -12,6 +12,14 @@ export const testControl: ITestControl =
     //
     keepSettingsFileChanges: false,
     //
+    // Control for waitForTeIdle
+    //
+    waitForTeIdle: {
+        iterations1: 3,
+        iterations2: 2,
+        sleep: 20,
+    },
+    //
     // LOGGING DEFAULTS
     //
     log: {
@@ -563,6 +571,14 @@ export interface ITestControl extends IDictionary<any>
     // KEEP SETTINGS FILE CHANGES (@ test-fixture/project1/.vscode/workspace.json)
     //
     keepSettingsFileChanges: boolean;
+    //
+    // Control for waitForTeIdle
+    //
+    waitForTeIdle: {
+        iterations1: 1 | 2 | 3 | 4 | 5;
+        iterations2: 1 | 2 | 3 | 4 | 5;
+        sleep: number;
+    };
     //
     // LOGGING DEFAULTS
     //
