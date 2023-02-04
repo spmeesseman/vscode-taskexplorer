@@ -38,54 +38,10 @@ export class TaskWatcher implements Disposable
 
     dispose()
     {
-        this.fireAllBabySitters();
         this.disposables.forEach((d) => {
             d.dispose();
         });
         this.disposables = [];
-    }
-
-
-    /**
-     * Used as a check to reset node state when a task 'hangs' or whatever it does sometimes
-     * when the task fails ad the vscode engine doesnt trigger the taskexec finished event.
-     * RUns every 2 seconds for each task that is launched.
-     *
-     * @param taskItem Task item
-     */
-    private babysitRunningTask(taskItem: TaskItem)
-    {
-        const taskId = taskItem.task.definition.taskItemId; // taskItem.id
-        this.fireBabySitter(taskId);
-        const taskTimerId = setTimeout((t: TaskItem) =>
-        {
-            if (t.isRunning())
-            {   /* istanbul ignore if */
-                if (!t.isExecuting())
-                {
-                    if (++this.babysitterCt >= 3)
-                    {
-                        this.babysitterCt = 0;
-                        log.write("task babysitter firing change event", 1);
-                        log.value("   task name", t.task.name, 1);
-                        this.fireTaskChangeEvents(t, "   ", 1);
-                    }
-                    else {
-                        this.babysitRunningTask(t);
-                    }
-                }
-                else {
-                    this.babysitRunningTask(t);
-                }
-            }
-        }, 750, taskItem);
-        this.babysitterTimers[taskId] = taskTimerId;
-    }
-
-
-    private fireAllBabySitters()
-    {
-        Object.keys(this.babysitterTimers).forEach(/* istanbul ignore next */(taskId) => this.fireBabySitter(taskId));
     }
 
 
@@ -237,7 +193,6 @@ export class TaskWatcher implements Disposable
             const taskItem = taskMap[taskId] as TaskItem;
             this.showStatusMessage(task, "   ");
             this.fireTaskChangeEvents(taskItem, "   ", 1);
-            this.babysitRunningTask(taskItem);
         }
 
         log.methodDone("task started event", 1);
