@@ -505,9 +505,9 @@ suite("Tree Tests", () =>
     test("Get Parent (Reveal API)", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        await executeSettingsUpdate("specialFolders.expanded.project1", false);
+        await executeSettingsUpdate("specialFolders.folderState.project1", "Collapsed");
         await testsApi.treeManager.refresh(undefined, undefined, "");
-        await executeSettingsUpdate("specialFolders.expanded.project1", true);
+        await executeSettingsUpdate("specialFolders.folderState.project1", "Expanded");
         utils.endRollingCount(this);
     });
 

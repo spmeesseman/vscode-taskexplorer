@@ -104,34 +104,34 @@ suite("Configuration / Settings Tests", () =>
         v = teApi.testsApi.config.get<any>("visual.disableAnimatedIcons");
         expect(teApi.testsApi.utilities.isBoolean(v) && v === cv).to.equal(true);
         //
-        // 4-part i.e. taskExplorer.specialFolders.expanded.lastTasks
+        // 4-part i.e. taskExplorer.specialFolders.folderState.lastTasks
         //
-        const cv2 = cv = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(cv) && teApi.testsApi.utilities.isBoolean(cv2)).to.equal(true);
-        await teApi.testsApi.config.updateWs("specialFolders.expanded.lastTasks", false);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === false).to.equal(true);
-        await teApi.testsApi.config.updateWs("specialFolders.expanded.lastTasks", true);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === true).to.equal(true);
-        await teApi.testsApi.config.updateWs("specialFolders.expanded.lastTasks", cv);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === cv).to.equal(true);
-        cv = teApi.testsApi.config.get<any>("specialFolders.expanded");
+        const cv2 = cv = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(cv) && teApi.testsApi.utilities.isString(cv2)).to.equal(true);
+        await teApi.testsApi.config.updateWs("specialFolders.folderState.lastTasks", "Collapsed");
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === "Collapsed").to.equal(true);
+        await teApi.testsApi.config.updateWs("specialFolders.folderState.lastTasks", "Expanded");
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === "Expanded").to.equal(true);
+        await teApi.testsApi.config.updateWs("specialFolders.folderState.lastTasks", cv);
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === cv).to.equal(true);
+        cv = teApi.testsApi.config.get<any>("specialFolders.folderState");
         expect(teApi.testsApi.utilities.isObject(cv)).to.equal(true);
-        cv.lastTasks = false;
-        await teApi.testsApi.config.updateWs("specialFolders.expanded", cv);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === false).to.equal(true);
+        cv.lastTasks = "Collapsed";
+        await teApi.testsApi.config.updateWs("specialFolders.folderState", cv);
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === "Collapsed").to.equal(true);
         expect(teApi.testsApi.utilities.isObject(cv)).to.equal(true);
-        cv.lastTasks = true;
-        await teApi.testsApi.config.updateWs("specialFolders.expanded", cv);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === true).to.equal(true);
+        cv.lastTasks = "Expanded";
+        await teApi.testsApi.config.updateWs("specialFolders.folderState", cv);
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === "Expanded").to.equal(true);
         cv.lastTasks = cv2;
-        await teApi.testsApi.config.updateWs("specialFolders.expanded.lastTasks", cv2);
-        v = teApi.testsApi.config.get<any>("specialFolders.expanded.lastTasks");
-        expect(teApi.testsApi.utilities.isBoolean(v) && v === cv2).to.equal(true);
+        await teApi.testsApi.config.updateWs("specialFolders.folderState.lastTasks", cv2);
+        v = teApi.testsApi.config.get<any>("specialFolders.folderState.lastTasks");
+        expect(teApi.testsApi.utilities.isString(v) && v === cv2).to.equal(true);
         //
         // Re-enable config watcher
         //

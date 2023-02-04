@@ -259,10 +259,10 @@ const createDefaultSettings = async() =>
         "taskExplorer.specialFolders.showFavorites": true,
         "taskExplorer.specialFolders.showLastTasks": true,
         "taskExplorer.specialFolders.showUserTasks": true,
-        "taskExplorer.specialFolders.expanded": {
-            favorites: true,
-            lastTasks: true,
-            userTasks: true
+        "taskExplorer.specialFolders.folderState": {
+            favorites: "Expanded",
+            lastTasks: "Expanded",
+            userTasks: "Expanded"
         },
         "taskExplorer.taskButtons.clickAction": "Open",
         "taskExplorer.taskButtons.showFavoritesButton": true,

@@ -20,9 +20,9 @@ suite("Initialization", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, testsApi } = await activate(this));
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-        await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
-        await executeSettingsUpdate("specialFolders.expanded.userTasks", false);
+        await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
+        await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Collapsed");
+        await executeSettingsUpdate("specialFolders.folderState.userTasks", "Collapsed");
         testsApi.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
@@ -32,9 +32,9 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         testsApi.enableConfigWatcher(false);
-        await executeSettingsUpdate("specialFolders.expanded.favorites", true);
-        await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
-        await executeSettingsUpdate("specialFolders.expanded.userTasks", true);
+        await executeSettingsUpdate("specialFolders.folderState.favorites", "Expanded");
+        await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Expanded");
+        await executeSettingsUpdate("specialFolders.folderState.userTasks", "Expanded");
         testsApi.enableConfigWatcher(true);
         await closeEditors();
         suiteFinished(this);

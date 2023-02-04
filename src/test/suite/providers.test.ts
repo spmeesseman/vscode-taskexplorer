@@ -256,7 +256,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
+            await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Collapsed");
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -264,7 +264,7 @@ suite("Provider Tests", () =>
             throw e;
         }
         finally {
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
+            await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Expanded");
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -281,7 +281,7 @@ suite("Provider Tests", () =>
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
-            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -289,7 +289,7 @@ suite("Provider Tests", () =>
             throw e;
         }
         finally {
-            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Expanded");
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -305,8 +305,8 @@ suite("Provider Tests", () =>
         const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
-            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", false);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
+            await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Collapsed");
             await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", true, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -314,8 +314,8 @@ suite("Provider Tests", () =>
             throw e;
         }
         finally {
-            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
-            await executeSettingsUpdate("specialFolders.expanded.lastTasks", true);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Expanded");
+            await executeSettingsUpdate("specialFolders.folderState.lastTasks", "Expanded");
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -333,13 +333,13 @@ suite("Provider Tests", () =>
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
-            await executeSettingsUpdate("specialFolders.expanded.favorites", false);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
         }
         catch (e) {
             throw e;
         }
         finally {
-            await executeSettingsUpdate("specialFolders.expanded.favorites", true);
+            await executeSettingsUpdate("specialFolders.folderState.favorites", "Expanded");
             await executeSettingsUpdate("specialFolders.showLastTasks", showLastTasks, tc.waitTime.config.showHideSpecialFolder);
             await executeSettingsUpdate("specialFolders.showFavorites", showFavorites, tc.waitTime.config.showHideSpecialFolder);
         }
@@ -467,7 +467,7 @@ suite("Provider Tests", () =>
         this.slow(tc.slowTime.cache.build + tc.slowTime.config.event + tc.slowTime.config.eventFast + tc.slowTime.min +
                   (tc.slowTime.commands.refresh* 2) + (tc.waitTime.refreshCommand* 2));
         await executeSettingsUpdate("logging.enable", false); // was hitting tree.logTask()
-        await executeSettingsUpdate("specialFolders.expanded.project1", false, tc.waitTime.config.event);
+        await executeSettingsUpdate("specialFolders.folderState.project1", "Collapsed", tc.waitTime.config.event);
         await refresh();
         endRollingCount(this);
     });

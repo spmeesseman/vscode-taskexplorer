@@ -1921,31 +1921,43 @@
                     "default": 10,
                     "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
                 },
-                "taskExplorer.specialFolders.expanded": {
+                "taskExplorer.specialFolders.folderState": {
                     "type": "object",
-                    "markdownDescription": "%config.taskExplorer.specialFolders.expanded%",
+                    "markdownDescription": "%config.taskExplorer.specialFolders.folderState%",
                     "additionalProperties": {
-                        "type": "boolean",
+                        "enum": [
+                            "Collapsed",
+                            "Expanded"
+                        ],
                         "description": ""
                     },
                     "properties": {
                         "lastTasks": {
-                            "type": "boolean",
-                            "description": "%config.taskExplorer.expandedLastTasks%"
+                            "enum": [
+                                "Collapsed",
+                                "Expanded"
+                            ],
+                            "description": "%config.taskExplorer.folderStateLastTasks%"
                         },
                         "favorites": {
-                            "type": "boolean",
-                            "description": "%config.taskExplorer.expandedFavorites%"
+                            "enum": [
+                                "Collapsed",
+                                "Expanded"
+                            ],
+                            "description": "%config.taskExplorer.folderStateFavorites%"
                         },
                         "userTasks": {
-                            "type": "boolean",
-                            "description": "%config.taskExplorer.expandedUserTasks%"
+                            "enum": [
+                                "Collapsed",
+                                "Expanded"
+                            ],
+                            "description": "%config.taskExplorer.folderStateUserTasks%"
                         }
                     },
                     "default": {
-                        "lastTasks": true,
-                        "favorites": true,
-                        "userTasks": true
+                        "lastTasks": "Expanded",
+                        "favorites": "Expanded",
+                        "userTasks": "Expanded"
                     }
                 },
                 "taskExplorer.visual.disableAnimatedIcons": {

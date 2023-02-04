@@ -3,7 +3,7 @@ import TaskItem from "./item";
 import log from "../lib/log/log";
 import TaskFolder from "./folder";
 import constants from "../lib/constants";
-import { ITaskTree, ITaskTreeManager } from "../interface";
+import { IDictionary, ITaskTree, ITaskTreeManager } from "../interface";
 import { sortTasks } from "../lib/sortTasks";
 import { storage } from "../lib/utils/storage";
 import { TaskTreeManager } from "./treeManager";
@@ -208,15 +208,14 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
 
     clearTaskItems()
     {
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
+        const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         this.taskFiles = [];
         //
         // The 'Last Tasks' folder will be 1st in the tree
         //
         if (configuration.get<boolean>("specialFolders.showLastTasks") === true)
         {
-            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
-                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+            this.collapsibleState =  TreeItemCollapsibleState[nodeExpandedeMap.lastTasks];
         }
         //
         // The 'Favorites' folder will be 2nd in the tree (or 1st if configured to hide
@@ -224,8 +223,7 @@ export default class SpecialTaskFolder extends TaskFolder implements Disposable
         //
         if (configuration.get<boolean>("specialFolders.showFavorites"))
         {
-            this.collapsibleState =  nodeExpandedeMap.lastTasks !== false ?
-                                     TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+            this.collapsibleState =  TreeItemCollapsibleState[nodeExpandedeMap.favorites];
         }
     }
 

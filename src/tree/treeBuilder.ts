@@ -165,8 +165,7 @@ export default class TaskTreeBuilder implements Disposable
         ]);
         log.value("   scope", each.scope, 4, logPad);
 
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded"),
-              relativePath = getTaskRelativePath(each);
+        const relativePath = getTaskRelativePath(each);
         //
         // Set scope name and create the TaskFolder, a "user" task will have a TaskScope scope, not
         // a WorkspaceFolder scope.
@@ -177,8 +176,9 @@ export default class TaskTreeBuilder implements Disposable
             folder = folders[scopeName];
             if (!folder)
             {
-                folder = new TaskFolder(each.scope, nodeExpandedeMap[utils.lowerCaseFirstChar(scopeName, true)] !== false ?
-                                                    TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+                const key = utils.lowerCaseFirstChar(scopeName, true),
+                      state = configuration.get<"Collapsed"|"Expanded">("specialFolders.folderState." + key, "Expanded");
+                folder = new TaskFolder(each.scope, TreeItemCollapsibleState[state]);
                 folders[scopeName] = folder;
                 log.value("constructed tree taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }
@@ -189,8 +189,8 @@ export default class TaskTreeBuilder implements Disposable
             folder = folders[scopeName];
             if (!folder)
             {
-                folder = new TaskFolder(scopeName, nodeExpandedeMap[utils.lowerCaseFirstChar(scopeName, true)] !== false ?
-                                                TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed);
+                const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
+                folder = new TaskFolder(scopeName, TreeItemCollapsibleState[nodeExpandedeMap[utils.lowerCaseFirstChar(scopeName, true)]]);
                 folders[scopeName] = folder;
                 log.value("constructed tree user taskfolder", `${scopeName} (${folder.id})`, 3, logPad + "   ");
             }

@@ -36,10 +36,10 @@
 	"config.taskExplorer.exclude": "Configure `glob` patterns for folders and files that should be excluded from script detection.",
 	"config.taskExplorer.excludeTask": "Configure `regex` patterns for individual tasks that should be excluded from task tree inclusion.",
 
-	"config.taskExplorer.expanded": "Specify individual (main) tree folders to be either expanded or collapses on startup",
-	"config.taskExplorer.expandedLastTasks": "`Last Tasks` folder",
-	"config.taskExplorer.expandedFavorites": "`Favorites` folder",
-	"config.taskExplorer.expandedUserTasks": "`User Tasks` folder",
+	"config.taskExplorer.folderState": "Specify individual (main) tree folders to be either expanded or collapses on startup",
+	"config.taskExplorer.folderStateLastTasks": "`Last Tasks` folder",
+	"config.taskExplorer.folderStateFavorites": "`Favorites` folder",
+	"config.taskExplorer.folderStateUserTasks": "`User Tasks` folder",
 
 	"config.taskExplorer.globPatternsAnt": "Configure glob patterns for locating Apache Ant files not named b(B)uild.xml.",
 	"config.taskExplorer.globPatternsBash": "Configure the glob patterns for locating bash scripts, can be used to locate scripts with no extension.",

@@ -68,14 +68,10 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         teApi = api;
         this.tasks = TaskTreeManager.tasks;
 
-        const nodeExpandedeMap: any = configuration.get<any>("specialFolders.expanded");
-        const favoritesExpanded = nodeExpandedeMap.favorites !== false ?
-                                  TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
-        const lastTaskExpanded = nodeExpandedeMap.lastTasks !== false ?
-                                TreeItemCollapsibleState.Expanded : TreeItemCollapsibleState.Collapsed;
+        const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         TaskTreeManager.specialFolders = {
-            favorites: new SpecialTaskFolder(this, constants.FAV_TASKS_LABEL, favoritesExpanded),
-            lastTasks: new SpecialTaskFolder(this, constants.LAST_TASKS_LABEL, lastTaskExpanded)
+            favorites: new SpecialTaskFolder(this, constants.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
+            lastTasks: new SpecialTaskFolder(this, constants.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
         this.disposables.push(TaskTreeManager.specialFolders.favorites);
         this.disposables.push(TaskTreeManager.specialFolders.lastTasks);
@@ -284,7 +280,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private doTaskCacheRemovals = (invalidation: string | undefined, logPad: string) =>
     {
         let ctRmv = 0;
-        log.write("   removing current invalidated tasks from cache", 3, logPad);
+        log.methodStart("do task cache removals", 2, logPad);
         const showUserTasks = configuration.get<boolean>("specialFolders.showUserTasks");
         this.tasks.slice().reverse().forEach((item, index, object) => // niftiest loop ever
         {   //
@@ -310,7 +306,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 this.tasks.splice(object.length - 1 - index, 1);
             }
         });
-        log.write(`   removed ${ctRmv} ${invalidation} current tasks from cache`, 3, logPad);
+        log.write(`   removed ${ctRmv} ${invalidation} current tasks from cache`, 2, logPad);
+        log.methodDone("do task cache removals", 2, logPad);
     };
 
 
@@ -329,6 +326,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 
     private fetchTasks = async(logPad: string) =>
     {
+        log.methodStart("fetch tasks", 1, logPad);
         if (this.tasks.length === 0 || !this.currentInvalidation || this.currentInvalidation  === "Workspace" || this.currentInvalidation === "tsc") // || this.currentInvalidationUri)
         {
             log.write("   fetching all tasks via VSCode fetchTasks call", 1, logPad);
@@ -337,8 +335,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             //
             // Process the tasks cache array for any removals that might need to be made
             //
-            this.doTaskCacheRemovals(undefined, logPad); // removes tasks that already exist that were just re-parsed
-        }     //                                         // as we will replace them a few lines down
+            this.doTaskCacheRemovals(undefined, logPad + "   "); // removes user tasks
+        }     //
         else // this.currentInvalidation guaranteed to be a string (task type) here
         {   //
             const taskName = getTaskTypeFriendlyName(this.currentInvalidation);
@@ -352,7 +350,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             const taskItems = await tasks.fetchTasks({ type: this.currentInvalidation });
             //
             // Process the tasks cache array for any removals that might need to be made
-            //                                                          // removes tasks that already exist that were just re-parsed
+            //                                                          // removes tasks that already existed that were just re-parsed
             this.doTaskCacheRemovals(this.currentInvalidation, logPad); // of the same task type (this.currentInvalidation)
             log.write(`   adding ${taskItems.length} new ${this.currentInvalidation} tasks`, 2, logPad);
             this.tasks.push(...taskItems);
@@ -398,11 +396,12 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             {
                 this.fireTreeRefreshEvent(logPad + "   ", 2);
             }
-            await this.treeBuilder.createTaskItemTree(logPad, 2);
+            await this.treeBuilder.createTaskItemTree(logPad + "   ", 2);
         }
 
         this.firstTreeBuildDone = true;
-        TaskTreeManager.refreshPending = this.processEventQueue(logPad);
+        // TaskTreeManager.refreshPending = this.processEventQueue(logPad + "   ");
+        log.methodDone("fetch tasks", 1, logPad);
     };
 
 
@@ -414,7 +413,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         });
     };
 
-
+/*
     private fireTreeManagerRefreshEvent = async(logPad: string, logLevel: number, taskFile?: TreeItem) =>
     {
         const id = "pendingFireTreeRefreshEvent-" + (taskFile ? taskFile.id?.replace(/\W/g, "") : "g");
@@ -461,7 +460,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
     };
-
+*/
 
     static getlastTasksFolder = () => this.specialFolders.lastTasks;
 
@@ -500,7 +499,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    initialize = async(logPad: string) =>
+    loadTasks = async(logPad: string) =>
     {
         log.methodStart("construct task tree manager", 1, logPad);
         TaskTreeManager.refreshPending = true;
@@ -669,7 +668,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         }
     };
 
-
+/*
     private processEventQueue = (logPad: string) =>
     {
         let firedEvent = false;
@@ -699,7 +698,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         log.methodDone("process task explorer main event queue", 1, logPad);
         return firedEvent;
     };
-
+*/
 
     /**
      * Responsible for refreshing the tree content and tasks cache
@@ -757,8 +756,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             [ "invalidate", invalidate ], [ "opt fsPath", utils.isUri(opt) ? opt.fsPath : "n/a" ]
         ]);
 
-        let refreshItem: TreeItem | undefined;
-
         await this.waitForRefreshComplete();
         TaskTreeManager.refreshPending = true;
 
@@ -795,7 +792,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             }
             this.treeBuilder.invalidate();
             log.write("   fire tree data change event", 2, logPad);
-            await this.fireTreeManagerRefreshEvent(logPad,  1, refreshItem);
+            await this.loadTasks(logPad + "   ");
+            // await fireTreeManagerRefreshEvent(logPad + "   ")
         }
 
         log.methodDone("refresh task tree", 1, logPad);

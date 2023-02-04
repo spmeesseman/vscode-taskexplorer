@@ -77,7 +77,7 @@ export const teApi: ITaskExplorerApi =
 };
 
 
-export async function activate(context: ExtensionContext) // , disposables: Disposable[]): Promise<ITaskExplorerApi>
+export async function activate(context: ExtensionContext)
 {
     extensionContext = context;
     //
@@ -249,9 +249,9 @@ const initialize = async(context: ExtensionContext) =>
     await storage.update2("lastDeactivated", 0);
     await storage.update2("lastWsRootPathChange", 0);
     //
-    // Start the first tree build
+    // Start the first tree build/load
     //
-    await treeManager.initialize("   ");
+    await treeManager.loadTasks("   ");
     //
     // Log the environment
     //
@@ -298,6 +298,11 @@ const tempDeleteSomePathToPrograms = async () =>
     if (ptp !== undefined) {
         await configuration.update("pathToPrograms.bash", undefined);
         await configuration.updateWs("pathToPrograms.bash", undefined);
+    }
+    ptp = configuration.get<any>("specialFolders.expanded");
+    if (ptp !== undefined) {
+        await configuration.update("specialFolders.expanded", undefined);
+        await configuration.updateWs("specialFolders.expanded", undefined);
     }
 };
 
@@ -375,17 +380,12 @@ export async function deactivate()
     storage.update2Sync("lastDeactivated", Date.now());
     //
     // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
-    // everything here, it doesn't seem to cause any issue with Code exiting.  But...
-    // TODO - Add local disposables[] array to pass to each module on instantiation so we
-    //        don't have to mess with context.subscriptions here, as I'm not sure if VSCode
-    //        does anything with it internally.  If we have a local disposables array, we can
-    //        set it to empty here when done andnot have to worry about it, since subscriptions
-    //        is read-only I don't want to set it to a new array instance or clear it and
-    //        @ts-ignore the error that TS complains about.
+    // everything here, it doesn't seem to cause any issue with Code exiting.
     //
     extensionContext.subscriptions.forEach((s) => {
         s.dispose();
     });
+    extensionContext.subscriptions.splice(0);
 }
 
 
