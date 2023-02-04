@@ -64,7 +64,6 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuild + tc.slowTime.min);
-        // await treeUtils.refresh(this);
         await testsApi.fileCache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);

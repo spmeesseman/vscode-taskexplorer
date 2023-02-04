@@ -156,7 +156,7 @@ export const activate = async (instance?: Mocha.Context) =>
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Waiting for extension to initialize", figures.colors.grey)}`);
-        waitForTeIdle();
+        await waitForTeIdle();
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
