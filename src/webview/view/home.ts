@@ -1,8 +1,9 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../page/teWebviewPanel";
-import { ITaskExplorerApi } from "../../interface";
+import TeWebviewPanel from "../webviewPanel";
+import WebviewManager from "../webViewManager";
 import { ExtensionContext, Uri } from "vscode";
+import { ITaskExplorerApi } from "../../interface";
 import { getWorkspaceProjectName } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
@@ -14,7 +15,7 @@ export const displayParsingReport = async(api: ITaskExplorerApi, context: Extens
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
+	panel = WebviewManager.create(viewTitle, viewType, html, context);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };

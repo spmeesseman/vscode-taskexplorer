@@ -1,7 +1,8 @@
 
 import * as path from "path";
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../page/teWebviewPanel";
+import TeWebviewPanel from "../webviewPanel";
+import WebviewManager from "../webViewManager";
 import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel, window } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
@@ -24,7 +25,7 @@ export abstract class TeView
 	{
 		log.methodStart("te view base constructor", 1, logPad);
 		this.html = html;
-		this.teWebviewPanel = TeWebviewPanel.create(title, viewtype, html, context);
+		this.teWebviewPanel = WebviewManager.create(title, viewtype, html, context);
 		log.methodDone("te view base constructor", 1, logPad);
 	}
 
@@ -58,7 +59,7 @@ export abstract class TeView
 			{
 				log.methodStart("revive parsing report", 1, logPad);
 				const html = await this.getPageContent(api, logPad, uri);
-				TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+				WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
 				log.methodDone("revive parsing report", 1, logPad);
 				resolve();
 			}, 10, webviewPanel, api, context, logPad, uri);

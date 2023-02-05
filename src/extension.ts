@@ -387,6 +387,9 @@ export async function deactivate()
 }
 
 
+export const getExtensionContext = () => extensionContext;
+
+
 export const getLicenseManager = () => licenseManager;
 
 

@@ -1,6 +1,7 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../page/teWebviewPanel";
+import TeWebviewPanel from "../webviewPanel";
+import WebviewManager from "../webViewManager";
 import { ITaskExplorerApi } from "../../interface";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
@@ -15,7 +16,7 @@ export const displayParsingReport = async(api: ITaskExplorerApi, context: Extens
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
+	panel = WebviewManager.create(viewTitle, viewType, html, context);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
@@ -28,7 +29,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) 
 	const explorer = api.explorer || api.sidebar;
 	const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
 				  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) && project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-	html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
+	html = await WebviewManager.createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
 	return html;
 };
 
@@ -52,7 +53,7 @@ export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskE
 		{
 			log.methodStart("revive parsing report", 1, logPad);
 			const html = await getPageContent(api, logPad, uri);
-			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
 			log.methodDone("revive parsing report", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, api, context, logPad, uri);
