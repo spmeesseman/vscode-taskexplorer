@@ -1,6 +1,7 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "./teWebviewPanel";
+import TeWebviewPanel from "../webviewPanel";
+import WebviewManager from "../webViewManager";
 import { join } from "path";
 import { marked } from "marked";
 import { timeout } from "../../lib/utils/utils";
@@ -18,7 +19,7 @@ export const displayReleaseNotes = async(api: ITaskExplorerApi, context: Extensi
 {
 	log.methodStart("display release notes", 1, logPad);
 	const html = await getPageContent(context, api, logPad + "   ");
-	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
+	panel = WebviewManager.create(viewTitle, viewType, html, context);
     log.methodDone("display release notes", 1, logPad);
     return panel;
 };
@@ -35,7 +36,7 @@ const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, 
 							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
 							   .replace("<!-- releasenotes -->", getNewReleaseNotes(context.extension.packageJSON.version, changeLogMd));
-	html = TeWebviewPanel.cleanLicenseButtons(html, api);
+	html = WebviewManager.cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
 	return html;
 };
@@ -143,7 +144,7 @@ export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskEx
 		{
 			log.methodStart("revive release notes", 1, logPad);
 			const html = await getPageContent(context, api, logPad + "   ");
-			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
 			log.methodDone("revive release notes", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, api, context, logPad);

@@ -1,6 +1,7 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "./teWebviewPanel";
+import TeWebviewPanel from "../webviewPanel";
+import WebviewManager from "../webViewManager";
 import { timeout } from "../../lib/utils/utils";
 import { ITaskExplorerApi } from "../../interface";
 import { getLicenseManager } from "../../extension";
@@ -16,7 +17,7 @@ export const displayLicenseReport = async(api: ITaskExplorerApi, context: Extens
 {
 	log.methodStart("display license report", 1, logPad);
 	const html = await getPageContent(api, logPad + "   ", tasks, newKey);
-	panel = TeWebviewPanel.create(viewTitle, viewType, html, context);
+	panel = WebviewManager.create(viewTitle, viewType, html, context);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };
@@ -34,7 +35,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	/* istanbul ignore else */
 	if (tasks)
 	{
-		html = await TeWebviewPanel.createTaskCountTable(api, tasks, "Task Explorer Licensing");
+		html = await WebviewManager.createTaskCountTable(api, tasks, "Task Explorer Licensing");
 
 		let infoContent = getExtraContent(api, logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
@@ -150,7 +151,7 @@ export const reviveLicensePage = async(webviewPanel: WebviewPanel, api: ITaskExp
 		{
 			log.methodStart("revive license report", 1, logPad);
 			const html = await getPageContent(api, logPad + "   ", tasks, newKey);
-			TeWebviewPanel.create(viewTitle, viewType, html, context, webviewPanel);
+			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
 			log.methodDone("revive license report", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, api, context, logPad, tasks, newKey);
