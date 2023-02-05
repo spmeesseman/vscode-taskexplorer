@@ -277,7 +277,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
         catch (e: any) { /* istanbul ignore next */ log.error(e); }
     }
     else if (isExternal) {
-        await util.timeout(150);
+        await util.timeout(50);
     }
 
     log.methodDone(logMsg, 1, logPad);

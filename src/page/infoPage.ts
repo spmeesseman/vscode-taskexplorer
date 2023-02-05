@@ -3,10 +3,9 @@ import * as path from "path";
 import log from "../lib/log/log";
 import TeWebviewPanel from "./teWebviewPanel";
 import { ITaskExplorerApi } from "../interface";
+import { TaskTreeManager } from "../tree/treeManager";
 import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../lib/utils/utils";
-import TaskTree from "../tree/tree";
-import { TaskTreeManager } from "../tree/treeManager";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";

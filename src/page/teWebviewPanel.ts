@@ -5,9 +5,7 @@ import { getTaskFiles } from "../lib/fileCache";
 import { getInstallPath } from "../lib/utils/pathUtils";
 import { getTaskTypes } from "../lib/utils/taskTypeUtils";
 import { IDictionary, ITaskExplorerApi } from "../interface";
-import {
-    commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace
-} from "vscode";
+import { commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 
 
 export default class TeWebviewPanel
@@ -89,6 +87,7 @@ export default class TeWebviewPanel
             column || ViewColumn.One, // Editor column to show the new webview panel in.
             {
                 enableScripts: true,
+                enableCommandUris: true,
                 localResourceRoots: [ resourceDir ]
             }
         );

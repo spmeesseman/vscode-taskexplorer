@@ -4,9 +4,8 @@ import TeWebviewPanel from "./teWebviewPanel";
 import { timeout } from "../lib/utils/utils";
 import { ITaskExplorerApi } from "../interface";
 import { getLicenseManager } from "../extension";
-import { ExtensionContext, Task, WebviewPanel } from "vscode";
-import TaskTree from "../tree/tree";
 import { TaskTreeManager } from "../tree/treeManager";
+import { ExtensionContext, Task, WebviewPanel } from "vscode";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";

@@ -1,9 +1,9 @@
 
 import log from "../lib/log/log";
+import TeWebviewPanel from "./teWebviewPanel";
 import { join } from "path";
 import { marked } from "marked";
 import { timeout } from "../lib/utils/utils";
-import TeWebviewPanel from "./teWebviewPanel";
 import { readFileAsync } from "../lib/utils/fs";
 import { ITaskExplorerApi } from "../interface";
 import { getInstallPath } from "../lib/utils/pathUtils";
