@@ -154,7 +154,7 @@ export default class TaskTree implements ITaskTree, Disposable
             this.refreshPending = false;
             if (!taskItemTree && TaskTree.loadStage > 2) {
                 this.refreshPending = true;
-                setTimeout(() => this._onDidChangeTreeData.fire(), 50);
+                // setTimeout(() => this._onDidChangeTreeData.fire(), 50);
             }
             return [ new LoadScripts(this) ];
         }
