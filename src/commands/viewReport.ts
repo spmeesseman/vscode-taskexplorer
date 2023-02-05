@@ -1,7 +1,7 @@
 
 import log from "../lib/log/log";
 import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
-import { displayParsingReport, getViewType, reviveParsingReport } from "../page/infoPage";
+import { displayParsingReport, getViewType, reviveParsingReport } from "../webview/page/infoPage";
 import { ITaskExplorerApi } from "../interface";
 
 let context: ExtensionContext;

@@ -3,7 +3,7 @@
 import log from "../lib/log/log";
 import { ITaskExplorerApi } from "../interface";
 import { commands, ExtensionContext } from "vscode";
-import { displayLicenseReport } from "../page/licensePage";
+import { displayLicenseReport } from "../webview/page/licensePage";
 import { getLicenseManager } from "../extension";
 
 let context: ExtensionContext;

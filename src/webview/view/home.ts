@@ -1,9 +1,9 @@
 
-import log from "../lib/log/log";
+import log from "../../lib/log/log";
 import TeWebviewPanel from "../page/teWebviewPanel";
-import { ITaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Uri } from "vscode";
-import { getWorkspaceProjectName } from "../lib/utils/utils";
+import { getWorkspaceProjectName } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";

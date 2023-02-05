@@ -1,10 +1,10 @@
 
 import { join } from "path";
-import { readFileAsync } from "../lib/utils/fs";
-import { getTaskFiles } from "../lib/fileCache";
-import { getInstallPath } from "../lib/utils/pathUtils";
-import { getTaskTypes } from "../lib/utils/taskTypeUtils";
-import { IDictionary, ITaskExplorerApi } from "../interface";
+import { readFileAsync } from "../../lib/utils/fs";
+import { getTaskFiles } from "../../lib/fileCache";
+import { getInstallPath } from "../../lib/utils/pathUtils";
+import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
+import { IDictionary, ITaskExplorerApi } from "../../interface";
 import { commands, Disposable, ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
 
 

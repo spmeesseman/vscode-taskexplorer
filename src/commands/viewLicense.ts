@@ -2,7 +2,7 @@
 import log from "../lib/log/log";
 import { ITaskExplorerApi } from "../interface";
 import { commands, ExtensionContext, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
-import { displayLicenseReport, getViewType, reviveLicensePage } from "../page/licensePage";
+import { displayLicenseReport, getViewType, reviveLicensePage } from "../webview/page/licensePage";
 
 let context: ExtensionContext;
 let teApi: ITaskExplorerApi;

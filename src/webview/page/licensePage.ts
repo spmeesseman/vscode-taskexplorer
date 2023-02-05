@@ -1,10 +1,10 @@
 
-import log from "../lib/log/log";
+import log from "../../lib/log/log";
 import TeWebviewPanel from "./teWebviewPanel";
-import { timeout } from "../lib/utils/utils";
-import { ITaskExplorerApi } from "../interface";
-import { getLicenseManager } from "../extension";
-import { TaskTreeManager } from "../tree/treeManager";
+import { timeout } from "../../lib/utils/utils";
+import { ITaskExplorerApi } from "../../interface";
+import { getLicenseManager } from "../../extension";
+import { TaskTreeManager } from "../../tree/treeManager";
 import { ExtensionContext, Task, WebviewPanel } from "vscode";
 
 const viewTitle = "Task Explorer Licensing";

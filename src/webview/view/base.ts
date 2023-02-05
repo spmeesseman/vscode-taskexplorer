@@ -1,11 +1,11 @@
 
 import * as path from "path";
-import log from "../lib/log/log";
+import log from "../../lib/log/log";
 import TeWebviewPanel from "../page/teWebviewPanel";
-import { ITaskExplorerApi } from "../interface";
+import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel, window } from "vscode";
-import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../lib/utils/utils";
-import { views } from "../lib/views";
+import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
+import { views } from "../../lib/views";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";

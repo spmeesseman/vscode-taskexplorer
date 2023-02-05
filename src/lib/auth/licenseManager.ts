@@ -2,7 +2,7 @@
 // import * as https from "http";
 import * as https from "https";
 import figures from "../figures";
-import TeWebviewPanel from "../../page/teWebviewPanel";
+import TeWebviewPanel from "../../webview/page/teWebviewPanel";
 import log, { logControl } from "../log/log";
 import { IncomingMessage } from "http";
 import { storage } from "../utils/storage";
@@ -10,7 +10,7 @@ import { refreshTree } from "../refreshTree";
 import { ITaskExplorerApi } from "../../interface";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { displayLicenseReport } from "../../page/licensePage";
+import { displayLicenseReport } from "../../webview/page/licensePage";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { commands, env, ExtensionContext, InputBoxOptions, Task, window } from "vscode";
 
