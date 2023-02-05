@@ -9,24 +9,24 @@ import { timeout } from "../../lib/utils/utils";
 import { readFileAsync } from "../../lib/utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../../lib/utils/pathUtils";
-import { getExtensionContext, getWebviewManager } from "../../extension";
+import { getExtensionContext, getWebviewManager, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
 let panel: TeWebviewPanel | undefined;
 
 
-export const displayReleaseNotes = async(api: ITaskExplorerApi, logPad: string) =>
+export const displayReleaseNotes = async(logPad: string) =>
 {
 	log.methodStart("display release notes", 1, logPad);
-	const html = await getPageContent(api, logPad + "   ");
+	const html = await getPageContent(logPad + "   ");
 	panel = getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display release notes", 1, logPad);
     return panel;
 };
 
 
-const getPageContent = async (api: ITaskExplorerApi, logPad: string) =>
+const getPageContent = async (logPad: string) =>
 {
 	log.methodStart("get page content", 1, logPad);
 	const installPath = await getInstallPath(),
@@ -38,7 +38,7 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string) =>
 							   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
 							   .replace("<!-- releasenotes -->", getNewReleaseNotes(version, changeLogMd));
-	html = WebviewManager.cleanLicenseButtons(html, api);
+	html = WebviewManager.cleanLicenseButtons(html);
 	log.methodDone("get page content", 1, logPad);
 	return html;
 };
@@ -133,22 +133,22 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string) =>
+export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, logPad: string) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
 	await new Promise<void>(async(resolve) =>
 	{
-		while (api.isBusy()) {
+		while (isExtensionBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string) =>
+		setTimeout(async (webviewPanel: WebviewPanel, logPad: string) =>
 		{
 			log.methodStart("revive release notes", 1, logPad);
-			const html = await getPageContent(api, logPad + "   ");
+			const html = await getPageContent(logPad + "   ");
 			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive release notes", 1, logPad);
 			resolve();
-		}, 10, webviewPanel, api, logPad);
+		}, 10, webviewPanel, logPad);
 	});
 };

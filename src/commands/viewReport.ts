@@ -1,11 +1,8 @@
 
 import log from "../lib/log/log";
-import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
-import { displayParsingReport, getViewType, reviveParsingReport } from "../webview/page/infoPage";
 import { ITaskExplorerApi } from "../interface";
-
-let context: ExtensionContext;
-let teApi: ITaskExplorerApi;
+import { displayParsingReport, getViewType, reviveParsingReport } from "../webview/page/infoPage";
+import { commands, ExtensionContext, Uri, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
 
 
 export const getParsingReportSerializer = () => serializer;
@@ -14,7 +11,7 @@ export const getParsingReportSerializer = () => serializer;
 const viewReport = async(uri?: Uri) =>
 {
     log.methodStart("view report command", 1, "", true);
-    const panel = await displayParsingReport(teApi, context, "   ", uri);
+    const panel = await displayParsingReport("   ", uri);
     log.methodDone("view report command", 1);
     return panel.getWebviewPanel();
 };
@@ -24,15 +21,13 @@ const serializer: WebviewPanelSerializer =
 {
     deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: any) =>
     {
-        await reviveParsingReport(webviewPanel, teApi, context, "");
+        await reviveParsingReport(webviewPanel, "");
     }
 };
 
 
-const registerViewReportCommand = (ctx: ExtensionContext, api: ITaskExplorerApi) =>
+const registerViewReportCommand = (ctx: ExtensionContext) =>
 {
-    teApi = api;
-    context = ctx;
 	ctx.subscriptions.push(
         commands.registerCommand("vscode-taskexplorer.viewReport", async (uri?: Uri) => viewReport(uri)),
         window.registerWebviewPanelSerializer(getViewType(), serializer)

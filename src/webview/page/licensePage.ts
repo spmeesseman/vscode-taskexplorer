@@ -4,26 +4,25 @@ import TeWebviewPanel from "../webviewPanel";
 import WebviewManager from "../webViewManager";
 import { Task, WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
-import { ITaskExplorerApi } from "../../interface";
 import { TaskTreeManager } from "../../tree/treeManager";
-import { getLicenseManager, getWebviewManager } from "../../extension";
+import { getLicenseManager, getWebviewManager, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
 let panel: TeWebviewPanel | undefined;
 
 
-export const displayLicenseReport = async(api: ITaskExplorerApi, logPad: string, tasks?: Task[], newKey?: string) =>
+export const displayLicenseReport = async(logPad: string, tasks?: Task[], newKey?: string) =>
 {
 	log.methodStart("display license report", 1, logPad);
-	const html = await getPageContent(api, logPad + "   ", tasks, newKey);
+	const html = await getPageContent(logPad + "   ", tasks, newKey);
 	panel = getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };
 
 
-const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Task[], newKey?: string) =>
+const getPageContent = async (logPad: string, tasks?: Task[], newKey?: string) =>
 {
 	let html = "";
 
@@ -35,9 +34,9 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 	/* istanbul ignore else */
 	if (tasks)
 	{
-		html = await WebviewManager.createTaskCountTable(api, tasks, "Task Explorer Licensing");
+		html = await WebviewManager.createTaskCountTable(tasks, "Task Explorer Licensing");
 
-		let infoContent = getExtraContent(api, logPad + "   ", newKey);
+		let infoContent = getExtraContent(logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
 
 		infoContent = getExtraContent2(logPad + "   ");
@@ -52,12 +51,12 @@ const getPageContent = async (api: ITaskExplorerApi, logPad: string, tasks?: Tas
 };
 
 
-const getExtraContent = (api: ITaskExplorerApi, logPad: string, newKey?: string) =>
+const getExtraContent = (logPad: string, newKey?: string) =>
 {
     log.methodStart("get body content", 1, logPad);
-
+	const licMgr = getLicenseManager();
 	const details = !newKey ?
-(!api.isLicensed() ? `
+(!licMgr.isLicensed() ? `
 <table class="margin-top-15">
 	<tr><td class="content-subsection-header">
 		Licensing Note
@@ -93,11 +92,11 @@ const getExtraContent = (api: ITaskExplorerApi, logPad: string, newKey?: string)
 `) : `
 <table class="margin-top-15">
 	<tr><td class="content-subsection-header">
-		30-Day License Key: &nbsp;${getLicenseManager().getLicenseKey()}
+		30-Day License Key: &nbsp;${licMgr.getLicenseKey()}
 	</td></tr>
 	<tr><td>
 		This license key is valid for30 days from the time it was issued.  Please show your support for
-		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(`${newKey}&${getLicenseManager().getToken()}`)}">here</a>.
+		the extension and purchase the license <a href="https://license.spmeesseman.com/purchase?key=${encodeURIComponent(`${newKey}&${licMgr.getToken()}`)}">here</a>.
 	</td></tr>
 </table>
 <table class="margin-top-20">
@@ -138,22 +137,22 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveLicensePage = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, tasks?: Task[], newKey?: string) =>
+export const reviveLicensePage = async(webviewPanel: WebviewPanel, logPad: string, tasks?: Task[], newKey?: string) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
 	await new Promise<void>(async(resolve) =>
 	{
-		while (api.isBusy()) {
+		while (isExtensionBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, tasks?: Task[], newKey?: string) =>
+		setTimeout(async (webviewPanel: WebviewPanel, logPad: string, tasks?: Task[], newKey?: string) =>
 		{
 			log.methodStart("revive license report", 1, logPad);
-			const html = await getPageContent(api, logPad + "   ", tasks, newKey);
+			const html = await getPageContent(logPad + "   ", tasks, newKey);
 			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive license report", 1, logPad);
 			resolve();
-		}, 10, webviewPanel, api, logPad, tasks, newKey);
+		}, 10, webviewPanel, logPad, tasks, newKey);
 	});
 };

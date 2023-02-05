@@ -1,11 +1,12 @@
 
-import { join } from "path";
 import TeWebviewPanel from "./webviewPanel";
+import { join } from "path";
+import { IDictionary } from "../interface";
 import { readFileAsync } from "../lib/utils/fs";
 import { getTaskFiles } from "../lib/fileCache";
+import { getLicenseManager } from "../extension";
 import { getInstallPath } from "../lib/utils/pathUtils";
 import { getTaskTypes } from "../lib/utils/taskTypeUtils";
-import { IDictionary, ITaskExplorerApi } from "../interface";
 import { ExtensionContext, Task, WebviewPanel, window, workspace } from "vscode";
 
 
@@ -44,7 +45,7 @@ export default class WebviewManager
     };
 
 
-    static createTaskCountTable = async(api: ITaskExplorerApi, tasks: Task[], title: string, project?: string) =>
+    static createTaskCountTable = async(tasks: Task[], title: string, project?: string) =>
     {
         const projects: string[] = [],
               taskCounts: IDictionary<number> = {},
@@ -101,13 +102,13 @@ export default class WebviewManager
         html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
         html = html.replace(/\$\{taskFiles.length\}/g, fileCount.toString());
 
-        return WebviewManager.cleanLicenseButtons(html, api);
+        return WebviewManager.cleanLicenseButtons(html);
     };
 
 
-    static cleanLicenseButtons = (html: string, api: ITaskExplorerApi) =>
+    static cleanLicenseButtons = (html: string) =>
     {
-        if (api.isLicensed())
+        if (getLicenseManager().isLicensed())
         {
             let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
                 idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;

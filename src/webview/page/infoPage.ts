@@ -4,7 +4,7 @@ import WebviewManager from "../webViewManager";
 import { dirname, relative } from "path";
 import { Task, Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "../../interface";
-import { getWebviewManager } from "../../extension";
+import { getWebviewManager, isExtensionBusy } from "../../extension";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
 
@@ -12,37 +12,29 @@ const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
 
 
-export const displayParsingReport = async(api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
+export const displayParsingReport = async(logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
-	const html = await getPageContent(api, logPad, uri);
+	const html = await getPageContent(logPad, uri);
 	const panel = getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
 
 
-const getPageContent = async (api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
+const getPageContent = async (logPad: string, uri?: Uri) =>
 {
 	let html = "";
 	const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
-	const explorer = api.explorer || api.sidebar;
-
-	if (explorer)
-	{
-		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
-							  .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
-					 			  				   project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await WebviewManager.createTaskCountTable(api, tasks, "Task Explorer Parsing Report", project);
-
-		const infoContent = getExtraContent(tasks, logPad + "   ", uri);
-		html = html.replace("<!-- addtlContent -->", infoContent);
-
-		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
-			  idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
-		html = html.replace(html.slice(idx1, idx2), "");
-	}
-
+	const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
+							     .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
+				  					      project === getWorkspaceProjectName(t.scope.uri.fsPath)));
+	html = await WebviewManager.createTaskCountTable(tasks, "Task Explorer Parsing Report", project);
+	const infoContent = getExtraContent(tasks, logPad + "   ", uri);
+	html = html.replace("<!-- addtlContent -->", infoContent);
+	const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
+			idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
+	html = html.replace(html.slice(idx1, idx2), "");
 	return html;
 };
 
@@ -128,22 +120,22 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
+export const reviveParsingReport = async(webviewPanel: WebviewPanel, logPad: string, uri?: Uri) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
 	await new Promise<void>(async(resolve) =>
 	{
-		while (api.isBusy()) {
+		while (isExtensionBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
+		setTimeout(async(webviewPanel: WebviewPanel, logPad: string, uri?: Uri) =>
 		{
 			log.methodStart("revive parsing report", 1, logPad);
-			const html = await getPageContent(api, logPad, uri);
+			const html = await getPageContent(logPad, uri);
 			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive parsing report", 1, logPad);
 			resolve();
-		}, 10, webviewPanel, api, context, logPad, uri);
+		}, 10, webviewPanel, context, logPad, uri);
 	});
 };

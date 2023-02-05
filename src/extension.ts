@@ -63,7 +63,7 @@ export const teApi: ITaskExplorerApi =
 {
     explorer: undefined,
     explorerView: undefined,
-    isBusy,
+    isBusy: isExtensionBusy,
     log,
     providers,
     refreshExternalProvider,
@@ -186,7 +186,7 @@ export async function activate(context: ExtensionContext)
         };
         teApi.setTests(true); // lol, damn istanbul.  cover the initial empty fn
         teApi.setTests = (isTests) => { tests = isTests; };
-        teApi.isBusy = () => isBusy() || teApi.testsApi.isBusy;
+        teApi.isBusy = () => isExtensionBusy() || teApi.testsApi.isBusy;
     }
 
     //
@@ -406,7 +406,7 @@ export const getTaskTreeManager = () => treeManager;
 export const getWebviewManager = () => webviewManager;
 
 
-function isBusy()
+export function isExtensionBusy()
 {
     return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange() || licenseManager.isBusy();
@@ -428,11 +428,11 @@ function registerCommands(context: ExtensionContext)
     registerDisableTaskTypeCommand(context);
     registerEnableTaskTypeCommand(context);
     registerEnterLicenseCommand(context);
-    registerGetLicenseCommand(context, teApi);
+    registerGetLicenseCommand(context);
     registerRemoveFromExcludesCommand(context);
-    registerViewLicenseCommand(context, teApi);
-    registerViewReportCommand(context, teApi);
-    registerViewReleaseNotesCommand(context, teApi);
+    registerViewLicenseCommand(context);
+    registerViewReportCommand(context);
+    registerViewReleaseNotesCommand(context);
     //
     // Register GetAPI task
     //
