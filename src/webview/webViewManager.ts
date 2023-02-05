@@ -11,16 +11,17 @@ import { ExtensionContext, Task, WebviewPanel, window, workspace } from "vscode"
 
 export default class WebviewManager
 {
-    private static panelMap: IDictionary<TeWebviewPanel> = {};
+    private extensionContext: ExtensionContext;
+    private panelMap: IDictionary<TeWebviewPanel> = {};
 
 
-    constructor()
+    constructor(context: ExtensionContext)
     {
-
+        this.extensionContext = context;
     }
 
 
-    static create(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
+    create(title: string, viewType: string, html: string, panel?: WebviewPanel)
     {
         const column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
 		if (this.panelMap[viewType] && !this.panelMap[viewType].isDisposed())
@@ -28,12 +29,12 @@ export default class WebviewManager
             this.panelMap[viewType].reveal(column);
             return this.panelMap[viewType];
 		}
-        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, context, panel);
+        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, this.extensionContext, panel);
         return this.panelMap[viewType];
 	}
 
 
-    static dispose = () =>
+    dispose = () =>
     {
         for (const d of Object.keys(this.panelMap).filter(p => !this.panelMap[p].isDisposed()))
         {

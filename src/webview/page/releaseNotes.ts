@@ -4,38 +4,40 @@ import TeWebviewPanel from "../webviewPanel";
 import WebviewManager from "../webViewManager";
 import { join } from "path";
 import { marked } from "marked";
+import { WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
 import { readFileAsync } from "../../lib/utils/fs";
 import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../../lib/utils/pathUtils";
-import { ExtensionContext, WebviewPanel } from "vscode";
+import { getExtensionContext, getWebviewManager } from "../../extension";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
 let panel: TeWebviewPanel | undefined;
 
 
-export const displayReleaseNotes = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
+export const displayReleaseNotes = async(api: ITaskExplorerApi, logPad: string) =>
 {
 	log.methodStart("display release notes", 1, logPad);
-	const html = await getPageContent(context, api, logPad + "   ");
-	panel = WebviewManager.create(viewTitle, viewType, html, context);
+	const html = await getPageContent(api, logPad + "   ");
+	panel = getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display release notes", 1, logPad);
     return panel;
 };
 
 
-const getPageContent = async (context: ExtensionContext, api: ITaskExplorerApi, logPad: string) =>
+const getPageContent = async (api: ITaskExplorerApi, logPad: string) =>
 {
 	log.methodStart("get page content", 1, logPad);
 	const installPath = await getInstallPath(),
 	      releaseNotesHtml = await readFileAsync(join(installPath, "res", "page", "release-notes.html")),
 	      changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),
-		  changeLogHtml = await marked(changeLogMd, { async: true });
+		  changeLogHtml = await marked(changeLogMd, { async: true }),
+		  version = getExtensionContext().extension.packageJSON.version;
 	let html = releaseNotesHtml.replace("<!-- changelog -->", changeLogHtml)
-							   .replace("<!-- title -->", `Task Explorer ${context.extension.packageJSON.version} Release Notes`)
+							   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
-							   .replace("<!-- releasenotes -->", getNewReleaseNotes(context.extension.packageJSON.version, changeLogMd));
+							   .replace("<!-- releasenotes -->", getNewReleaseNotes(version, changeLogMd));
 	html = WebviewManager.cleanLicenseButtons(html, api);
 	log.methodDone("get page content", 1, logPad);
 	return html;
@@ -131,7 +133,7 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
+export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
@@ -140,13 +142,13 @@ export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, api: ITaskEx
 		while (api.isBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string) =>
+		setTimeout(async (webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string) =>
 		{
 			log.methodStart("revive release notes", 1, logPad);
-			const html = await getPageContent(context, api, logPad + "   ");
-			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
+			const html = await getPageContent(api, logPad + "   ");
+			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive release notes", 1, logPad);
 			resolve();
-		}, 10, webviewPanel, api, context, logPad);
+		}, 10, webviewPanel, api, logPad);
 	});
 };

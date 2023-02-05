@@ -1,21 +1,22 @@
 
-import * as path from "path";
 import log from "../../lib/log/log";
 import WebviewManager from "../webViewManager";
+import { dirname, relative } from "path";
+import { Task, Uri, WebviewPanel } from "vscode";
 import { ITaskExplorerApi } from "../../interface";
+import { getWebviewManager } from "../../extension";
 import { TaskTreeManager } from "../../tree/treeManager";
-import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
 
 
-export const displayParsingReport = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+export const displayParsingReport = async(api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	const panel = WebviewManager.create(viewTitle, viewType, html, context);
+	const panel = getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
@@ -82,10 +83,10 @@ const getExtraContent = (tasks: Task[], logPad: string, uri?: Uri) =>
 		{
 			if (t.definition.uri)
 			{
-				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath);
+				filePath = relative(dirname(wsFolder.uri.fsPath), t.definition.uri.fsPath);
 			}
 			else {
-				filePath = path.relative(path.dirname(wsFolder.uri.fsPath), t.name);
+				filePath = relative(dirname(wsFolder.uri.fsPath), t.name);
 			}
 		}
 		else {
@@ -127,7 +128,7 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
@@ -136,11 +137,11 @@ export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskE
 		while (api.isBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+		setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 		{
 			log.methodStart("revive parsing report", 1, logPad);
 			const html = await getPageContent(api, logPad, uri);
-			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
+			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive parsing report", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, api, context, logPad, uri);

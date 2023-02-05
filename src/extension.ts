@@ -4,6 +4,7 @@ import * as util from "./lib/utils/utils";
 import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
+import WebviewManager from "./webview/webViewManager";
 import registerViewReportCommand from "./commands/viewReport";
 import registerGetLicenseCommand from "./commands/getLicense";
 import registerViewLicenseCommand from "./commands/viewLicense";
@@ -54,6 +55,7 @@ let tests = false;
 let dev = false;
 let licenseManager: ILicenseManager;
 let treeManager: TaskTreeManager;
+let webviewManager: WebviewManager;
 let extensionContext: ExtensionContext;
 
 
@@ -152,6 +154,11 @@ export async function activate(context: ExtensionContext)
     // Create license manager instance
     //
     licenseManager = new LicenseManager(context, teApi);
+
+    //
+    // Create the Webviews Manager
+    //
+    webviewManager = new WebviewManager(context);
 
     //
     // Authentication Provider
@@ -394,6 +401,9 @@ export const getLicenseManager = () => licenseManager;
 
 
 export const getTaskTreeManager = () => treeManager;
+
+
+export const getWebviewManager = () => webviewManager;
 
 
 function isBusy()

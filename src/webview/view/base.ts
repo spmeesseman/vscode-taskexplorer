@@ -7,6 +7,7 @@ import { ITaskExplorerApi } from "../../interface";
 import { ExtensionContext, Task, Uri, WebviewPanel, window } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
 import { views } from "../../lib/views";
+import { getWebviewManager } from "../../extension";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
@@ -21,11 +22,11 @@ export abstract class TeView
 	abstract getPageContent(api: ITaskExplorerApi, logPad: string, ...args: any[]): Promise<string>;
 
 
-	constructor(title: string, viewtype: string, html: string, context: ExtensionContext, logPad: string)
+	constructor(title: string, viewtype: string, html: string, logPad: string)
 	{
 		log.methodStart("te view base constructor", 1, logPad);
 		this.html = html;
-		this.teWebviewPanel = WebviewManager.create(title, viewtype, html, context);
+		this.teWebviewPanel = getWebviewManager().create(title, viewtype, html);
 		log.methodDone("te view base constructor", 1, logPad);
 	}
 
@@ -46,7 +47,7 @@ export abstract class TeView
 	getViewType = () => viewType;
 
 
-	reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+	reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 	{   //
 		// Use a timeout so license manager can initialize first
 		//
@@ -55,14 +56,14 @@ export abstract class TeView
 			while (api.isBusy()) {
 				await timeout(100);
 			}
-			setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+			setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 			{
 				log.methodStart("revive parsing report", 1, logPad);
 				const html = await this.getPageContent(api, logPad, uri);
-				WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
+				getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 				log.methodDone("revive parsing report", 1, logPad);
 				resolve();
-			}, 10, webviewPanel, api, context, logPad, uri);
+			}, 10, webviewPanel, api, logPad, uri);
 		});
 	};
 }

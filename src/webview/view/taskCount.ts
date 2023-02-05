@@ -4,19 +4,20 @@ import TeWebviewPanel from "../webviewPanel";
 import WebviewManager from "../webViewManager";
 import { ITaskExplorerApi } from "../../interface";
 import { TaskTreeManager } from "../../tree/treeManager";
-import { ExtensionContext, Task, Uri, WebviewPanel } from "vscode";
+import { Task, Uri, WebviewPanel } from "vscode";
 import { getWorkspaceProjectName, isWorkspaceFolder, timeout } from "../../lib/utils/utils";
+import { getWebviewManager } from "../../extension";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
 let panel: TeWebviewPanel | undefined;
 
 
-export const displayParsingReport = async(api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+export const displayParsingReport = async(api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 {
     log.methodStart("display parsing report", 1, logPad);
 	const html = await getPageContent(api, logPad, uri);
-	panel = WebviewManager.create(viewTitle, viewType, html, context);
+	panel =  getWebviewManager().create(viewTitle, viewType, html);
     log.methodDone("display parsing report", 1, logPad);
     return panel;
 };
@@ -40,7 +41,7 @@ export const getViewTitle = () => viewTitle;
 export const getViewType = () => viewType;
 
 
-export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 {   //
 	// Use a timeout so license manager can initialize first
 	//
@@ -49,13 +50,13 @@ export const reviveParsingReport = async(webviewPanel: WebviewPanel, api: ITaskE
 		while (api.isBusy()) {
 			await timeout(100);
 		}
-		setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, context: ExtensionContext, logPad: string, uri?: Uri) =>
+		setTimeout(async(webviewPanel: WebviewPanel, api: ITaskExplorerApi, logPad: string, uri?: Uri) =>
 		{
 			log.methodStart("revive parsing report", 1, logPad);
 			const html = await getPageContent(api, logPad, uri);
-			WebviewManager.create(viewTitle, viewType, html, context, webviewPanel);
+			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive parsing report", 1, logPad);
 			resolve();
-		}, 10, webviewPanel, api, context, logPad, uri);
+		}, 10, webviewPanel, api, logPad, uri);
 	});
 };
