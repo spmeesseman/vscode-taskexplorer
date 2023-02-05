@@ -1,47 +1,61 @@
 
 import WebviewManager from "./webViewManager";
-import { commands, Disposable, ExtensionContext, Uri, ViewColumn, WebviewPanel } from "vscode";
+import { commands, Disposable, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from "vscode";
 
 
-export default class TeWebviewPanel
+export default class TeWebviewPanel // implements WebviewPanel
 {
     public title: string;
     public viewType: string;
     private panel: WebviewPanel;
     private disposables: Disposable[] = [];
+    private disposed = false;
+    isDisposed = () => this.disposed;
 
 
-    constructor(panel: WebviewPanel, title: string, viewType: string, html: string, context: ExtensionContext)
+    constructor(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
     {
-        this.panel = panel;
+        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
+              column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
+
         this.title = title;
         this.viewType = viewType;
 
-        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
-              cssDir = Uri.joinPath(resourceDir, "css"),
+        this.panel = panel || window.createWebviewPanel(
+            viewType,                 // Identifies the type of the webview. Used internally
+            title,                    // Title of the panel displayed to the users
+            column || ViewColumn.One, // Editor column to show the new webview panel in.
+            {
+                enableScripts: true,
+                enableCommandUris: true,
+                localResourceRoots: [ resourceDir ]
+            }
+        );
+
+        const cssDir = Uri.joinPath(resourceDir, "css"),
               jsDir = Uri.joinPath(resourceDir, "js"),
               pageDir = Uri.joinPath(resourceDir, "page"),
               sourceImgDir = Uri.joinPath(resourceDir, "sources"),
-              pageUri = panel.webview.asWebviewUri(pageDir),
-              cssUri = panel.webview.asWebviewUri(cssDir),
-              jsUri = panel.webview.asWebviewUri(jsDir),
-              resourceDirUri = panel.webview.asWebviewUri(resourceDir),
-              sourceImgDirUri = panel.webview.asWebviewUri(sourceImgDir);
+              pageUri = this.panel.webview.asWebviewUri(pageDir),
+              cssUri = this.panel.webview.asWebviewUri(cssDir),
+              jsUri = this.panel.webview.asWebviewUri(jsDir),
+              resourceDirUri = this.panel.webview.asWebviewUri(resourceDir),
+              sourceImgDirUri = this.panel.webview.asWebviewUri(sourceImgDir);
 
-        panel.webview.html = html.replace(/\[webview\.cspSource\]/g, panel.webview.cspSource)
-                                 .replace(/\[webview\.cssDir\]/g, cssUri.toString())
-                                 .replace(/\[webview\.jsDir\]/g, jsUri.toString())
-                                 .replace(/\[webview\.pageDir\]/g, pageUri.toString())
-                                 .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                                 .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
-                                 .replace(/\[webview\.nonce\]/g, WebviewManager.getNonce());
+        this.panel.webview.html = html.replace(/\[webview\.cspSource\]/g, this.panel.webview.cspSource)
+                                      .replace(/\[webview\.cssDir\]/g, cssUri.toString())
+                                      .replace(/\[webview\.jsDir\]/g, jsUri.toString())
+                                      .replace(/\[webview\.pageDir\]/g, pageUri.toString())
+                                      .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
+                                      .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
+                                      .replace(/\[webview\.nonce\]/g, WebviewManager.getNonce());
         //
         // Listen for when the panel is disposed
         // This happens when the user closes the panel or when the panel is closed programmatically
         //
-        panel.onDidDispose(() => this.dispose.call(panel), panel, this.disposables);
+        this.panel.onDidDispose(() => this.dispose(), this, this.disposables);
 
-        panel.onDidChangeViewState(
+        this.panel.onDidChangeViewState(
             e => {
                 // if (panel.visible) {
                     // update();
@@ -50,7 +64,7 @@ export default class TeWebviewPanel
             null, this.disposables
         );
 
-        panel.webview.onDidReceiveMessage
+        this.panel.webview.onDidReceiveMessage
         (
             message => {
                 // i think don't await, the caller can't get the final result anyway
@@ -59,7 +73,7 @@ export default class TeWebviewPanel
             undefined, this.disposables
         );
 
-        panel.reveal();
+        this.panel.reveal();
     }
 
 
@@ -70,6 +84,7 @@ export default class TeWebviewPanel
         {
             (this.disposables.pop() as Disposable).dispose();
         }
+        this.disposed = true;
     }
 
 
@@ -78,7 +93,7 @@ export default class TeWebviewPanel
 
     reveal(viewColumn?: ViewColumn | undefined, preserveFocus?: boolean | undefined): void
     {
-        throw new Error("Method not implemented.");
+        this.panel.reveal(viewColumn, preserveFocus);
     }
 
 }

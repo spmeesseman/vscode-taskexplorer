@@ -6,7 +6,7 @@ import { getTaskFiles } from "../lib/fileCache";
 import { getInstallPath } from "../lib/utils/pathUtils";
 import { getTaskTypes } from "../lib/utils/taskTypeUtils";
 import { IDictionary, ITaskExplorerApi } from "../interface";
-import { ExtensionContext, Task, Uri, ViewColumn, WebviewPanel, window, workspace } from "vscode";
+import { ExtensionContext, Task, WebviewPanel, window, workspace } from "vscode";
 
 
 export default class WebviewManager
@@ -14,40 +14,32 @@ export default class WebviewManager
     private static panelMap: IDictionary<TeWebviewPanel> = {};
 
 
-    public static create(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
+    constructor()
     {
-        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
-              column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
 
-		if (this.panelMap[viewType]) {
-			this.panelMap[viewType].reveal(column);
-			return this.panelMap[viewType];
+    }
+
+
+    static create(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
+    {
+        const column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
+		if (this.panelMap[viewType] && !this.panelMap[viewType].isDisposed())
+        {
+            this.panelMap[viewType].reveal(column);
+            return this.panelMap[viewType];
 		}
-
-        panel = panel || window.createWebviewPanel(
-            viewType,                 // Identifies the type of the webview. Used internally
-            title,                    // Title of the panel displayed to the users
-            column || ViewColumn.One, // Editor column to show the new webview panel in.
-            {
-                enableScripts: true,
-                enableCommandUris: true,
-                localResourceRoots: [ resourceDir ]
-            }
-        );
-
-        this.panelMap[viewType] = new TeWebviewPanel(panel, title, viewType, html, context);
-        // TeWebviewPanel.panelMap[title] = this;
+        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, context, panel);
         return this.panelMap[viewType];
 	}
 
 
-    dispose = () =>
+    static dispose = () =>
     {
-        for (const d of Object.keys(WebviewManager.panelMap))
+        for (const d of Object.keys(this.panelMap).filter(p => !this.panelMap[p].isDisposed()))
         {
-            WebviewManager.panelMap[d].dispose();
+            this.panelMap[d].dispose();
         }
-        WebviewManager.panelMap = {};
+        this.panelMap = {};
     };
 
 

@@ -2,8 +2,8 @@
 // import * as https from "http";
 import * as https from "https";
 import figures from "../figures";
-import TeWebviewPanel from "../../webview/page/teWebviewPanel";
 import log, { logControl } from "../log/log";
+import TeWebviewPanel from "../../webview/webviewPanel";
 import { IncomingMessage } from "http";
 import { storage } from "../utils/storage";
 import { refreshTree } from "../refreshTree";

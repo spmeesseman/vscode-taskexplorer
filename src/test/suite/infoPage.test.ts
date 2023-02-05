@@ -3,7 +3,7 @@
 
 import { Uri, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
-import { getViewTitle, getViewType } from "../../page/infoPage";
+import { getViewTitle, getViewType } from "../../webview/page/infoPage";
 import { getParsingReportSerializer } from "../../commands/viewReport";
 import { ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";

@@ -5,14 +5,14 @@
 import * as utils from "../utils/utils";
 import { join } from "path";
 import { expect } from "chai";
-import { Task, workspace } from "vscode";
+import { Task } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { getLicenseManager } from "../../extension";
-import { ILicenseManager } from "../../interface/ILicenseManager";
 import { executeTeCommand } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { getViewTitle, getViewType, reviveLicensePage } from "../../page/licensePage";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 import { getLicensePageSerializer } from "../../commands/viewLicense";
+import { getViewTitle, getViewType } from "../../webview/page/licensePage";
+import { IFilesystemApi, ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -22,7 +22,6 @@ const licMgrMaxFreeTasksForScriptType = 50; // Should be set to what the constan
 
 let teApi: ITaskExplorerApi;
 let fsApi: IFilesystemApi;
-let explorer: ITaskTree;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
@@ -47,7 +46,6 @@ suite("License Manager Tests", () =>
 		// we just disable TLS_REJECT_UNAUTHORIZED in the NodeJS environment.
 		//
         ({ teApi, fsApi } = await utils.activate(this));
-        explorer = teApi.testsApi.explorer;
 		oLicenseKey = await teApi.testsApi.storage.getSecret("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);

@@ -1,12 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Extension, Uri, WebviewPanel } from "vscode";
+import { Extension, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
-import { getViewTitle, getViewType } from "../../page/releaseNotes";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getReleaseNotesSerializer } from "../../commands/viewReleaseNotes";
+import { getViewTitle, getViewType } from "../../webview/page/releaseNotes";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
