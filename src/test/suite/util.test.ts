@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
@@ -9,6 +10,7 @@ import log, { logControl } from "../../lib/log/log";
 import { env } from "process";
 import { join } from "path";
 import { expect } from "chai";
+import { Stopwatch } from "../../lib/stopwatch";
 import { InitScripts } from "../../lib/noScripts";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { camelCase, properCase } from "../../lib/utils/commonUtils";
@@ -693,6 +695,39 @@ suite("Util Tests", () =>
 		try { afs.writeFileSync(getWsPath("."), "its a dir"); } catch {}
         endRollingCount(this);
 	});
+
+
+    test("Stopwatch", async function()
+    {
+        if (exitRollingCount(this)) return;
+		this.slow(150);
+
+        let sw = new Stopwatch(
+			"Task Explorer vX.X.X",
+			{
+				log: {
+					message: ` activating in vscode x.x.x on the desktop (${
+						env.machineId
+					}|${env.sessionId})`,
+				}
+			},
+		);
+		await sleep(12);
+		sw.log();
+		await sleep(12);
+		sw.stop({ message: "Stop!!" });
+
+		expect(sw.startTime).to.not.be.undefined;
+		expect(sw.elapsed).to.be.a("number").that.is.greaterThan(0);
+
+		sw = new Stopwatch(undefined);
+
+		Stopwatch.start("swKey");
+		await sleep(25);
+		Stopwatch.stop("swKey");
+
+        endRollingCount(this);
+    });
 
 
     test("Storage", async function()

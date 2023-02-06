@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import { expect } from "chai";
 import { refreshTree } from "../../lib/refreshTree";
 import { ITaskTree, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
@@ -62,6 +64,11 @@ suite("Initialization", () =>
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
+        expect(teApi.sidebar).to.not.be.undefined;
+        expect(teApi.sidebarView).to.not.be.undefined;
+        expect(teApi.explorer).to.be.undefined;
+        expect(teApi.explorerView).to.be.undefined;
+        expect(teApi.testsApi.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 
@@ -84,6 +91,11 @@ suite("Initialization", () =>
         setExplorer(teApi.explorer as ITaskTree);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         testsApi.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
+        expect(teApi.sidebar).to.not.be.undefined;
+        expect(teApi.sidebarView).to.not.be.undefined;
+        expect(teApi.explorer).to.be.not.undefined;
+        expect(teApi.explorerView).to.not.be.undefined;
+        expect(teApi.testsApi.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 
@@ -106,6 +118,11 @@ suite("Initialization", () =>
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         testsApi.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
+        expect(teApi.sidebar).to.be.undefined;
+        expect(teApi.sidebarView).to.be.undefined;
+        expect(teApi.explorer).to.be.not.undefined;
+        expect(teApi.explorerView).to.not.be.undefined;
+        expect(teApi.testsApi.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 

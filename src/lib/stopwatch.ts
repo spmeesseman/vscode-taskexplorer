@@ -7,7 +7,7 @@ import { isString } from "./utils/utils";
 import { IDictionary } from "../interface";
 
 interface StopwatchLogOptions { message?: string; suffix?: string };
-interface StopwatchOptions { logLevel: number; log: StopwatchLogOptions };
+interface StopwatchOptions { logLevel?: number; log: StopwatchLogOptions };
 
 
 export class Stopwatch

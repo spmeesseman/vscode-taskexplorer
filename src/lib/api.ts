@@ -15,7 +15,7 @@ import { workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "./utils/configuration";
 import { onWsFoldersChange } from "./watcher/fileWatcher";
 import { enableConfigWatcher } from "./watcher/configWatcher";
-import { IExternalProvider, ITaskExplorerApi, ITaskTree, ITestsApi } from "../interface";
+import { IExternalProvider, ITaskExplorerApi, ITaskTree, ITaskTreeView, ITestsApi } from "../interface";
 
 
 export class TeApi implements ITaskExplorerApi
@@ -30,6 +30,7 @@ export class TeApi implements ITaskExplorerApi
         this.container = container;
         this._tests = container.tests;
 
+        /* istanbul ignore else */
         if (this._tests)
         {
             this._testsApi = {
@@ -71,9 +72,7 @@ export class TeApi implements ITaskExplorerApi
 
     set explorer(tree)
     {
-        if (this.container.treeManager.views.taskExplorer) {
-            this.container.treeManager.views.taskExplorer.tree = tree as ITaskTree;
-        }
+        (this.container.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as ITaskTree;
     }
 
 

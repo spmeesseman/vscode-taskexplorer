@@ -209,11 +209,9 @@ export class TeContainer
 
 	get env(): "dev" | "tests" | "production"
     {
-        let env: "dev" | "tests" | "production" = "production";
-		if (this.prereleaseOrDebugging) {
-			env = configuration.get<"dev" | "tests" | "production">("runtimeEnvironment", "tests");
-		}
-		return env;
+		const isDev = this._context.extensionMode === ExtensionMode.Development,
+			  isTests = this._context.extensionMode === ExtensionMode.Test;
+		return !isDev && !isTests ? "production" : (isTests ? "tests" : "dev");
 	}
 
 	get id() {
