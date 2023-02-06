@@ -98,7 +98,7 @@ export abstract class TeWebviewBase<State>
 	protected async getHtml(webview: Webview, ...args: unknown[])
 	{
         const resourceDir = Uri.joinPath(this.container.context.extensionUri, "res");
-		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "dist", "webviews");
+		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "res", "page");
 		const uri = Uri.joinPath(webRootUri, this.fileName);
 		const content = new TextDecoder("utf8").decode(await workspace.fs.readFile(uri));
 

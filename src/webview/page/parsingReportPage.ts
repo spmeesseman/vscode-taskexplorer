@@ -1,13 +1,13 @@
 
-import log from "../../lib/log/log";
-import { dirname, join, relative } from "path";
-import { Task, Uri, WebviewPanel } from "vscode";
-import { isExtensionBusy } from "../../extension";
-import { TaskTreeManager } from "../../tree/treeManager";
-import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
-import { TeContainer } from "../../lib/container";
-import { Commands, ContextKeys } from "../../lib/constants";
+import { Task, Uri } from "vscode";
+import { dirname, relative } from "path";
 import { TeWebviewPanel } from "../webviewPanel";
+import { TeContainer } from "../../lib/container";
+import { executeCommand } from "../../lib/command";
+import { TaskTreeManager } from "../../tree/treeManager";
+import { Commands, ContextKeys } from "../../lib/constants";
+import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
+import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
@@ -22,9 +22,9 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	constructor(container: TeContainer) {
 		super(
 			container,
-			join(container.context.extensionUri.fsPath, "res", "page", "license-manager.html"),
-			"Task Explorer Parsing Report",
-			"images/taskExplorer-icon.png",
+			"license-manager.html",
+			viewTitle,
+			"res/gears-r-blue.png",
 			"taskExplorer.parsingReport",
 			`${ContextKeys.WebviewPrefix}parsingReport`,
 			"parsingReportPage",
@@ -135,5 +135,11 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 
 
 	getViewType = () => viewType;
+
+
+	protected override onMessageReceived(e: IpcMessage)
+	{
+		onIpc(ExecuteCommandType, e, params => executeCommand(("vscode-taskexplorer." + params.command) as Commands, params.args));
+	}
 
 }

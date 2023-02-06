@@ -23,10 +23,10 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	constructor(container: TeContainer) {
 		super(
 			container,
-			join(container.context.extensionUri.fsPath, "res", "page", "release-notes.html"),
+			"release-notes.html",
 			viewTitle,
-			"images/taskExplorer-icon.png",
-			"taskExplorer.parsingReport",
+			"res/gears-r-blue.png",
+			"taskExplorer.releaseNotes",
 			`${ContextKeys.WebviewPrefix}releaseNotes`,
 			"releaseNotesPage",
 			Commands.ShowReleaseNotesPage

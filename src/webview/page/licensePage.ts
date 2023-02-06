@@ -1,13 +1,13 @@
 
-import log from "../../lib/log/log";
 import { TeWebviewPanel } from "../webviewPanel";
-import { Task, WebviewPanel } from "vscode";
+import { Task } from "vscode";
 import { timeout } from "../../lib/utils/utils";
 import { isExtensionBusy } from "../../extension";
 import { TeContainer } from "../../lib/container";
+import { executeCommand } from "../../lib/command";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
-import { join } from "path";
+import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
@@ -22,9 +22,9 @@ export class LicensePage extends TeWebviewPanel<State>
 	constructor(container: TeContainer) {
 		super(
 			container,
-			join(container.context.extensionUri.fsPath, "res", "page", "license-manager.html"),
-			"Task Explorer Parsing Report",
-			"images/taskExplorer-icon.png",
+			"license-manager.html",
+			viewTitle,
+			"res/gears-r-blue.png",
 			"taskExplorer.licensePage",
 			`${ContextKeys.WebviewPrefix}licensePage`,
 			"licensePage",
@@ -139,5 +139,11 @@ export class LicensePage extends TeWebviewPanel<State>
 
 
 	getViewType = () => viewType;
+
+
+	protected override onMessageReceived(e: IpcMessage)
+	{
+		onIpc(ExecuteCommandType, e, params => executeCommand(("vscode-taskexplorer." + params.command) as Commands, params.args));
+	}
 
 }
