@@ -236,6 +236,10 @@ export class TeContainer
 		return this._licenseManager;
 	}
 
+	get tests() {
+		return this._context.extensionMode === ExtensionMode.Test;
+	}
+
 	get treeManager() {
 		return this._treeManager;
 	}

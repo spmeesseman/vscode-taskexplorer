@@ -494,7 +494,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 if (!opt1)
                 {
                     log.write("   invalidate all providers", 1, logPad);
-                    for (const [ key, p ] of Object.entries(this.container))
+                    for (const [ key, p ] of Object.entries(this.container.providers))
                     {
                         log.write("   invalidate '" + key + "' task provider", 1, logPad);
                         await p.invalidate(undefined, logPad + "   ");

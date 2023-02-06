@@ -43,12 +43,18 @@ export const enum Commands
     Run = "vscode-taskexplorer.run",
     RunLastTask = "vscode-taskexplorer.runLastTask",
 	EnterLicense = "vscode-taskexplorer.enterLicense",
+	GetApi = "vscode-taskexplorer.getApi",
 	GetLicense = "vscode-taskexplorer.getLicense",
 	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
 	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
 	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
 	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage",
 	ShowHomeView = "vscode-taskexplorer.showHomeView"
+}
+
+export const enum TeCommands
+{
+	GetApi = "getApi"
 }
 
 export const enum ContextKeys

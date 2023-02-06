@@ -8,7 +8,6 @@ import { setContext } from "./context";
 import { ContextKeys } from "./constants";
 import { TeContainer } from "./container";
 import { storage } from "./utils/storage";
-import { registerCommand } from "./command";
 import { refreshTree } from "./refreshTree";
 import { isExtensionBusy } from "../extension";
 import { workspace, WorkspaceFolder } from "vscode";
@@ -25,10 +24,10 @@ export class TeApi implements ITaskExplorerApi
 	readonly container: TeContainer;
 
 
-    constructor(container: TeContainer, tests: boolean)
+    constructor(container: TeContainer)
     {
-        this._tests = tests;
         this.container = container;
+        this._tests = container.tests;
 
         if (this._tests)
         {
@@ -51,14 +50,12 @@ export class TeApi implements ITaskExplorerApi
             };
             void setContext(ContextKeys.Tests, true);
             this.setTests(true); // lol, damn istanbul.  cover the initial empty fn
-            this.setTests = (isTests) => { tests = isTests; };
+            this.setTests = (isTests) => { this._tests = isTests; };
             this.isBusy = () => isExtensionBusy() || this._testsApi.isBusy;
         }
         else {
             this._testsApi = {} as unknown as ITestsApi;
         }
-
-        container.context.subscriptions.push(registerCommand("vscode-taskexplorer.getApi", () => this));
     }
 
 

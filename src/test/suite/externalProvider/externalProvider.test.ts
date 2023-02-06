@@ -2,9 +2,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import fsUtils from "../../utils/fsUtils";
 import { join } from "path";
+import fsUtils from "../../utils/fsUtils";
 import { refresh } from "../../utils/treeUtils";
+import { TeCommands } from "../../../lib/constants";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";
@@ -73,7 +74,7 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.commands.fast + 75);
-        teApi = await executeTeCommand("getApi") as ITaskExplorerApi;
+        teApi = await executeTeCommand(TeCommands.GetApi) as ITaskExplorerApi;
         endRollingCount(this);
     });
 

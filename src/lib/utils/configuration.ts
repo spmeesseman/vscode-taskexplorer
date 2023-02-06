@@ -24,9 +24,9 @@ class Configuration implements IConfiguration
     }
 
 
-    public initialize(context: ExtensionContext, isTests: boolean)
+    public initialize(context: ExtensionContext)
     {
-        this.isTests = isTests;
+        this.isTests = context.extensionMode === ExtensionMode.Test;
         this.isDev = context.extensionMode === ExtensionMode.Development;
         this.configurationGlobal = workspace.getConfiguration();
         this.configuration = workspace.getConfiguration(extensionName);
@@ -153,7 +153,7 @@ class Configuration implements IConfiguration
 
 export const configuration = new Configuration();
 
-export const registerConfiguration = (context: ExtensionContext, isTests: boolean) =>
+export const registerConfiguration = (context: ExtensionContext) =>
 {
-    configuration.initialize(context, isTests);
+    configuration.initialize(context);
 };

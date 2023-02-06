@@ -1,35 +1,30 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
-import { once } from "./lib/event";
-import { join } from "path";
-// import { isWeb } from "@env/platform";
-import { isWeb } from "./lib/env/node/platform";
-import { TeContainer } from "./lib/container";
-// import { hrtime } from "@env/hrtime";
 import { TeApi } from "./lib/api";
+import { once } from "./lib/event";
+// import { isWeb } from "@env/platform";
+// import { hrtime } from "@env/hrtime";
+import { setContext } from "./lib/context";
 import { Stopwatch } from "./lib/stopwatch";
-import { Commands } from "./lib/constants";
-import { executeCommand } from "./lib/command";
+import { TeContainer } from "./lib/container";
+import { isWeb } from "./lib/env/node/platform";
+import { Commands, ContextKeys } from "./lib/constants";
 import { ITaskExplorerApi } from "./interface";
-import { showWhatsNewMessage } from "./lib/messages";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskTreeManager } from "./tree/treeManager";
-import { ExtensionContext, env, version as codeVersion, window } from "vscode";
+import { ExtensionContext, env, version as codeVersion, ExtensionMode } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { enableConfigWatcher, isProcessingConfigChange } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
+import { registerCommand } from "./lib/command";
 
 // import "tsconfig-paths/register";
 
 export let teApi: ITaskExplorerApi;
-
 let ready = false;
-let tests = false;
-let extensionContext: ExtensionContext;
 
 
 export async function activate(context: ExtensionContext)
@@ -42,22 +37,15 @@ export async function activate(context: ExtensionContext)
 		// `TaskExplorer${prerelease ? (insiders ? " (Insiders)" : " (pre-release)") : ""} v${version}`,
 		`Task Explorer v${version}`,
 		{
+            logLevel: 1,
 			log: {
 				message: ` activating in ${env.appName}(${codeVersion}) on the ${isWeb ? "web" : "desktop"} (${
 					env.machineId
 				}|${env.sessionId})`,
 				// ${context.extensionRuntime !== ExtensionRuntime.Node ? ' in a webworker' : ''}
-			},
-            logLevel: 1
+			}
 		},
 	);
-
-    extensionContext = context;
-
-    //
-    // Set 'tests' flag if tests are running and this is not a user runtime
-    //
-    tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
 
     //
     // TODO - Handle untrusted workspace
@@ -75,23 +63,35 @@ export async function activate(context: ExtensionContext)
     //
     // Initialize configuration
     //
-    registerConfiguration(context, tests);
+    registerConfiguration(context);
 
     //
     // Initialize logging
+    //    0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
     //
-    await log.registerLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
+    await log.registerLog(context, context.extensionMode === ExtensionMode.Test ? 2 : /* istanbul ignore next */ 0);
     log.methodStart("activation", 1, "", true);
 
     //
     // Initialize persistent storage
     //
-    await initStorage(context, tests);
+    await initStorage(context);
 
-	const syncedVersion = storage.get<string>(prerelease && !insiders ? "synced:preVersion" : "synced:version");
-	const localVersion = storage.get<string>(prerelease && !insiders ? "preVersion" : "version");
+    //
+    // !!! Temporary after settings layout redo / rename !!!
+    // !!! Remove sometime down the road (from 12/22/22) !!!
+    //
+    await migrateSettings();
+    //
+    // !!! End temporary !!!
+    //
 
+    //
+    // Figure out previous version
+    //
 	let previousVersion: string | undefined;
+	const syncedVersion = storage.get<string>(prerelease && !insiders ? "synced:preVersion" : "synced:version"),
+          localVersion = storage.get<string>(prerelease && !insiders ? "preVersion" : "version");
 	if (!localVersion || !syncedVersion) {
 		previousVersion = syncedVersion ?? localVersion;
 	}
@@ -102,21 +102,39 @@ export async function activate(context: ExtensionContext)
 		previousVersion = localVersion;
 	}
 
+    //
+    // Instantiate application container (beautiful concept from GitLens project)
+    //
     const container = TeContainer.create(context, storage, prerelease, version, previousVersion);
 	once(container.onReady)(() =>
     {
-		void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
+		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
 		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
 		if (!syncedVersion || (version === syncedVersion)) {
 			void storage.update(prerelease && !insiders ? "synced:preVersion" : "synced:version", version);
 		}
 	});
 
+    //
+    // Wait for ready signal from application container
+    //
 	await container.ready();
 
-	// if (teContainer.debugging) {
-	// 	void setContext(ContextKeys.Debugging, true);
-	// }
+    //
+    // Instantiate the extension API
+    //
+	teApi = new TeApi(container);
+    context.subscriptions.push(registerCommand(Commands.GetApi, () => teApi));
+
+    //
+    // Set application mode context
+    //
+	if (container.debugging) {
+		void setContext(ContextKeys.Debugging, true);
+	}
+	else if (container.tests) {
+		void setContext(ContextKeys.Tests, true);
+	}
 
     //
     // TODO - Telemetry
@@ -129,15 +147,6 @@ export async function activate(context: ExtensionContext)
 	// 	upgrade: previousVersion != null && version !== previousVersion,
 	// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
 	// });
-
-    //
-    // !!! Temporary after settings layout redo / rename !!!
-    // !!! Remove sometime down the road (from 12/22/22) !!!
-    //
-    await migrateSettings();
-    //
-    // !!! End temporary !!!
-    //
 
 
     const exitMessage =
@@ -162,11 +171,6 @@ export async function activate(context: ExtensionContext)
 	// 	startTime,
 	// 	endTime,
 	// );
-
-    //
-    // Create API instance
-    //
-	teApi = new TeApi(container, tests);
 
     //
     // Use a delayed initialization so we can display an 'Initializing...' message
@@ -212,10 +216,10 @@ export async function deactivate()
     // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
     // everything here, it doesn't seem to cause any issue with Code exiting.
     //
-    extensionContext.subscriptions.forEach((s) => {
+    TeContainer.instance.context.subscriptions.forEach((s) => {
         s.dispose();
     });
-    extensionContext.subscriptions.splice(0);
+    TeContainer.instance.context.subscriptions.splice(0);
 }
 
 
@@ -256,7 +260,7 @@ const initialize = async(container: TeContainer) =>
     //
     const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
     /* istanbul ignore else */
-    if (tests || /* istanbul ignore next */!rootFolderChanged)
+    if (container.tests || /* istanbul ignore next */!rootFolderChanged)
     {
         await fileCache.rebuildCache("   ");
     }     //
@@ -287,9 +291,6 @@ const initialize = async(container: TeContainer) =>
     //
     setTimeout(() => { ready = true; }, 1);
 };
-
-
-export const getExtensionContext = () => extensionContext;
 
 
 export function isExtensionBusy()
@@ -358,83 +359,83 @@ const migrateSettings = async () =>
 };
 
 
-async function showWelcomeOrWhatsNew(container: TeContainer, version: string, previousVersion: string | undefined, logPad: string)
-{
-	if (!previousVersion)
-    {
-		log.write(`First-time install; window.focused=${window.state.focused}`, 1, logPad);
-
-		if (configuration.get<boolean>("showWelcomeOnInstall") === false) return;
-
-		if (window.state.focused) {
-			await container.storage.delete("pendingWelcomeOnFocus");
-			await executeCommand(Commands.ShowWelcomePage);
-		}     //
-        else // Save pending on window getting focus
-		{   //
-            await container.storage.update("pendingWelcomeOnFocus", true);
-			const disposable = window.onDidChangeWindowState(e =>
-            {
-				if (!e.focused) return;
-				disposable.dispose();
-                //
-				// If the window is now focused and we are pending the welcome, clear the pending state and show
-                //
-				if (container.storage.get("pendingWelcomeOnFocus") === true)
-                {
-					void container.storage.delete("pendingWelcomeOnFocus");
-					if (configuration.get("showWelcomeOnInstall")) {
-						void executeCommand(Commands.ShowWelcomePage);
-					}
-				}
-			});
-			container.context.subscriptions.push(disposable);
-		}
-		return;
-	}
-
-	if (previousVersion !== version) {
-		log.write(`GitLens upgraded from v${previousVersion} to v${version}; window.focused=${window.state.focused}`, 1, logPad);
-	}
-
-	const [ major, minor ] = version.split(".").map(v => parseInt(v, 10));
-	const [ prevMajor, prevMinor ] = previousVersion.split(".").map(v => parseInt(v, 10));
-
-    //
-	// Don't notify on downgrades
-    //
-	if (major === prevMajor || major < prevMajor || (major === prevMajor && minor < prevMinor)) {
-		return;
-	}
-
-	if (major !== prevMajor) {
-		version = String(major);
-	}
-
-	void executeCommand(Commands.ShowHomeView);
-
-	if (configuration.get("showWhatsNewAfterUpgrades"))
-    {
-		if (window.state.focused) {
-			await container.storage.delete("pendingWhatsNewOnFocus");
-			await showWhatsNewMessage(version);
-		}     //
-        else // Save pending on window getting focus
-        {   //
-			await container.storage.update("pendingWhatsNewOnFocus", true);
-			const disposable = window.onDidChangeWindowState(e =>
-            {
-				if (!e.focused) return;
-				disposable.dispose();
-				if (container.storage.get("pendingWhatsNewOnFocus") === true)
-                {
-					void container.storage.delete("pendingWhatsNewOnFocus");
-					if (configuration.get("showWhatsNewAfterUpgrades")) {
-						void showWhatsNewMessage(version);
-					}
-				}
-			});
-			container.context.subscriptions.push(disposable);
-		}
-	}
-}
+// async function showWelcomeOrWhatsNew(container: TeContainer, version: string, previousVersion: string | undefined, logPad: string)
+// {
+// 	if (!previousVersion)
+//     {
+// 		log.write(`First-time install; window.focused=${window.state.focused}`, 1, logPad);
+//
+// 		if (configuration.get<boolean>("showWelcomeOnInstall") === false) return;
+//
+// 		if (window.state.focused) {
+// 			await container.storage.delete("pendingWelcomeOnFocus");
+// 			await executeCommand(Commands.ShowWelcomePage);
+// 		}     //
+//         else // Save pending on window getting focus
+// 		{   //
+//             await container.storage.update("pendingWelcomeOnFocus", true);
+// 			const disposable = window.onDidChangeWindowState(e =>
+//             {
+// 				if (!e.focused) return;
+// 				disposable.dispose();
+//                 //
+// 				// If the window is now focused and we are pending the welcome, clear the pending state and show
+//                 //
+// 				if (container.storage.get("pendingWelcomeOnFocus") === true)
+//                 {
+// 					void container.storage.delete("pendingWelcomeOnFocus");
+// 					if (configuration.get("showWelcomeOnInstall")) {
+// 						void executeCommand(Commands.ShowWelcomePage);
+// 					}
+// 				}
+// 			});
+// 			container.context.subscriptions.push(disposable);
+// 		}
+// 		return;
+// 	}
+//
+// 	if (previousVersion !== version) {
+// 		log.write(`GitLens upgraded from v${previousVersion} to v${version}; window.focused=${window.state.focused}`, 1, logPad);
+// 	}
+//
+// 	const [ major, minor ] = version.split(".").map(v => parseInt(v, 10));
+// 	const [ prevMajor, prevMinor ] = previousVersion.split(".").map(v => parseInt(v, 10));
+//
+//     //
+// 	// Don't notify on downgrades
+//     //
+// 	if (major === prevMajor || major < prevMajor || (major === prevMajor && minor < prevMinor)) {
+// 		return;
+// 	}
+//
+// 	if (major !== prevMajor) {
+// 		version = String(major);
+// 	}
+//
+// 	void executeCommand(Commands.ShowHomeView);
+//
+// 	if (configuration.get("showWhatsNewAfterUpgrades"))
+//     {
+// 		if (window.state.focused) {
+// 			await container.storage.delete("pendingWhatsNewOnFocus");
+// 			await showWhatsNewMessage(version);
+// 		}     //
+//         else // Save pending on window getting focus
+//         {   //
+// 			await container.storage.update("pendingWhatsNewOnFocus", true);
+// 			const disposable = window.onDidChangeWindowState(e =>
+//             {
+// 				if (!e.focused) return;
+// 				disposable.dispose();
+// 				if (container.storage.get("pendingWhatsNewOnFocus") === true)
+//                 {
+// 					void container.storage.delete("pendingWhatsNewOnFocus");
+// 					if (configuration.get("showWhatsNewAfterUpgrades")) {
+// 						void showWhatsNewMessage(version);
+// 					}
+// 				}
+// 			});
+// 			container.context.subscriptions.push(disposable);
+// 		}
+// 	}
+// }

@@ -9,7 +9,7 @@ import { isNumber, isString } from "./utils";
 export let storage: IStorage;
 
 
-export const initStorage = async (context: ExtensionContext, isTests: boolean) =>
+export const initStorage = async (context: ExtensionContext) =>
 {
     const storageFile = join(context.globalStorageUri.fsPath, "storage.json");
     await createDir(context.globalStorageUri.fsPath);
@@ -17,7 +17,7 @@ export const initStorage = async (context: ExtensionContext, isTests: boolean) =
     if (!(await pathExists(storageFile))) {
         await writeFile(storageFile, "{}");
     }
-    storage = new Storage(context, storageFile, isTests);
+    storage = new Storage(context, storageFile);
 };
 
 
@@ -30,12 +30,12 @@ class Storage implements IStorage, Memento
     private storageFile: string;
 
 
-    constructor(context: ExtensionContext, storageFile: string, isTests: boolean)
+    constructor(context: ExtensionContext, storageFile: string)
     {
         this.storage = context.globalState;
         this.secrets = context.secrets;
         this.isDev = context.extensionMode === ExtensionMode.Development;
-        this.isTests = isTests;
+        this.isTests = context.extensionMode === ExtensionMode.Test;
         this.storageFile = storageFile;
     }
 
