@@ -1,10 +1,11 @@
 
 import { ITaskTree } from "./ITaskTree";
-import { ITaskTreeManager } from "./ITaskTreeManager";
 import { IStorage } from "./IStorage";
 import { IFileCache } from "./IFileCache";
 import { IFilesystemApi } from "./IFilesystemApi";
 import { IConfiguration } from "./IConfiguration";
+import { ILicenseManager } from "./ILicenseManager";
+import { ITaskTreeManager } from "./ITaskTreeManager";
 import { ExtensionContext, WorkspaceFolder, WorkspaceFoldersChangeEvent } from "vscode";
 
 export interface ITestsApi
@@ -13,6 +14,7 @@ export interface ITestsApi
     config: IConfiguration;
     utilities: any;
     explorer: ITaskTree;
+    licenseManager: ILicenseManager;
     treeManager: ITaskTreeManager;
     fileCache: IFileCache; // for tests use only
     fs: IFilesystemApi;

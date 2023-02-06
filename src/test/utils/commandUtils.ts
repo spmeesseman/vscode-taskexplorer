@@ -24,16 +24,16 @@ export const executeTeCommandAsync = async (command: string, minWait?: number, m
 export const executeTeCommand2Async = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommandAsync(command, minWait, maxWait, ...args);
 
 
-export const executeTeCommand = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
+export const executeTeCommand = async <T>(command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
     const rc = await commands.executeCommand(`vscode-taskexplorer.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
-    return rc;
+    return rc as T;
 };
 
 
-export const executeTeCommand2 = (command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand(command, minWait, maxWait, ...args);
+export const executeTeCommand2 = <T>(command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand<T>(command, minWait, maxWait, ...args);
 
 
 export const focusExplorerView = async (instance?: any) =>

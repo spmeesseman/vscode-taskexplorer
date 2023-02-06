@@ -10,7 +10,6 @@ import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { TeContainer } from "../../lib/container";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -47,7 +46,8 @@ suite("License Manager Tests", () =>
 		oLicenseKey = await teApi.testsApi.storage.getSecret("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
-		TeContainer.instance.licenseManager.setTestData({
+		licMgr = teApi.testsApi.licenseManager;
+		licMgr.setTestData({
 			logRequestSteps: tc.log.licServerReqSteps,
 			maxFreeTasks: licMgrMaxFreeTasks,
 			maxFreeTaskFiles: licMgrMaxFreeTaskFiles,
@@ -62,7 +62,6 @@ suite("License Manager Tests", () =>
     {
         if (utils.exitRollingCount(this, false, true)) return;
 		teApi.setTests(true);
-		licMgr?.dispose();
 		await utils.closeEditors();
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
 		if (oLicenseKey) {
@@ -185,10 +184,13 @@ suite("License Manager Tests", () =>
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
 		await utils.sleep(50);
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "showParsingReportPage" });
-		// if (workspace.textDocuments.length > 0) {
-		// 	await licMgr.getWebviewPanel()?.webview.postMessage({ command: "showParsingReportPage" });
-		// }
+		await licMgr.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showParsingReportPage"
+			}
+		});
 		await utils.sleep(500);
         utils.endRollingCount(this);
 	});
@@ -199,9 +201,14 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + 1100 + tc.slowTime.storageUpdate);
 		utils.overrideNextShowInputBox("1234-5678-9098-0000000");
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "enterLicense" });
+		await licMgr.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.enterLicense"
+			}
+		});
 		await utils.sleep(500);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -217,7 +224,6 @@ suite("License Manager Tests", () =>
 		teApi.setTests(true);
 		await licMgr.setTasks(tasks);
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -235,7 +241,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -253,7 +258,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -271,7 +275,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -285,7 +288,6 @@ suite("License Manager Tests", () =>
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -299,7 +301,6 @@ suite("License Manager Tests", () =>
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -342,7 +343,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox("Info");
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -356,7 +356,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox("Not Now");
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -372,7 +371,6 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
 		await utils.sleep(400);
-		licMgr.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -450,15 +448,22 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.get30DayLicense +
 				  tc.slowTime.storageSecretRead + tc.slowTime.closeEditors + 1100);
-		await teApi.testsApi.storage.updateSecret("version", undefined);
+		await utils.setLicensed(false);
+		await teApi.testsApi.storage.update("version", undefined);
+		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
 		await utils.sleep(50);
-		const result = await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
+		const result = await licMgr.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+            params: {
+                command: "vscode-taskexplorer.getLicense"
+            }
+		});
 		await utils.sleep(500);
 		expect(result).to.be.equal(true);
 		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);
 		const newKey = await teApi.testsApi.storage.getSecret("license_key_30day");
-		licMgr.dispose();
 		await utils.closeEditors();
 		expect(newKey).to.be.a("string").with.length.that.is.greaterThan(20);
         utils.endRollingCount(this);
@@ -470,9 +475,8 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.closeEditors + tc.slowTime.licenseMgr.get30DayLicense + tc.slowTime.storageSecretUpdate);
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
-		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
+		const result = await executeTeCommand<{ panel: any; newKey: any }>("getLicense");
 		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);
-		licMgr.dispose();
 		await utils.closeEditors();
 		expect(result).to.be.an("object");
 		expect(result.panel).to.not.be.undefined;
@@ -485,8 +489,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.commands.standard + tc.slowTime.closeEditors + tc.slowTime.storageSecretUpdate);
-		const result = await executeTeCommand("getLicense") as { panel: any; newKey: any };
-		licMgr.dispose();
+		const result = await executeTeCommand<{ panel: any; newKey: any }>("getLicense");
 		await utils.closeEditors();
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
 		expect(result).to.be.an("object");

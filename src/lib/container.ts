@@ -29,7 +29,7 @@ import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { registerStatusBarItem } from "./statusBarItem";
-import { WebviewManager } from "../webview/webViewManager";
+import { WebviewManager } from "../webview/webviewManager";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";

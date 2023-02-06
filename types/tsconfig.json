@@ -15,8 +15,11 @@
 	"include": ["../src/interface"],
 	"exclude": [
 		"../src/common",
+		"../src/commands",
 		"../src/providers",
 		"../src/test",
-		"../src/tree"
+		"../src/tree",
+		"../src/webview",
+		"../src/extension.*"
 	]
 }

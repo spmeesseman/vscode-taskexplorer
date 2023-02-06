@@ -193,7 +193,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 	protected onShowCommand(...args: unknown[])
     {
-		void this.show(undefined, ...args);
+		return this.show(undefined, ...args);
 	}
 
 

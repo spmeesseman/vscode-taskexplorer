@@ -15,7 +15,7 @@ import { workspace, WorkspaceFolder } from "vscode";
 import { configuration } from "./utils/configuration";
 import { onWsFoldersChange } from "./watcher/fileWatcher";
 import { enableConfigWatcher } from "./watcher/configWatcher";
-import { IExternalProvider, ITaskExplorerApi, ITestsApi } from "../interface";
+import { IExternalProvider, ITaskExplorerApi, ITaskTree, ITestsApi } from "../interface";
 
 
 export class TeApi implements ITaskExplorerApi
@@ -41,6 +41,7 @@ export class TeApi implements ITaskExplorerApi
                 enableConfigWatcher,
                 onWsFoldersChange,
                 utilities: util,
+                licenseManager: this.container.licenseManager,
                 treeManager: this.container.treeManager,
                 extensionContext: this.container.context,
                 wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0],
@@ -68,6 +69,14 @@ export class TeApi implements ITaskExplorerApi
     }
 
 
+    set explorer(tree)
+    {
+        if (this.container.treeManager.views.taskExplorer) {
+            this.container.treeManager.views.taskExplorer.tree = tree as ITaskTree;
+        }
+    }
+
+
     get explorerView()
     {
         return this.container.treeManager.views.taskExplorer?.view;
@@ -89,6 +98,14 @@ export class TeApi implements ITaskExplorerApi
     get sidebar()
     {
         return this.container.treeManager.views.taskExplorerSideBar?.tree;
+    }
+
+
+    set sidebar(tree)
+    {
+        if (this.container.treeManager.views.taskExplorerSideBar) {
+            this.container.treeManager.views.taskExplorerSideBar.tree = tree as ITaskTree;
+        }
     }
 
 

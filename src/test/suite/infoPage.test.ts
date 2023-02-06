@@ -1,13 +1,15 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Uri, WebviewPanel } from "vscode";
+import { Uri } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
+import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount
 } from "../utils/utils";
+import { TeCommands } from "../../lib/constants";
 
 let teApi: ITaskExplorerApi;
 let projectUri: Uri;
@@ -56,9 +58,9 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 150);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
-		const panel = await executeTeCommand2("showParsingReportPage", [ projectUri ], testControl.waitTime.viewReport) as WebviewPanel;
+		const panel = await executeTeCommand2<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, [ projectUri ], testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -69,9 +71,9 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 150);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
-	    const panel = await executeTeCommand2("showParsingReportPage", [ projectUri, "", 5 ], testControl.waitTime.viewReport) as WebviewPanel;
+	    const panel = await executeTeCommand2<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, [ projectUri, "", 5 ], testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -81,9 +83,9 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 150);
-	    const panel = await executeTeCommand("showParsingReportPage", testControl.waitTime.viewReport) as WebviewPanel;
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -95,9 +97,9 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
         await teApi.testsApi.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
-	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
         await teApi.testsApi.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeEditors();
@@ -109,10 +111,16 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    const panel = await executeTeCommand("showParsingReportPage", testControl.waitTime.viewReport) as WebviewPanel;
-		await panel.webview.postMessage({ command: "showLicensePage" });
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>("showParsingReportPage", testControl.waitTime.viewReport);
+		await panel.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showLicensePage"
+			}
+		});
 		await sleep(500);
-		panel.dispose();
+		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -126,9 +134,9 @@ suite("Info Report Tests", () =>
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
 		teApi.sidebar = undefined;
-	    const panel = await executeTeCommand("showParsingReportPage", testControl.waitTime.viewReport) as WebviewPanel;
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeEditors();
@@ -144,9 +152,9 @@ suite("Info Report Tests", () =>
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
 		teApi.sidebar = oExplorer;
-	    const panel = await executeTeCommand("showParsingReportPage", testControl.waitTime.viewReport) as WebviewPanel;
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.dispose();
+		panel.hide();
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeEditors();
@@ -162,10 +170,16 @@ suite("Info Report Tests", () =>
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
 		teApi.sidebar = undefined;
-	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
-		await panel.webview.postMessage({ command: "showLicensePage" });
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
+		await panel.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showLicensePage"
+			}
+		});
 		await sleep(500);
-		panel.dispose();
+		panel.hide();
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeEditors();
@@ -181,10 +195,16 @@ suite("Info Report Tests", () =>
 		const oSidebar = teApi.sidebar;
 		teApi.explorer = undefined;
 		teApi.sidebar = oExplorer;
-	    const panel = await executeTeCommand("viewReport", testControl.waitTime.viewReport) as WebviewPanel;
-		await panel.webview.postMessage({ command: "showLicensePage" });
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
+		await panel.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showLicensePage"
+			}
+		});
 		await sleep(500);
-		panel.dispose();
+		panel.hide();
 		teApi.explorer = oExplorer;
 		teApi.sidebar = oSidebar;
 		await closeEditors();

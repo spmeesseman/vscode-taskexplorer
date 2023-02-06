@@ -68,7 +68,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 		this.disposables.forEach((d) => {
             d.dispose();
         });
-	    this.panel?.dispose();
+	    this.panel?.hide();
 		this.numTasks = 0;
 		this.licensed = false;
 		this.panel = undefined;
@@ -167,7 +167,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	getVersion = () => this.container.version;
 
 
-	getWebviewPanel = () => undefined; // this.panel?.getWebviewPanel();
+	getWebviewPanel = () => this.panel?.getWebviewPanel() as WebviewPanel | undefined;
 
 
 	isBusy = () => this.busy;

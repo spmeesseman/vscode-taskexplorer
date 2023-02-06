@@ -1,13 +1,19 @@
 
 import { TextDecoder } from "util";
 // import { getNonce } from "@env/crypto";
-import { TeContainer } from "../lib/container";
-import { getNonce } from "../lib/env/node/crypto";
-import { WebviewManager } from "./webViewManager";
-import { Disposable, Uri, Webview, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewView, workspace } from "vscode";
-import { ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc, WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType } from "./protocol";
-import { executeCommand } from "../lib/command";
 import { Commands } from "../lib/constants";
+import { TeContainer } from "../lib/container";
+import { executeCommand } from "../lib/command";
+import { getNonce } from "../lib/env/node/crypto";
+import { WebviewManager } from "./webviewManager";
+import {
+	Disposable, Uri, Webview, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent,
+	WebviewView, workspace
+} from "vscode";
+import {
+	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
+	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
+} from "./protocol";
 
 
 export abstract class TeWebviewBase<State>
@@ -213,7 +219,7 @@ export abstract class TeWebviewBase<State>
 	}
 
 
-	protected postMessage(message: IpcMessage)
+	private postMessage(message: IpcMessage)
 	{
 		if (!this._view || !this.isReady || !this.visible) return Promise.resolve(false);
 		//

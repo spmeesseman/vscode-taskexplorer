@@ -1,7 +1,5 @@
 
-import { ProviderResult, Task, Uri, WorkspaceFolder } from "vscode";
-import { executeTeCommand } from "../lib/command";
-import { TeCommands } from "../lib/constants";
+import { commands, ProviderResult, Task, Uri, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "./ITaskExplorerApi";
 import { ITaskExplorerProvider } from "./ITaskProvider";
 
@@ -19,7 +17,7 @@ export abstract class IExternalProvider implements ITaskExplorerProvider
 
     async provideTasks()
     {
-        const teApi = await executeTeCommand<ITaskExplorerApi>(TeCommands.GetApi);
+        const teApi = await commands.executeCommand<ITaskExplorerApi>("vscode-taskexplorer.getApi");
         if (teApi.providers[this.providerName])
         {
             return this.getTasks();

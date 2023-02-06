@@ -1,9 +1,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Extension, WebviewPanel } from "vscode";
+import { Extension } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
+import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
@@ -11,7 +12,7 @@ import {
 
 let teApi: ITaskExplorerApi;
 let extension: Extension<any>;
-let webviewPanel: WebviewPanel | undefined;
+let webviewPanel: TeWebviewPanel<any> | undefined;
 
 
 suite("Release Notes Page Tests", () =>
@@ -27,8 +28,7 @@ suite("Release Notes Page Tests", () =>
 	suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-		webviewPanel?.dispose();
-		webviewPanel = undefined;
+		webviewPanel?.hide();
 		await closeEditors();
         suiteFinished(this);
 	});
@@ -44,7 +44,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + 200);
-		webviewPanel = await executeTeCommand("showReleaseNotesPage", testControl.waitTime.viewReport) as WebviewPanel;
+		webviewPanel = await executeTeCommand<TeWebviewPanel<any>>("showReleaseNotesPage", testControl.waitTime.viewReport);
 		await sleep(100);
         endRollingCount(this);
 	});
@@ -58,7 +58,7 @@ suite("Release Notes Page Tests", () =>
 		const version = extension.packageJSON.version;
 		extension.packageJSON.version = "17.4444.0";
 		try {
-			webviewPanel = await executeTeCommand("showReleaseNotesPage", testControl.waitTime.viewReport) as WebviewPanel;
+			webviewPanel = await executeTeCommand<TeWebviewPanel<any>>("showReleaseNotesPage", testControl.waitTime.viewReport);
 			await sleep(100);
 		}
 		catch (e) { throw e; }
@@ -71,7 +71,13 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-		await webviewPanel?.webview.postMessage({ command: "showLicensePage" });
+		await webviewPanel?.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showLicensePage"
+			}
+		});
 		await sleep(500);
         endRollingCount(this);
 	});
@@ -81,9 +87,15 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    await webviewPanel?.webview.postMessage({ command: "showParsingReportPage" });
+	    await webviewPanel?.getWebviewPanel()?.webview.postMessage(
+		{
+			method: "command/execute",
+			params: {
+				command: "vscode-taskexplorer.showParsingReportPage"
+			}
+		});
 		await sleep(500);
-		webviewPanel?.dispose();
+		webviewPanel?.hide();
 		webviewPanel = undefined;
         endRollingCount(this);
 	});
@@ -100,7 +112,7 @@ suite("Release Notes Page Tests", () =>
 		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
 	    await getReleaseNotesSerializer().deserializeWebviewPanel(panel, null);
 		await sleep(50);
-		panel.dispose();
+		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});

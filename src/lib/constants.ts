@@ -57,7 +57,11 @@ export const enum Commands
 export const enum TeCommands
 {
 	GetApi = "getApi",
-	RemovefromExcludes = "removeFromExcludes"
+	RemovefromExcludes = "removeFromExcludes",
+	ShowLicensePage = "showLicensePage",
+	ShowParsingReportPage = "showParsingReportPage",
+	ShowReleaseNotesPage = "showReleaseNotesPage",
+	ShowWelcomePage = "showWelcomePage",
 }
 
 export const enum ContextKeys
