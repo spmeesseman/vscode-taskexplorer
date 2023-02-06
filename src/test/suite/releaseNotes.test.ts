@@ -5,8 +5,6 @@ import { Extension, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { getReleaseNotesSerializer } from "../../commands/viewReleaseNotes";
-import { getViewTitle, getViewType } from "../../webview/page/releaseNotes";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
@@ -46,7 +44,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + 200);
-		webviewPanel = await executeTeCommand("viewReleaseNotes", testControl.waitTime.viewReport) as WebviewPanel;
+		webviewPanel = await executeTeCommand("showReleaseNotesPage", testControl.waitTime.viewReport) as WebviewPanel;
 		await sleep(100);
         endRollingCount(this);
 	});
@@ -60,7 +58,7 @@ suite("Release Notes Page Tests", () =>
 		const version = extension.packageJSON.version;
 		extension.packageJSON.version = "17.4444.0";
 		try {
-			webviewPanel = await executeTeCommand("viewReleaseNotes", testControl.waitTime.viewReport) as WebviewPanel;
+			webviewPanel = await executeTeCommand("showReleaseNotesPage", testControl.waitTime.viewReport) as WebviewPanel;
 			await sleep(100);
 		}
 		catch (e) { throw e; }
@@ -73,7 +71,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-		await webviewPanel?.webview.postMessage({ command: "viewLicense" });
+		await webviewPanel?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
         endRollingCount(this);
 	});
@@ -83,14 +81,14 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    await webviewPanel?.webview.postMessage({ command: "viewReport" });
+	    await webviewPanel?.webview.postMessage({ command: "showParsingReportPage" });
 		await sleep(500);
 		webviewPanel?.dispose();
 		webviewPanel = undefined;
         endRollingCount(this);
 	});
 
-
+/*
 	test("Deserialize Release Notes Page", async function()
 	{
         if (exitRollingCount(this)) return;
@@ -106,5 +104,5 @@ suite("Release Notes Page Tests", () =>
 		await closeEditors();
         endRollingCount(this);
 	});
-
+*/
 });

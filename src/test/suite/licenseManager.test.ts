@@ -9,7 +9,6 @@ import { Task } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { ILicenseManager } from "../../interface/ILicenseManager";
-import { getViewTitle, getViewType } from "../../webview/page/licensePage";
 import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { TeContainer } from "../../lib/container";
 
@@ -186,9 +185,9 @@ suite("License Manager Tests", () =>
 		await teApi.testsApi.storage.update("lastLicenseNag", undefined);
 		await setTasks();
 		await utils.sleep(50);
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
+		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "showParsingReportPage" });
 		// if (workspace.textDocuments.length > 0) {
-		// 	await licMgr.getWebviewPanel()?.webview.postMessage({ command: "viewReport" });
+		// 	await licMgr.getWebviewPanel()?.webview.postMessage({ command: "showParsingReportPage" });
 		// }
 		await utils.sleep(500);
         utils.endRollingCount(this);
