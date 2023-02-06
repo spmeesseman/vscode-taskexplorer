@@ -1,6 +1,6 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../webviewPanel";
+import { TeWebviewPanel } from "../webviewPanel";
 import { Task, WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
 import { isExtensionBusy } from "../../extension";
@@ -9,7 +9,7 @@ import { TaskTreeManager } from "../../tree/treeManager";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
-let panel: TeWebviewPanel | undefined;
+let panel: TeWebviewPanel<Record<string, unknown>> | undefined;
 
 
 export const displayLicenseReport = async(logPad: string, tasks?: Task[], newKey?: string) =>

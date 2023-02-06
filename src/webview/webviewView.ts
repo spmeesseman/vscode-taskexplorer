@@ -11,7 +11,7 @@ import {
 } from "vscode";
 
 
-export type WebviewViewIds = "home" | "taskCount";
+export type WebviewViewIds = "home" | "parsingReport";
 
 
 export abstract class TeWebviewView<State, SerializedState = State> extends TeWebviewBase<State> implements WebviewViewProvider, Disposable
@@ -25,7 +25,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		container: TeContainer,
 		title: string,
 		fileName: string,
-		public readonly id: `gitlens.views.${WebviewViewIds}`,
+		public readonly id: `taskExplorer.views.${WebviewViewIds}`,
 		private readonly contextKeyPrefix: `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}`,
 		private readonly trackingFeature: TrackedUsageFeatures)
 	{

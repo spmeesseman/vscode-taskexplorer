@@ -1,99 +1,198 @@
 
-import WebviewManager from "./webViewManager";
-import { commands, Disposable, ExtensionContext, Uri, ViewColumn, WebviewPanel, window } from "vscode";
+// import type { Commands, ContextKeys } from "../constants";
+// import type { Container } from "../container";
+// import { setContext } from "../context";
+// import { executeCommand, registerCommand } from "../system/command";
+// import { serialize } from "../system/decorators/serialize";
+import { TeWebviewBase } from "./base";
+import { setContext } from "../lib/context";
+import { TeContainer } from "../lib/container";
+import { registerCommand } from "../lib/command";
+import { Commands, ContextKeys } from "../lib/constants";
+import type { WebviewFocusChangedParams } from "./protocol";
+import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
+import {
+    WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
+    Disposable, Uri, ViewColumn, window
+} from "vscode";
+
+export type WebviewIds = "parsingReport" | "license" | "releaseNotes";
 
 
-export default class TeWebviewPanel // implements WebviewPanel
+export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> implements Disposable
 {
-    public title: string;
-    public viewType: string;
-    private panel: WebviewPanel;
-    private disposables: Disposable[] = [];
-    private disposed = false;
-    isDisposed = () => this.disposed;
+	protected readonly disposables: Disposable[] = [];
+	private _disposablePanel: Disposable | undefined;
+	private _disposed = false;
+	protected override _view: WebviewPanel | undefined;
 
 
-    constructor(title: string, viewType: string, html: string, context: ExtensionContext, panel?: WebviewPanel)
+	constructor(container: TeContainer,
+				fileName: string,
+				title: string,
+				private readonly iconPath: string,
+				public readonly id: `taskExplorer.${WebviewIds}`,
+				private readonly contextKeyPrefix: `${ContextKeys.WebviewPrefix}${WebviewIds}`,
+				private readonly trackingFeature: TrackedUsageFeatures,
+				showCommand: Commands)
+	{
+		super(container, title, fileName);
+		this.disposables.push(registerCommand(showCommand, this.onShowCommand, this));
+	}
+
+
+	dispose()
+	{
+		this.disposables.forEach(d => void d.dispose());
+		this._disposablePanel?.dispose();
+		this._disposed = true;
+	}
+
+
+	get disposed() {
+		return this._disposed;
+	}
+
+
+	protected get options(): WebviewPanelOptions & WebviewOptions
+	{
+		return {
+			retainContextWhenHidden: true,
+			enableFindWidget: true,
+			enableCommandUris: true,
+			enableScripts: true,
+			localResourceRoots: [ Uri.joinPath(this.container.context.extensionUri, "res") ]
+		};
+	}
+
+
+	hide()
+	{
+		this._view?.dispose();
+	}
+
+
+	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ..._args: unknown[]): Promise<void>
+	{
+		void this.container.usage.track(`${this.trackingFeature}:shown`);
+
+		const column = options?.column ?? ViewColumn.One; // ViewColumn.Beside;
+		// Only try to open beside if there is an active tab
+		// if (column === ViewColumn.Beside && !window.tabGroups.activeTabGroup.activeTab) {
+		// 	column = ViewColumn.Active;
+		// }
+
+		if (!this._view)
+		{
+			this._view = window.createWebviewPanel(
+				this.id,
+				this.title,
+				{
+					viewColumn: column,
+					preserveFocus: options?.preserveFocus ?? false
+				},
+				this.options
+			);
+
+			this._view.iconPath = Uri.file(this.container.context.asAbsolutePath(this.iconPath));
+			this._disposablePanel = Disposable.from(
+				this._view,
+				this._view.onDidDispose(this.onPanelDisposed, this),
+				this._view.onDidChangeViewState(this.onViewStateChanged, this),
+				this._view.webview.onDidReceiveMessage(this.onMessageReceivedCore, this),
+				...(this.onInitializing?.() ?? []),
+				...(this.registerCommands?.() ?? []),
+				window.onDidChangeWindowState(this.onWindowStateChanged, this),
+			);
+
+			this._view.webview.html = await this.getHtml(this._view.webview);
+		}
+		else {
+			await this.refresh(true);
+			this._view.reveal(this._view.viewColumn ?? ViewColumn.Active, options?.preserveFocus ?? false);
+		}
+	}
+
+
+	private onWindowStateChanged(e: WindowState) {
+		if (!this.visible) return;
+
+		this.onWindowFocusChanged?.(e.focused);
+	}
+
+
+	private resetContextKeys()
+	{
+		void setContext(`${this.contextKeyPrefix}:inputFocus`, false);
+		void setContext(`${this.contextKeyPrefix}:focus`, false);
+		void setContext(`${this.contextKeyPrefix}:active`, false);
+	}
+
+
+	private setContextKeys(active: boolean | undefined, focus?: boolean, inputFocus?: boolean)
+	{
+		if (!active)
+		{
+			void setContext(`${this.contextKeyPrefix}:active`, active);
+			if (!active) {
+				focus = false;
+				inputFocus = false;
+			}
+		}
+		if (!focus) {
+			void setContext(`${this.contextKeyPrefix}:focus`, focus);
+		}
+		if (!inputFocus) {
+			void setContext(`${this.contextKeyPrefix}:inputFocus`, inputFocus);
+		}
+	}
+
+
+	private onPanelDisposed()
     {
-        const resourceDir = Uri.joinPath(context.extensionUri, "res"),
-              column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
+		this.resetContextKeys();
 
-        this.title = title;
-        this.viewType = viewType;
+		this.onActiveChanged?.(false);
+		this.onFocusChanged?.(false);
+		this.onVisibilityChanged?.(false);
 
-        this.panel = panel || window.createWebviewPanel(
-            viewType,                 // Identifies the type of the webview. Used internally
-            title,                    // Title of the panel displayed to the users
-            column || ViewColumn.One, // Editor column to show the new webview panel in.
-            {
-                enableScripts: true,
-                enableCommandUris: true,
-                localResourceRoots: [ resourceDir ]
-            }
-        );
-
-        const cssDir = Uri.joinPath(resourceDir, "css"),
-              jsDir = Uri.joinPath(resourceDir, "js"),
-              pageDir = Uri.joinPath(resourceDir, "page"),
-              sourceImgDir = Uri.joinPath(resourceDir, "sources"),
-              pageUri = this.panel.webview.asWebviewUri(pageDir),
-              cssUri = this.panel.webview.asWebviewUri(cssDir),
-              jsUri = this.panel.webview.asWebviewUri(jsDir),
-              resourceDirUri = this.panel.webview.asWebviewUri(resourceDir),
-              sourceImgDirUri = this.panel.webview.asWebviewUri(sourceImgDir);
-
-        this.panel.webview.html = html.replace(/\[webview\.cspSource\]/g, this.panel.webview.cspSource)
-                                      .replace(/\[webview\.cssDir\]/g, cssUri.toString())
-                                      .replace(/\[webview\.jsDir\]/g, jsUri.toString())
-                                      .replace(/\[webview\.pageDir\]/g, pageUri.toString())
-                                      .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                                      .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
-                                      .replace(/\[webview\.nonce\]/g, WebviewManager.getNonce());
-        //
-        // Listen for when the panel is disposed
-        // This happens when the user closes the panel or when the panel is closed programmatically
-        //
-        this.panel.onDidDispose(() => this.dispose(), this, this.disposables);
-
-        this.panel.onDidChangeViewState(
-            e => {
-                // if (panel.visible) {
-                    // update();
-                // }
-            },
-            null, this.disposables
-        );
-
-        this.panel.webview.onDidReceiveMessage
-        (
-            message => {
-                // i think don't await, the caller can't get the final result anyway
-                commands.executeCommand("vscode-taskexplorer." + message.command);
-            },
-            undefined, this.disposables
-        );
-
-        this.panel.reveal();
-    }
+		this.isReady = false;
+		this._disposablePanel?.dispose();
+		this._disposablePanel = undefined;
+		this._view = undefined;
+	}
 
 
-    dispose()
+	protected onShowCommand(...args: unknown[])
     {
-        this.panel.dispose();
-        while (this.disposables.length)
-        {
-            (this.disposables.pop() as Disposable).dispose();
-        }
-        this.disposed = true;
-    }
+		void this.show(undefined, ...args);
+	}
 
 
-    getWebviewPanel = () => this.panel;
+	protected onViewFocusChanged(e: WebviewFocusChangedParams)
+	{
+		this.setContextKeys(undefined, e.focused, e.inputFocused);
+		this.onFocusChanged?.(e.focused);
+	}
 
 
-    reveal(viewColumn?: ViewColumn | undefined, preserveFocus?: boolean | undefined): void
-    {
-        this.panel.reveal(viewColumn, preserveFocus);
-    }
+	protected onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent)
+	{
+		const { active, visible } = e.webviewPanel;
+		if (visible) {
+			this.setContextKeys(active);
+			this.onActiveChanged?.(active);
+			if (!active) {
+				this.onFocusChanged?.(false);
+			}
+		} else {
+			this.resetContextKeys();
+
+			this.onActiveChanged?.(false);
+			this.onFocusChanged?.(false);
+		}
+
+		this.onVisibilityChanged?.(visible);
+	}
 
 }

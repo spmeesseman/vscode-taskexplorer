@@ -6,9 +6,38 @@ import { isExtensionBusy } from "../../extension";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists, timeout } from "../../lib/utils/utils";
 import { TeContainer } from "../../lib/container";
+import { Commands, ContextKeys } from "../../lib/constants";
+import { TeWebviewPanel } from "../webviewPanel";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
+
+interface State {
+	pinned: boolean;
+};
+
+export class ParsingReportPage extends TeWebviewPanel<State>
+{
+	constructor(container: TeContainer) {
+		super(
+			container,
+			"welcome.html",
+			"Task Explorer Parsing Report",
+			"images/taskExplorer-icon.png",
+			"taskExplorer.parsingReport",
+			`${ContextKeys.WebviewPrefix}parsingReport`,
+			"parsingReportPage",
+			Commands.ShowParsingReportPage,
+		);
+	}
+
+	protected override includeBootstrap(): State {
+		return {
+			// Make sure to get the raw config, not from the container which has the modes mixed in
+			config: configuration.getAll(true),
+		};
+	}
+}
 
 
 export const displayParsingReport = async(logPad: string, uri?: Uri) =>

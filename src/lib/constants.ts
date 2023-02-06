@@ -44,6 +44,9 @@ export const enum Commands
     RunLastTask = "vscode-taskexplorer.runLastTask",
 	EnterLicense = "vscode-taskexplorer.enterLicense",
 	GetLicense = "vscode-taskexplorer.getLicense",
+	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
+	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
+	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
 	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage",
 	ShowHomeView = "vscode-taskexplorer.showHomeView"
 }
@@ -58,6 +61,7 @@ export const enum ContextKeys
 	Disabled = "taskExplorer:disabled",
 	Enabled = "taskExplorer:enabled",
 	Untrusted = "taskExplorer:untrusted",
+	ParsingReport = "taskExplorer:parsingReport",
 	ReleaseNotes = "taskExplorer:releaseNotes",
 	Tests = "taskExplorer:tests"
 }

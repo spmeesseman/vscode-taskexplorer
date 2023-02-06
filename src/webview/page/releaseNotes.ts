@@ -1,6 +1,6 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../webviewPanel";
+import { TeWebviewPanel } from "../webviewPanel";
 import { join } from "path";
 import { marked } from "marked";
 import { WebviewPanel } from "vscode";
@@ -12,7 +12,7 @@ import { getExtensionContext, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
-let panel: TeWebviewPanel | undefined;
+let panel: TeWebviewPanel<Record<string, unknown>> | undefined;
 
 
 export const displayReleaseNotes = async(logPad: string) =>

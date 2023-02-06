@@ -160,8 +160,8 @@ export async function activate(context: ExtensionContext)
 	// 	insiders: insiders,
 	// 	prerelease: prerelease,
 	// 	install: previousVersion == null,
-	// 	upgrade: previousVersion != null && gitlensVersion !== previousVersion,
-	// 	upgradedFrom: previousVersion != null && gitlensVersion !== previousVersion ? previousVersion : undefined,
+	// 	upgrade: previousVersion != null && version !== previousVersion,
+	// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
 	// });
 
 

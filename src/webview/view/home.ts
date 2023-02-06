@@ -1,14 +1,14 @@
 
 import { Uri } from "vscode";
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../webviewPanel";
+import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { ITaskExplorerApi } from "../../interface";
 import { getWorkspaceProjectName } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
-let panel: TeWebviewPanel | undefined;
+let panel: TeWebviewPanel<Record<string, unknown>> | undefined;
 
 
 export const displayParsingReport = async(api: ITaskExplorerApi, logPad: string, uri?: Uri) =>

@@ -274,8 +274,8 @@
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
             },
             {
-                "command": "vscode-taskexplorer.viewReport",
-                "title": "%command.viewReport%",
+                "command": "vscode-taskexplorer.showParsingReportPage",
+                "title": "%command.showParsingReportPage%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
             },
             {
@@ -287,12 +287,12 @@
                 "title": "%command.getLicense%"
             },
             {
-                "command": "vscode-taskexplorer.viewLicense",
-                "title": "%command.viewLicense%"
+                "command": "vscode-taskexplorer.showLicensePage",
+                "title": "%command.showLicensePage%"
             },
             {
-                "command": "vscode-taskexplorer.viewReleaseNotes",
-                "title": "%command.viewReleaseNotes%"
+                "command": "vscode-taskexplorer.showReleaseNotesPage",
+                "title": "%command.showReleaseNotesPage%"
             },
             {
                 "command": "vscode-taskexplorer.enableTaskType",

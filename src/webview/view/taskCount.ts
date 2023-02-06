@@ -1,6 +1,6 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../webviewPanel";
+import { TeWebviewPanel } from "../webviewPanel";
 import { Task, Uri, WebviewPanel } from "vscode";
 import { isExtensionBusy } from "../../extension";
 import { TeContainer } from "../../lib/container";
@@ -9,7 +9,7 @@ import { getWorkspaceProjectName, isWorkspaceFolder, timeout } from "../../lib/u
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
-let panel: TeWebviewPanel | undefined;
+let panel: TeWebviewPanel<Record<string, unknown>> | undefined;
 
 
 export const displayParsingReport = async(logPad: string, uri?: Uri) =>

@@ -1,10 +1,8 @@
 
 import WebviewManager from "../webview/webViewManager";
-import registerViewReportCommand from "../commands/viewReport";
 import registerAddToExcludesCommand from "../commands/addToExcludes";
 import registerEnableTaskTypeCommand from "../commands/enableTaskType";
 import registerDisableTaskTypeCommand from "../commands/disableTaskType";
-import registerViewReleaseNotesCommand from "../commands/viewReleaseNotes";
 import registerRemoveFromExcludesCommand from "../commands/removeFromExcludes";
 import { Commands } from "./constants";
 import { IDictionary } from "../interface";
@@ -31,10 +29,11 @@ import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { PowershellTaskProvider } from "../providers/powershell";
-import { AppPublisherTaskProvider } from "../providers/appPublisher";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
-import { ConfigurationChangeEvent, Event, ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
+import { AppPublisherTaskProvider } from "../providers/appPublisher";
+import { ParsingReportPage } from "../webview/page/parsingReportPage";
+import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 
 
 export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
@@ -130,7 +129,6 @@ export class TeContainer
 		get: (_target, prop) =>
         {
 			if (!TeContainer.#instance) return (TeContainer.#instance as any)[prop];
-			// Allow access to config before being initialized
 			if (prop === "config") return configuration;
 			throw new Error("TeContainer is not initialized");
 		},
@@ -160,8 +158,6 @@ export class TeContainer
 		registerDisableTaskTypeCommand(this._context);
 		registerEnableTaskTypeCommand(this._context);
 		registerRemoveFromExcludesCommand(this._context);
-		registerViewReportCommand(this._context);
-		registerViewReleaseNotesCommand(this._context);
 	}
 
 
@@ -269,13 +265,13 @@ export class TeContainer
 		return this._version;
 	}
 
-	// private _homeView: HomeWebviewView | undefined;
-	// get homeView() {
-	// 	if (this._homeView == null) {
-	// 		this._context.subscriptions.push((this._homeView = new HomeWebviewView(this)));
-	// 	}
-	// 	return this._homeView;
-	// }
+	private _parsingReportPage: ParsingReportPage | undefined;
+	get parsingReportPage() {
+		if (!this._parsingReportPage) {
+			this._context.subscriptions.push((this._parsingReportPage = new ParsingReportPage(this)));
+		}
+		return this._parsingReportPage;
+	}
 
 	// private _keyboard: Keyboard;
 	// get keyboard() {

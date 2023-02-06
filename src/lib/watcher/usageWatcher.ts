@@ -14,7 +14,11 @@ export type TrackedUsageFeatures =
 	| "runlastTask"
 	| "openSideBar"
 	| "clearFavorites"
-	| "clearLastTasks";
+	| "clearLastTasks"
+	| "licensePage"
+	| "parsingReportPage"
+	| "releaseNotesPage";
+
 export type TrackedUsageKeys = `${TrackedUsageFeatures}:shown`;
 
 

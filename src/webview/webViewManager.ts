@@ -1,5 +1,5 @@
 
-import TeWebviewPanel from "./webviewPanel";
+import { TeWebviewPanel } from "./webviewPanel";
 import { join } from "path";
 // import { getNonce } from "@env/crypto";
 import { IDictionary } from "../interface";
@@ -19,7 +19,7 @@ export default class WebviewManager implements Disposable
     private static ipcSequence = 0;
 
     private container: TeContainer;
-    private panelMap: IDictionary<TeWebviewPanel> = {};
+    private panelMap: IDictionary<TeWebviewPanel<Record<string, unknown>>> = {};
 
 
     constructor(container: TeContainer)
@@ -30,10 +30,9 @@ export default class WebviewManager implements Disposable
 
     create(title: string, viewType: string, html: string, panel?: WebviewPanel)
     {
-        const column = window.activeTextEditor ? window.activeTextEditor.viewColumn : undefined;
-		if (this.panelMap[viewType] && !this.panelMap[viewType].isDisposed())
+        if (this.panelMap[viewType] && !this.panelMap[viewType].disposed)
         {
-            this.panelMap[viewType].reveal(column);
+            this.panelMap[viewType].show();
             return this.panelMap[viewType];
 		}
         this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, this.container.context, panel);
@@ -43,7 +42,7 @@ export default class WebviewManager implements Disposable
 
     dispose = () =>
     {
-        for (const d of Object.keys(this.panelMap).filter(p => !this.panelMap[p].isDisposed()))
+        for (const d of Object.keys(this.panelMap).filter(p => !this.panelMap[p].disposed))
         {
             this.panelMap[d].dispose();
         }

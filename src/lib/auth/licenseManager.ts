@@ -3,7 +3,7 @@
 import * as https from "https";
 import figures from "../figures";
 import log, { logControl } from "../log/log";
-import TeWebviewPanel from "../../webview/webviewPanel";
+import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { IncomingMessage } from "http";
 import { teApi } from "../../extension";
 import { Commands } from "../constants";
@@ -32,7 +32,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
 	private maxTasksReached = false;
-	private panel: TeWebviewPanel | undefined;
+	private panel: TeWebviewPanel<Record<string, unknown>> | undefined;
 	private port = 443;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
@@ -169,7 +169,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	getVersion = () => this.container.version;
 
 
-	getWebviewPanel = () => this.panel?.getWebviewPanel();
+	getWebviewPanel = () => undefined; // this.panel?.getWebviewPanel();
 
 
 	isBusy = () => this.busy;

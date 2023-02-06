@@ -1,6 +1,6 @@
 
 import log from "../../lib/log/log";
-import TeWebviewPanel from "../webviewPanel";
+import { TeWebviewPanel } from "../webviewPanel";
 import { views } from "../../lib/views";
 import { Uri, WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
@@ -9,13 +9,12 @@ import { ITaskExplorerApi } from "../../interface";
 
 const viewTitle = "Task Explorer Parsing Report";
 const viewType = "viewParsingReport";
-let panel: TeWebviewPanel | undefined;
 
 
 export abstract class TeView
 {
 	private html: string;
-	private teWebviewPanel: TeWebviewPanel;
+	private teWebviewPanel: TeWebviewPanel<Record<string, unknown>>;
 
 	abstract getPageContent(api: ITaskExplorerApi, logPad: string, ...args: any[]): Promise<string>;
 
