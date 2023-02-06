@@ -29,15 +29,17 @@ import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { registerStatusBarItem } from "./statusBarItem";
+import { HomeView } from "../webview/view/home/homeView";
+import { LicensePage } from "../webview/page/licensePage";
 import { WebviewManager } from "../webview/webviewManager";
 import { ILicenseManager } from "../interface/ILicenseManager";
+import { ReleaseNotesPage } from "../webview/page/releaseNotes";
+import { registerConfigWatcher } from "./watcher/configWatcher";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
 import { ParsingReportPage } from "../webview/page/parsingReportPage";
+import { TaskCountView } from "../webview/view/taskCount/taskCountView";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
-import { ReleaseNotesPage } from "../webview/page/releaseNotes";
-import { LicensePage } from "../webview/page/licensePage";
-import { registerConfigWatcher } from "./watcher/configWatcher";
 
 
 export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
@@ -62,11 +64,13 @@ export class TeContainer
 	private readonly _storage: IStorage;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _usage: UsageWatcher;
+	private _homeView: HomeView;
+	private _taskCountView: TaskCountView;
 	private _licensePage: LicensePage;
 	private _releaseNotesPage: ReleaseNotesPage;
 	private _parsingReportPage: ParsingReportPage;
-	// private _viewCommands: ViewCommands | undefined;
 	// private _welcomePage: WelcomePage;
+	// private _viewCommands: ViewCommands | undefined;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
@@ -103,14 +107,17 @@ export class TeContainer
 		// );
 		// context.subscriptions.push((this._subscription = new SubscriptionService(this, previousVersion)));
 
+		this._homeView = new HomeView(this);
+		this._taskCountView = new TaskCountView(this);
+
 		this._licensePage = new LicensePage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
 		// this._welcomePage = new WelcomePage(this);
-
 		// context.subscriptions.push(this._welcomePage);
+
 		context.subscriptions.push(
-			this._licenseManager, this._treeManager, this._usage, this._licensePage,
+			this._licenseManager, this._treeManager, this._usage, this._homeView , this._licensePage,
 			this._parsingReportPage, this._releaseNotesPage /* this._welcomePage */
 		);
 	}
@@ -258,6 +265,14 @@ export class TeContainer
 		return this._version;
 	}
 
+	get homeView() {
+		return this._homeView;
+	}
+
+	get taskCountView() {
+		return this._taskCountView;
+	}
+
 	get licensePage() {
 		return this._licensePage;
 	}
@@ -298,7 +313,4 @@ export class TeContainer
 	// 	return this._viewCommands;
 	// }
 
-	// get welcomeWebview() {
-	// 	return this._welcomeWebview;
-	// }
 }
