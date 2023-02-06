@@ -8,7 +8,7 @@ import { Commands, ContextKeys } from "../../lib/constants";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
-const viewType = "viewParsingReport";
+const viewType = "showParsingReportPage";
 
 interface State {
 	pinned: boolean;

@@ -2,7 +2,7 @@
 import { isObject } from "./utils";
 import { IConfiguration } from "../../interface/IConfiguration";
 import {
-    ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext
+    ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext, ExtensionMode
 } from "vscode";
 
 const extensionName = "taskExplorer";
@@ -24,10 +24,10 @@ class Configuration implements IConfiguration
     }
 
 
-    public initialize(context: ExtensionContext, isDev: boolean, isTests: boolean)
+    public initialize(context: ExtensionContext, isTests: boolean)
     {
-        this.isDev = isDev;
         this.isTests = isTests;
+        this.isDev = context.extensionMode === ExtensionMode.Development;
         this.configurationGlobal = workspace.getConfiguration();
         this.configuration = workspace.getConfiguration(extensionName);
         this.pkgJsonCfgProps = context.extension.packageJSON.contributes.configuration.properties;
@@ -153,7 +153,7 @@ class Configuration implements IConfiguration
 
 export const configuration = new Configuration();
 
-export const registerConfiguration = (context: ExtensionContext, isDev: boolean, isTests: boolean) =>
+export const registerConfiguration = (context: ExtensionContext, isTests: boolean) =>
 {
-    configuration.initialize(context, isDev, isTests);
+    configuration.initialize(context, isTests);
 };

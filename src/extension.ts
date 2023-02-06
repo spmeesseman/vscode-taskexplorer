@@ -4,7 +4,7 @@ import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import { once } from "./lib/event";
-import { join, resolve } from "path";
+import { join } from "path";
 // import { isWeb } from "@env/platform";
 import { isWeb } from "./lib/env/node/platform";
 import { TeContainer } from "./lib/container";
@@ -13,28 +13,23 @@ import { TeApi } from "./lib/api";
 import { Stopwatch } from "./lib/stopwatch";
 import { Commands } from "./lib/constants";
 import { executeCommand } from "./lib/command";
+import { ITaskExplorerApi } from "./interface";
 import { showWhatsNewMessage } from "./lib/messages";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskTreeManager } from "./tree/treeManager";
-import { registerStatusBarItem } from "./lib/statusBarItem";
-import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { ExtensionContext, env, version as codeVersion, window } from "vscode";
-import { ITaskExplorerApi } from "./interface";
-import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
-import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
+import { configuration, registerConfiguration } from "./lib/utils/configuration";
+import { enableConfigWatcher, isProcessingConfigChange } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";
+import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 
 // import "tsconfig-paths/register";
 
-
+export let teApi: ITaskExplorerApi;
 
 let ready = false;
 let tests = false;
-let dev = false;
 let extensionContext: ExtensionContext;
-
-
-export let teApi: ITaskExplorerApi;
 
 
 export async function activate(context: ExtensionContext)
@@ -65,11 +60,6 @@ export async function activate(context: ExtensionContext)
     tests = await fs.pathExists(join(__dirname, "test", "runTest.js"));
 
     //
-    // Set 'dev' flag if running a debugging session from vSCode
-    //
-    dev = !tests && /* istanbul ignore next */await fs.pathExists(resolve(__dirname, "..", "src"));
-
-    //
     // TODO - Handle untrusted workspace
     //
     // if (!workspace.isTrusted) {
@@ -83,9 +73,9 @@ export async function activate(context: ExtensionContext)
 	// }
 
     //
-    // Initialize logging
+    // Initialize configuration
     //
-    registerConfiguration(context, dev, tests);
+    registerConfiguration(context, tests);
 
     //
     // Initialize logging
@@ -94,33 +84,9 @@ export async function activate(context: ExtensionContext)
     log.methodStart("activation", 1, "", true);
 
     //
-    // Initialize global status Bar Item
-    //
-    registerStatusBarItem(context);
-
-    //
     // Initialize persistent storage
     //
-    await initStorage(context, dev, tests);
-
-    //
-    // !!! Temporary after settings layout redo / rename !!!
-    // !!! Remove sometime down the road (from 12/22/22) !!!
-    //
-    await migrateSettings();
-    //
-    // !!! End temporary !!!
-    //
-
-    //
-    // Register file cache
-    //
-    await fileCache.registerFileCache(context);
-
-    //
-    // Register configurations/settings change watcher
-    //
-    registerConfigWatcher(context);
+    await initStorage(context, tests);
 
 	const syncedVersion = storage.get<string>(prerelease && !insiders ? "synced:preVersion" : "synced:version");
 	const localVersion = storage.get<string>(prerelease && !insiders ? "preVersion" : "version");
@@ -163,6 +129,15 @@ export async function activate(context: ExtensionContext)
 	// 	upgrade: previousVersion != null && version !== previousVersion,
 	// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
 	// });
+
+    //
+    // !!! Temporary after settings layout redo / rename !!!
+    // !!! Remove sometime down the road (from 12/22/22) !!!
+    //
+    await migrateSettings();
+    //
+    // !!! End temporary !!!
+    //
 
 
     const exitMessage =

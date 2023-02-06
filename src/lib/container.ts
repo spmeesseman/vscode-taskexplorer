@@ -1,4 +1,5 @@
 
+import * as fileCache from "./fileCache";
 import registerAddToExcludesCommand from "../commands/addToExcludes";
 import registerEnableTaskTypeCommand from "../commands/enableTaskType";
 import registerDisableTaskTypeCommand from "../commands/disableTaskType";
@@ -27,6 +28,7 @@ import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { PowershellTaskProvider } from "../providers/powershell";
+import { registerStatusBarItem } from "./statusBarItem";
 import { WebviewManager } from "../webview/webViewManager";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
@@ -35,6 +37,7 @@ import { ParsingReportPage } from "../webview/page/parsingReportPage";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
 import { LicensePage } from "../webview/page/licensePage";
+import { registerConfigWatcher } from "./watcher/configWatcher";
 
 
 export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
@@ -51,6 +54,7 @@ export class TeContainer
 	private readonly _version: string;
 	private readonly _prerelease;
 	private readonly _context: ExtensionContext;
+	private readonly _previousVersion: string | undefined;
 	private _onReady: EventEmitter<void> = new EventEmitter<void>();
 	// private _subscription: SubscriptionService;
 	// private _subscriptionAuthentication: SubscriptionAuthenticationProvider;
@@ -80,6 +84,7 @@ export class TeContainer
 		this._context = context;
 		this._prerelease = prerelease;
 		this._version = version;
+		this._previousVersion = previousVersion;
         this._storage = storage;
 		this._providers = {};
 
@@ -127,19 +132,22 @@ export class TeContainer
 	});
 
 
-	get onReady()
-	{
+	get onReady() {
 		return this._onReady.event;
 	}
 
 
 	ready = async() =>
 	{
-		if (this._ready) throw new Error("TeContainer is already ready");
-
-		this._ready = true;
+		if (this._ready) {
+			throw new Error("TeContainer is already ready");
+		}
+		await fileCache.registerFileCache(this._context);
+		registerConfigWatcher(this._context);
 		this.registerTaskProviders();
 		this.registerContextMenuCommands();
+		registerStatusBarItem(this._context);
+		this._ready = true;
 		queueMicrotask(() => this._onReady.fire());
 	};
 
@@ -191,13 +199,11 @@ export class TeContainer
         this.registerTaskProvider("ruby", new RubyTaskProvider());
     };
 
-	get context()
-	{
+	get context() {
 		return this._context;
 	}
 
-	get debugging()
-    {
+	get debugging() {
 		return this._context.extensionMode === ExtensionMode.Development;
 	}
 
@@ -210,38 +216,31 @@ export class TeContainer
 		return env;
 	}
 
-	get id()
-    {
+	get id() {
 		return this._context.extension.id;
 	}
 
-	get prerelease()
-	{
+	get prerelease(){
 		return this._prerelease;
 	}
 
-	get prereleaseOrDebugging()
-	{
+	get prereleaseOrDebugging() {
 		return this._prerelease || this.debugging;
 	}
 
-	get providers()
-	{
+	get providers() {
 		return this._providers;
 	}
 
-	get licenseManager()
-    {
+	get licenseManager() {
 		return this._licenseManager;
 	}
 
-	get treeManager()
-    {
+	get treeManager() {
 		return this._treeManager;
 	}
 
-	get webviewManager()
-    {
+	get webviewManager() {
 		return this._webviewManager;
 	}
 

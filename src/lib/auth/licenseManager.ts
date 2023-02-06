@@ -10,7 +10,7 @@ import { Commands } from "../constants";
 import { TeContainer } from "../container";
 import { storage } from "../utils/storage";
 import { refreshTree } from "../refreshTree";
-import { registerCommand } from "../command";
+import { executeCommand, registerCommand } from "../command";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -87,7 +87,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 			}
 			else if (action === "Info")
 			{
-				await commands.executeCommand("vscode-taskexplorer.viewLicense");
+				await executeCommand(Commands.ShowLicensePage);
 			}
 		});
 	};

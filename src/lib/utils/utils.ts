@@ -2,13 +2,14 @@
 
 import * as minimatch from "minimatch";
 import log from "../log/log";
-import constants from "../constants";
+import constants, { Commands } from "../constants";
 import TaskFile from "../../tree/file";
 import TaskItem from "../../tree/item";
 import { configuration } from "./configuration";
 import { basename, extname, sep } from "path";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 import { WorkspaceFolder, Uri, workspace, window, commands } from "vscode";
+import { executeCommand } from "../command";
 
 
 export function getCombinedGlobPattern(defaultPattern: string, globs: string[]): string
@@ -266,11 +267,11 @@ export function showMaxTasksReachedMessage(licMgr: ILicenseManager, taskType?: s
 		{
 			if (action === "Enter License Key")
 			{
-				await commands.executeCommand("vscode-taskexplorer.enterLicense");
+				await executeCommand(Commands.EnterLicense);
 			}
 			else if (action === "Info")
 			{
-				await commands.executeCommand("vscode-taskexplorer.viewLicense");
+				await executeCommand(Commands.ShowLicensePage);
 			}
 		});
     }

@@ -30,25 +30,25 @@ export class TeApi implements ITaskExplorerApi
         this._tests = tests;
         this.container = container;
 
-        this._testsApi = { // Will get removed on activation if not tests environment
-            fs,
-            config: configuration,
-            fileCache,
-            isBusy: false,
-            storage,
-            enableConfigWatcher,
-            onWsFoldersChange,
-            utilities: util,
-            treeManager: this.container.treeManager,
-            extensionContext: this.container.context,
-            wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0],
-            get explorer()
-            {
-                return (this.treeManager.views.taskExplorer?.tree || this.treeManager.views.taskExplorerSideBar?.tree) as TaskTree;
-            }
-        };
-
-        if (this._tests) {
+        if (this._tests)
+        {
+            this._testsApi = {
+                fs,
+                config: configuration,
+                fileCache,
+                isBusy: false,
+                storage,
+                enableConfigWatcher,
+                onWsFoldersChange,
+                utilities: util,
+                treeManager: this.container.treeManager,
+                extensionContext: this.container.context,
+                wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0],
+                get explorer()
+                {
+                    return (this.treeManager.views.taskExplorer?.tree || this.treeManager.views.taskExplorerSideBar?.tree) as TaskTree;
+                }
+            };
             void setContext(ContextKeys.Tests, true);
             this.setTests(true); // lol, damn istanbul.  cover the initial empty fn
             this.setTests = (isTests) => { tests = isTests; };

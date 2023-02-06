@@ -1,18 +1,14 @@
 
 import { join } from "path";
 import { marked } from "marked";
-import { timeout } from "../../lib/utils/utils";
 import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { readFileAsync } from "../../lib/utils/fs";
-import { executeCommand } from "../../lib/command";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { Commands, ContextKeys } from "../../lib/constants";
-import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
-import { getExtensionContext, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Release Notes";
-const viewType = "viewReleaseNotes";
+const viewType = "showReleaseNotesPage";
 
 interface State {
 	pinned: boolean;
@@ -43,7 +39,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		const installPath = await getInstallPath(),
 			  changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),
 			  changeLogHtml = await marked(changeLogMd, { async: true }),
-			  version = getExtensionContext().extension.packageJSON.version;
+			  version = this.container.context.extension.packageJSON.version;
 		html = html.replace("<!-- changelog -->", changeLogHtml)
 				   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 				   .replace("<!-- subtitle -->", this.getNewInThisReleaseShortDsc())

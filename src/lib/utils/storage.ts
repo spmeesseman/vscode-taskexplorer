@@ -1,6 +1,6 @@
 
 import { join } from "path";
-import { Memento, ExtensionContext, SecretStorage } from "vscode";
+import { Memento, ExtensionContext, SecretStorage, ExtensionMode } from "vscode";
 import { IDictionary } from "../../interface";
 import { IStorage } from "../../interface/IStorage";
 import { createDir, pathExists, readJsonAsync, readJsonSync, writeFile, writeFileSync } from "./fs";
@@ -9,7 +9,7 @@ import { isNumber, isString } from "./utils";
 export let storage: IStorage;
 
 
-export const initStorage = async (context: ExtensionContext, isDev: boolean, isTests: boolean) =>
+export const initStorage = async (context: ExtensionContext, isTests: boolean) =>
 {
     const storageFile = join(context.globalStorageUri.fsPath, "storage.json");
     await createDir(context.globalStorageUri.fsPath);
@@ -17,7 +17,7 @@ export const initStorage = async (context: ExtensionContext, isDev: boolean, isT
     if (!(await pathExists(storageFile))) {
         await writeFile(storageFile, "{}");
     }
-    storage = new Storage(context, storageFile, isDev, isTests);
+    storage = new Storage(context, storageFile, isTests);
 };
 
 
@@ -30,11 +30,11 @@ class Storage implements IStorage, Memento
     private storageFile: string;
 
 
-    constructor(context: ExtensionContext, storageFile: string, isDev: boolean, isTests: boolean)
+    constructor(context: ExtensionContext, storageFile: string, isTests: boolean)
     {
         this.storage = context.globalState;
         this.secrets = context.secrets;
-        this.isDev = isDev;
+        this.isDev = context.extensionMode === ExtensionMode.Development;
         this.isTests = isTests;
         this.storageFile = storageFile;
     }

@@ -1,16 +1,12 @@
 
 import { Task } from "vscode";
 import { TeWebviewPanel } from "../webviewPanel";
-import { timeout } from "../../lib/utils/utils";
-import { isExtensionBusy } from "../../extension";
 import { TeContainer } from "../../lib/container";
-import { executeCommand } from "../../lib/command";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
-import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
 
 const viewTitle = "Task Explorer Licensing";
-const viewType = "viewLicensePage";
+const viewType = "showLicensePage";
 
 interface State {
 	pinned: boolean;
