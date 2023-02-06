@@ -68,26 +68,6 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		}
 	};
 
-	// private revive = async(webviewPanel: WebviewPanel, logPad: string) =>
-	// {   //
-	// 	// Use a timeout so license manager can initialize first
-	// 	//
-	// 	await new Promise<void>(async(resolve) =>
-	// 	{
-	// 		while (isExtensionBusy()) {
-	// 			await timeout(100);
-	// 		}
-	// 		setTimeout(async (webviewPanel: WebviewPanel, logPad: string) =>
-	// 		{
-	// 			log.methodStart("revive release notes", 1, logPad);
-	// 			const html = await getPageContent(logPad + "   ");
-	// 			TeContainer.instance.webviewManager.create(viewTitle, viewType, html, webviewPanel);
-	// 			log.methodDone("revive release notes", 1, logPad);
-	// 			resolve();
-	// 		}, 10, webviewPanel, logPad);
-	// 	});
-	// };
-
 
 	protected get options(): WebviewPanelOptions & WebviewOptions
 	{

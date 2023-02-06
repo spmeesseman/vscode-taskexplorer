@@ -1,14 +1,10 @@
 
 import { Task, Uri } from "vscode";
 import { dirname, relative } from "path";
-import { timeout } from "../../lib/utils/utils";
 import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
-import { isExtensionBusy } from "../../extension";
-import { executeCommand } from "../../lib/command";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
-import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
 
 const viewTitle = "Task Explorer Parsing Report";
@@ -35,7 +31,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override finalizeHtml = (html: string, uri: Uri) => this.getPageContent(html, uri);
+	protected override finalizeHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
 
 
 	// protected override includeBootstrap(): State {
@@ -46,8 +42,9 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	// }
 
 
-	private getPageContent = async(html: string, uri?: Uri) =>
+	private getPageContent = async(html: string, ...args: any[]) =>
 	{
+		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
 									 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&

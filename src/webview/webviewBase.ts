@@ -157,7 +157,7 @@ export abstract class TeWebviewBase<State>
             }
         });
 
-		return this.finalizeHtml(html, args);
+		return this.finalizeHtml(html, ...args);
 	}
 
 
