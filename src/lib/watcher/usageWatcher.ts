@@ -17,7 +17,9 @@ export type TrackedUsageFeatures =
 	| "clearLastTasks"
 	| "licensePage"
 	| "parsingReportPage"
-	| "releaseNotesPage";
+	| "releaseNotesPage"
+	| "homeView"
+	| "taskCountView";
 
 export type TrackedUsageKeys = `${TrackedUsageFeatures}:shown`;
 

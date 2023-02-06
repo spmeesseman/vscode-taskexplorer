@@ -1,8 +1,8 @@
 
 import { join } from "path";
-import { Memento, ExtensionContext, SecretStorage, ExtensionMode } from "vscode";
+import { Memento, ExtensionContext, SecretStorage, ExtensionMode, SecretStorageChangeEvent, EventEmitter, Disposable, Event } from "vscode";
 import { IDictionary } from "../../interface";
-import { IStorage } from "../../interface/IStorage";
+import { IStorage, StorageChangeEvent } from "../../interface/IStorage";
 import { createDir, pathExists, readJsonAsync, readJsonSync, writeFile, writeFileSync } from "./fs";
 import { isNumber, isString } from "./utils";
 
@@ -29,6 +29,16 @@ class Storage implements IStorage, Memento
     private isTests: boolean;
     private storageFile: string;
 
+    private _onDidChange = new EventEmitter<StorageChangeEvent>();
+	public get onDidChange(): Event<StorageChangeEvent> {
+		return this._onDidChange.event;
+	}
+
+	private _onDidChangeSecrets = new EventEmitter<SecretStorageChangeEvent>();
+	public get onDidChangeSecrets(): Event<SecretStorageChangeEvent> {
+		return this._onDidChangeSecrets.event;
+	}
+
 
     constructor(context: ExtensionContext, storageFile: string)
     {
@@ -37,6 +47,7 @@ class Storage implements IStorage, Memento
         this.isDev = context.extensionMode === ExtensionMode.Development;
         this.isTests = context.extensionMode === ExtensionMode.Test;
         this.storageFile = storageFile;
+        context.subscriptions.push(context.secrets.onDidChange(e => this._onDidChangeSecrets.fire(e)));
     }
 
 
@@ -109,11 +120,19 @@ class Storage implements IStorage, Memento
     getSecret = (key: string) => this.secrets.get(this.getKey(key));
 
 
-    delete = (key: string) => this.storage.update(this.getKey(key), undefined);
+    delete = async(key: string) =>
+    {
+        await this.storage.update(this.getKey(key), undefined);
+        this._onDidChange.fire({ key, workspace: false });
+    };
 
 
     // update = (key: string, value: any) => this.storage.update(key, value);
-    update = (key: string, value: any) => this.storage.update(this.getKey(key), value);
+    update = async(key: string, value: any) =>
+    {
+        await this.storage.update(this.getKey(key), value);
+        this._onDidChange.fire({ key, workspace: false });
+    };
 
 
     async update2(key: string, value: any)
@@ -128,6 +147,7 @@ class Storage implements IStorage, Memento
             store[this.getKey(key)] = value;
             const newJson = JSON.stringify(store);
             await writeFile(this.storageFile, newJson);
+            this._onDidChange.fire({ key, workspace: false });
         }
         catch {}
     }
@@ -145,6 +165,7 @@ class Storage implements IStorage, Memento
             store[this.getKey(key)] = value;
             const newJson = JSON.stringify(store);
             writeFileSync(this.storageFile, newJson);
+            this._onDidChange.fire({ key, workspace: false });
         }
         catch {}
     }

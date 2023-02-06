@@ -211,6 +211,23 @@ export function pushIfNotExists(arr: any[], item: any)
 }
 
 
+export function pluralize(s: string, count: number)
+    // options?: {
+    //     infix?: string; /** Controls the character/string between the count and the string */
+    //     format?: (count: number) => string | undefined; /** Formats the count */
+    //     only?: boolean; /** Controls if only the string should be included */
+    //     plural?: string; /** Controls the plural version of the string */
+    //     zero?: string; /** Controls the string for a zero value */
+    // })
+{
+    return `${count} ${s}${count === 1 ? "" : "s"}`;
+	// if (!isObject(options)) return `${count} ${s}${count === 1 ? "" : "s"}`;
+	// const suffix = count === 1 ? s : options.plural ?? `${s}s`;
+	// if (options.only) return suffix;
+	// return `${count === 0 ? options.zero ?? count : options.format?.(count) ?? count}${options.infix ?? " "}${suffix}`;
+}
+
+
 // export const removeFromArray = <T>(arr: T[], cb: (value: any, index: number, array: T[]) => void)
 // {
 //     const shallowReverse = arr.slice().reverse();
@@ -247,6 +264,16 @@ export function removeFromArray(arr: any[], item: any)
         arr.splice(idx2, 1);
     }
 }
+
+
+// // Removes \ / : * ? " < > | and C0 and C1 control codes
+// // eslint-disable-next-line no-control-regex
+// const illegalCharsForFSRegex = /[\\/:*?"<>|\x00-\x1f\x80-\x9f]/g;
+//
+// export function sanitizeForFileSystem(s: string, replacement: string = '_') {
+// 	if (!s) return s;
+// 	return s.replace(illegalCharsForFSRegex, replacement);
+// }
 
 
 let maxTasksMessageShown = false;

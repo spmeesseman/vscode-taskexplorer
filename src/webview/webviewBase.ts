@@ -18,10 +18,9 @@ import {
 
 export abstract class TeWebviewBase<State>
 {
-    abstract hide(): void;
+    // abstract hide(): void;
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
     protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
-	protected abstract onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent): void;
 
 	protected isReady = false;
 	protected _view: WebviewView | WebviewPanel | undefined;

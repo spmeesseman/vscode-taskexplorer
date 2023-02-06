@@ -12,7 +12,7 @@ import {
 } from "vscode";
 
 
-export type WebviewViewIds = "home" | "parsingReport";
+export type WebviewViewIds = "home" | "taskCount";
 
 
 export abstract class TeWebviewView<State, SerializedState = State> extends TeWebviewBase<State> implements WebviewViewProvider, Disposable

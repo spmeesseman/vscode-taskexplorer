@@ -1,6 +1,17 @@
+import { Event, SecretStorageChangeEvent } from "vscode";
+
+
+export interface StorageChangeEvent
+{
+    readonly key: string;
+    readonly workspace: boolean;
+};
+
 
 export interface IStorage // extends Memento
 {
+    onDidChange: Event<StorageChangeEvent>;
+    onDidChangeSecrets: Event<SecretStorageChangeEvent>;
     delete(key: string): Thenable<void>;
     get<T>(key: string): T | undefined;
     get<T>(key: string, defaultValue?: T): T;

@@ -9,6 +9,11 @@ import { IDictionary } from "../../interface";
 const colors = figures.colors;
 // let lastWriteMsg: string | undefined;
 
+// const padLeft = (s: string, padTo: number, padding: string = '\u00a0', width?: number) =>
+// {
+// 	const diff = padTo - (width ?? getWidth(s));
+// 	return diff <= 0 ? s : padding.repeat(diff) + s;
+// };
 
 // const shouldSkip = (msg: string) =>
 // {

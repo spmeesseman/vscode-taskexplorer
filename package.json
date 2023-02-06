@@ -137,10 +137,13 @@
         "webpack-build:test": "webpack --env environment=test --config ./webpack.config.test.js"
     },
     "dependencies": {
+        "@microsoft/fast-element": "^1.11.0",
+        "@microsoft/fast-react-wrapper": "^0.3.16-0",
         "@opentelemetry/api": "^1.4.0",
         "@opentelemetry/exporter-trace-otlp-http": "^0.35.1",
         "@opentelemetry/sdk-trace-base": "^1.9.1",
         "@sgarciac/bombadil": "^2.3.0",
+        "@vscode/codicons": "^0.0.32",
         "@vscode/webview-ui-toolkit": "^1.2.1",
         "glob": "^8.1.0",
         "https-proxy-agent": "^5.0.1",
@@ -148,6 +151,8 @@
         "marked": "^4.2.12",
         "minimatch": "^5.1.2",
         "node-fetch": "^2.6.9",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
         "uuid": "^9.0.0",
         "vscode-nls": "^4.1.2",
         "xml2js": "^0.4.23"

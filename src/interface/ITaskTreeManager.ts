@@ -1,5 +1,5 @@
 
-import TaskMap from "./types/TaskMap";
+import { TaskMap } from "./types/TaskMap";
 import { ITaskFolder } from "./ITaskFolder";
 import { Task, TreeItem, Uri } from "vscode";
 import { IDictionary } from "./IDictionary";
