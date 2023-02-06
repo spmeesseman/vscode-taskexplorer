@@ -2,7 +2,6 @@
 import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
-import { ITaskExplorerApi } from "../interface";
 import { loadMessageBundle } from "vscode-nls";
 import { refreshTree } from "../lib/refreshTree";
 import { testPattern } from "../lib/utils/utils";

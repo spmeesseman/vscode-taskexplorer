@@ -1,20 +1,15 @@
 
-import { TeWebviewPanel } from "./webviewPanel";
-import { join } from "path";
+import { Task, workspace } from "vscode";
 // import { getNonce } from "@env/crypto";
 import { IDictionary } from "../interface";
 import { TeContainer } from "../lib/container";
-import { readFileAsync } from "../lib/utils/fs";
 import { getTaskFiles } from "../lib/fileCache";
 import { getNonce } from "../lib/env/node/crypto";
-import { getInstallPath } from "../lib/utils/pathUtils";
 import { getTaskTypes } from "../lib/utils/taskTypeUtils";
-import { Disposable, Task, WebviewPanel, window, workspace } from "vscode";
 
 
-export default class WebviewManager
+export class WebviewManager
 {
-	static #instance: WebviewManager | undefined;
     private static maxSmallIntegerV8 = 2 ** 30;
     private static ipcSequence = 0;
 
@@ -107,12 +102,13 @@ export default class WebviewManager
 
     static nextIpcId = () =>
     {
-        if (this.ipcSequence === this.maxSmallIntegerV8) {
+        if (this.ipcSequence === this.maxSmallIntegerV8)
+        {
             this.ipcSequence = 1;
-        } else {
+        }
+        else {
             this.ipcSequence++;
         }
-
 	    return `host:${this.ipcSequence}`;
     };
 

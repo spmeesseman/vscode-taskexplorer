@@ -1,10 +1,8 @@
 
-import WebviewManager from "../webview/webViewManager";
 import registerAddToExcludesCommand from "../commands/addToExcludes";
 import registerEnableTaskTypeCommand from "../commands/enableTaskType";
 import registerDisableTaskTypeCommand from "../commands/disableTaskType";
 import registerRemoveFromExcludesCommand from "../commands/removeFromExcludes";
-import { Commands } from "./constants";
 import { IDictionary } from "../interface";
 import { IStorage } from "../interface/IStorage";
 import { configuration } from "./utils/configuration";
@@ -29,6 +27,7 @@ import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { PowershellTaskProvider } from "../providers/powershell";
+import { WebviewManager } from "../webview/webViewManager";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
@@ -59,11 +58,11 @@ export class TeContainer
 	private readonly _storage: IStorage;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _usage: UsageWatcher;
-	// private _viewCommands: ViewCommands | undefined;
-	// private _welcomeWebview: WelcomeWebview;
 	private _licensePage: LicensePage;
 	private _releaseNotesPage: ReleaseNotesPage;
 	private _parsingReportPage: ParsingReportPage;
+	// private _viewCommands: ViewCommands | undefined;
+	// private _welcomePage: WelcomePage;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
@@ -84,34 +83,14 @@ export class TeContainer
         this._storage = storage;
 		this._providers = {};
 
-		//
-		// Create license manager instance
-		//
-		context.subscriptions.push((this._licenseManager = this._licenseManager = new LicenseManager(this)));
-
-		//
-		// Create the Webviews Manager
-		//
+		this._licenseManager = this._licenseManager = new LicenseManager(this);
 		this._webviewManager = new WebviewManager(this);
+		this._treeManager = new TaskTreeManager(this);
+		this._usage = new UsageWatcher(this, storage);
 
-		//
-		// Create task tree manager and register the tree providers
-		//
-		context.subscriptions.push((this._treeManager = new TaskTreeManager(this)));
-
-		// context.subscriptions.push((this._storage = storage));
-		// context.subscriptions.push((this._telemetry = new TelemetryService(this)));
-		context.subscriptions.push((this._usage = new UsageWatcher(this, storage)));
-
-		//
-		// Authentication Provider
-		//
 		// context.subscriptions.push(
 		// 	new TeAuthenticationProvider(context)
 		// );
-
-		// context.subscriptions.push(configuration.onWillChange(this.onConfigurationChanging, this));
-
 		// const server = new ServerConnection(this);
 		// context.subscriptions.push(server);
 		// context.subscriptions.push(
@@ -119,10 +98,16 @@ export class TeContainer
 		// );
 		// context.subscriptions.push((this._subscription = new SubscriptionService(this, previousVersion)));
 
-		context.subscriptions.push((this._licensePage = new LicensePage(this)));
-		context.subscriptions.push((this._parsingReportPage = new ParsingReportPage(this)));
-		context.subscriptions.push((this._releaseNotesPage = new ReleaseNotesPage(this)));
-		// context.subscriptions.push((this._welcomeWebview = new WelcomeWebview(this)));
+		this._licensePage = new LicensePage(this);
+		this._parsingReportPage = new ParsingReportPage(this);
+		this._releaseNotesPage = new ReleaseNotesPage(this);
+		// this._welcomePage = new WelcomePage(this);
+
+		// context.subscriptions.push(this._welcomePage);
+		context.subscriptions.push(
+			this._licenseManager, this._treeManager, this._usage, this._licensePage,
+			this._parsingReportPage, this._releaseNotesPage /* this._welcomePage */
+		);
 	}
 
 
@@ -148,24 +133,24 @@ export class TeContainer
 	}
 
 
-	async ready()
+	ready = async() =>
 	{
 		if (this._ready) throw new Error("TeContainer is already ready");
 
 		this._ready = true;
-		this.registerContextMenuCommands();
 		this.registerTaskProviders();
+		this.registerContextMenuCommands();
 		queueMicrotask(() => this._onReady.fire());
-	}
+	};
 
 
-	private registerContextMenuCommands()
+	private registerContextMenuCommands = () =>
 	{
 		registerAddToExcludesCommand(this._context);
 		registerDisableTaskTypeCommand(this._context);
 		registerEnableTaskTypeCommand(this._context);
 		registerRemoveFromExcludesCommand(this._context);
-	}
+	};
 
 
     private registerTaskProvider = (providerName: string, provider: TaskExplorerProvider) =>
