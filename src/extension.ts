@@ -14,7 +14,7 @@ import { Commands, ContextKeys } from "./lib/constants";
 import { ITaskExplorerApi } from "./interface";
 import { initStorage, storage } from "./lib/utils/storage";
 import { TaskTreeManager } from "./tree/treeManager";
-import { ExtensionContext, env, version as codeVersion, ExtensionMode } from "vscode";
+import { ExtensionContext, env, version as codeVersion, ExtensionMode, commands } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { enableConfigWatcher, isProcessingConfigChange } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";

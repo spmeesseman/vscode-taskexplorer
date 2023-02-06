@@ -23,7 +23,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 		command,
 		function (this: any, ...args) {
 			// TeContainer.instance.telemetry.sendEvent("command", { command: command });
-			callback.call(this, ...args);
+			return callback.call(this, ...args);
 		},
 		thisArg
 	);
@@ -52,6 +52,18 @@ export function executeCommand<T extends [...unknown[]] = [], U = any>(command: 
 export function executeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
 {
 	return commands.executeCommand<U>(command, ...args);
+}
+
+
+export function executeTeCommand<U = any>(command: SupportedCommands): Thenable<U>;
+// eslint-disable-next-line no-redeclare
+export function executeTeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
+// eslint-disable-next-line no-redeclare
+export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
+// eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
+export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
+{
+	return commands.executeCommand<U>(`vscode-taskexplorer.${command}`, ...args);
 }
 
 
