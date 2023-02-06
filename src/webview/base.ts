@@ -4,14 +4,18 @@ import { TextDecoder } from "util";
 // import { getNonce } from "@env/crypto";
 import { TeContainer } from "../lib/container";
 import { getNonce } from "../lib/env/node/crypto";
-import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
-import { IpcMessage, IpcMessageParams, IpcNotificationType } from "./protocol";
+import { Disposable, Uri, Webview, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewView, workspace } from "vscode";
+import { ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc, WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType } from "./protocol";
+import { executeCommand } from "../lib/command";
+import { Commands } from "../lib/constants";
 
 
 export abstract class TeWebviewBase<State>
 {
     abstract hide(): void;
-    abstract show(options?: any, ..._args: unknown[]): Promise<void>;
+    abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
+    protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
+	protected abstract onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent): void;
 
 	protected isReady = false;
 	protected _view: WebviewView | WebviewPanel | undefined;
@@ -173,6 +177,30 @@ export abstract class TeWebviewBase<State>
 		if (!e) return;
 
 		switch (e.method) {
+			case WebviewReadyCommandType.method:
+				onIpc(WebviewReadyCommandType, e, () => {
+					this.isReady = true;
+					this.onReady?.();
+				});
+
+				break;
+
+			case WebviewFocusChangedCommandType.method:
+				onIpc(WebviewFocusChangedCommandType, e, params => {
+					this.onViewFocusChanged(params);
+				});
+
+				break;
+
+			case ExecuteCommandType.method:
+				onIpc(ExecuteCommandType, e, params => {
+					if (params.args) {
+						void executeCommand(params.command as Commands, ...params.args);
+					} else {
+						void executeCommand(params.command as Commands);
+					}
+				});
+				break;
 			default:
 				this.onMessageReceived?.(e);
 				break;
@@ -196,21 +224,15 @@ export abstract class TeWebviewBase<State>
 	protected async refresh(force?: boolean)
     {
 		if (!this._view) return;
-
-		// Mark the webview as not ready, until we know if we are changing the html
 		this.isReady = false;
 		const html = await this.getHtml(this._view.webview);
 		if (force) {
-			// Reset the html to get the webview to reload
 			this._view.webview.html = "";
 		}
-
-		// If we aren't changing the html, mark the webview as ready again
 		if (this._view.webview.html === html) {
 			this.isReady = true;
 			return;
 		}
-
 		this._view.webview.html = html;
 	}
 

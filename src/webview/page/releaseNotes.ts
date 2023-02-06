@@ -1,13 +1,14 @@
 
-import log from "../../lib/log/log";
-import { TeWebviewPanel } from "../webviewPanel";
 import { join } from "path";
 import { marked } from "marked";
+import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { readFileAsync } from "../../lib/utils/fs";
+import { executeCommand } from "../../lib/command";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { getExtensionContext } from "../../extension";
 import { Commands, ContextKeys } from "../../lib/constants";
+import { ExecuteCommandType, IpcMessage, onIpc } from "../protocol";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
@@ -27,8 +28,8 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 			"images/taskExplorer-icon.png",
 			"taskExplorer.parsingReport",
 			`${ContextKeys.WebviewPrefix}releaseNotes`,
-			"parsingReportPage",
-			Commands.ShowParsingReportPage
+			"releaseNotesPage",
+			Commands.ShowReleaseNotesPage
 		);
 	}
 
@@ -138,5 +139,11 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 
 
 	getViewType = () => viewType;
+
+
+	protected override onMessageReceived(e: IpcMessage)
+	{
+		onIpc(ExecuteCommandType, e, params => executeCommand(("vscode-taskexplorer." + params.command) as Commands, params.args));
+	}
 
 }

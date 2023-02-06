@@ -13,7 +13,7 @@ import type { WebviewFocusChangedParams } from "./protocol";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
-    Disposable, Uri, ViewColumn, window
+    Disposable, Uri, ViewColumn, window, WebviewPanelSerializer
 } from "vscode";
 
 export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes";
@@ -37,7 +37,10 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				showCommand: Commands)
 	{
 		super(container, title, fileName);
-		this.disposables.push(registerCommand(showCommand, this.onShowCommand, this));
+		this.disposables.push(
+			registerCommand(showCommand, this.onShowCommand, this),
+			window.registerWebviewPanelSerializer(id, this.serializer)
+		);
 	}
 
 
@@ -52,6 +55,36 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	get disposed() {
 		return this._disposed;
 	}
+
+
+	private serializer: WebviewPanelSerializer =
+	{
+		deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: State) =>
+		{
+			this._view = webviewPanel;
+			await this.show();
+		}
+	};
+
+	// private revive = async(webviewPanel: WebviewPanel, logPad: string) =>
+	// {   //
+	// 	// Use a timeout so license manager can initialize first
+	// 	//
+	// 	await new Promise<void>(async(resolve) =>
+	// 	{
+	// 		while (isExtensionBusy()) {
+	// 			await timeout(100);
+	// 		}
+	// 		setTimeout(async (webviewPanel: WebviewPanel, logPad: string) =>
+	// 		{
+	// 			log.methodStart("revive release notes", 1, logPad);
+	// 			const html = await getPageContent(logPad + "   ");
+	// 			TeContainer.instance.webviewManager.create(viewTitle, viewType, html, webviewPanel);
+	// 			log.methodDone("revive release notes", 1, logPad);
+	// 			resolve();
+	// 		}, 10, webviewPanel, logPad);
+	// 	});
+	// };
 
 
 	protected get options(): WebviewPanelOptions & WebviewOptions
@@ -72,7 +105,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ..._args: unknown[]): Promise<void>
+	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ..._args: unknown[])
 	{
 		void this.container.usage.track(`${this.trackingFeature}:shown`);
 
@@ -111,6 +144,8 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 			await this.refresh(true);
 			this._view.reveal(this._view.viewColumn ?? ViewColumn.Active, options?.preserveFocus ?? false);
 		}
+
+		return this;
 	}
 
 

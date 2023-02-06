@@ -34,6 +34,8 @@ import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
 import { ParsingReportPage } from "../webview/page/parsingReportPage";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
+import { ReleaseNotesPage } from "../webview/page/releaseNotes";
+import { LicensePage } from "../webview/page/licensePage";
 
 
 export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
@@ -59,7 +61,9 @@ export class TeContainer
 	private readonly _usage: UsageWatcher;
 	// private _viewCommands: ViewCommands | undefined;
 	// private _welcomeWebview: WelcomeWebview;
-	// private _releaseNotesWebview: ReleaseNotesPage;
+	private _licensePage: LicensePage;
+	private _releaseNotesPage: ReleaseNotesPage;
+	private _parsingReportPage: ParsingReportPage;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
@@ -115,6 +119,9 @@ export class TeContainer
 		// );
 		// context.subscriptions.push((this._subscription = new SubscriptionService(this, previousVersion)));
 
+		context.subscriptions.push((this._licensePage = new LicensePage(this)));
+		context.subscriptions.push((this._parsingReportPage = new ParsingReportPage(this)));
+		context.subscriptions.push((this._releaseNotesPage = new ReleaseNotesPage(this)));
 		// context.subscriptions.push((this._welcomeWebview = new WelcomeWebview(this)));
 	}
 
@@ -265,12 +272,16 @@ export class TeContainer
 		return this._version;
 	}
 
-	private _parsingReportPage: ParsingReportPage | undefined;
+	get licensePage() {
+		return this._licensePage;
+	}
+
 	get parsingReportPage() {
-		if (!this._parsingReportPage) {
-			this._context.subscriptions.push((this._parsingReportPage = new ParsingReportPage(this)));
-		}
 		return this._parsingReportPage;
+	}
+
+	get releaseNotesPage() {
+		return this._releaseNotesPage;
 	}
 
 	// private _keyboard: Keyboard;

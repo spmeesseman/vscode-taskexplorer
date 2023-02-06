@@ -14,8 +14,8 @@ import { registerCommand } from "../command";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { ILicenseManager } from "../../interface/ILicenseManager";
-import { displayLicenseReport, getViewType, reviveLicensePage } from "../../webview/page/licensePage";
 import { commands, Disposable, env, InputBoxOptions, Task, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
+import { LicensePage } from "../../webview/page/licensePage";
 
 
 export class LicenseManager implements ILicenseManager, Disposable
@@ -32,7 +32,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
 	private maxTasksReached = false;
-	private panel: TeWebviewPanel<Record<string, unknown>> | undefined;
+	private panel: LicensePage | undefined;
 	private port = 443;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
@@ -42,9 +42,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 		this.container = container;
 		this.disposables.push(
 			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey),
-			registerCommand(Commands.GetLicense, () => this.getLicense),
-			registerCommand("vscode-taskexplorer.viewLicense", async () => this.viewLicense()),
-        	window.registerWebviewPanelSerializer(getViewType(), this.serializer)
+			registerCommand(Commands.GetLicense, () => this.getLicense)
 		);
     }
 
@@ -145,7 +143,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	{
 		log.methodStart("get 30-day license command", 1, "", true);
 		const newKey = await this.requestLicense("   ");
-		const panel = await displayLicenseReport("   ", [], newKey);
+		const panel = await this.container.licensePage.show();
 		log.methodDone("get 30-day license command", 1);
 		return { panel: panel.getWebviewPanel(), newKey };
 	};
@@ -369,7 +367,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 
 		if (versionChange)
 		{
-			this.panel = await displayLicenseReport("   ", tasks);
+			this.panel = await this.container.licensePage.show();
 			await storage.update("version", this.container.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
 		}
@@ -508,22 +506,5 @@ export class LicenseManager implements ILicenseManager, Disposable
 
 		return false;
 	}*/
-
-	viewLicense = async() =>
-	{
-		log.methodStart("view license command", 1, "", true);
-		const panel = await displayLicenseReport("   ");
-		log.methodDone("view license command", 1);
-		return panel.getWebviewPanel();
-	};
-
-
-	serializer: WebviewPanelSerializer =
-	{
-		deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: any) =>
-		{
-			await reviveLicensePage(webviewPanel,  "");
-		}
-	};
 
 }

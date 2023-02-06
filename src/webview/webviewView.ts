@@ -9,6 +9,7 @@ import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands
 } from "vscode";
+import { WebviewFocusChangedParams } from "./protocol";
 
 
 export type WebviewViewIds = "home" | "parsingReport";
@@ -63,6 +64,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		catch (ex) {
 			log.error(ex);
 		}
+		return this;
 	}
 
 
@@ -117,7 +119,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	}
 
 
-	protected onViewFocusChanged(e: any): void
+	protected onViewFocusChanged(e: WebviewFocusChangedParams): void
 	{
 		this.setContextKeys(e.focused, e.inputFocused);
 		this.onFocusChanged?.(e.focused);

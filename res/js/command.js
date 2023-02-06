@@ -6,32 +6,32 @@
     const enterLicense = () =>
     {
         vscode.postMessage({
-            command: 'enterLicense',
-            text: ''
+            params: 'enterLicense',
+            method: 'command/execute'
         });
     };
     
     const getLicense = () =>
     {
         vscode.postMessage({
-            command: 'getLicense',
-            text: ''
+            params: 'getLicense',
+            method: 'command/execute'
         });
     };
     
-    const viewLicense = () =>
+    const showLicensePage = () =>
     {
         vscode.postMessage({
-            command: 'viewLicense',
-            text: ''
+            params: 'showLicensePage',
+            method: 'command/execute'
         });
     };
     
-    const viewReport = () =>
+    const showParsingReport = () =>
     {
         vscode.postMessage({
-            command: 'viewReport',
-            text: ''
+            params: 'showParsingReport',
+            method: 'command/execute'
         });
     };
 
@@ -48,12 +48,12 @@
     elem = document.getElementById("btnViewLicense");
     if (elem)
     {
-        elem.onclick = viewLicense;
+        elem.onclick = showLicensePage;
     }
     elem = document.getElementById("btnViewReport");
     if (elem)
     {
-        elem.onclick = viewReport;
+        elem.onclick = showParsingReport;
     }
     
     //
@@ -70,11 +70,11 @@
             case 'getLicense':
                 getLicense();
                 break;
-            case 'viewLicense':
-                viewLicense();
+            case 'showLicensePage':
+                showLicensePage();
                 break;
-            case 'viewReport':
-                viewReport();
+            case 'showParsingReport':
+                showParsingReport();
                 break;
         }
     });

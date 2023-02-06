@@ -17,7 +17,7 @@ interface State {
 };
 
 
-export class ParsingReportPage extends TeWebviewPanel<State>
+export class LicensePage extends TeWebviewPanel<State>
 {
 	constructor(container: TeContainer) {
 		super(
@@ -25,15 +25,16 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 			join(container.context.extensionUri.fsPath, "res", "page", "license-manager.html"),
 			"Task Explorer Parsing Report",
 			"images/taskExplorer-icon.png",
-			"taskExplorer.parsingReport",
+			"taskExplorer.licensePage",
 			`${ContextKeys.WebviewPrefix}licensePage`,
-			"parsingReportPage",
-			Commands.ShowParsingReportPage
+			"licensePage",
+			Commands.ShowLicensePage
 		);
 	}
 
 
 	protected override finalizeHtml = (html: string) => this.getPageContent(html);
+
 
 	private getPageContent = async (html: string, tasks?: Task[], newKey?: string) =>
 	{
