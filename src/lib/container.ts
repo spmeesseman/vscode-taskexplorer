@@ -88,7 +88,7 @@ export class TeContainer
 		//
 		// Create the Webviews Manager
 		//
-		context.subscriptions.push((this._webviewManager = new WebviewManager(this)));
+		this._webviewManager = new WebviewManager(this);
 
 		//
 		// Create task tree manager and register the tree providers

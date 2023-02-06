@@ -16,7 +16,7 @@ import {
     Disposable, Uri, ViewColumn, window
 } from "vscode";
 
-export type WebviewIds = "parsingReport" | "license" | "releaseNotes";
+export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes";
 
 
 export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> implements Disposable

@@ -61,6 +61,7 @@ export const enum ContextKeys
 	Disabled = "taskExplorer:disabled",
 	Enabled = "taskExplorer:enabled",
 	Untrusted = "taskExplorer:untrusted",
+	licensePage = "taskExplorer:licensePage",
 	ParsingReport = "taskExplorer:parsingReport",
 	ReleaseNotes = "taskExplorer:releaseNotes",
 	Tests = "taskExplorer:tests"

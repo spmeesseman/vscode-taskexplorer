@@ -30,14 +30,12 @@ export abstract class TeWebviewBase<State>
 	private readonly _cspNonce = getNonce();
 	private _title: string;	protected onInitializing?(): Disposable[] | undefined;
 	private _originalTitle: string | undefined;
-	private _htmlFilter: (html: string) => string;
 
 
-    constructor(protected readonly container: TeContainer, title: string, protected readonly fileName: string, htmlFilter: (html: string) => string = (html) => html)
+    constructor(protected readonly container: TeContainer, title: string, protected readonly fileName: string)
     {
 		this._title = title;
 		this._originalTitle = title;
-		this._htmlFilter = htmlFilter;
     }
 
 
@@ -84,10 +82,16 @@ export abstract class TeWebviewBase<State>
 	}
 
 
+	protected async finalizeHtml(html: string, ...args: unknown[])
+	{
+		return html;
+	}
+
+
 	getWebviewPanel = () => this._view;
 
 
-	protected async getHtml(webview: Webview)
+	protected async getHtml(webview: Webview, ...args: unknown[])
 	{
         const resourceDir = Uri.joinPath(this.container.context.extensionUri, "res");
 		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "dist", "webviews");
@@ -148,7 +152,7 @@ export abstract class TeWebviewBase<State>
             }
         });
 
-		return this._htmlFilter(html);
+		return this.finalizeHtml(html, args);
 	}
 
 

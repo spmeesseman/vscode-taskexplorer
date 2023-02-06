@@ -12,14 +12,13 @@ import { getTaskTypes } from "../lib/utils/taskTypeUtils";
 import { Disposable, Task, WebviewPanel, window, workspace } from "vscode";
 
 
-export default class WebviewManager implements Disposable
+export default class WebviewManager
 {
 	static #instance: WebviewManager | undefined;
     private static maxSmallIntegerV8 = 2 ** 30;
     private static ipcSequence = 0;
 
     private container: TeContainer;
-    private panelMap: IDictionary<TeWebviewPanel<Record<string, unknown>>> = {};
 
 
     constructor(container: TeContainer)
@@ -28,35 +27,12 @@ export default class WebviewManager implements Disposable
     }
 
 
-    create(title: string, viewType: string, html: string, panel?: WebviewPanel)
-    {
-        if (this.panelMap[viewType] && !this.panelMap[viewType].disposed)
-        {
-            this.panelMap[viewType].show();
-            return this.panelMap[viewType];
-		}
-        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, this.container.context, panel);
-        return this.panelMap[viewType];
-	}
-
-
-    dispose = () =>
-    {
-        for (const d of Object.keys(this.panelMap).filter(p => !this.panelMap[p].disposed))
-        {
-            this.panelMap[d].dispose();
-        }
-        this.panelMap = {};
-    };
-
-
-    createTaskCountTable = async(tasks: Task[], title: string, project?: string) =>
+    createTaskCountTable = async(tasks: Task[], title: string, html: string, project?: string) =>
     {
         const projects: string[] = [],
-              taskCounts: IDictionary<number> = {},
-              installPath = await getInstallPath();
-        let fileCount = 0,
-            html = await readFileAsync(join(installPath, "res", "page", "license-manager.html"));
+              taskCounts: IDictionary<number> = {};
+
+        let fileCount = 0;
 
         html = html.replace("<!-- title -->", title);
 
