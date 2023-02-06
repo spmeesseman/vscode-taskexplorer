@@ -140,10 +140,11 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	private onWindowStateChanged(e: WindowState) {
-		if (!this.visible) return;
-
-		this.onWindowFocusChanged?.(e.focused);
+	private onWindowStateChanged(e: WindowState)
+	{
+		if (this.visible) {
+			this.onWindowFocusChanged?.(e.focused);
+		}
 	}
 
 
@@ -205,19 +206,19 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	protected onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent)
 	{
 		const { active, visible } = e.webviewPanel;
-		if (visible) {
+		if (visible)
+		{
 			this.setContextKeys(active);
 			this.onActiveChanged?.(active);
 			if (!active) {
 				this.onFocusChanged?.(false);
 			}
-		} else {
+		}
+		else {
 			this.resetContextKeys();
-
 			this.onActiveChanged?.(false);
 			this.onFocusChanged?.(false);
 		}
-
 		this.onVisibilityChanged?.(visible);
 	}
 

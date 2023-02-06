@@ -10,9 +10,6 @@ import { getTaskTypes } from "../lib/utils/taskTypeUtils";
 
 export class WebviewManager
 {
-    private static maxSmallIntegerV8 = 2 ** 30;
-    private static ipcSequence = 0;
-
     private container: TeContainer;
 
 
@@ -94,22 +91,6 @@ export class WebviewManager
             html = html.replace(html.slice(idx1, idx2), "");
         }
         return html;
-    };
-
-
-    static getNonce = () => getNonce();
-
-
-    static nextIpcId = () =>
-    {
-        if (this.ipcSequence === this.maxSmallIntegerV8)
-        {
-            this.ipcSequence = 1;
-        }
-        else {
-            this.ipcSequence++;
-        }
-	    return `host:${this.ipcSequence}`;
     };
 
 }

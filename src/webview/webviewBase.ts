@@ -41,6 +41,8 @@ export abstract class TeWebviewBase<State>
 	private readonly _cspNonce = getNonce();
 	private _title: string;	protected onInitializing?(): Disposable[] | undefined;
 	private _originalTitle: string | undefined;
+    private maxSmallIntegerV8 = 2 ** 30;
+    private ipcSequence = 0;
 
 
     constructor(protected readonly container: TeContainer, title: string, protected readonly fileName: string)
@@ -50,7 +52,17 @@ export abstract class TeWebviewBase<State>
     }
 
 
-	protected nextIpcId = () => WebviewManager.nextIpcId();
+    protected nextIpcId  = () =>
+    {
+        if (this.ipcSequence === this.maxSmallIntegerV8)
+        {
+            this.ipcSequence = 1;
+        }
+        else {
+            this.ipcSequence++;
+        }
+	    return `host:${this.ipcSequence}`;
+    };
 
 
 	protected get cspNonce()
@@ -137,7 +149,7 @@ export abstract class TeWebviewBase<State>
                           .replace(/\[webview\.pageDir\]/g, pageUri.toString())
                           .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
                           .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
-                          .replace(/\[webview\.nonce\]/g, WebviewManager.getNonce());
+                          .replace(/\[webview\.nonce\]/g, this.cspNonce);
 
 		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|webroot)}/g, (_s: string, token: string) =>
         {

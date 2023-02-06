@@ -5,16 +5,16 @@ import { VsCodeCommands, Commands, TeCommands } from "./constants";
 import { TeContainer } from "./container";
 // import { Container } from "../container";
 
-type CommandConstructor = new (container: TeContainer) => Command;
-const registrableCommands: CommandConstructor[] = [];
+// type CommandConstructor = new (container: TeContainer) => Command;
+// const registrableCommands: CommandConstructor[] = [];
 
 
-export const command = (): ClassDecorator =>
-{
-	return (target: any) => {
-		registrableCommands.push(target);
-	};
-};
+// export const command = (): ClassDecorator =>
+// {
+// 	return (target: any) => {
+// 		registrableCommands.push(target);
+// 	};
+// };
 
 
 export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any): Disposable =>
@@ -55,29 +55,29 @@ export function executeCommand<T extends [...unknown[]] = [], U = any>(command: 
 }
 
 
-export function executeTeCommand<U = any>(command: SupportedCommands): Thenable<U>;
-// eslint-disable-next-line no-redeclare
-export function executeTeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare
-export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
-export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
-{
-	return commands.executeCommand<U>(`vscode-taskexplorer.${command}`, ...args);
-}
+// export function executeTeCommand<U = any>(command: SupportedCommands): Thenable<U>;
+// // eslint-disable-next-line no-redeclare
+// export function executeTeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
+// // eslint-disable-next-line no-redeclare
+// export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
+// // eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
+// export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
+// {
+// 	return commands.executeCommand<U>(`vscode-taskexplorer.${command}`, ...args);
+// }
 
 
-export function executeVsCodeCommand<T = unknown, U = any>(command: VsCodeCommands, arg: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare
-export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
-export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
-{
-	// if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
-	// 	TeContainer.instance.telemetry.sendEvent("command/core", { command: command });
-	// }
-	return commands.executeCommand<U>(command, ...args);
-}
+// export function executeVsCodeCommand<T = unknown, U = any>(command: VsCodeCommands, arg: T): Thenable<U>;
+// // eslint-disable-next-line no-redeclare
+// export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>;
+// // eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
+// export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
+// {
+// 	// if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
+// 	// 	TeContainer.instance.telemetry.sendEvent("command/core", { command: command });
+// 	// }
+// 	return commands.executeCommand<U>(command, ...args);
+// }
 
 
-export const executeEditorCommand = <T>(command: Commands, uri: Uri | undefined, args: T) => commands.executeCommand(command, uri, args);
+// export const executeEditorCommand = <T>(command: Commands, uri: Uri | undefined, args: T) => commands.executeCommand(command, uri, args);
