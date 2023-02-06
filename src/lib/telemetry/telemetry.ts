@@ -1,0 +1,252 @@
+export default {};
+// // import { getProxyAgent } from "@env/fetch";
+// // import { getPlatform } from "@env/platform";
+// import { getProxyAgent } from "../env/node/fetch";
+// import { getPlatform } from "../env/node/platform";
+// import type { TeContainer } from "../container";
+// import { configuration } from "../utils/configuration";
+// import { Disposable, version as codeVersion, env } from "vscode";
+// import type { AttributeValue, Span, TimeInput } from "@opentelemetry/api";
+//
+//
+// export interface TelemetryContext
+// {
+// 	env: string;
+// 	extensionId: string;
+// 	extensionVersion: string;
+// 	machineId: string;
+// 	sessionId: string;
+// 	language: string;
+// 	platform: string;
+// 	vscodeEdition: string;
+// 	vscodeHost: string;
+// 	vscodeRemoteName: string;
+// 	vscodeShell: string;
+// 	vscodeUIKind: string;
+// 	vscodeVersion: string;
+// }
+//
+//
+// export interface TelemetryProvider extends Disposable
+// {
+// 	sendEvent(name: string, data?: Record<string, AttributeValue>, startTime?: TimeInput, endTime?: TimeInput): void;
+// 	startEvent(name: string, data?: Record<string, AttributeValue>, startTime?: TimeInput): Span;
+// 	setGlobalAttributes(attributes: Map<string, AttributeValue>): void;
+// }
+//
+//
+// interface QueuedEvent
+// {
+// 	type: "sendEvent";
+// 	name: string;
+// 	data?: Record<string, AttributeValue | null | undefined>;
+// 	global: Map<string, AttributeValue>;
+// 	startTime: TimeInput;
+// 	endTime: TimeInput;
+// }
+//
+//
+// export class TelemetryService implements Disposable
+// {
+// 	private _enabled = false;
+// 	private provider: TelemetryProvider | undefined;
+// 	private globalAttributes = new Map<string, AttributeValue>();
+// 	private eventQueue: QueuedEvent[] = [];
+// 	private _initializationTimer: ReturnType<typeof setTimeout> | undefined;
+//
+//
+// 	constructor(private readonly container: TeContainer)
+// 	{
+// 		container.context.subscriptions.push(
+// 			configuration.onDidChange((e: any) =>
+// 			{
+// 				if (e.affectsConfiguration("telemetry.enabled")) {
+// 					this.ensureTelemetry(container);
+// 				}
+// 			}),
+// 			env.onDidChangeTelemetryEnabled(() => this.ensureTelemetry(container)),
+// 		);
+// 		this.ensureTelemetry(container);
+// 	}
+//
+//
+// 	dispose()
+// 	{
+// 		this.provider?.dispose();
+// 		this.provider = undefined;
+// 	}
+//
+//
+// 	get enabled() {
+// 		return this._enabled;
+// 	}
+//
+//
+// 	private ensureTelemetry(container: Container)
+// 	{
+// 		this._enabled = env.isTelemetryEnabled && configuration.get("telemetry.enabled", undefined, true);
+//
+// 		if (!this._enabled)
+// 		{
+// 			if (this._initializationTimer) {
+// 				clearTimeout(this._initializationTimer);
+// 				this._initializationTimer = undefined;
+// 			}
+// 			this.eventQueue.length = 0;
+// 			this.provider?.dispose();
+// 			this.provider = undefined;
+// 			return;
+// 		}
+//
+// 		if (this._initializationTimer) {
+// 			return;
+// 		}
+//
+// 		this._initializationTimer = setTimeout(() => this.initializeTelemetry(container), 7500);
+// 	}
+//
+//
+// 	private async initializeTelemetry(container: Container)
+// 	{
+// 		if (this._initializationTimer) {
+// 			clearTimeout(this._initializationTimer);
+// 			this._initializationTimer = undefined;
+// 		}
+//
+// 		this.provider = new (await import(/* webpackChunkName: "telemetry" */ "./openTelemetryProvider"))
+// 		.OpenTelemetryProvider(
+// 		{
+// 			env: container.env,
+// 			extensionId: container.id,
+// 			extensionVersion: container.version,
+// 			machineId: env.machineId,
+// 			sessionId: env.sessionId,
+// 			language: env.language,
+// 			platform: getPlatform(),
+// 			vscodeEdition: env.appName,
+// 			vscodeHost: env.appHost,
+// 			vscodeRemoteName: env.remoteName ?? "",
+// 			vscodeShell: env.shell,
+// 			vscodeUIKind: String(env.uiKind),
+// 			vscodeVersion: codeVersion,
+// 		},
+// 		getProxyAgent(),
+// 		container.debugging);
+//
+//
+// 		if (this.eventQueue.length)
+// 		{
+// 			const queue = [ ...this.eventQueue ];
+// 			this.eventQueue.length = 0;
+//
+// 			for (const { type, name, data, global } of queue) {
+// 				if (type === "sendEvent") {
+// 					this.provider.setGlobalAttributes(global);
+// 					this.provider.sendEvent(name, stripNullOrUndefinedAttributes(data));
+// 				}
+// 			}
+// 		}
+//
+// 		this.provider.setGlobalAttributes(this.globalAttributes);
+// 	}
+//
+//
+// 	sendEvent(name: string, data?: Record<string, AttributeValue | null | undefined>, startTime?: TimeInput, endTime?: TimeInput)
+// 	{
+// 		if (this._enabled)
+// 		{
+// 			if (!this.provider) {
+// 				this.eventQueue.push({
+// 					type: "sendEvent",
+// 					name,
+// 					data,
+// 					global: new Map([ ...this.globalAttributes ]),
+// 					startTime: startTime ?? Date.now(),
+// 					endTime: endTime ?? Date.now(),
+// 				});
+// 				return;
+// 			}
+// 			this.provider.sendEvent(name, stripNullOrUndefinedAttributes(data), startTime, endTime);
+// 		}
+// 	}
+//
+//
+// 	startEvent(name: string, data?: Record<string, AttributeValue | null | undefined>, startTime?: TimeInput): Disposable | undefined
+// 	{
+// 		if (this._enabled)
+// 		{
+// 			if (this.provider) {
+// 				const span = this.provider.startEvent(name, stripNullOrUndefinedAttributes(data), startTime);
+// 				return {
+// 					dispose: () => span?.end(),
+// 				};
+// 			}
+// 			startTime = startTime ?? Date.now();
+// 			return {
+// 				dispose: () => this.sendEvent(name, data, startTime, Date.now()),
+// 			};
+// 		}
+// 	}
+//
+//
+// 	// sendErrorEvent(
+// 	// 	name: string,
+// 	// 	data?: Record<string, string>,
+// 	// ): void {
+// 	// }
+//
+// 	// sendException(
+// 	// 	error: Error | unknown,
+// 	// 	data?: Record<string, string>,
+// 	// ): void {
+// 	// }
+//
+// 	setGlobalAttribute(key: string, value: AttributeValue | null | undefined)
+// 	{
+// 		if (!value) {
+// 			this.globalAttributes.delete(key);
+// 		}
+// 		else {
+// 			this.globalAttributes.set(key, value);
+// 		}
+// 		this.provider?.setGlobalAttributes(this.globalAttributes);
+// 	}
+//
+//
+// 	setGlobalAttributes(attributes: Record<string, AttributeValue | null | undefined>)
+// 	{
+// 		for (const [ key, value ] of Object.entries(attributes))
+// 		{
+// 			if (!value) {
+// 				this.globalAttributes.delete(key);
+// 			}
+// 			else {
+// 				this.globalAttributes.set(key, value);
+// 			}
+// 		}
+// 		this.provider?.setGlobalAttributes(this.globalAttributes);
+// 	}
+//
+//
+// 	deleteGlobalAttribute(key: string)
+// 	{
+// 		this.globalAttributes.delete(key);
+// 		this.provider?.setGlobalAttributes(this.globalAttributes);
+// 	}
+// }
+//
+//
+// const stripNullOrUndefinedAttributes = (data: Record<string, AttributeValue | null | undefined> | undefined) =>
+// {
+// 	if (data)
+// 	{
+// 		const attributes: Record<string, AttributeValue> | undefined = Object.create(null);
+// 		for (const [ key, value ] of Object.entries(data))
+// 		{
+// 			if (value) {
+// 				attributes![key] = value;
+// 			}
+// 		}
+// 		return attributes;
+// 	}
+// };

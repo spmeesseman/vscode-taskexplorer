@@ -45,6 +45,7 @@
         "nocase",
         "noscripts",
         "noworkspace",
+        "OTLP",
         "Pipenv",
         "pkief",
         "scottmeesseman",
