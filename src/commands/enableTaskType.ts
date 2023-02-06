@@ -1,10 +1,11 @@
 
 import log from "../lib/log/log";
-import constants from "../lib/constants";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
+import { registerCommand } from "../lib/command";
+import { ExtensionContext, Uri, window } from "vscode";
+import { Globs, Commands } from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
-import { commands, ExtensionContext, Uri, window } from "vscode";
 
 const localize = loadMessageBundle();
 
@@ -12,7 +13,7 @@ const localize = loadMessageBundle();
 const enableTaskType = async(uri: Uri) =>
 {
     log.methodStart("enable task type file explorer command", 1, "", true, [[ "path", uri.fsPath ]]);
-    const globKey = Object.keys(constants).find((k => k.startsWith("GLOB_") && testPattern(uri.path, constants[k])));
+    const globKey = Object.keys(Globs).find((k => k.startsWith("GLOB_") && testPattern(uri.path, Globs[k])));
     if (globKey)
     {
         const taskType = globKey.replace("GLOB_", "").toLowerCase();
@@ -30,7 +31,7 @@ const enableTaskType = async(uri: Uri) =>
 const registerEnableTaskTypeCommand = (context: ExtensionContext) =>
 {
 	context.subscriptions.push(
-        commands.registerCommand("vscode-taskexplorer.enableTaskType", async (uri: Uri) => { await enableTaskType(uri); })
+        registerCommand(Commands.EnableTaskType, async (uri: Uri) => { await enableTaskType(uri); })
     );
 };
 

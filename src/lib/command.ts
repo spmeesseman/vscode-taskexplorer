@@ -1,7 +1,7 @@
 
 import { Command as CoreCommand, Disposable, Uri, commands, Command } from "vscode";
 // import { CoreGitCommands } from "../constants";
-import { VsCodeCommands, Commands } from "./constants";
+import { VsCodeCommands, Commands, TeCommands } from "./constants";
 import { TeContainer } from "./container";
 // import { Container } from "../container";
 
@@ -40,7 +40,7 @@ export const asCommand = <T extends unknown[]>(command: Omit<CoreCommand, "argum
 // 	commands.executeCommand(`${Commands.ActionPrefix}${action}`, { ...args, type: action });
 
 
-type SupportedCommands = Commands | `taskExplorer.view.${string}.focus` | `taskExplorer.view.${string}.resetViewLocation`;
+type SupportedCommands = Commands | TeCommands | `taskExplorer.view.${string}.focus` | `taskExplorer.view.${string}.resetViewLocation`;
 
 
 export function executeCommand<U = any>(command: SupportedCommands): Thenable<U>;

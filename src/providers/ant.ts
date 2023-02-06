@@ -1,6 +1,6 @@
 
 import log from "../lib/log/log";
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";
 import { basename, dirname, join } from "path";
@@ -271,7 +271,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
 
     public override getGlobPattern()
     {
-        return getCombinedGlobPattern(constants.GLOB_ANT,
+        return getCombinedGlobPattern(Globs.GLOB_ANT,
                                       [ ...configuration.get<string[]>("includeAnt", []),
                                         ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }

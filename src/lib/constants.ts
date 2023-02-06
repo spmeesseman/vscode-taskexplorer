@@ -3,7 +3,7 @@
 import { IDictionary } from "../interface";
 
 
-const constants: IDictionary<string> =
+export const Globs: IDictionary<string> =
 {
     DEFAULT_SEPARATOR: "-",
     LAST_TASKS_STORE: "lastTasks",
@@ -36,15 +36,17 @@ const constants: IDictionary<string> =
     GLOB_WORKSPACE: "**/.vscode/tasks.json"
 };
 
-export default constants;
-
 export const enum Commands
 {
+	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
     Run = "vscode-taskexplorer.run",
     RunLastTask = "vscode-taskexplorer.runLastTask",
+	DisableTaskType = "vscode-taskexplorer.disableTaskType",
+	EnableTaskType = "vscode-taskexplorer.enableTaskType",
 	EnterLicense = "vscode-taskexplorer.enterLicense",
 	GetApi = "vscode-taskexplorer.getApi",
 	GetLicense = "vscode-taskexplorer.getLicense",
+	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
 	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
 	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
 	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
@@ -54,7 +56,8 @@ export const enum Commands
 
 export const enum TeCommands
 {
-	GetApi = "getApi"
+	GetApi = "getApi",
+	RemovefromExcludes = "removeFromExcludes"
 }
 
 export const enum ContextKeys

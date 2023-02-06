@@ -4,7 +4,7 @@
 /* tslint:disable */
 
 import * as utils from "../utils/utils";
-import constants from "../../lib/constants";
+import { Globs } from "../../lib/constants";
 import TaskItem from "../../tree/item";
 import SpecialTaskFolder from "../../tree/specialFolder";
 import { expect } from "chai";
@@ -420,8 +420,8 @@ async function startTask(taskItem: TaskItem, addToSpecial: boolean)
         const taskTree = testsApi.treeManager.getTaskTree();
         if (taskTree)
         {
-            const sFolder= taskTree[0].label === constants.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                           (taskTree[1].label === constants.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                           (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 const sTaskItem = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === taskItem.id);

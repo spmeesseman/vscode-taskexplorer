@@ -1,5 +1,5 @@
 
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
 import { getCombinedGlobPattern } from "../lib/utils/utils";
 import { TaskExplorerProvider } from "./provider";
@@ -11,7 +11,7 @@ export class BashTaskProvider extends ScriptTaskProvider implements TaskExplorer
 
     public override getGlobPattern()
     {
-        return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
+        return getCombinedGlobPattern(Globs.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
     }
 
 }

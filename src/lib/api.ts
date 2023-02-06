@@ -8,6 +8,7 @@ import { setContext } from "./context";
 import { ContextKeys } from "./constants";
 import { TeContainer } from "./container";
 import { storage } from "./utils/storage";
+import { registerCommand } from "./command";
 import { refreshTree } from "./refreshTree";
 import { isExtensionBusy } from "../extension";
 import { workspace, WorkspaceFolder } from "vscode";
@@ -56,6 +57,8 @@ export class TeApi implements ITaskExplorerApi
         else {
             this._testsApi = {} as unknown as ITestsApi;
         }
+
+        container.context.subscriptions.push(registerCommand("vscode-taskexplorer.getApi", () => this, this));
     }
 
 

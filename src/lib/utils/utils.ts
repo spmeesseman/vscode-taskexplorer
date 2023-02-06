@@ -2,7 +2,7 @@
 
 import * as minimatch from "minimatch";
 import log from "../log/log";
-import constants, { Commands } from "../constants";
+import { Commands, Globs } from "../constants";
 import TaskFile from "../../tree/file";
 import TaskItem from "../../tree/item";
 import { configuration } from "./configuration";
@@ -30,7 +30,7 @@ export function getCombinedGlobPattern(defaultPattern: string, globs: string[]):
 
 export function getGroupSeparator()
 {
-    return configuration.get<string>("groupSeparator", constants.DEFAULT_SEPARATOR);
+    return configuration.get<string>("groupSeparator", Globs.DEFAULT_SEPARATOR);
 }
 
 
@@ -38,14 +38,14 @@ export function getGlobPattern(taskType: string): string
 {
     taskType = taskType.replace(/\W*\-/, "");
     if (taskType === "ant") {
-        return getCombinedGlobPattern(constants.GLOB_ANT,
+        return getCombinedGlobPattern(Globs.GLOB_ANT,
                 [ ...configuration.get<string[]>("includeAnt", []), ...configuration.get<string[]>("globPatternsAnt", []) ]);
     }
     else if (taskType === "bash") {
-        return getCombinedGlobPattern(constants.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
+        return getCombinedGlobPattern(Globs.GLOB_BASH, configuration.get<string[]>("globPatternsBash", []));
     }
     else {
-        return constants["GLOB_" + taskType.toUpperCase()];
+        return Globs["GLOB_" + taskType.toUpperCase()];
     }
 }
 
@@ -152,9 +152,9 @@ export const isObjectEmpty = (value: any) =>
 export function isSpecial(taskItem: TaskItem)
 {
     return taskItem && taskItem.id &&
-           (taskItem.id.includes(constants.LAST_TASKS_LABEL + ":") ||
-            taskItem.id.includes(constants.FAV_TASKS_LABEL + ":") ||
-            taskItem.id.includes(constants.USER_TASKS_LABEL + ":"));
+           (taskItem.id.includes(Globs.LAST_TASKS_LABEL + ":") ||
+            taskItem.id.includes(Globs.FAV_TASKS_LABEL + ":") ||
+            taskItem.id.includes(Globs.USER_TASKS_LABEL + ":"));
 }
 
 

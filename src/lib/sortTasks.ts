@@ -3,7 +3,7 @@ import log from "./log/log";
 import TaskItem from "../tree/item";
 import TaskFile from "../tree/file";
 import TaskFolder from "../tree/folder";
-import constants from "./constants";
+import { Globs } from "./constants";
 import { TreeItemLabel } from "vscode";
 import { IDictionary, ITaskFile, ITaskItem } from "../interface";
 import { configuration } from "./utils/configuration";
@@ -14,22 +14,22 @@ export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>
 {
     return [ ...Object.values(folders) ].sort((a: TaskFolder, b: TaskFolder) =>
     {
-        if (a.label === constants.LAST_TASKS_LABEL) {
+        if (a.label === Globs.LAST_TASKS_LABEL) {
             return -1;
         }
-        else if (b.label === constants.LAST_TASKS_LABEL) {
+        else if (b.label === Globs.LAST_TASKS_LABEL) {
             return 1;
         }
-        else if (a.label === constants.FAV_TASKS_LABEL) {
+        else if (a.label === Globs.FAV_TASKS_LABEL) {
             return -1;
         }
-        else if (b.label === constants.FAV_TASKS_LABEL) {
+        else if (b.label === Globs.FAV_TASKS_LABEL) {
             return 1;
         }
-        else if (a.label === constants.USER_TASKS_LABEL) {
+        else if (a.label === Globs.USER_TASKS_LABEL) {
             return -1;
         }
-        else if (b.label === constants.USER_TASKS_LABEL) {
+        else if (b.label === Globs.USER_TASKS_LABEL) {
             return 1;
         }
         if (a.label && b.label && configuration.get<boolean>("sortProjectFoldersAlpha")) {

@@ -13,7 +13,7 @@ import { IDictionary, ITaskTreeManager, TaskMap } from "../interface";
 import TaskFile from "./file";
 import { join } from "path";
 import { NoScripts } from "../lib/noScripts";
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
 
 export default class TaskTreeBuilder implements Disposable
@@ -185,7 +185,7 @@ export default class TaskTreeBuilder implements Disposable
         }     //
         else // User Task (not related to a ws or project)
         {   //
-            scopeName = constants.USER_TASKS_LABEL;
+            scopeName = Globs.USER_TASKS_LABEL;
             folder = folders[scopeName];
             if (!folder)
             {

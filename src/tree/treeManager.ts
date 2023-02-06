@@ -7,7 +7,7 @@ import TaskItem from "./item";
 import log from "../lib/log/log";
 import TaskFolder from "./folder";
 import TaskTree from "../tree/tree";
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import TaskTreeBuilder from "./treeBuilder";
 import SpecialTaskFolder from "./specialFolder";
 import statusBarItem from "../lib/statusBarItem";
@@ -57,8 +57,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         TaskTreeManager.specialFolders = {
-            favorites: new SpecialTaskFolder(this, constants.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
-            lastTasks: new SpecialTaskFolder(this, constants.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
+            favorites: new SpecialTaskFolder(this, Globs.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
+            lastTasks: new SpecialTaskFolder(this, Globs.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
         this.disposables.push(TaskTreeManager.specialFolders.favorites);
         this.disposables.push(TaskTreeManager.specialFolders.lastTasks);

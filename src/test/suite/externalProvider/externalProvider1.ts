@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import constants from "../../../lib/constants";
+import { Globs } from "../../../lib/constants";
 import { getDevPath } from "../../utils/sharedUtils";
 import { getRelativePath } from "../../../lib/utils/pathUtils";
 import { IExternalProvider, ITaskDefinition } from "../../../interface";
@@ -43,7 +43,7 @@ export class ExternalTaskProvider1 extends IExternalProvider implements IExterna
 
     public getGlobPattern(): string
     {
-        return constants.GLOB_EXTERNAL;
+        return Globs.GLOB_EXTERNAL;
     }
 
 

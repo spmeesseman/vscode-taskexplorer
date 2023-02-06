@@ -4,7 +4,7 @@
 import * as path from "path";
 import * as treeUtils from "./treeUtils";
 import figures from "../../lib/figures";
-import constants from "../../lib/constants";
+import { Globs } from "../../lib/constants";
 import { expect } from "chai";
 import { testControl } from "../control";
 import { deactivate } from "../../extension";
@@ -339,7 +339,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
 
 
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
-    taskItem.id.replace(constants.LAST_TASKS_LABEL + ":", "").replace(constants.FAV_TASKS_LABEL + ":", "").replace(constants.USER_TASKS_LABEL + ":", "");
+    taskItem.id.replace(Globs.LAST_TASKS_LABEL + ":", "").replace(Globs.FAV_TASKS_LABEL + ":", "").replace(Globs.USER_TASKS_LABEL + ":", "");
 
 
 export const getTeApi = () => teApi;

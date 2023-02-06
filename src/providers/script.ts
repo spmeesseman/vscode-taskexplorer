@@ -1,6 +1,6 @@
 
 import log from "../lib/log/log";
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import { basename, dirname, sep, extname, join } from "path";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
@@ -205,7 +205,7 @@ export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExpl
 
     public override getGlobPattern()
     {
-        return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
+        return Globs[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }
 
 

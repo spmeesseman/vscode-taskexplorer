@@ -1,6 +1,6 @@
 
 import log from "../lib/log/log";
-import constants from "../lib/constants";
+import { Globs } from "../lib/constants";
 import { extname } from "path";
 import { TeContainer } from "../lib/container";
 import { getTaskFiles } from "../lib/fileCache";
@@ -58,7 +58,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
      */
     public getGlobPattern()
     {
-        return constants[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
+        return Globs[`GLOB_${this.providerName.replace(/\-/g, "").toUpperCase()}`];
     }
 
 
