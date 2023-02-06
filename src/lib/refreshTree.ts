@@ -1,4 +1,4 @@
 import { Uri } from "vscode";
-import { getTaskTreeManager } from "../extension";
+import { TeContainer } from "./container";
 
-export const refreshTree = (taskType: string | boolean | undefined, uri: Uri | false | undefined, logPad: string) => getTaskTreeManager().refresh(taskType, uri, logPad);
+export const refreshTree = (taskType: string | boolean | undefined, uri: Uri | false | undefined, logPad: string) => TeContainer.instance.treeManager.refresh(taskType, uri, logPad);

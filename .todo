@@ -32,7 +32,17 @@ Features:
 
     ☐ Context Menu - For scripts i.e. sh bat etc, menu item to 'run' and 'run w arguments'
 
+    ☐ Telemetry
+
+    ☐ New task provider - eslint
+        if eslit is present in node_modules set up basic tasks everyone would use
+    
+    ☐ Decorate ative editor task file i.e. package.json with task actions
+        Run command, etc, inline in file while open in editor, at end of line of defined tasks
+
 General Todos:
+
+    ☐ Auth / Sign In / Integration with License Manager
 
     ✔ Test visibility change event @done(23-01-13 22:22)
         Differences in tray open/closed, switching views, vscode minimized, etc

@@ -4,8 +4,8 @@ import TaskItem from "./item";
 import log from "../lib/log/log";
 import { dirname } from "path";
 import { TaskMap } from "../interface";
-import { providers } from "../extension";
 import { pathExists } from "../lib/utils/fs";
+import { TeContainer } from "../lib/container";
 import { TaskTreeManager } from "./treeManager";
 import { getTerminal } from "../lib/getTerminal";
 import { ScriptTaskProvider } from "../providers/script";
@@ -187,7 +187,7 @@ export const run = async(taskItem: TaskItem, noTerminal = false, withArgs = fals
             //
             const def = newTask.definition,
                   folder = taskItem.getFolder(),
-                  p = providers[def.type];
+                  p = TeContainer.instance.providers[def.type];
             /* istanbul ignore else */
             if (folder && p)
             {

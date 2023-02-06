@@ -1,6 +1,7 @@
 
 export interface IStorage // extends Memento
 {
+    delete(key: string): Thenable<void>;
     get<T>(key: string): T | undefined;
     get<T>(key: string, defaultValue?: T): T;
     getSecret(key: string): Thenable<string | undefined>;

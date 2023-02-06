@@ -1,6 +1,4 @@
 import TaskMap from "./types/TaskMap";
-import ITaskTree from "./ITaskTree";
-import ITaskTreeManager from "./ITaskTreeManager";
 
 export * from "./ICacheItem";
 export * from "./IDictionary";
@@ -16,9 +14,10 @@ export * from "./ITaskExplorerApi";
 export * from "./ITaskFile";
 export * from "./ITaskFolder";
 export * from "./ITaskItem";
+export * from "./ITaskTree";
+export * from "./ITaskTreeManager";
 export * from "./ITestsApi";
+export * from "./ITaskTreeView";
 export * from "./types/TaskMap";
 
-export { ITaskTree };
-export { ITaskTreeManager };
 export { TaskMap };

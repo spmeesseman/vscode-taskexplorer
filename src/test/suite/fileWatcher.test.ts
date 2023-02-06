@@ -8,7 +8,6 @@ import { join } from "path";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
-import { getLicenseManager } from "../../extension";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -271,10 +270,10 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
-        utils.setLicensed(false, getLicenseManager());
+        utils.setLicensed(false);
         await fsApi.copyDir(outsideWsDir, insideWsDir, undefined, true); // copy folder
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        utils.setLicensed(true, getLicenseManager());
+        utils.setLicensed(true);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
         utils.endRollingCount(this);
     });

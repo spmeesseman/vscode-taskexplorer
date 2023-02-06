@@ -1,5 +1,11 @@
 {
     "extends": "./tsconfig.base.json",
+    // "compilerOptions": {
+    //     "paths": {
+	// 		"@env/*": [ "src/lib/env/node/*" ]
+	// 	},
+    //     // "tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
+    // },
     "exclude": [
         "node_modules",
         ".vscode-test",

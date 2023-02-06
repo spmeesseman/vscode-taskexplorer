@@ -1,11 +1,11 @@
 
 import log from "../../lib/log/log";
 import TeWebviewPanel from "../webviewPanel";
-import WebviewManager from "../webViewManager";
 import { Task, WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
+import { isExtensionBusy } from "../../extension";
+import { TeContainer } from "../../lib/container";
 import { TaskTreeManager } from "../../tree/treeManager";
-import { getLicenseManager, getWebviewManager, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Licensing";
 const viewType = "viewLicensePage";
@@ -16,7 +16,7 @@ export const displayLicenseReport = async(logPad: string, tasks?: Task[], newKey
 {
 	log.methodStart("display license report", 1, logPad);
 	const html = await getPageContent(logPad + "   ", tasks, newKey);
-	panel = getWebviewManager().create(viewTitle, viewType, html);
+	panel = TeContainer.instance.webviewManager.create(viewTitle, viewType, html);
     log.methodDone("display license report", 1, logPad);
     return panel;
 };
@@ -34,7 +34,7 @@ const getPageContent = async (logPad: string, tasks?: Task[], newKey?: string) =
 	/* istanbul ignore else */
 	if (tasks)
 	{
-		html = await WebviewManager.createTaskCountTable(tasks, "Task Explorer Licensing");
+		html = await TeContainer.instance.webviewManager.createTaskCountTable(tasks, "Task Explorer Licensing");
 
 		let infoContent = getExtraContent(logPad + "   ", newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
@@ -54,7 +54,7 @@ const getPageContent = async (logPad: string, tasks?: Task[], newKey?: string) =
 const getExtraContent = (logPad: string, newKey?: string) =>
 {
     log.methodStart("get body content", 1, logPad);
-	const licMgr = getLicenseManager();
+	const licMgr = TeContainer.instance.licenseManager;
 	const details = !newKey ?
 (!licMgr.isLicensed() ? `
 <table class="margin-top-15">
@@ -150,7 +150,7 @@ export const reviveLicensePage = async(webviewPanel: WebviewPanel, logPad: strin
 		{
 			log.methodStart("revive license report", 1, logPad);
 			const html = await getPageContent(logPad + "   ", tasks, newKey);
-			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
+			TeContainer.instance.webviewManager.create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive license report", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, logPad, tasks, newKey);

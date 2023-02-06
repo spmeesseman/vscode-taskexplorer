@@ -1,24 +1,30 @@
 
 import TeWebviewPanel from "./webviewPanel";
 import { join } from "path";
+// import { getNonce } from "@env/crypto";
 import { IDictionary } from "../interface";
+import { TeContainer } from "../lib/container";
 import { readFileAsync } from "../lib/utils/fs";
 import { getTaskFiles } from "../lib/fileCache";
-import { getLicenseManager } from "../extension";
+import { getNonce } from "../lib/env/node/crypto";
 import { getInstallPath } from "../lib/utils/pathUtils";
 import { getTaskTypes } from "../lib/utils/taskTypeUtils";
-import { ExtensionContext, Task, WebviewPanel, window, workspace } from "vscode";
+import { Disposable, Task, WebviewPanel, window, workspace } from "vscode";
 
 
-export default class WebviewManager
+export default class WebviewManager implements Disposable
 {
-    private extensionContext: ExtensionContext;
+	static #instance: WebviewManager | undefined;
+    private static maxSmallIntegerV8 = 2 ** 30;
+    private static ipcSequence = 0;
+
+    private container: TeContainer;
     private panelMap: IDictionary<TeWebviewPanel> = {};
 
 
-    constructor(context: ExtensionContext)
+    constructor(container: TeContainer)
     {
-        this.extensionContext = context;
+        this.container = container;
     }
 
 
@@ -30,7 +36,7 @@ export default class WebviewManager
             this.panelMap[viewType].reveal(column);
             return this.panelMap[viewType];
 		}
-        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, this.extensionContext, panel);
+        this.panelMap[viewType] = new TeWebviewPanel(title, viewType, html, this.container.context, panel);
         return this.panelMap[viewType];
 	}
 
@@ -45,7 +51,7 @@ export default class WebviewManager
     };
 
 
-    static createTaskCountTable = async(tasks: Task[], title: string, project?: string) =>
+    createTaskCountTable = async(tasks: Task[], title: string, project?: string) =>
     {
         const projects: string[] = [],
               taskCounts: IDictionary<number> = {},
@@ -102,13 +108,13 @@ export default class WebviewManager
         html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
         html = html.replace(/\$\{taskFiles.length\}/g, fileCount.toString());
 
-        return WebviewManager.cleanLicenseButtons(html);
+        return this.cleanLicenseButtons(html);
     };
 
 
-    static cleanLicenseButtons = (html: string) =>
+    cleanLicenseButtons = (html: string) =>
     {
-        if (getLicenseManager().isLicensed())
+        if (this.container.licenseManager.isLicensed())
         {
             let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
                 idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;
@@ -121,14 +127,18 @@ export default class WebviewManager
     };
 
 
-    static getNonce = () =>
+    static getNonce = () => getNonce();
+
+
+    static nextIpcId = () =>
     {
-        let text = "";
-        const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for (let i = 0; i < 32; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        if (this.ipcSequence === this.maxSmallIntegerV8) {
+            this.ipcSequence = 1;
+        } else {
+            this.ipcSequence++;
         }
-        return text;
+
+	    return `host:${this.ipcSequence}`;
     };
 
 }

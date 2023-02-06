@@ -5,20 +5,24 @@ import figures from "../figures";
 import log, { logControl } from "../log/log";
 import TeWebviewPanel from "../../webview/webviewPanel";
 import { IncomingMessage } from "http";
+import { teApi } from "../../extension";
+import { Commands } from "../constants";
+import { TeContainer } from "../container";
 import { storage } from "../utils/storage";
 import { refreshTree } from "../refreshTree";
-import { ITaskExplorerApi } from "../../interface";
+import { registerCommand } from "../command";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { displayLicenseReport } from "../../webview/page/licensePage";
 import { ILicenseManager } from "../../interface/ILicenseManager";
-import { commands, env, ExtensionContext, InputBoxOptions, Task, window } from "vscode";
+import { displayLicenseReport, getViewType, reviveLicensePage } from "../../webview/page/licensePage";
+import { commands, Disposable, env, InputBoxOptions, Task, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
 
 
-export class LicenseManager implements ILicenseManager
+export class LicenseManager implements ILicenseManager, Disposable
 {
+	private disposables: Disposable[] = [];
 	private busy = false;
-	private context: ExtensionContext;
+	private container: TeContainer;
 	private host = "license.spmeesseman.com";
 	private licensed = false;
 	private logRequestStepsTests = false;
@@ -30,16 +34,18 @@ export class LicenseManager implements ILicenseManager
 	private maxTasksReached = false;
 	private panel: TeWebviewPanel | undefined;
 	private port = 443;
-	private teApi: ITaskExplorerApi;
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
-	private version: string;
 
 
-	constructor(context: ExtensionContext, api: ITaskExplorerApi)
+	constructor(container: TeContainer)
     {
-		this.context = context;
-		this.teApi = api;
-        this.version = context.extension.packageJSON.version; // Note that `context.extension` is only VSCode 1.55+
+		this.container = container;
+		this.disposables.push(
+			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey),
+			registerCommand(Commands.GetLicense, () => this.getLicense),
+			registerCommand("vscode-taskexplorer.viewLicense", async () => this.viewLicense()),
+        	window.registerWebviewPanelSerializer(getViewType(), this.serializer)
+		);
     }
 
 
@@ -61,6 +67,9 @@ export class LicenseManager implements ILicenseManager
 
 	dispose()
 	{
+		this.disposables.forEach((d) => {
+            d.dispose();
+        });
 	    this.panel?.dispose();
 		this.numTasks = 0;
 		this.licensed = false;
@@ -132,6 +141,16 @@ export class LicenseManager implements ILicenseManager
 	};
 
 
+	async getLicense()
+	{
+		log.methodStart("get 30-day license command", 1, "", true);
+		const newKey = await this.requestLicense("   ");
+		const panel = await displayLicenseReport("   ", [], newKey);
+		log.methodDone("get 30-day license command", 1);
+		return { panel: panel.getWebviewPanel(), newKey };
+	};
+
+
 	getLicenseKey = async() => storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
 
 
@@ -147,7 +166,7 @@ export class LicenseManager implements ILicenseManager
 	getToken = () => this.token;
 
 
-	getVersion = () => this.version;
+	getVersion = () => this.container.version;
 
 
 	getWebviewPanel = () => this.panel?.getWebviewPanel();
@@ -162,7 +181,7 @@ export class LicenseManager implements ILicenseManager
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
 		/* istanbul ignore if */
-		if (this.teApi.isTests() && !logControl.writeToConsole && this.logRequestStepsTests)
+		if (teApi.isTests() && !logControl.writeToConsole && this.logRequestStepsTests)
 		{
 			if (!value && value !== false) {
 				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
@@ -279,7 +298,7 @@ export class LicenseManager implements ILicenseManager
 				ip: "*",
 				json: true,
 				license: true,
-				tests: this.teApi.isTests()
+				tests: teApi.isTests()
 			}),
 			() => {
 				this.log("   output stream written, ending request and waiting for response...", logPad);
@@ -324,7 +343,7 @@ export class LicenseManager implements ILicenseManager
 		let displayPopup = !this.licensed;
 		const storedVersion = storage.get<string>("version"),
 			  lastNag = storage.get<string>("lastLicenseNag"),
-			  versionChange = this.version !== storedVersion;
+			  versionChange = this.container.version !== storedVersion;
 
 		if (this.numTasks === tasks.length) {
 			return;
@@ -351,7 +370,7 @@ export class LicenseManager implements ILicenseManager
 		if (versionChange)
 		{
 			this.panel = await displayLicenseReport("   ", tasks);
-			await storage.update("version", this.version);
+			await storage.update("version", this.container.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
 		}
 		else if (displayPopup)
@@ -489,5 +508,22 @@ export class LicenseManager implements ILicenseManager
 
 		return false;
 	}*/
+
+	viewLicense = async() =>
+	{
+		log.methodStart("view license command", 1, "", true);
+		const panel = await displayLicenseReport("   ");
+		log.methodDone("view license command", 1);
+		return panel.getWebviewPanel();
+	};
+
+
+	serializer: WebviewPanelSerializer =
+	{
+		deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: any) =>
+		{
+			await reviveLicensePage(webviewPanel,  "");
+		}
+	};
 
 }

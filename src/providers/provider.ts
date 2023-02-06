@@ -2,8 +2,8 @@
 import log from "../lib/log/log";
 import constants from "../lib/constants";
 import { extname } from "path";
+import { TeContainer } from "../lib/container";
 import { getTaskFiles } from "../lib/fileCache";
-import { getLicenseManager } from "../extension";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
 import { isDirectory, pathExistsSync } from "../lib/utils/fs";
@@ -69,7 +69,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
         log.methodStart(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, true, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
-            const licMgr = getLicenseManager();
+            const licMgr = TeContainer.instance.licenseManager;
             this.cachedTasks = await this.readTasks(TaskExplorerProvider.logPad + "   ");
             if (licMgr && !licMgr.isLicensed())
             {

@@ -1,5 +1,10 @@
 {
     "extends": "./tsconfig.base.json",
+    // "compilerOptions": {
+    //     "paths": {
+	// 		"@env/*": [ "lib/env/node/*" ]
+	// 	}
+    // },
     "exclude": [
         "node_modules",
         ".vscode-test",

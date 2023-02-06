@@ -19,6 +19,7 @@ import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { ITaskTree, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
+import { TeContainer } from "../../lib/container";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
@@ -423,8 +424,9 @@ export const setFailed = (ctrlc = true) =>
 };
 
 
-export const setLicensed = async (valid: boolean, licMgr: ILicenseManager) =>
+export const setLicensed = async (valid: boolean) =>
 {
+    const licMgr = TeContainer.instance.licenseManager;
     teApi.setTests(!valid);
     await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
     await licMgr.checkLicense();

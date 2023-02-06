@@ -2,7 +2,7 @@
 import log from "./log/log";
 import TaskItem from "../tree/item";
 import { TextDocument } from "vscode";
-import { providers } from "../extension";
+import { TeContainer } from "./container";
 import { IDictionary } from "../interface";
 import { isWatchTask } from "./utils/taskTypeUtils";
 
@@ -64,7 +64,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     else if (!isWatchTask(taskItem.taskSource))
     {
         log.write("   find custom provider position", 2);
-        const provider = providers[def.type];
+        const provider = TeContainer.instance.providers[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 

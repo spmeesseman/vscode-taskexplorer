@@ -7,9 +7,9 @@ import { registerFileWatcher } from "./fileWatcher";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
-import { getTaskTreeManager } from "../../extension";
 import { pushIfNotExists } from "../utils/utils";
 import { IDictionary } from "../../interface";
+import { TeContainer } from "../container";
 
 let watcherEnabled = true;
 let processingConfigEvent = false;
@@ -251,14 +251,14 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enableExplorerView");
         log.write("   the 'enableExplorerView' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        getTaskTreeManager().enableTaskTree("taskExplorer", newValue, "   ");
+        TeContainer.instance.treeManager.enableTaskTree("taskExplorer", newValue, "   ");
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
         const newValue = configuration.get<boolean>("enableSideBar");
         log.write("   the 'enableSideBar' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        getTaskTreeManager().enableTaskTree("taskExplorerSideBar", newValue, "   ");
+        TeContainer.instance.treeManager.enableTaskTree("taskExplorerSideBar", newValue, "   ");
     }
 
     //

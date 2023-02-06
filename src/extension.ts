@@ -1,86 +1,64 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./lib/utils/utils";
 import * as fs from "./lib/utils/fs";
 import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
-import WebviewManager from "./webview/webViewManager";
-import registerViewReportCommand from "./commands/viewReport";
-import registerGetLicenseCommand from "./commands/getLicense";
-import registerViewLicenseCommand from "./commands/viewLicense";
-import registerEnterLicenseCommand from "./commands/enterLicense";
-import registerAddToExcludesCommand from "./commands/addToExcludes";
-import registerEnableTaskTypeCommand from "./commands/enableTaskType";
-import registerDisableTaskTypeCommand from "./commands/disableTaskType";
-import registerViewReleaseNotesCommand from "./commands/viewReleaseNotes";
-import registerRemoveFromExcludesCommand from "./commands/removeFromExcludes";
+import { once } from "./lib/event";
 import { join, resolve } from "path";
-import { refreshTree } from "./lib/refreshTree";
-import { AntTaskProvider } from "./providers/ant";
-import { BashTaskProvider } from "./providers/bash";
-import { GulpTaskProvider } from "./providers/gulp";
-import { MakeTaskProvider } from "./providers/make";
-import { RubyTaskProvider } from "./providers/ruby";
-import { NsisTaskProvider } from "./providers/nsis";
-import { PerlTaskProvider } from "./providers/perl";
-import { TaskTreeManager } from "./tree/treeManager";
-import { BatchTaskProvider } from "./providers/batch";
-import { MavenTaskProvider } from "./providers/maven";
-import { GruntTaskProvider } from "./providers/grunt";
-import { GradleTaskProvider } from "./providers/gradle";
-import { PipenvTaskProvider } from "./providers/pipenv";
-import { PythonTaskProvider } from "./providers/python";
-import { WebpackTaskProvider } from "./providers/webpack";
-import { JenkinsTaskProvider } from "./providers/jenkins";
+// import { isWeb } from "@env/platform";
+import { isWeb } from "./lib/env/node/platform";
+import { TeContainer } from "./lib/container";
+// import { hrtime } from "@env/hrtime";
+import { TeApi } from "./lib/api";
+import { Stopwatch } from "./lib/stopwatch";
+import { Commands } from "./lib/constants";
+import { executeCommand } from "./lib/command";
+import { showWhatsNewMessage } from "./lib/messages";
 import { initStorage, storage } from "./lib/utils/storage";
-import { LicenseManager } from "./lib/auth/licenseManager";
-import { ComposerTaskProvider } from "./providers/composer";
-import { TaskExplorerProvider } from "./providers/provider";
+import { TaskTreeManager } from "./tree/treeManager";
 import { registerStatusBarItem } from "./lib/statusBarItem";
-import { ILicenseManager } from "./interface/ILicenseManager";
-import { PowershellTaskProvider } from "./providers/powershell";
-import { ITaskExplorerProvider } from "./interface/ITaskProvider";
-import { AppPublisherTaskProvider } from "./providers/appPublisher";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
-import { ExtensionContext, tasks, commands, workspace, WorkspaceFolder, env } from "vscode";
-import { IDictionary, IExternalProvider, ITaskTree, ITaskExplorerApi, ITestsApi, ITaskTreeManager } from "./interface";
+import { ExtensionContext, env, version as codeVersion, window } from "vscode";
+import { ITaskExplorerApi } from "./interface";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./lib/watcher/configWatcher";
-import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent, onWsFoldersChange } from "./lib/watcher/fileWatcher";
+import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";
 
-export const providers: IDictionary<ITaskExplorerProvider> = {};
+// import "tsconfig-paths/register";
+
+
 
 let ready = false;
 let tests = false;
 let dev = false;
-let licenseManager: ILicenseManager;
-let treeManager: TaskTreeManager;
-let webviewManager: WebviewManager;
 let extensionContext: ExtensionContext;
 
 
-export const teApi: ITaskExplorerApi =
-{
-    explorer: undefined,
-    explorerView: undefined,
-    isBusy: isExtensionBusy,
-    log,
-    providers,
-    refreshExternalProvider,
-    register: registerExternalProvider,
-    sidebar: undefined,
-    sidebarView: undefined,
-    unregister: unregisterExternalProvider,
-    testsApi: {} as unknown as ITestsApi,
-    isLicensed: () => licenseManager.isLicensed(),
-    isTests: () => tests,
-    setTests: () => {}
-};
+export let teApi: ITaskExplorerApi;
 
 
 export async function activate(context: ExtensionContext)
 {
+    const version: string = context.extension.packageJSON.version;
+	const insiders = context.extension.id === "spmeesseman-vscode-taskexplorer-insiders";
+	const prerelease = false; // insiders || satisfies(version, "> 2023.0.0");
+
+	const sw = new Stopwatch(
+		// `TaskExplorer${prerelease ? (insiders ? " (Insiders)" : " (pre-release)") : ""} v${version}`,
+		`Task Explorer v${version}`,
+		{
+			log: {
+				message: ` activating in ${env.appName}(${codeVersion}) on the ${isWeb ? "web" : "desktop"} (${
+					env.machineId
+				}|${env.sessionId})`,
+				// ${context.extensionRuntime !== ExtensionRuntime.Node ? ' in a webworker' : ''}
+			},
+            logLevel: 1
+		},
+	);
+
     extensionContext = context;
+
     //
     // Set 'tests' flag if tests are running and this is not a user runtime
     //
@@ -92,6 +70,19 @@ export async function activate(context: ExtensionContext)
     dev = !tests && /* istanbul ignore next */await fs.pathExists(resolve(__dirname, "..", "src"));
 
     //
+    // TODO - Handle untrusted workspace
+    //
+    // if (!workspace.isTrusted) {
+	// 	void setContext(ContextKeys.Untrusted, true);
+	// 	context.subscriptions.push(
+	// 		workspace.onDidGrantWorkspaceTrust(() => {
+	// 			void setContext(ContextKeys.Untrusted, undefined);
+	// 			container.telemetry.setGlobalAttribute('workspace.isTrusted', workspace.isTrusted);
+	// 		}),
+	// 	);
+	// }
+
+    //
     // Initialize logging
     //
     registerConfiguration(context, dev, tests);
@@ -100,6 +91,7 @@ export async function activate(context: ExtensionContext)
     // Initialize logging
     //
     await log.registerLog(context, tests ? 2 : /* istanbul ignore next */ 0); // 0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
+    log.methodStart("activation", 1, "", true);
 
     //
     // Initialize global status Bar Item
@@ -111,15 +103,11 @@ export async function activate(context: ExtensionContext)
     //
     await initStorage(context, dev, tests);
 
-    log.methodStart("activation", 1, "", true);
-
     //
     // !!! Temporary after settings layout redo / rename !!!
     // !!! Remove sometime down the road (from 12/22/22) !!!
     //
-    await tempRemapSettingsToNewLayout();
-    await tempResetGroupingSep();
-    await tempDeleteSomePathToPrograms();
+    await migrateSettings();
     //
     // !!! End temporary !!!
     //
@@ -130,230 +118,92 @@ export async function activate(context: ExtensionContext)
     await fileCache.registerFileCache(context);
 
     //
-    // Register internal task providers.  Npm, VScode type tasks are provided
-    // by VSCode, not internally.
-    //
-    registerTaskProviders(context);
-
-    //
-    // Register non-ui commands found in package.json contributes.commands
-    //
-    registerCommands(context);
-
-    //
-    // Create task tree manager and register the tree providers
-    //
-    treeManager = new TaskTreeManager(context, teApi);
-
-    //
     // Register configurations/settings change watcher
     //
     registerConfigWatcher(context);
 
-    //
-    // Create license manager instance
-    //
-    licenseManager = new LicenseManager(context, teApi);
+	const syncedVersion = storage.get<string>(prerelease && !insiders ? "synced:preVersion" : "synced:version");
+	const localVersion = storage.get<string>(prerelease && !insiders ? "preVersion" : "version");
+
+	let previousVersion: string | undefined;
+	if (!localVersion || !syncedVersion) {
+		previousVersion = syncedVersion ?? localVersion;
+	}
+    else if (syncedVersion === localVersion) {
+		previousVersion = syncedVersion;
+	}
+    else {
+		previousVersion = localVersion;
+	}
+
+    const container = TeContainer.create(context, storage, prerelease, version, previousVersion);
+	once(container.onReady)(() =>
+    {
+		void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
+		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
+		if (!syncedVersion || (version === syncedVersion)) {
+			void storage.update(prerelease && !insiders ? "synced:preVersion" : "synced:version", version);
+		}
+	});
+
+	await container.ready();
+
+	// if (teContainer.debugging) {
+	// 	void setContext(ContextKeys.Debugging, true);
+	// }
 
     //
-    // Create the Webviews Manager
+    // TODO - Telemetry
     //
-    webviewManager = new WebviewManager(context);
+	// teContainer.telemetry.setGlobalAttributes({
+	// 	debugging: container.debugging,
+	// 	insiders: insiders,
+	// 	prerelease: prerelease,
+	// 	install: previousVersion == null,
+	// 	upgrade: previousVersion != null && gitlensVersion !== previousVersion,
+	// 	upgradedFrom: previousVersion != null && gitlensVersion !== previousVersion ? previousVersion : undefined,
+	// });
+
+
+    const exitMessage =
+    `syncedVersion=${syncedVersion}, localVersion=${localVersion}, previousVersion=${previousVersion}, welcome=${storage.get(
+        "views:welcome:visible",
+    )}`;
+	sw.stop({ message: ` activated${!exitMessage ? `, ${exitMessage}` : ""}` });
 
     //
-    // Authentication Provider
+    // TODO - Telemetry
     //
-    // context.subscriptions.push(
-	// 	new TeAuthenticationProvider(context)
+	// const startTime = sw.startTime;
+	// const endTime = hrtime();
+	// const elapsed = sw.elapsed();
+    // container.telemetry.sendEvent(
+	// 	"activate",
+	// 	{
+	// 		"activation.elapsed": elapsed,
+	// 		"activation.mode": mode?.name,
+	// 		...flatCfg,
+	// 	},
+	// 	startTime,
+	// 	endTime,
 	// );
 
-    /* istanbul ignore else */
-    if (tests)
-    {
-        teApi.testsApi = { // Will get removed on activation if not tests environment
-            fs,
-            config: configuration,
-            explorer: teApi.explorer as ITaskTree, // TaskTreeManager has set
-            fileCache,
-            isBusy: false,
-            storage,
-            enableConfigWatcher,
-            onWsFoldersChange,
-            utilities: util,
-            treeManager,
-            extensionContext: context,
-            wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0]
-        };
-        teApi.setTests(true); // lol, damn istanbul.  cover the initial empty fn
-        teApi.setTests = (isTests) => { tests = isTests; };
-        teApi.isBusy = () => isExtensionBusy() || teApi.testsApi.isBusy;
-    }
+    //
+    // Create API instance
+    //
+	teApi = new TeApi(container, tests);
 
     //
     // Use a delayed initialization so we can display an 'Initializing...' message
     // in the tree on startup.  Really no good way to do that w/o this.
     //
-    setTimeout(initialize, 25, context);
+    setTimeout(initialize, 25, container);
 
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
 
     return teApi;
 }
-
-
-const initialize = async(context: ExtensionContext) =>
-{
-    const now = Date.now(),
-          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
-          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
-    log.methodStart("initialization", 1, "", true);
-    //
-    // Authentication
-    //
-    // const session = await authentication.getSession("auth0", [], { createIfNone: false });
-    // if (session) {
-    //     window.showInformationMessage(`Welcome back ${session.account.label}`);
-    // }
-    //
-    // Check license
-    //
-    await licenseManager.checkLicense("   ");
-    //
-    // Register file type watchers
-    // This "used" to also start the file scan to build the file task file cache. It now
-    // does not on startup.  We use rebuildCache() below, so as to initiate one scan as
-    // opposed to one scan per task type, like it did previously.  Note that if task types
-    // are enabled or disabled in settings after startup, then the individual calls to
-    // registerFileWatcher() will perform the scan for that task type.
-    //
-    await registerFileWatchers(context, "   ");
-    //
-    // Build the file cache, this kicks off the whole process as refreshTree() will be called
-    // down the line in the initialization process.
-    //
-    // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
-    // To make the tree reload pain as light as possible, we now always persist the file cache
-    // regardless if the user settings has activated it or not when the extension deactivates
-    // in this scenario. So check this case and proceed as necessary.
-    //
-    const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
-    /* istanbul ignore else */
-    if (tests || /* istanbul ignore next */!rootFolderChanged)
-    {
-        await fileCache.rebuildCache("   ");
-    }     //
-    else // See comments/notes above
-    {   //
-        const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
-        enableConfigWatcher(false);
-        await configuration.update("enablePersistentFileCaching", true);
-        await fileCache.rebuildCache("   ");
-        await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
-        enableConfigWatcher(true);
-    }
-    await storage.update2("lastDeactivated", 0);
-    await storage.update2("lastWsRootPathChange", 0);
-    //
-    // Start the first tree build/load
-    //
-    await treeManager.loadTasks("   ");
-    //
-    // Log the environment
-    //
-    log.methodDone("initialization", 1, "", [
-        [ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
-        [ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
-    ]);
-    //
-    // Signal that first task load has completed
-    //
-    setTimeout(() => { ready = true; }, 1);
-};
-
-
-//
-// !!! Temporary                                     !!!
-// !!! Remove sometime down the road (from 1/18/22)  !!!
-// !!! Remove call in method activate() too          !!!
-//
-/* istanbul ignore next */
-const tempResetGroupingSep = async () =>
-{
-    const groupSep = configuration.get<string>("groupSeparator", "-");
-    if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
-        await configuration.update("groupSeparator", "-");
-    }
-};
-
-
-//
-// !!! Temporary                                     !!!
-// !!! Remove sometime down the road (from 1/18/22)  !!!
-// !!! Remove call in method activate() too          !!!
-//
-/* istanbul ignore next */
-const tempDeleteSomePathToPrograms = async () =>
-{
-    let ptp = configuration.get<string>("pathToPrograms.apppublisher");
-    if (ptp !== undefined) {
-        await configuration.update("pathToPrograms.apppublisher", undefined);
-        await configuration.updateWs("pathToPrograms.apppublisher", undefined);
-    }
-    ptp = configuration.get<string>("pathToPrograms.bash");
-    if (ptp !== undefined) {
-        await configuration.update("pathToPrograms.bash", undefined);
-        await configuration.updateWs("pathToPrograms.bash", undefined);
-    }
-    ptp = configuration.get<any>("specialFolders.expanded");
-    if (ptp !== undefined) {
-        await configuration.update("specialFolders.expanded", undefined);
-        await configuration.updateWs("specialFolders.expanded", undefined);
-    }
-};
-
-
-//
-// !!! Temporary after settings layout redo / rename !!!
-// !!! Remove sometime down the road (from 12/22/22) !!!
-// !!! Remove call in method activate() too          !!!
-//
-/* istanbul ignore next */
-const tempRemapSettingsToNewLayout = async() =>
-{
-    const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
-    if (didSettingUpgrade)
-    {
-        const taskTypes = getTaskTypes();
-        taskTypes.push("ansicon");
-        for (const taskType of taskTypes)
-        {
-            let oldEnabledSetting = getTaskTypeSettingName(taskType, "enable"),
-                newEnabledSetting = getTaskTypeEnabledSettingName(taskType);
-            if (taskType !== "ansicon" && taskType !== "curl")
-            {
-                const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
-                if (oldSettingValue1 !== undefined)
-                {
-                    await configuration.update(newEnabledSetting, oldSettingValue1);
-                    await configuration.update(oldEnabledSetting, undefined);
-                    await configuration.updateWs(oldEnabledSetting, undefined);
-                }
-            }
-
-            oldEnabledSetting = getTaskTypeSettingName(taskType, "pathTo");
-            newEnabledSetting = getTaskTypeSettingName(taskType, "pathToPrograms.");
-            const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
-            if (oldSettingValue2 !== undefined)
-            {
-                await configuration.update(newEnabledSetting, oldSettingValue2);
-                await configuration.update(oldEnabledSetting, undefined);
-                await configuration.updateWs(oldEnabledSetting, undefined);
-            }
-        }
-        await storage.update("DID_SETTINGS_UPGRADE", true);
-    }
-};
 
 
 export async function deactivate()
@@ -394,101 +244,222 @@ export async function deactivate()
 }
 
 
+const initialize = async(container: TeContainer) =>
+{
+    const now = Date.now(),
+          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
+          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
+    log.methodStart("initialization", 1, "", true);
+    //
+    // Authentication
+    //
+    // const session = await authentication.getSession("auth0", [], { createIfNone: false });
+    // if (session) {
+    //     window.showInformationMessage(`Welcome back ${session.account.label}`);
+    // }
+    //
+    // Check license
+    //
+    await container.licenseManager.checkLicense("   ");
+    //
+    // Register file type watchers
+    // This "used" to also start the file scan to build the file task file cache. It now
+    // does not on startup.  We use rebuildCache() below, so as to initiate one scan as
+    // opposed to one scan per task type, like it did previously.  Note that if task types
+    // are enabled or disabled in settings after startup, then the individual calls to
+    // registerFileWatcher() will perform the scan for that task type.
+    //
+    await registerFileWatchers(container.context, "   ");
+    //
+    // Build the file cache, this kicks off the whole process as refreshTree() will be called
+    // down the line in the initialization process.
+    //
+    // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
+    // To make the tree reload pain as light as possible, we now always persist the file cache
+    // regardless if the user settings has activated it or not when the extension deactivates
+    // in this scenario. So check this case and proceed as necessary.
+    //
+    const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
+    /* istanbul ignore else */
+    if (tests || /* istanbul ignore next */!rootFolderChanged)
+    {
+        await fileCache.rebuildCache("   ");
+    }     //
+    else // See comments/notes above
+    {   //
+        const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
+        enableConfigWatcher(false);
+        await configuration.update("enablePersistentFileCaching", true);
+        await fileCache.rebuildCache("   ");
+        await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+        enableConfigWatcher(true);
+    }
+    await storage.update2("lastDeactivated", 0);
+    await storage.update2("lastWsRootPathChange", 0);
+    //
+    // Start the first tree build/load
+    //
+    await container.treeManager.loadTasks("   ");
+    //
+    // Log the environment
+    //
+    log.methodDone("initialization", 1, "", [
+        [ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
+        [ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
+    ]);
+    //
+    // Signal that first task load has completed
+    //
+    setTimeout(() => { ready = true; }, 1);
+};
+
+
 export const getExtensionContext = () => extensionContext;
-
-
-export const getLicenseManager = () => licenseManager;
-
-
-export const getTaskTreeManager = () => treeManager;
-
-
-export const getWebviewManager = () => webviewManager;
 
 
 export function isExtensionBusy()
 {
     return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
-           isProcessingFsEvent() || isProcessingConfigChange() || licenseManager.isBusy();
+           isProcessingFsEvent() || isProcessingConfigChange() || TeContainer.instance.licenseManager.isBusy();
 }
 
 
-async function refreshExternalProvider(providerName: string)
+/* istanbul ignore next */
+const migrateSettings = async () =>
 {
-    if (providers[providerName])
-    {
-        await refreshTree(providerName, undefined, "");
+    const groupSep = configuration.get<string>("groupSeparator", "-");
+    if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
+        await configuration.update("groupSeparator", "-");
     }
-}
+
+    let ptp = configuration.get<string>("pathToPrograms.apppublisher");
+    if (ptp !== undefined) {
+        await configuration.update("pathToPrograms.apppublisher", undefined);
+        await configuration.updateWs("pathToPrograms.apppublisher", undefined);
+    }
+    ptp = configuration.get<string>("pathToPrograms.bash");
+    if (ptp !== undefined) {
+        await configuration.update("pathToPrograms.bash", undefined);
+        await configuration.updateWs("pathToPrograms.bash", undefined);
+    }
+    ptp = configuration.get<any>("specialFolders.expanded");
+    if (ptp !== undefined) {
+        await configuration.update("specialFolders.expanded", undefined);
+        await configuration.updateWs("specialFolders.expanded", undefined);
+    }
+
+    const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
+    if (didSettingUpgrade)
+    {
+        const taskTypes = getTaskTypes();
+        taskTypes.push("ansicon");
+        for (const taskType of taskTypes)
+        {
+            let oldEnabledSetting = getTaskTypeSettingName(taskType, "enable"),
+                newEnabledSetting = getTaskTypeEnabledSettingName(taskType);
+            if (taskType !== "ansicon" && taskType !== "curl")
+            {
+                const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
+                if (oldSettingValue1 !== undefined)
+                {
+                    await configuration.update(newEnabledSetting, oldSettingValue1);
+                    await configuration.update(oldEnabledSetting, undefined);
+                    await configuration.updateWs(oldEnabledSetting, undefined);
+                }
+            }
+
+            oldEnabledSetting = getTaskTypeSettingName(taskType, "pathTo");
+            newEnabledSetting = getTaskTypeSettingName(taskType, "pathToPrograms.");
+            const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
+            if (oldSettingValue2 !== undefined)
+            {
+                await configuration.update(newEnabledSetting, oldSettingValue2);
+                await configuration.update(oldEnabledSetting, undefined);
+                await configuration.updateWs(oldEnabledSetting, undefined);
+            }
+        }
+        await storage.update("DID_SETTINGS_UPGRADE", true);
+    }
+};
 
 
-function registerCommands(context: ExtensionContext)
+async function showWelcomeOrWhatsNew(container: TeContainer, version: string, previousVersion: string | undefined, logPad: string)
 {
-    registerAddToExcludesCommand(context);
-    registerDisableTaskTypeCommand(context);
-    registerEnableTaskTypeCommand(context);
-    registerEnterLicenseCommand(context);
-    registerGetLicenseCommand(context);
-    registerRemoveFromExcludesCommand(context);
-    registerViewLicenseCommand(context);
-    registerViewReportCommand(context);
-    registerViewReleaseNotesCommand(context);
+	if (!previousVersion)
+    {
+		log.write(`First-time install; window.focused=${window.state.focused}`, 1, logPad);
+
+		if (configuration.get<boolean>("showWelcomeOnInstall") === false) return;
+
+		if (window.state.focused) {
+			await container.storage.delete("pendingWelcomeOnFocus");
+			await executeCommand(Commands.ShowWelcomePage);
+		}     //
+        else // Save pending on window getting focus
+		{   //
+            await container.storage.update("pendingWelcomeOnFocus", true);
+			const disposable = window.onDidChangeWindowState(e =>
+            {
+				if (!e.focused) return;
+				disposable.dispose();
+                //
+				// If the window is now focused and we are pending the welcome, clear the pending state and show
+                //
+				if (container.storage.get("pendingWelcomeOnFocus") === true)
+                {
+					void container.storage.delete("pendingWelcomeOnFocus");
+					if (configuration.get("showWelcomeOnInstall")) {
+						void executeCommand(Commands.ShowWelcomePage);
+					}
+				}
+			});
+			container.context.subscriptions.push(disposable);
+		}
+		return;
+	}
+
+	if (previousVersion !== version) {
+		log.write(`GitLens upgraded from v${previousVersion} to v${version}; window.focused=${window.state.focused}`, 1, logPad);
+	}
+
+	const [ major, minor ] = version.split(".").map(v => parseInt(v, 10));
+	const [ prevMajor, prevMinor ] = previousVersion.split(".").map(v => parseInt(v, 10));
+
     //
-    // Register GetAPI task
+	// Don't notify on downgrades
     //
-    context.subscriptions.push(commands.registerCommand("vscode-taskexplorer.getApi", () => teApi));
-}
+	if (major === prevMajor || major < prevMajor || (major === prevMajor && minor < prevMinor)) {
+		return;
+	}
 
+	if (major !== prevMajor) {
+		version = String(major);
+	}
 
-async function registerExternalProvider(providerName: string, provider: IExternalProvider, logPad: string)
-{
-    providers[providerName] = provider;
-    await refreshTree(providerName, undefined, logPad);
-}
+	void executeCommand(Commands.ShowHomeView);
 
-
-
-function registerTaskProvider(providerName: string, provider: TaskExplorerProvider, context: ExtensionContext)
-{
-    context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
-    providers[providerName] = provider;
-}
-
-
-function registerTaskProviders(context: ExtensionContext)
-{   //
-    // Internal Task Providers
-    //
-    // These tak types are provided internally by the extension.  Some task types (npm, grunt,
-    //  gulp, ts) are provided by VSCode itself
-    //
-    // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
-    //     https://code.visualstudio.com/api/extension-guides/task-provider
-    //
-    registerTaskProvider("ant", new AntTaskProvider(), context);                    // Apache Ant Build Automation Tool
-    registerTaskProvider("apppublisher", new AppPublisherTaskProvider(), context);  // App Publisher (work related)
-    registerTaskProvider("composer", new ComposerTaskProvider(), context);          // PHP / composer.json
-    registerTaskProvider("gradle", new GradleTaskProvider(), context);              // Gradle multi-Language Automation Tool
-    registerTaskProvider("grunt", new GruntTaskProvider(), context);                // Gulp JavaScript Toolkit
-    registerTaskProvider("gulp", new GulpTaskProvider(), context);                  // Grunt JavaScript Task Runner
-    registerTaskProvider("jenkins", new JenkinsTaskProvider(), context);            // Jenkinsfile validation task
-    registerTaskProvider("make", new MakeTaskProvider(), context);                  // C/C++ Makefile
-    registerTaskProvider("maven", new MavenTaskProvider(), context);                // Apache Maven Toolset
-    registerTaskProvider("pipenv", new PipenvTaskProvider(), context);              // Pipfile for Python pipenv package manager
-    registerTaskProvider("webpack", new WebpackTaskProvider(), context);
-    // Script type tasks
-    registerTaskProvider("bash", new BashTaskProvider(), context);
-    registerTaskProvider("batch", new BatchTaskProvider(), context);
-    registerTaskProvider("nsis", new NsisTaskProvider(), context);
-    registerTaskProvider("perl", new PerlTaskProvider(), context);
-    registerTaskProvider("powershell", new PowershellTaskProvider(), context);
-    registerTaskProvider("python", new PythonTaskProvider(), context);
-    registerTaskProvider("ruby", new RubyTaskProvider(), context);
-}
-
-
-async function unregisterExternalProvider(providerName: string, logPad: string)
-{
-    delete providers[providerName];
-    await refreshTree(providerName, undefined, logPad);
+	if (configuration.get("showWhatsNewAfterUpgrades"))
+    {
+		if (window.state.focused) {
+			await container.storage.delete("pendingWhatsNewOnFocus");
+			await showWhatsNewMessage(version);
+		}     //
+        else // Save pending on window getting focus
+        {   //
+			await container.storage.update("pendingWhatsNewOnFocus", true);
+			const disposable = window.onDidChangeWindowState(e =>
+            {
+				if (!e.focused) return;
+				disposable.dispose();
+				if (container.storage.get("pendingWhatsNewOnFocus") === true)
+                {
+					void container.storage.delete("pendingWhatsNewOnFocus");
+					if (configuration.get("showWhatsNewAfterUpgrades")) {
+						void showWhatsNewMessage(version);
+					}
+				}
+			});
+			container.context.subscriptions.push(disposable);
+		}
+	}
 }

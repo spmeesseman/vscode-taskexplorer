@@ -11,8 +11,8 @@ import constants from "../lib/constants";
 import TaskTreeBuilder from "./treeBuilder";
 import SpecialTaskFolder from "./specialFolder";
 import statusBarItem from "../lib/statusBarItem";
-import ITaskTreeManager from "../interface/ITaskTreeManager";
 import { isDirectory } from "../lib/utils/fs";
+import { TeContainer } from "../lib/container";
 import { rebuildCache } from "../lib/fileCache";
 import { getTerminal } from "../lib/getTerminal";
 import { addToExcludes } from "../lib/addToExcludes";
@@ -20,25 +20,16 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
-import { IDictionary, ITaskExplorerApi } from "../interface";
-import { getLicenseManager, providers } from "../extension";
+import { IDictionary, ITaskTreeView, ITaskTreeManager } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
-    ExtensionContext, window, TreeView, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState
+    window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState
 } from "vscode";
-
-
-let teApi: ITaskExplorerApi;
-
-interface TeTreeView
-{
-    view: TreeView<TreeItem>;
-    tree: TaskTree;
-}
 
 
 export class TaskTreeManager implements ITaskTreeManager, Disposable
 {
+    private container: TeContainer;
     private static tasks: Task[] = [];
     private static refreshPending = false;
     private static specialFolders: {
@@ -52,17 +43,17 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private firstTreeBuildDone = false;
     private currentInvalidation: string | undefined;
     private disposables: Disposable[] = [];
-    private views: IDictionary<TeTreeView|undefined> = {
+    private _views: IDictionary<ITaskTreeView|undefined> = {
         taskExplorer: undefined,
         taskExplorerSideBar: undefined
     };
 
 
-    constructor(context: ExtensionContext, api: ITaskExplorerApi)
+    constructor(container: TeContainer)
     {
         log.methodStart("construct task tree manager", 1, "   ");
-        teApi = api;
         this.tasks = TaskTreeManager.tasks;
+        this.container = container;
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         TaskTreeManager.specialFolders = {
@@ -99,8 +90,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         this.createTaskTree("taskExplorer", "      ");
         this.createTaskTree("taskExplorerSideBar", "      ");
 
-        context.subscriptions.push(this);
-
         log.methodDone("construct task tree manager", 1, "   ");
     }
 
@@ -112,6 +101,12 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         });
         this.tasks = [];
         this.disposables = [];
+    }
+
+
+    get views()
+    {
+        return this._views;
     }
 
 
@@ -203,7 +198,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private createTaskTree = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
     {
         log.methodStart("create task tree provider", 1, logPad, false, [[ "name", name ]]);
-        if (!this.views[name])
+        if (!this._views[name])
         {
             const taskTree = new TaskTree(name, this),
                   treeView = window.createTreeView(name, { treeDataProvider: taskTree, showCollapseAll: true });
@@ -224,19 +219,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             //
             // Set view/tree pair in tracked views dictionary
             //
-            this.views[name] = { view: treeView, tree: taskTree };
-            //
-            // Set instances in TeApi
-            //
-            if (name === "taskExplorer")
-            {
-                teApi.testsApi.explorer = teApi.explorer = taskTree;
-                teApi.explorerView = treeView;
-            }
-            else {
-                teApi.testsApi.explorer = teApi.sidebar = taskTree;
-                teApi.sidebarView = treeView;
-            }
+            this._views[name] = { view: treeView, tree: taskTree };
             log.write("   tree data provider '" + name + "' created", 1, logPad);
         }
         log.methodDone("create task tree provider", 1, logPad);
@@ -246,7 +229,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private disposeTaskTree = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
     {
         log.methodStart("dispose explorer view / tree provider", 1, logPad, false, [[ "name", name ]]);
-        const view = this.views[name];
+        const view = this._views[name];
         if (view)
         {   //
             // Get/remove the 3 disposables created in createTaskTree() and dispose() each
@@ -255,18 +238,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             disposables.forEach((d) => {
                 d.dispose();
             });
-            this.views[name] = undefined;
-            if (name === "taskExplorer")
-            {
-                teApi.explorer = undefined;
-                teApi.explorerView = undefined;
-            }
-            else
-            {
-                teApi.sidebar = undefined;
-                teApi.sidebarView = undefined;
-            }
-            teApi.testsApi.explorer = (teApi.explorer || teApi.sidebar) as TaskTree;
+            this._views[name] = undefined;
             log.write("   tree data provider '" + name + "' un-registered", 1, "   ");
         }
         log.methodDone("dispose explorer view / tree provider", 1, logPad);
@@ -363,7 +335,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         //
         // If this is the first time the tree is being built, do a few extra things
         //
-        const licMgr = getLicenseManager();
+        const licMgr = this.container.licenseManager;
         const maxTasks = licMgr.getMaxNumberOfTasks();
         if (!this.firstTreeBuildDone)
         {   //
@@ -401,9 +373,9 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 
     fireTreeRefreshEvent = (logPad: string, logLevel: number, treeItem?: TreeItem) =>
     {
-        Object.values(this.views).filter(v => !!v && v.tree).forEach((v) =>
+        Object.values(this._views).filter(v => !!v && v.tree).forEach((v) =>
         {
-            (v as TeTreeView).tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
+            (v as ITaskTreeView).tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
         });
     };
 
@@ -514,7 +486,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
                 // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
-                await providers[opt1]?.invalidate(opt2, logPad + "   ");
+                await this.container.providers[opt1]?.invalidate(opt2, logPad + "   ");
             }
             else //
             {   // If opt1 is undefined, refresh all providers
@@ -522,7 +494,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 if (!opt1)
                 {
                     log.write("   invalidate all providers", 1, logPad);
-                    for (const [ key, p ] of Object.entries(providers))
+                    for (const [ key, p ] of Object.entries(this.container))
                     {
                         log.write("   invalidate '" + key + "' task provider", 1, logPad);
                         await p.invalidate(undefined, logPad + "   ");
@@ -530,7 +502,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate '" + opt1 + "' task provider", 1, logPad);
-                    providers[opt1]?.invalidate(undefined, logPad + "   ");
+                    this.container.providers[opt1]?.invalidate(undefined, logPad + "   ");
                 }
             }
         }

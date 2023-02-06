@@ -1,7 +1,7 @@
 
-import ITaskTree from "./ITaskTree";
 import { ILog } from "./ILog";
 import { ITestsApi } from "./ITestsApi";
+import { ITaskTree  } from "./ITaskTree";
 import { TreeItem, TreeView } from "vscode";
 import { IExternalProvider } from "./IExternalProvider";
 import { ITaskExplorerProvider } from "./ITaskProvider";

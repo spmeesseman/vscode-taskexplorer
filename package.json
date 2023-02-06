@@ -192,6 +192,7 @@
         "string-replace-loader": "^3.1.0",
         "ts-loader": "^8.0.17",
         "ts-node": "^8.10.2",
+        "tsconfig-paths": "^4.1.2",
         "tslint": "^6.1.3",
         "typescript": "^4.5.5",
         "vscode-nls-dev": "^4.0.0",
@@ -216,7 +217,7 @@
                 {
                     "id": "taskActivity",
                     "title": "%view.name%",
-					"contextualTitle": "TaskExplorer",
+                    "contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg"
                 }
             ]
@@ -227,38 +228,38 @@
                     "id": "taskExplorer",
                     "name": "%view.name%",
                     "when": "config.taskExplorer.enableExplorerView",
-					"contextualTitle": "TaskExplorer",
+                    "contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
                     "visibility": "visible"
                 }
             ],
             "taskActivity": [
                 {
-					"type": "webview",
-					"id": "taskExplorer.views.home",
-					"name": "Home",
-					"contextualTitle": "TaskExplorer",
+                    "type": "webview",
+                    "id": "taskExplorer.views.home",
+                    "name": "Home",
+                    "contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
-					"visibility": "collapsed"
-				},
+                    "visibility": "collapsed"
+                },
                 {
                     "type": "tree",
                     "id": "taskExplorerSideBar",
                     "name": "Explorer",
                     "when": "config.taskExplorer.enableSideBar",
-					"contextualTitle": "TaskExplorer",
+                    "contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
                     "visibility": "visible"
                 },
                 {
-					"type": "webview",
-					"id": "taskExplorer.views.taskCount",
-					"name": "Task Count",
+                    "type": "webview",
+                    "id": "taskExplorer.views.taskCount",
+                    "name": "Task Count",
                     "when": "config.taskExplorer.enableSideBar",
-					"contextualTitle": "TaskExplorer",
-					"icon": "$(gitlens-gitlens)",
-					"visibility": "collapsed"
-				}
+                    "contextualTitle": "TaskExplorer",
+                    "icon": "$(gitlens-gitlens)",
+                    "visibility": "collapsed"
+                }
             ]
         },
         "commands": [

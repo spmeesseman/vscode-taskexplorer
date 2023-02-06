@@ -1,6 +1,6 @@
 
-import ITaskTree from "./ITaskTree";
-import ITaskTreeManager from "./ITaskTreeManager";
+import { ITaskTree } from "./ITaskTree";
+import { ITaskTreeManager } from "./ITaskTreeManager";
 import { IStorage } from "./IStorage";
 import { IFileCache } from "./IFileCache";
 import { IFilesystemApi } from "./IFilesystemApi";

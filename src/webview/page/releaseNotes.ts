@@ -1,15 +1,14 @@
 
 import log from "../../lib/log/log";
 import TeWebviewPanel from "../webviewPanel";
-import WebviewManager from "../webViewManager";
 import { join } from "path";
 import { marked } from "marked";
 import { WebviewPanel } from "vscode";
 import { timeout } from "../../lib/utils/utils";
+import { TeContainer } from "../../lib/container";
 import { readFileAsync } from "../../lib/utils/fs";
-import { ITaskExplorerApi } from "../../interface";
 import { getInstallPath } from "../../lib/utils/pathUtils";
-import { getExtensionContext, getWebviewManager, isExtensionBusy } from "../../extension";
+import { getExtensionContext, isExtensionBusy } from "../../extension";
 
 const viewTitle = "Task Explorer Release Notes";
 const viewType = "viewReleaseNotes";
@@ -20,7 +19,7 @@ export const displayReleaseNotes = async(logPad: string) =>
 {
 	log.methodStart("display release notes", 1, logPad);
 	const html = await getPageContent(logPad + "   ");
-	panel = getWebviewManager().create(viewTitle, viewType, html);
+	panel = TeContainer.instance.webviewManager.create(viewTitle, viewType, html);
     log.methodDone("display release notes", 1, logPad);
     return panel;
 };
@@ -38,7 +37,7 @@ const getPageContent = async (logPad: string) =>
 							   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 							   .replace("<!-- subtitle -->", getNewInThisReleaseShortDsc())
 							   .replace("<!-- releasenotes -->", getNewReleaseNotes(version, changeLogMd));
-	html = WebviewManager.cleanLicenseButtons(html);
+	html = TeContainer.instance.webviewManager.cleanLicenseButtons(html);
 	log.methodDone("get page content", 1, logPad);
 	return html;
 };
@@ -146,7 +145,7 @@ export const reviveReleaseNotes = async(webviewPanel: WebviewPanel, logPad: stri
 		{
 			log.methodStart("revive release notes", 1, logPad);
 			const html = await getPageContent(logPad + "   ");
-			getWebviewManager().create(viewTitle, viewType, html, webviewPanel);
+			TeContainer.instance.webviewManager.create(viewTitle, viewType, html, webviewPanel);
 			log.methodDone("revive release notes", 1, logPad);
 			resolve();
 		}, 10, webviewPanel, logPad);
