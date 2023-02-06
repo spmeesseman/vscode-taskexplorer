@@ -5,8 +5,10 @@
 // import { executeCommand, registerCommand } from "../system/command";
 // import { serialize } from "../system/decorators/serialize";
 import { setContext } from "../lib/context";
+import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { TeContainer } from "../lib/container";
+import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { Commands, ContextKeys } from "../lib/constants";
 import type { WebviewFocusChangedParams } from "./protocol";
@@ -108,6 +110,10 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ..._args: unknown[])
 	{
 		void this.container.usage.track(`${this.trackingFeature}:shown`);
+
+		while (isExtensionBusy()) {
+			await timeout(100);
+		}
 
 		const column = options?.column ?? ViewColumn.One; // ViewColumn.Beside;
 		// Only try to open beside if there is an active tab

@@ -55,6 +55,9 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	}
 
 
+	protected override includeBootstrap?(): SerializedState | Promise<SerializedState>;
+
+
 	async show(options?: { preserveFocus?: boolean })
 	{
 		void this.container.usage.track(`${this.trackingFeature}:shown`);

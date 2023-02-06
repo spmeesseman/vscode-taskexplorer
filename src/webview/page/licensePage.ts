@@ -1,6 +1,6 @@
 
-import { TeWebviewPanel } from "../webviewPanel";
 import { Task } from "vscode";
+import { TeWebviewPanel } from "../webviewPanel";
 import { timeout } from "../../lib/utils/utils";
 import { isExtensionBusy } from "../../extension";
 import { TeContainer } from "../../lib/container";
@@ -139,11 +139,5 @@ export class LicensePage extends TeWebviewPanel<State>
 
 
 	getViewType = () => viewType;
-
-
-	protected override onMessageReceived(e: IpcMessage)
-	{
-		onIpc(ExecuteCommandType, e, params => executeCommand(("vscode-taskexplorer." + params.command) as Commands, params.args));
-	}
 
 }

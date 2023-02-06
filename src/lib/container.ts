@@ -153,13 +153,13 @@ export class TeContainer
 		if (this._ready) throw new Error("TeContainer is already ready");
 
 		this._ready = true;
-		this.registerCommands();
+		this.registerContextMenuCommands();
 		this.registerTaskProviders();
 		queueMicrotask(() => this._onReady.fire());
 	}
 
 
-	private registerCommands()
+	private registerContextMenuCommands()
 	{
 		registerAddToExcludesCommand(this._context);
 		registerDisableTaskTypeCommand(this._context);

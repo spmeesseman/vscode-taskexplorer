@@ -26,10 +26,11 @@ export abstract class TeWebviewBase<State>
 	protected onVisibilityChanged?(visible: boolean): void;
 	protected onWindowFocusChanged?(focused: boolean): void;
 	protected registerCommands?(): Disposable[];
-	protected includeBootstrap?(): State | Promise<State>;
+	protected includeBootstrap?(): any;
 	protected includeHead?(): string | Promise<string>;
 	protected includeBody?(): string | Promise<string>;
 	protected includeEndOfBody?(): string | Promise<string>;
+
 
 	private readonly _cspNonce = getNonce();
 	private _title: string;	protected onInitializing?(): Disposable[] | undefined;
@@ -176,31 +177,35 @@ export abstract class TeWebviewBase<State>
 	{
 		if (!e) return;
 
-		switch (e.method) {
+		switch (e.method)
+		{
 			case WebviewReadyCommandType.method:
-				onIpc(WebviewReadyCommandType, e, () => {
+				onIpc(WebviewReadyCommandType, e, () =>
+				{
 					this.isReady = true;
 					this.onReady?.();
 				});
-
 				break;
 
 			case WebviewFocusChangedCommandType.method:
-				onIpc(WebviewFocusChangedCommandType, e, params => {
+				onIpc(WebviewFocusChangedCommandType, e, params =>
+				{
 					this.onViewFocusChanged(params);
 				});
-
 				break;
 
 			case ExecuteCommandType.method:
-				onIpc(ExecuteCommandType, e, params => {
+				onIpc(ExecuteCommandType, e, params =>
+				{
 					if (params.args) {
 						void executeCommand(params.command as Commands, ...params.args);
-					} else {
+					}
+					else {
 						void executeCommand(params.command as Commands);
 					}
 				});
 				break;
+
 			default:
 				this.onMessageReceived?.(e);
 				break;

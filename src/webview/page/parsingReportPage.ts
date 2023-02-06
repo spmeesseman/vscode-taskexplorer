@@ -1,8 +1,10 @@
 
 import { Task, Uri } from "vscode";
 import { dirname, relative } from "path";
+import { timeout } from "../../lib/utils/utils";
 import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
+import { isExtensionBusy } from "../../extension";
 import { executeCommand } from "../../lib/command";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
@@ -48,8 +50,8 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	{
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
-									.filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
-											project === getWorkspaceProjectName(t.scope.uri.fsPath)));
+									 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
+											  project === getWorkspaceProjectName(t.scope.uri.fsPath)));
 		html = await TeContainer.instance.webviewManager.createTaskCountTable(tasks, "Task Explorer Parsing Report", html, project);
 		const infoContent = this.getExtraContent(tasks, uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);
@@ -135,11 +137,5 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 
 
 	getViewType = () => viewType;
-
-
-	protected override onMessageReceived(e: IpcMessage)
-	{
-		onIpc(ExecuteCommandType, e, params => executeCommand(("vscode-taskexplorer." + params.command) as Commands, params.args));
-	}
 
 }

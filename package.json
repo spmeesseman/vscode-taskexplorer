@@ -512,7 +512,7 @@
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
                 },
                 {
-                    "command": "vscode-taskexplorer.viewReport",
+                    "command": "vscode-taskexplorer.showParsingReportPage",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
                 }

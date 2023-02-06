@@ -6,32 +6,40 @@
     const enterLicense = () =>
     {
         vscode.postMessage({
-            params: 'enterLicense',
-            method: 'command/execute'
+            method: 'command/execute',
+            params: {
+                command: 'vscode-taskexplorer.enterLicense'
+            }
         });
     };
     
     const getLicense = () =>
     {
         vscode.postMessage({
-            params: 'getLicense',
-            method: 'command/execute'
+            method: 'command/execute',
+            params: {
+                command: 'vscode-taskexplorer.getLicense'
+            }
         });
     };
     
     const showLicensePage = () =>
     {
         vscode.postMessage({
-            params: 'showLicensePage',
-            method: 'command/execute'
+            method: 'command/execute',
+            params: {
+                command: 'vscode-taskexplorer.showLicensePage'
+            }
         });
     };
     
     const showParsingReport = () =>
     {
         vscode.postMessage({
-            params: 'showParsingReport',
-            method: 'command/execute'
+            method: 'command/execute',
+            params: {
+                command: 'vscode-taskexplorer.showParsingReportPage'
+            }
         });
     };
 
