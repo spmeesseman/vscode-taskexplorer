@@ -5,7 +5,7 @@
 // import { executeCommand, registerCommand } from "../system/command";
 // import { serialize } from "../system/decorators/serialize";
 import { setContext } from "../lib/context";
-import { timeout } from "../lib/utils/utils";
+import { isObject, timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { TeContainer } from "../lib/container";
 import { isExtensionBusy } from "../extension";
@@ -63,8 +63,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	{
 		deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: State) =>
 		{
-			this._view = webviewPanel;
-			await this.show();
+			await this.show(undefined, webviewPanel, state);
 		}
 	};
 
@@ -87,7 +86,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ..._args: unknown[])
+	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ...args: any[])
 	{
 		void this.container.usage.track(`${this.trackingFeature}:shown`);
 
@@ -103,15 +102,22 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 		if (!this._view)
 		{
-			this._view = window.createWebviewPanel(
-				this.id,
-				this.title,
-				{
-					viewColumn: column,
-					preserveFocus: options?.preserveFocus ?? false
-				},
-				this.options
-			);
+			if (args.length === 2 && isObject(args[0]) && args[0].webview)
+			{
+				this._view = args[0] as WebviewPanel;
+			}
+			else
+			{
+				this._view = window.createWebviewPanel(
+					this.id,
+					this.title,
+					{
+						viewColumn: column,
+						preserveFocus: options?.preserveFocus ?? false
+					},
+					this.options
+				);
+			}
 
 			this._view.iconPath = Uri.file(this.container.context.asAbsolutePath(this.iconPath));
 			this._disposablePanel = Disposable.from(
