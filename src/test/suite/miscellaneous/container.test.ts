@@ -51,7 +51,8 @@ suite("Container Tests", () =>
         expect(teContainer.releaseNotesPage).to.not.be.undefined;
         expect(teContainer.licenseManager).to.not.be.undefined;
         expect(teContainer.treeManager).to.not.be.undefined;
-        expect(teContainer.webviewManager).to.not.be.undefined;
+        expect(teContainer.homeView).to.not.be.undefined;
+        expect(teContainer.taskCountView).to.not.be.undefined;
         endRollingCount(this);
     });
 

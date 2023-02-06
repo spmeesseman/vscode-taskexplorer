@@ -4,6 +4,7 @@ import { TeContainer } from "../../lib/container";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
+import { createTaskCountTable } from "../shared/taskCountTable";
 
 interface State {
 	pinned: boolean;
@@ -44,7 +45,7 @@ export class LicensePage extends TeWebviewPanel<State>
 		/* istanbul ignore else */
 		if (tasks)
 		{
-			html = await TeContainer.instance.webviewManager.createTaskCountTable(tasks, "Task Explorer Licensing", html);
+			html = await createTaskCountTable(tasks, "Task Explorer Licensing", html);
 
 			let infoContent = this.getExtraContent(newKey);
 			html = html.replace("<!-- addtlContentTop -->", infoContent);

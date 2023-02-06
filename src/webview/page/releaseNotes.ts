@@ -6,6 +6,7 @@ import { readFileAsync } from "../../lib/utils/fs";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
+import { removeLicenseButtons } from "../shared/removeLicenseButtons";
 
 interface State {
 	pinned: boolean;
@@ -46,7 +47,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 				   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 				   .replace("<!-- subtitle -->", this.getNewInThisReleaseShortDsc())
 				   .replace("<!-- releasenotes -->", this.getNewReleaseNotes(version, changeLogMd));
-		html = this.container.webviewManager.cleanLicenseButtons(html);
+		html = removeLicenseButtons(html);
 		return html;
 	};
 

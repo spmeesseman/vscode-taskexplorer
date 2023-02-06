@@ -31,7 +31,6 @@ import { PowershellTaskProvider } from "../providers/powershell";
 import { registerStatusBarItem } from "./statusBarItem";
 import { HomeView } from "../webview/view/home/homeView";
 import { LicensePage } from "../webview/page/licensePage";
-import { WebviewManager } from "../webview/webviewManager";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
 import { registerConfigWatcher } from "./watcher/configWatcher";
@@ -50,7 +49,6 @@ export class TeContainer
 
 	private _licenseManager: ILicenseManager;
 	private _treeManager: TaskTreeManager;
-	private _webviewManager: WebviewManager;
 
 	private _ready = false;
 	private readonly _version: string;
@@ -93,7 +91,6 @@ export class TeContainer
 		this._providers = {};
 
 		this._licenseManager = this._licenseManager = new LicenseManager(this);
-		this._webviewManager = new WebviewManager(this);
 		this._treeManager = new TaskTreeManager(this);
 		this._usage = new UsageWatcher(this, storage);
 
@@ -247,10 +244,6 @@ export class TeContainer
 
 	get treeManager() {
 		return this._treeManager;
-	}
-
-	get webviewManager() {
-		return this._webviewManager;
 	}
 
 	get storage(): IStorage {
