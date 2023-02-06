@@ -112,13 +112,7 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>("showParsingReportPage", testControl.waitTime.viewReport);
-		await panel.getWebviewPanel()?.webview.postMessage(
-		{
-			method: "command/execute",
-			params: {
-				command: "vscode-taskexplorer.showLicensePage"
-			}
-		});
+		await panel.getWebviewPanel()?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
 		await closeEditors();
@@ -171,13 +165,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = undefined;
 		teApi.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
-		await panel.getWebviewPanel()?.webview.postMessage(
-		{
-			method: "command/execute",
-			params: {
-				command: "vscode-taskexplorer.showLicensePage"
-			}
-		});
+		await panel.getWebviewPanel()?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
 		teApi.explorer = oExplorer;
@@ -196,13 +184,7 @@ suite("Info Report Tests", () =>
 		teApi.explorer = undefined;
 		teApi.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(TeCommands.ShowParsingReportPage, testControl.waitTime.viewReport);
-		await panel.getWebviewPanel()?.webview.postMessage(
-		{
-			method: "command/execute",
-			params: {
-				command: "vscode-taskexplorer.showLicensePage"
-			}
-		});
+		await panel.getWebviewPanel()?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
 		teApi.explorer = oExplorer;

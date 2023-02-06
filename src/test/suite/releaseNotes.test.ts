@@ -71,13 +71,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-		await webviewPanel?.getWebviewPanel()?.webview.postMessage(
-		{
-			method: "command/execute",
-			params: {
-				command: "vscode-taskexplorer.showLicensePage"
-			}
-		});
+		await webviewPanel?.getWebviewPanel()?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
         endRollingCount(this);
 	});
@@ -87,13 +81,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    await webviewPanel?.getWebviewPanel()?.webview.postMessage(
-		{
-			method: "command/execute",
-			params: {
-				command: "vscode-taskexplorer.showParsingReportPage"
-			}
-		});
+	    await webviewPanel?.getWebviewPanel()?.webview.postMessage({ command: "showParsingReport" });
 		await sleep(500);
 		webviewPanel?.hide();
 		webviewPanel = undefined;

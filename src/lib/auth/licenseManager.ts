@@ -41,8 +41,8 @@ export class LicenseManager implements ILicenseManager, Disposable
     {
 		this.container = container;
 		this.disposables.push(
-			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey),
-			registerCommand(Commands.GetLicense, () => this.getLicense)
+			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey(), this),
+			registerCommand(Commands.GetLicense, () => this.getLicense(), this)
 		);
     }
 
