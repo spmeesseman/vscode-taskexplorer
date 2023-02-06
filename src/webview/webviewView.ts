@@ -1,15 +1,15 @@
 
 import log from "../lib/log/log";
-import { TeWebviewBase } from "./base";
 import { setContext } from "../lib/context";
+import { TeWebviewBase } from "./webviewBase";
 import { ContextKeys } from "../lib/constants";
 import { TeContainer } from "../lib/container";
+import { WebviewFocusChangedParams } from "./protocol";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands
 } from "vscode";
-import { WebviewFocusChangedParams } from "./protocol";
 
 
 export type WebviewViewIds = "home" | "parsingReport";

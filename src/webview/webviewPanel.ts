@@ -4,8 +4,8 @@
 // import { setContext } from "../context";
 // import { executeCommand, registerCommand } from "../system/command";
 // import { serialize } from "../system/decorators/serialize";
-import { TeWebviewBase } from "./base";
 import { setContext } from "../lib/context";
+import { TeWebviewBase } from "./webviewBase";
 import { TeContainer } from "../lib/container";
 import { registerCommand } from "../lib/command";
 import { Commands, ContextKeys } from "../lib/constants";
