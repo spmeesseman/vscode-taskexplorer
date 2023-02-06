@@ -25,7 +25,6 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 {
 	protected readonly disposables: Disposable[] = [];
 	private _disposablePanel: Disposable | undefined;
-	private _disposed = false;
 	protected override _view: WebviewPanel | undefined;
 
 
@@ -41,7 +40,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		super(container, title, fileName);
 		this.disposables.push(
 			registerCommand(showCommand, this.onShowCommand, this),
-			window.registerWebviewPanelSerializer(id, this.serializer)
+			window.registerWebviewPanelSerializer(id, this._serializer)
 		);
 	}
 
@@ -50,22 +49,21 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	{
 		this.disposables.forEach(d => void d.dispose());
 		this._disposablePanel?.dispose();
-		this._disposed = true;
 	}
 
 
-	get disposed() {
-		return this._disposed;
-	}
-
-
-	private serializer: WebviewPanelSerializer =
+	private _serializer: WebviewPanelSerializer =
 	{
 		deserializeWebviewPanel: async(webviewPanel: WebviewPanel, state: State) =>
 		{
 			await this.show(undefined, webviewPanel, state);
 		}
 	};
+
+
+	get serializer() {
+		return this._serializer;
+	}
 
 
 	protected get options(): WebviewPanelOptions & WebviewOptions

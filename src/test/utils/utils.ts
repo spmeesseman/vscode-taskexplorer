@@ -9,17 +9,16 @@ import { expect } from "chai";
 import { testControl } from "../control";
 import { deactivate } from "../../extension";
 import { startInput, stopInput } from "./input";
+import { TeContainer } from "../../lib/container";
 import { hasExplorerFocused } from "./commandUtils";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import initSettings, { cleanupSettings } from "./initSettings";
-import { ILicenseManager } from "../../interface/ILicenseManager";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { ITaskTree, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
-import { TeContainer } from "../../lib/container";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
@@ -176,6 +175,7 @@ export const activate = async (instance?: Mocha.Context) =>
     }
     return {
         teApi,
+        teContainer: TeContainer.instance,
         extension: ext as Extension<any>,
         testsApi: teApi.testsApi,
         fsApi: teApi.testsApi.fs,
@@ -274,7 +274,7 @@ export const createwebviewForRevive = (viewTitle: string, viewType: string) =>
 {
     const resourceDir = Uri.joinPath(teApi.testsApi.extensionContext.extensionUri, "res");
     const panel = window.createWebviewPanel(
-        viewType,
+        `taskExplorer.${viewType}`,
         viewTitle,
         ViewColumn.One,
         {

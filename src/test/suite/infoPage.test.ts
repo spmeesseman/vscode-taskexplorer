@@ -2,16 +2,19 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Uri } from "vscode";
+import { TeCommands } from "../../lib/constants";
+import { TeContainer } from "../../lib/container";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
+import { ParsingReportPage } from "../../webview/page/parsingReportPage";
 import { ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
-	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount
+	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
-import { TeCommands } from "../../lib/constants";
 
 let teApi: ITaskExplorerApi;
+let teContainer: TeContainer;
 let projectUri: Uri;
 let userTasks: boolean;
 let origExplorer: ITaskTree | undefined;
@@ -24,7 +27,7 @@ suite("Info Report Tests", () =>
 	suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi } = await activate(this));
+        ({ teContainer, teApi } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teApi.explorer;
 		origSidebar = teApi.sidebar;
@@ -193,21 +196,20 @@ suite("Info Report Tests", () =>
         endRollingCount(this);
 	});
 
-/*
+
 	test("Deserialize Report Page (All Projects)", async function()
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 200);
-		const panel = createwebviewForRevive(getViewTitle(), getViewType());
-	    await getParsingReportSerializer().deserializeWebviewPanel(panel, null);
+		const panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
+	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
 		teApi.testsApi.isBusy = true;
 		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
-	    await getParsingReportSerializer().deserializeWebviewPanel(panel, null);
+	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
-		panel.dispose();
 		await closeEditors();
         endRollingCount(this);
 	});
-*/
+
 });

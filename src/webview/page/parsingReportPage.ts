@@ -1,14 +1,11 @@
 
 import { Task, Uri } from "vscode";
 import { dirname, relative } from "path";
-import { TeWebviewPanel } from "../webviewPanel";
+import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
-
-const viewTitle = "Task Explorer Parsing Report";
-const viewType = "showParsingReportPage";
 
 interface State {
 	pinned: boolean;
@@ -17,13 +14,18 @@ interface State {
 
 export class ParsingReportPage extends TeWebviewPanel<State>
 {
-	constructor(container: TeContainer) {
+	static viewTitle = "Task Explorer Parsing Report";
+	static viewId: WebviewIds = "parsingReport";
+
+
+	constructor(container: TeContainer)
+	{
 		super(
 			container,
 			"license-manager.html",
-			viewTitle,
+			ParsingReportPage.viewTitle,
 			"res/gears-r-blue.png",
-			"taskExplorer.parsingReport",
+			`taskExplorer.${ParsingReportPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}parsingReport`,
 			"parsingReportPage",
 			Commands.ShowParsingReportPage
@@ -128,11 +130,5 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 
 		return `<tr><td><table class="margin-top-15"><tr><td>${summary}</td></tr></table><table><tr><td>${details}</td></tr></table></td></tr>`;
 	};
-
-
-	getViewTitle = () => viewTitle;
-
-
-	getViewType = () => viewType;
 
 }

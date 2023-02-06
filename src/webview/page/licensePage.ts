@@ -1,12 +1,9 @@
 
 import { Task } from "vscode";
-import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
-
-const viewTitle = "Task Explorer Licensing";
-const viewType = "showLicensePage";
+import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 
 interface State {
 	pinned: boolean;
@@ -15,13 +12,18 @@ interface State {
 
 export class LicensePage extends TeWebviewPanel<State>
 {
-	constructor(container: TeContainer) {
+	static viewTitle = "Task Explorer Licensing";
+	static viewId: WebviewIds = "licensePage";
+
+
+	constructor(container: TeContainer)
+	{
 		super(
 			container,
 			"license-manager.html",
-			viewTitle,
+			LicensePage.viewTitle,
 			"res/gears-r-blue.png",
-			"taskExplorer.licensePage",
+			`taskExplorer.${LicensePage.viewId}`,
 			`${ContextKeys.WebviewPrefix}licensePage`,
 			"licensePage",
 			Commands.ShowLicensePage
@@ -129,11 +131,5 @@ export class LicensePage extends TeWebviewPanel<State>
 	</td></tr>`;
 		return `<tr><td>${details}</td></tr>`;
 	};
-
-
-	getViewTitle = () => viewTitle;
-
-
-	getViewType = () => viewType;
 
 }

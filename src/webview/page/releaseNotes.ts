@@ -1,14 +1,11 @@
 
 import { join } from "path";
 import { marked } from "marked";
-import { TeWebviewPanel } from "../webviewPanel";
 import { TeContainer } from "../../lib/container";
 import { readFileAsync } from "../../lib/utils/fs";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { Commands, ContextKeys } from "../../lib/constants";
-
-const viewTitle = "Task Explorer Release Notes";
-const viewType = "showReleaseNotesPage";
+import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 
 interface State {
 	pinned: boolean;
@@ -17,13 +14,18 @@ interface State {
 
 export class ReleaseNotesPage extends TeWebviewPanel<State>
 {
-	constructor(container: TeContainer) {
+	static viewTitle = "Task Explorer Release Notes";
+	static viewId: WebviewIds = "releaseNotes";
+
+
+	constructor(container: TeContainer)
+	{
 		super(
 			container,
 			"release-notes.html",
-			viewTitle,
+			ReleaseNotesPage.viewTitle,
 			"res/gears-r-blue.png",
-			"taskExplorer.releaseNotes",
+			`taskExplorer.${ReleaseNotesPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}releaseNotes`,
 			"releaseNotesPage",
 			Commands.ShowReleaseNotesPage
@@ -130,11 +132,5 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		html += "</ul>";
 		return html;
 	};
-
-
-	getViewTitle = () => viewTitle;
-
-
-	getViewType = () => viewType;
 
 }
