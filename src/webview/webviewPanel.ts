@@ -105,6 +105,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 			if (args.length === 2 && isObject(args[0]) && args[0].webview)
 			{
 				this._view = args[0] as WebviewPanel;
+				args.splice(0, 2);
 			}
 			else
 			{
@@ -130,7 +131,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				window.onDidChangeWindowState(this.onWindowStateChanged, this),
 			);
 
-			this._view.webview.html = await this.getHtml(this._view.webview);
+			this._view.webview.html = await this.getHtml(this._view.webview, ...args);
 		}
 		else {
 			await this.refresh(true);

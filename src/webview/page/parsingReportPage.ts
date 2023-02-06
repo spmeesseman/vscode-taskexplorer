@@ -53,7 +53,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 		const infoContent = this.getExtraContent(tasks, uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);
 		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
-				idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
+			  idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
 		html = html.replace(html.slice(idx1, idx2), "");
 		return html;
 	};

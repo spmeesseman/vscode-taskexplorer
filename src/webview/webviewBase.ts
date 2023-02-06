@@ -216,8 +216,11 @@ export abstract class TeWebviewBase<State>
 	protected postMessage(message: IpcMessage)
 	{
 		if (!this._view || !this.isReady || !this.visible) return Promise.resolve(false);
-
-		// It looks like there is a bug where `postMessage` can sometimes just hang infinitely. Not sure why, but ensure we don't hang
+		//
+		// From GitLens:
+		//     It looks like there is a bug where `postMessage` can sometimes just hang infinitely.
+		//     Not sure why, but ensure we don't hang
+		//
 		return Promise.race<boolean>(
 		[
 			this._view.webview.postMessage(message),
