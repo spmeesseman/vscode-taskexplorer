@@ -1,11 +1,11 @@
 
-import { TeWebviewView } from "../../webviewView";
-import { IpcMessage, onIpc } from "../../protocol";
-import { ContextKeys } from "../../../lib/constants";
-import { TeContainer } from "../../../lib/container";
-import { registerCommand } from "../../../lib/command";
-import { StorageChangeEvent } from "../../../interface/IStorage";
-import { getContext, onDidChangeContext } from "../../../lib/context";
+import { TeWebviewView } from "../webviewView";
+import { IpcMessage, onIpc } from "../protocol";
+import { ContextKeys } from "../../lib/constants";
+import { TeContainer } from "../../lib/container";
+import { registerCommand } from "../../lib/command";
+import { StorageChangeEvent } from "../../interface/IStorage";
+import { getContext, onDidChangeContext } from "../../lib/context";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 
 interface State {

@@ -37,12 +37,9 @@ const removeUriFromExcludes = async(uri: Uri) =>
 };
 
 
-const registerRemoveFromExcludesCommand = (context: ExtensionContext) =>
+export const registerRemoveFromExcludesCommand = (context: ExtensionContext) =>
 {
 	context.subscriptions.push(
         registerCommand(Commands.RemovefromExcludes, async (uri: Uri) => { await removeUriFromExcludes(uri); })
     );
 };
-
-
-export default registerRemoveFromExcludesCommand;

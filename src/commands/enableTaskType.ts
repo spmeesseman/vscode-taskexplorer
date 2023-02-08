@@ -28,12 +28,9 @@ const enableTaskType = async(uri: Uri) =>
 };
 
 
-const registerEnableTaskTypeCommand = (context: ExtensionContext) =>
+export const registerEnableTaskTypeCommand = (context: ExtensionContext) =>
 {
 	context.subscriptions.push(
         registerCommand(Commands.EnableTaskType, async (uri: Uri) => { await enableTaskType(uri); })
     );
 };
-
-
-export default registerEnableTaskTypeCommand;

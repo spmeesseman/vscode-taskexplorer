@@ -17,12 +17,9 @@ const disableTaskType = async(uri: Uri) =>
 };
 
 
-const registerDisableTaskTypeCommand = (context: ExtensionContext) =>
+export const registerDisableTaskTypeCommand = (context: ExtensionContext) =>
 {
 	context.subscriptions.push(
         registerCommand(Commands.DisableTaskType, async (uri: Uri) => { await disableTaskType(uri); })
     );
 };
-
-
-export default registerDisableTaskTypeCommand;

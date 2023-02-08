@@ -37,12 +37,9 @@ const addUriToExcludes = async(uri: Uri) =>
 };
 
 
-const registerAddToExcludesCommand = (context: ExtensionContext) =>
+export const registerAddToExcludesCommand = (context: ExtensionContext) =>
 {
 	context.subscriptions.push(
         registerCommand(Commands.AddToExcludesMenu, async (uri: Uri) => { await addUriToExcludes(uri); })
     );
 };
-
-
-export default registerAddToExcludesCommand;

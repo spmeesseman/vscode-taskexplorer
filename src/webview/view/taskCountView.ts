@@ -1,14 +1,14 @@
 
-import { TeWebviewView } from "../../webviewView";
-import { IpcMessage, onIpc } from "../../protocol";
-import { ContextKeys } from "../../../lib/constants";
-import type { TeContainer } from "../../../lib/container";
+import { TeWebviewView } from "../webviewView";
+import { IpcMessage, onIpc } from "../protocol";
+import { ContextKeys } from "../../lib/constants";
+import type { TeContainer } from "../../lib/container";
 // import { onDidChangeContext } from "../../../lib/context";
-import { StorageChangeEvent } from "../../../interface/IStorage";
+import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable, workspace } from "vscode";
-import { createTaskCountTable } from "../../shared/taskCountTable";
-import { getTaskFiles } from "../../../lib/fileCache";
-import { TaskTreeManager } from "../../../tree/treeManager";
+import { createTaskCountTable } from "../shared/taskCountTable";
+import { getTaskFiles } from "../../lib/fileCache";
+import { TaskTreeManager } from "../../tree/treeManager";
 
 
 interface State {
