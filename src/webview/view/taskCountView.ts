@@ -1,9 +1,9 @@
 
-import { TeWebviewView } from "../webviewView";
+import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { ContextKeys } from "../../lib/constants";
 import { TeContainer } from "../../lib/container";
 import { ConfigurationChangeEvent } from "vscode";
-import { TaskTreeManager } from "../../tree/treeManager";
+import { TasksChangeEvent } from "../../interface";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { createTaskCountTable } from "../shared/taskCountTable";
 
@@ -15,13 +15,24 @@ interface State {
 
 export class TaskCountView extends TeWebviewView<State>
 {
+	static viewTitle = "Task Counts";
+	static viewId: WebviewViewIds = "taskCount";
+
 
 	constructor(container: TeContainer)
 	{
-		super(container, "Home", "license-manager.html", "taskExplorer.views.taskCount", `${ContextKeys.WebviewViewPrefix}home`, "taskCountView");
+		super(
+			container,
+			TaskCountView.viewTitle,
+			"task-count.html",
+			`taskExplorer.views.${TaskCountView.viewId}`,
+			`${ContextKeys.WebviewViewPrefix}home`,
+			"taskCountView"
+		);
 		this.disposables.push(
-			this.container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
-			this.container.storage.onDidChange(e => { this.onStorageChanged(e); }, this)
+			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
+			container.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
+			container.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
 		);
 	}
 
@@ -33,6 +44,14 @@ export class TaskCountView extends TeWebviewView<State>
 
 	private onStorageChanged(e: StorageChangeEvent)
 	{
+	}
+
+
+	private async onTasksChanged(e: TasksChangeEvent)
+	{
+		if (this.isFirstLoadComplete) {
+			await this.refresh();
+		}
 	}
 
 

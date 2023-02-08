@@ -1,11 +1,11 @@
 
-import { ConfigurationChangeEvent, Disposable } from "vscode";
-import { TeWebviewView } from "../webviewView";
 import { ContextKeys } from "../../lib/constants";
 import { TeContainer } from "../../lib/container";
-import { registerCommand } from "../../lib/command";
-import { StorageChangeEvent } from "../../interface/IStorage";
 import { TasksChangeEvent } from "../../interface";
+import { registerCommand } from "../../lib/command";
+import { ConfigurationChangeEvent, Disposable } from "vscode";
+import { StorageChangeEvent } from "../../interface/IStorage";
+import { TeWebviewView, WebviewViewIds } from "../webviewView";
 
 interface State {
 	webroot?: string;
@@ -14,15 +14,24 @@ interface State {
 
 export class HomeView extends TeWebviewView<State>
 {
-	private _firstLoadComplete = false;
+	static viewTitle = "Home";
+	static viewId: WebviewViewIds = "home";
+
 
 	constructor(container: TeContainer)
 	{
-		super(container, "Home", "home.html", "taskExplorer.views.home", `${ContextKeys.WebviewViewPrefix}home`, "homeView");
+		super(
+			container,
+			HomeView.viewTitle,
+			"home.html",
+			`taskExplorer.views.${HomeView.viewId}`,
+			`${ContextKeys.WebviewViewPrefix}home`,
+			"homeView"
+		);
 		this.disposables.push(
-			this.container.storage.onDidChange(e => { this.onStorageChanged(e); }),
-			this.container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
-			this.container.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
+			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
+			container.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
+			container.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
 		);
 	}
 
@@ -39,7 +48,7 @@ export class HomeView extends TeWebviewView<State>
 
 	private async onTasksChanged(e: TasksChangeEvent)
 	{
-		if (this._firstLoadComplete) {
+		if (this.isFirstLoadComplete) {
 			await this.refresh();
 		}
 	}
@@ -49,7 +58,6 @@ export class HomeView extends TeWebviewView<State>
 	{
 		const taskCount = this.container.treeManager.getTasks().length,
 			  taskCountToday = this.container.storage.get<number>("taskCountToday", 0);
-		this._firstLoadComplete = true;
 		return html.replace("#{taskCounts.length}",  taskCount.toString())
 				   .replace("#{taskCounts.today}", taskCountToday.toString());
 	};
@@ -83,12 +91,4 @@ export class HomeView extends TeWebviewView<State>
 	// {
 	// 	return this.getState();
 	// }
-
-	// private async getState(): Promise<State>
-	// {
-	// 	return {
-	// 		webroot: this.getWebRoot()
-	// 	};
-	// }
-
 }

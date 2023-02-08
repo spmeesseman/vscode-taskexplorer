@@ -1,4 +1,11 @@
 
+/**
+ * @class TeWebviewBase
+ *
+ * Credits to the author of the Gitlens extension for the webview/webpanel encapsulation
+ * concepts that got my praise and thus used in Task Explorer as a starting point.
+ */
+
 import { TextDecoder } from "util";
 // import { getNonce } from "@env/crypto";
 import { Commands } from "../lib/constants";
@@ -14,27 +21,27 @@ import {
 
 export abstract class TeWebviewBase<State>
 {
-    // abstract hide(): void;
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
     protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
 
 	protected isReady = false;
 	protected _view: WebviewView | WebviewPanel | undefined;
-	protected onReady?(): void;
-	protected onMessageReceived?(e: IpcMessage): void;
+	protected includeBootstrap?(): any;
+	protected includeBody?(): string | Promise<string>;
+	protected includeEndOfBody?(): string | Promise<string>;
+	protected includeHead?(): string | Promise<string>;
 	protected onActiveChanged?(active: boolean): void;
+	protected onInitializing?(): Disposable[] | undefined;
 	protected onFocusChanged?(focused: boolean): void;
+	protected onMessageReceived?(e: IpcMessage): void;
+	protected onReady?(): void;
 	protected onVisibilityChanged?(visible: boolean): void;
 	protected onWindowFocusChanged?(focused: boolean): void;
 	protected registerCommands?(): Disposable[];
-	protected includeBootstrap?(): any;
-	protected includeHead?(): string | Promise<string>;
-	protected includeBody?(): string | Promise<string>;
-	protected includeEndOfBody?(): string | Promise<string>;
-
 
 	private readonly _cspNonce = getNonce();
-	private _title: string;	protected onInitializing?(): Disposable[] | undefined;
+	private _isFirstLoadComplete = false;
+	private _title: string;
 	private _originalTitle: string | undefined;
     private maxSmallIntegerV8 = 2 ** 30;
     private ipcSequence = 0;
@@ -47,22 +54,15 @@ export abstract class TeWebviewBase<State>
     }
 
 
-    protected nextIpcId  = () =>
-    {
-        if (this.ipcSequence === this.maxSmallIntegerV8)
-        {
-            this.ipcSequence = 1;
-        }
-        else {
-            this.ipcSequence++;
-        }
-	    return `host:${this.ipcSequence}`;
-    };
-
-
-	protected get cspNonce()
+	private get cspNonce()
 	{
 		return this._cspNonce;
+	}
+
+
+	get isFirstLoadComplete()
+	{
+		return this._isFirstLoadComplete;
 	}
 
 
@@ -89,14 +89,6 @@ export abstract class TeWebviewBase<State>
 	get visible()
 	{
 		return this._view?.visible ?? false;
-	}
-
-
-	protected getWebRoot()
-	{
-		if (!this._view) return;
-		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "dist", "webviews");
-		return this._view.webview.asWebviewUri(webRootUri).toString();
 	}
 
 
@@ -146,20 +138,15 @@ export abstract class TeWebviewBase<State>
 
 		let html = await this.previewHtml(content, ...args);
 
-        html = html.replace(/\[webview\.cssDir\]/g, cssUri.toString())
-				   .replace(/\[webview\.jsDir\]/g, jsUri.toString())
-				   .replace(/\[webview\.pageDir\]/g, pageUri.toString())
-				   .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-				   .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString());
-
 		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|title|version|webroot)}/g, (_s: string, token: string) =>
-        {
-            switch (token) {
-                case "head":
-                    return head ?? "";
-                case "body":
-                    return body ?? "";
-                case "endOfBody":
+        {                                            //
+            switch (token)                           // Credits to the author of the Gitlens extension for
+			{                                        // this nice little replacer.  And the encapsulation
+                case "head":                         // concepts for the webviews/webpanels that get my
+                    return head ?? "";               // praise and used in Task Explorer. Made note in top
+                case "body":                         // level file comment too.
+                    return body ?? "";               //
+                case "endOfBody":                    //
                     return `${bootstrap ? `<script type="text/javascript" nonce="${this.cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
                 case "placement":
                     return "editor";
@@ -180,8 +167,28 @@ export abstract class TeWebviewBase<State>
             }
         });
 
+        html = html.replace(/\[webview.cssDir\]/g, cssUri.toString())     // Last of the old replacers. Funny how similar
+				   .replace(/\[webview.jsDir\]/g, jsUri.toString())       // it was the way I was already doing things as
+				   .replace(/\[webview.pageDir\]/g, pageUri.toString())   // compared to the GitLens author.  He just beat
+				   .replace(/\[webview.resourceDir\]/g, resourceDirUri.toString())    // me though.
+				   .replace(/\[webview.sourceImgDir\]/g, sourceImgDirUri.toString());
+
+		this._isFirstLoadComplete = true;
 		return this.finalizeHtml(html, ...args);
 	}
+
+
+    private nextIpcId  = () =>
+    {
+        if (this.ipcSequence === this.maxSmallIntegerV8)
+        {
+            this.ipcSequence = 1;
+        }
+        else {
+            this.ipcSequence++;
+        }
+	    return `host:${this.ipcSequence}`;
+    };
 
 
 	protected notify<T extends IpcNotificationType<any>>(type: T, params: IpcMessageParams<T>, completionId?: string)

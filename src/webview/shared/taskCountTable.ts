@@ -26,23 +26,6 @@ export const createTaskCountTable = async(extensionUri: Uri, project?: string, h
         taskCounts[t.source]++;
     });
 
-    if (!project)
-    {
-        /* istanbul ignore else */
-        if (workspace.workspaceFolders)
-        {
-            for (const wf of workspace.workspaceFolders)
-            {
-                projects.push(wf.name);
-            }
-        }
-        tableTemplate = tableTemplate.replace(/\#\{projects\.length\}/g, projects.length.toString());
-    }
-    else {
-        projects.push(project);
-        tableTemplate = tableTemplate.replace(/\#\{projects\.length\} project\(s\)/g, "the " + project + " project");
-    }
-
     getTaskTypes().forEach((tcKey) =>
     {
         const taskFiles = getTaskFiles(tcKey) || [];
@@ -59,12 +42,29 @@ export const createTaskCountTable = async(extensionUri: Uri, project?: string, h
     //     html = html.replace(/\$\{taskCounts.yarn\}/g, "0");
     // }
 
-    if (html) {
-        html = html.replace(/\#\{taskCounts\.table\}/g, tableTemplate);
+    if (html)
+    {
         html = removeLicenseButtons(html);
+        html = html.replace(/\#\{taskCounts\.table\}/g, tableTemplate);
         html = html.replace(/\#\{taskCounts\.length\}/g, tasks.length.toString())
                     .replace(/\#\{taskTypes\.length\}/g, Object.keys(taskCounts).length.toString())
                     .replace(/\#\{taskFiles\.length\}/g, fileCount.toString());
+        if (!project)
+        {
+            /* istanbul ignore else */
+            if (workspace.workspaceFolders)
+            {
+                for (const wf of workspace.workspaceFolders)
+                {
+                    projects.push(wf.name);
+                }
+            }
+            html = html.replace(/\#\{projects\.length\}/g, projects.length.toString());
+        }
+        else {
+            projects.push(project);
+            html = html.replace(/\#\{projects\.length\} project\(s\)/g, "the " + project + " project");
+        }
     }
     else {
         html = tableTemplate;
