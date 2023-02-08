@@ -119,6 +119,7 @@
 	"command.addToExcludes": "Add to excludes list",
 	"command.clearFavorites": "Clear all tasks from the `Favorites` folder",
 	"command.clearLastTasks": "Clear all tasks from the `Last Tasks` folder",
+	"command.donate": "Donate if you like!",
 	"command.debug": "Debugging ",
 	"command.getApi": "Get Task Explorer API object",
 	"command.open": "Open",
