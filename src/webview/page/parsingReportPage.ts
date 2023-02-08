@@ -52,7 +52,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
 									 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
 											  project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await createTaskCountTable(tasks, "Task Explorer Parsing Report", html, project);
+		html = await createTaskCountTable(tasks, html, project);
 		const infoContent = this.getExtraContent(tasks, uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);
 		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),

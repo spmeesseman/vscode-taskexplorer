@@ -138,15 +138,13 @@ export abstract class TeWebviewBase<State>
               resourceDirUri = webview.asWebviewUri(resourceDir),
               sourceImgDirUri = webview.asWebviewUri(sourceImgDir);
 
-        let html = content.replace(/\[webview\.cspSource\]/g, cspSource)
-                          .replace(/\[webview\.cssDir\]/g, cssUri.toString())
+        let html = content.replace(/\[webview\.cssDir\]/g, cssUri.toString())
                           .replace(/\[webview\.jsDir\]/g, jsUri.toString())
                           .replace(/\[webview\.pageDir\]/g, pageUri.toString())
                           .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                          .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString())
-                          .replace(/\[webview\.nonce\]/g, this.cspNonce);
+                          .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString());
 
-		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|webroot)}/g, (_s: string, token: string) =>
+		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|title|version|webroot)}/g, (_s: string, token: string) =>
         {
             switch (token) {
                 case "head":
@@ -163,6 +161,10 @@ export abstract class TeWebviewBase<State>
                     return this.cspNonce;
                 case "root":
                     return root;
+				case "title":
+					return this._title;
+				case "version":
+					return this.container.version;
                 case "webroot":
                     return webRoot;
                 default:

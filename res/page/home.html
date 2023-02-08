@@ -3,7 +3,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src https://ka-p.fontawesome.com; img-src [webview.cspSource]; script-src 'nonce-[webview.nonce]'; style-src [webview.cspSource] https://ka-p.fontawesome.com;">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src https://ka-p.fontawesome.com; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource} https://ka-p.fontawesome.com;">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
         <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
@@ -19,35 +19,27 @@
 
                 <table width="100%">
                     <tr>
-                    <td valign="top" width="40">
+                    <td valign="top">
                         <table>
                             <tr><td><table>
-                                <tr>
                                     <td>
 										<span class="fad fa-cogs te-icon"></span>
                                     </td>
-									<td><table cellspacing="0" cellpadding="0" class="content-title">
-										<tr>
-											<td>
-												<span class="">Task</span>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<span class=""> &nbsp;&nbsp;&nbsp;Explorer</span>
-											</td>
-										</tr>
-									</table></td>
+                                    <td valign="top">
+                                        <span class="homeview-content-title">Task</span>
+                                        <span class="homeview-content-title-version">v#{version}</span>
+                                        <div class="homeview-content-title margin-top-minus-5"> &nbsp;&nbsp;&nbsp;Explorer</div>
+                                    </td>
                                 </tr>
 								<tr>
-									<td colspan="2">
-										<table width="100%">
+									<td colspan="2" width="100%">
+										<table width="100%" class="margin-top-3">
 											<tr>
 												<td>
 													Total Tasks Parsed:
 												</td>
 												<td align="right">
-													0
+													#{taskCounts.length} 
 												</td>
 											</tr>
 											<tr>
@@ -55,7 +47,7 @@
 													# of tasks ran today:
 												</td>
 												<td align="right">
-													0
+													#{taskCounts.today} 
 												</td>
 											</tr>
 										</table>

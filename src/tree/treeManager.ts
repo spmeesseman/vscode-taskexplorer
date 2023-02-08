@@ -20,10 +20,10 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
-import { IDictionary, ITaskTreeView, ITaskTreeManager } from "../interface";
+import { IDictionary, ITaskTreeView, ITaskTreeManager, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
-    window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState
+    window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
 
 
@@ -43,6 +43,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private firstTreeBuildDone = false;
     private currentInvalidation: string | undefined;
     private disposables: Disposable[] = [];
+    private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
     private _views: IDictionary<ITaskTreeView|undefined> = {
         taskExplorer: undefined,
         taskExplorerSideBar: undefined
@@ -377,6 +378,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         {
             (v as ITaskTreeView).tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
         });
+        this._onDidTasksChange.fire({ taskCount: this.tasks.length });
     };
 
 
@@ -516,6 +518,12 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 
 
     static isBusy = () => this.refreshPending || TaskTreeBuilder.isBusy();
+
+
+	get onTasksChanged(): Event<TasksChangeEvent>
+    {
+		return this._onDidTasksChange.event;
+	}
 
 
     private onWorkspaceFolderRemoved = (uri: Uri, logPad: string) =>

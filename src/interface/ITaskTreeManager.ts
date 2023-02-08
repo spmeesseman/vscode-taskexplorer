@@ -5,6 +5,11 @@ import { Task, TreeItem, Uri } from "vscode";
 import { IDictionary } from "./IDictionary";
 import { ITaskTreeView } from "./ITaskTreeView";
 
+export interface TasksChangeEvent
+{
+    readonly taskCount: number;
+};
+
 export interface ITaskTreeManager
 {
     views: IDictionary<ITaskTreeView|undefined>;

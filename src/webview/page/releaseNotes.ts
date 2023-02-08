@@ -15,7 +15,7 @@ interface State {
 
 export class ReleaseNotesPage extends TeWebviewPanel<State>
 {
-	static viewTitle = "Task Explorer Release Notes";
+	static viewTitle = "Task Explorer #{version} Release Notes";
 	static viewId: WebviewIds = "releaseNotes";
 
 
@@ -24,7 +24,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		super(
 			container,
 			"release-notes.html",
-			ReleaseNotesPage.viewTitle,
+			ReleaseNotesPage.viewTitle.replace("#{version}", container.context.extension.packageJSON.version),
 			"res/gears-r-blue.png",
 			`taskExplorer.${ReleaseNotesPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}releaseNotes`,
@@ -44,7 +44,6 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 			  changeLogHtml = await marked(changeLogMd, { async: true }),
 			  version = this.container.context.extension.packageJSON.version;
 		html = html.replace("<!-- changelog -->", changeLogHtml)
-				   .replace("<!-- title -->", `Task Explorer ${version} Release Notes`)
 				   .replace("<!-- subtitle -->", this.getNewInThisReleaseShortDsc())
 				   .replace("<!-- releasenotes -->", this.getNewReleaseNotes(version, changeLogMd));
 		html = removeLicenseButtons(html);

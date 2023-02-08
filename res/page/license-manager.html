@@ -3,7 +3,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src [webview.cspSource]; script-src 'nonce-[webview.nonce]'; style-src [webview.cspSource];">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource};">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
         <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
@@ -25,7 +25,7 @@
                             <td class="content-img">
                                 <img src="[webview.resourceDir]/gears-r-colors.png" />
                             </td>
-                            <td class="content-title"> &nbsp;<!-- title --></td>
+                            <td class="content-title"> &nbsp;#{title}</td>
                         </tr></table>
                     </td></tr>
                     <tr><td>
@@ -104,7 +104,7 @@
                             </tr>
                             <tr>
                                 <td class="padding-top-10 padding-bottom-10">
-                                    ${taskCounts.length} tasks and ${taskTypes.length} task types in ${taskFiles.length} files found in ${projects.length} project(s)
+                                    #{taskCounts.length} tasks and #{taskTypes.length} task types in #{taskFiles.length} files found in #{projects.length} project(s)
                                 </td>
                             </tr>
                             <tr><td><table width="100%">
@@ -113,139 +113,139 @@
                                         <img src="[webview.sourceImgDir]/ant.png" class="task-image" />
                                     </td>
                                     <td class="task-count" width="12%">
-                                        ${taskCounts.ant}
+                                        #{taskCounts.ant}
                                     </td>
                                     <td width="10%">
                                         <img src="[webview.sourceImgDir]/apppublisher.png" class="task-image" />
                                     </td>
                                     <td class="task-count" width="12%">
-                                        ${taskCounts.apppublisher}
+                                        #{taskCounts.apppublisher}
                                     </td>
                                     <td width="10%">
                                         <img src="[webview.sourceImgDir]/bash.png" class="task-image" />
                                     </td>
                                     <td class="task-count" width="12%">
-                                        ${taskCounts.bash}
+                                        #{taskCounts.bash}
                                     </td>
                                     <td width="10%">
                                         <img src="[webview.sourceImgDir]/bat.png" class="task-image" />
                                     </td>
                                     <td class="task-count" width="12%">
-                                        ${taskCounts.batch}
+                                        #{taskCounts.batch}
                                     </td>
                                     <td width="10%">
                                         <img src="[webview.sourceImgDir]/bat.png" class="task-image" />
                                     </td>
                                     <td class="task-count" width="12%">
-                                        ${taskCounts.composer}
+                                        #{taskCounts.composer}
                                     </td>
                                 </tr><tr>
                                     <td>
                                         <img src="[webview.sourceImgDir]/gradle.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.gradle}
+                                        #{taskCounts.gradle}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/grunt.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.grunt}
+                                        #{taskCounts.grunt}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/gulp.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.gulp}
+                                        #{taskCounts.gulp}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/jenkins.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.jenkins}
+                                        #{taskCounts.jenkins}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/make.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.make}
+                                        #{taskCounts.make}
                                     </td>
                                 </tr><tr>
                                     <td>
                                         <img src="[webview.sourceImgDir]/maven.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.maven}
+                                        #{taskCounts.maven}
                                     </td>
                                     <td class="task-image-stacked-container">
                                         <img src="[webview.sourceImgDir]/npm.png" class="task-image-stacked" />
                                         <img src="[webview.sourceImgDir]/yarn.png" class="task-image-stacked" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.npm}
-                                        <!--${taskCounts.npm_plus_yarn}-->
+                                        #{taskCounts.npm}
+                                        <!--#{taskCounts.npm_plus_yarn}-->
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/nsis.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.nsis}
+                                        #{taskCounts.nsis}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/powershell.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.powershell}
+                                        #{taskCounts.powershell}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/python.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.python}
+                                        #{taskCounts.python}
                                     </td>
                                 </tr><tr>
                                     <td>
                                         <img src="[webview.sourceImgDir]/perl.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.perl}
+                                        #{taskCounts.perl}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/ruby.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.ruby}
+                                        #{taskCounts.ruby}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/ts.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.tsc}
+                                        #{taskCounts.tsc}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/webpack.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.webpack}
+                                        #{taskCounts.webpack}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/workspace.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.Workspace}
+                                        #{taskCounts.Workspace}
                                     </td>
                                 </tr><!--<tr>
                                     <td>
                                         <img src="[webview.sourceImgDir]/npm.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.npm}
+                                        #{taskCounts.npm}
                                     </td>
                                     <td>
                                         <img src="[webview.sourceImgDir]/yarn.png" class="task-image" />
                                     </td>
                                     <td class="task-count">
-                                        ${taskCounts.yarn}
+                                        #{taskCounts.yarn}
                                     </td>
                                 </tr>-->
                             </table></td></tr>

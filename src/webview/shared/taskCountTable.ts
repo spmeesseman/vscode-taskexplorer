@@ -5,14 +5,12 @@ import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
 import { removeLicenseButtons } from "./removeLicenseButtons";
 
 
-export const createTaskCountTable = async(tasks: Task[], title: string, html: string, project?: string) =>
+export const createTaskCountTable = async(tasks: Task[], html: string, project?: string) =>
 {
     const projects: string[] = [],
-        taskCounts: IDictionary<number> = {};
+          taskCounts: IDictionary<number> = {};
 
     let fileCount = 0;
-
-    html = html.replace("<!-- title -->", title);
 
     tasks.forEach((t) =>
     {
@@ -32,20 +30,18 @@ export const createTaskCountTable = async(tasks: Task[], title: string, html: st
                 projects.push(wf.name);
             }
         }
-        // eslint-disable-next-line no-template-curly-in-string
-        html = html.replace("${projects.length}", projects.length.toString());
+        html = html.replace(/\#\{projects\.length\}/g, projects.length.toString());
     }
     else {
         projects.push(project);
-        // eslint-disable-next-line no-template-curly-in-string
-        html = html.replace("${projects.length} project(s)", "the " + project + " project");
+        html = html.replace(/\#\{projects\.length\} project\(s\)/g, "the " + project + " project");
     }
 
     getTaskTypes().forEach((tcKey) =>
     {
         const taskFiles = getTaskFiles(tcKey) || [];
         fileCount += taskFiles.length;
-        html = html.replace(new RegExp(`\\\${taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
+        html = html.replace(new RegExp(`#{taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
     });
 
     // html = html.replace(/\$\{taskCounts.npm_plus_yarn\}/g, taskCounts.npm || "0");
@@ -57,9 +53,9 @@ export const createTaskCountTable = async(tasks: Task[], title: string, html: st
     //     html = html.replace(/\$\{taskCounts.yarn\}/g, "0");
     // }
 
-    html = html.replace(/\$\{taskCounts\.length\}/g, tasks.length.toString());
-    html = html.replace(/\$\{taskTypes.length\}/g, Object.keys(taskCounts).length.toString());
-    html = html.replace(/\$\{taskFiles.length\}/g, fileCount.toString());
+    html = html.replace(/\#\{taskCounts\.length\}/g, tasks.length.toString());
+    html = html.replace(/\#\{taskTypes\.length\}/g, Object.keys(taskCounts).length.toString());
+    html = html.replace(/\#\{taskFiles\.length\}/g, fileCount.toString());
 
     return removeLicenseButtons(html);
 };
