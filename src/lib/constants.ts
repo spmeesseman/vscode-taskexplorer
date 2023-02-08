@@ -39,6 +39,7 @@ export const Globs: IDictionary<string> =
 export const enum Commands
 {
 	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
+	Donate = "vscode-taskexplorer.donate",
     Run = "vscode-taskexplorer.run",
     RunLastTask = "vscode-taskexplorer.runLastTask",
 	DisableTaskType = "vscode-taskexplorer.disableTaskType",

@@ -22,10 +22,12 @@ import { GradleTaskProvider } from "../providers/gradle";
 import { PipenvTaskProvider } from "../providers/pipenv";
 import { PythonTaskProvider } from "../providers/python";
 import { LicensePage } from "../webview/page/licensePage";
+import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
+import { IConfiguration } from "../interface/IConfiguration";
 import { TaskCountView } from "../webview/view/taskCountView";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
@@ -39,7 +41,6 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
-import { IConfiguration } from "../interface/IConfiguration";
 
 
 export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
@@ -155,6 +156,7 @@ export class TeWrapper
 
 	private registerContextMenuCommands = () =>
 	{
+		registerDonateCommand(this._context);
 		registerAddToExcludesCommand(this._context);
 		registerDisableTaskTypeCommand(this._context);
 		registerEnableTaskTypeCommand(this._context);

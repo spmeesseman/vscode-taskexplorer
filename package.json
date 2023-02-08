@@ -228,7 +228,7 @@
                     "id": "taskActivity",
                     "title": "%view.name%",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "res/logo.svg"
+                    "icon": "res/img/logo.svg"
                 }
             ]
         },
@@ -289,6 +289,15 @@
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
             },
             {
+                "command": "vscode-taskexplorer.donate",
+                "title": "%command.donate%",
+                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "icon": {
+                    "light": "res/img/light/donate.svg",
+                    "dark": "res/img/dark/donate.svg"
+                }
+            },
+            {
                 "command": "vscode-taskexplorer.enterLicense",
                 "title": "%command.enterLicense%"
             },
@@ -329,8 +338,8 @@
                 "title": "%command.refresh%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/refresh.svg",
-                    "dark": "res/dark/refresh.svg"
+                    "light": "res/img/light/refresh.svg",
+                    "dark": "res/img/dark/refresh.svg"
                 }
             },
             {
@@ -338,8 +347,8 @@
                 "title": "%command.clearFavorites%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/clear.svg",
-                    "dark": "res/dark/clear.svg"
+                    "light": "res/img/light/clear.svg",
+                    "dark": "res/img/dark/clear.svg"
                 }
             },
             {
@@ -347,8 +356,8 @@
                 "title": "%command.clearLastTasks%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/clear.svg",
-                    "dark": "res/dark/clear.svg"
+                    "light": "res/img/light/clear.svg",
+                    "dark": "res/img/dark/clear.svg"
                 }
             },
             {
@@ -366,8 +375,8 @@
                 "title": "%command.run%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
+                    "light": "res/img/light/continue.svg",
+                    "dark": "res/img/dark/continue.svg"
                 }
             },
             {
@@ -375,8 +384,8 @@
                 "title": "%command.runNoTerm%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
+                    "light": "res/img/light/continue.svg",
+                    "dark": "res/img/dark/continue.svg"
                 }
             },
             {
@@ -384,8 +393,8 @@
                 "title": "%command.runWithArgs%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
+                    "light": "res/img/light/continue.svg",
+                    "dark": "res/img/dark/continue.svg"
                 }
             },
             {
@@ -393,8 +402,8 @@
                 "title": "Task Explorer: Run Last Task",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "light": "res/light/continue.svg",
-                    "dark": "res/dark/continue.svg"
+                    "light": "res/img/light/continue.svg",
+                    "dark": "res/img/dark/continue.svg"
                 }
             },
             {
@@ -402,8 +411,8 @@
                 "title": "%command.addRemoveFavorite%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/favorite.svg",
-                    "light": "res/light/favorite.svg"
+                    "dark": "res/img/dark/favorite.svg",
+                    "light": "res/img/light/favorite.svg"
                 }
             },
             {
@@ -411,8 +420,8 @@
                 "title": "%command.pause%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/pause.svg",
-                    "light": "res/light/pause.svg"
+                    "dark": "res/img/dark/pause.svg",
+                    "light": "res/img/light/pause.svg"
                 }
             },
             {
@@ -420,8 +429,8 @@
                 "title": "%command.restart%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/restart.svg",
-                    "light": "res/light/restart.svg"
+                    "dark": "res/img/dark/restart.svg",
+                    "light": "res/img/light/restart.svg"
                 }
             },
             {
@@ -429,8 +438,8 @@
                 "title": "%command.stop%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/stop.svg",
-                    "light": "res/light/stop.svg"
+                    "dark": "res/img/dark/stop.svg",
+                    "light": "res/img/light/stop.svg"
                 }
             },
             {
@@ -438,8 +447,8 @@
                 "title": "%command.open%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/file.svg",
-                    "light": "res/light/file.svg"
+                    "dark": "res/img/dark/file.svg",
+                    "light": "res/img/light/file.svg"
                 }
             },
             {
@@ -447,8 +456,8 @@
                 "title": "%command.openTerminal%",
                 "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
                 "icon": {
-                    "dark": "res/dark/terminal.svg",
-                    "light": "res/light/terminal.svg"
+                    "dark": "res/img/dark/terminal.svg",
+                    "light": "res/img/light/terminal.svg"
                 }
             },
             {
@@ -541,6 +550,10 @@
                     "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
                 },
                 {
+                    "command": "vscode-taskexplorer.donate",
+                    "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                },
+                {
                     "command": "vscode-taskexplorer.disableTaskType",
                     "when": "false"
                 },
@@ -630,6 +643,11 @@
                 {
                     "command": "vscode-taskexplorer.refresh",
                     "when": "view == taskExplorer || view == taskExplorerSideBar",
+                    "group": "navigation"
+                },
+                {
+                    "command": "vscode-taskexplorer.donate",
+                    "when": "view == taskExplorer.views.home",
                     "group": "navigation"
                 }
             ],
