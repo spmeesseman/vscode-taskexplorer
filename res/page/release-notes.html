@@ -6,10 +6,10 @@
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src https://ka-p.fontawesome.com; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource} https://ka-p.fontawesome.com;">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
-        <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
-        <link rel="stylesheet" href="[webview.cssDir]/page.css">
-        <link rel="stylesheet" href="[webview.cssDir]/release-notes.css">
-        <link rel="stylesheet" href="[webview.cssDir]/fa.css"> <!-- <link rel="stylesheet" href="https://kit.fontawesome.com/e5d9daff3c.css" crossorigin="anonymous"> -->
+        <link rel="stylesheet" href="#{webroot}/css/vscode.css">
+        <link rel="stylesheet" href="#{webroot}/css/page.css">
+        <link rel="stylesheet" href="#{webroot}/css/release-notes.css">
+        <link rel="stylesheet" href="#{webroot}/css/fa.css"> <!-- <link rel="stylesheet" href="https://kit.fontawesome.com/e5d9daff3c.css" crossorigin="anonymous"> -->
     </head>
 
     <body class="te-page-bg">
@@ -23,7 +23,7 @@
                     <tr><td>
                         <table><tr>
                             <td class="content-img">
-                                <!--<img src="[webview.resourceDir]/img/logo-clr.png" />-->
+                                <!--<img src="#{webroot}/img/logo-clr.png" />-->
                                 <span class="fad fa-cogs te-icon"></span>
                             </td>
                             <td class="content-title"> &nbsp;#{title}</td>
@@ -32,55 +32,55 @@
                     <tr><td>
                         <table class="margin-top-15"><tr>
                             <td>
-                                <img src="[webview.sourceImgDir]/npm.png" />
+                                <img src="#{webroot}/img/sources/npm.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/ant.png" />
+                                <img src="#{webroot}/img/sources/ant.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/yarn.png" />
+                                <img src="#{webroot}/img/sources/yarn.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/grunt.png" />
+                                <img src="#{webroot}/img/sources/grunt.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/gulp.png" />
+                                <img src="#{webroot}/img/sources/gulp.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/gradle.png" />
+                                <img src="#{webroot}/img/sources/gradle.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/workspace.png" />
+                                <img src="#{webroot}/img/sources/workspace.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/make.png" />
+                                <img src="#{webroot}/img/sources/make.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/ts.png" />
+                                <img src="#{webroot}/img/sources/ts.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/bat.png" />
+                                <img src="#{webroot}/img/sources/bat.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/ruby.png" />
+                                <img src="#{webroot}/img/sources/ruby.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/powershell.png" />
+                                <img src="#{webroot}/img/sources/powershell.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/bash.png" />
+                                <img src="#{webroot}/img/sources/bash.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/python.png" />
+                                <img src="#{webroot}/img/sources/python.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/nsis.png" />
+                                <img src="#{webroot}/img/sources/nsis.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/perl.png" />
+                                <img src="#{webroot}/img/sources/perl.png" />
                             </td>
                             <td>
-                                <img src="[webview.sourceImgDir]/maven.png" />
+                                <img src="#{webroot}/img/sources/maven.png" />
                             </td>
                         </tr></table>
                     </td></tr>
@@ -172,8 +172,8 @@
 
         </table>
 
-        <script nonce="#{cspNonce}" src="[webview.jsDir]/command.js"></script>
-        <script nonce="#{cspNonce}" src="[webview.jsDir]/toggle.js"></script>
+        <script nonce="#{cspNonce}" src="#{webroot}/js/command.js"></script>
+        <script nonce="#{cspNonce}" src="#{webroot}/js/toggle.js"></script>
 
     </body>
 </html>

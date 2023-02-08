@@ -1,3 +1,16 @@
 :root {
 	--container-padding: 10px;
 }
+
+.task-usage-table {
+	font-size: 12px;
+}
+
+.task-usage-table-label {
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.task-usage-table-value {
+	font-size: 12px;
+}

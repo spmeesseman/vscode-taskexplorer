@@ -109,10 +109,11 @@ export abstract class TeWebviewBase<State>
 
 	protected async getHtml(webview: Webview, ...args: unknown[])
 	{
-        const resourceDir = Uri.joinPath(this.container.context.extensionUri, "res");
-		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "res", "page");
-		const uri = Uri.joinPath(webRootUri, this.fileName);
-		const content = new TextDecoder("utf8").decode(await workspace.fs.readFile(uri));
+		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "res"),
+			  uri = Uri.joinPath(webRootUri, "page", this.fileName),
+			  content = new TextDecoder("utf8").decode(await workspace.fs.readFile(uri)),
+			  cspSource = webview.cspSource,
+			  webRoot = webview.asWebviewUri(webRootUri).toString();
 
 		const [ bootstrap, head, body, endOfBody ] = await Promise.all([
 			this.includeBootstrap?.(),
@@ -121,25 +122,9 @@ export abstract class TeWebviewBase<State>
 			this.includeEndOfBody?.(),
 		]);
 
-		const cspSource = webview.cspSource;
-
-		const root = webview.asWebviewUri(this.container.context.extensionUri).toString();
-		const webRoot = webview.asWebviewUri(webRootUri).toString();
-
-        const cssDir = Uri.joinPath(resourceDir, "css"),
-              jsDir = Uri.joinPath(resourceDir, "js"),
-              pageDir = Uri.joinPath(resourceDir, "page"),
-              imgDir = Uri.joinPath(resourceDir, "img"),
-              sourceImgDir = Uri.joinPath(imgDir, "sources"),
-              pageUri = webview.asWebviewUri(pageDir),
-              cssUri = webview.asWebviewUri(cssDir),
-              jsUri = webview.asWebviewUri(jsDir),
-              resourceDirUri = webview.asWebviewUri(resourceDir),
-              sourceImgDirUri = webview.asWebviewUri(sourceImgDir);
-
 		let html = await this.previewHtml(content, ...args);
 
-		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|title|version|webroot)}/g, (_s: string, token: string) =>
+		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|title|version|webroot)}/g, (_s: string, token: string) =>
         {                                            //
             switch (token)                           // Credits to the author of the Gitlens extension for
 			{                                        // this nice little replacer.  And the encapsulation
@@ -155,8 +140,6 @@ export abstract class TeWebviewBase<State>
                     return cspSource;
                 case "cspNonce":
                     return this.cspNonce;
-                case "root":
-                    return root;
 				case "title":
 					return this._title;
 				case "version":
@@ -167,12 +150,6 @@ export abstract class TeWebviewBase<State>
                     return "";
             }
         });
-
-        html = html.replace(/\[webview.cssDir\]/g, cssUri.toString())     // Last of the old replacers. Funny how similar
-				   .replace(/\[webview.jsDir\]/g, jsUri.toString())       // it was the way I was already doing things as
-				   .replace(/\[webview.pageDir\]/g, pageUri.toString())   // compared to the GitLens author.  He just beat
-				   .replace(/\[webview.resourceDir\]/g, resourceDirUri.toString())    // me though.
-				   .replace(/\[webview.sourceImgDir\]/g, sourceImgDirUri.toString());
 
 		this._isFirstLoadComplete = true;
 		return this.finalizeHtml(html, ...args);

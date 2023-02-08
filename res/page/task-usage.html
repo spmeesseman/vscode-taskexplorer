@@ -6,12 +6,45 @@
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
-        <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
-        <link rel="stylesheet" href="[webview.cssDir]/task-usage.css">
+        <link rel="stylesheet" href="#{webroot}/css/vscode.css">
+        <link rel="stylesheet" href="#{webroot}/css/task-usage.css">
     </head>
 
     <body>
-        #{body}
+        <table class="task-usage-table">
+            <tr>
+                <td class="task-usage-table-label">
+                    # of tasks ran today:
+                </td>
+                <td align="right" class="task-usage-table-value">
+                    #{taskCounts.today}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-usage-table-label">
+                    Avg. # of tasks ran per day:
+                </td>
+                <td align="right" class="task-usage-table-value">
+                    #{taskCounts.avgPerDay}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-usage-table-label">
+                    Most Used Task:
+                </td>
+                <td align="right" class="task-usage-table-value">
+                    #{taskCounts.mostUsedTask}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-usage-table-label">
+                    Last task ran at:
+                </td>
+                <td align="right" class="task-usage-table-value">
+                    #{taskCounts.mostUsedTask}
+                </td>
+            </tr>
+        </table>
     </body>
 
 </html>
