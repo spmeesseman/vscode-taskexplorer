@@ -1,13 +1,12 @@
 
 import log from "./log/log";
-import TaskItem from "../tree/item";
-import TaskFile from "../tree/file";
-import TaskFolder from "../tree/folder";
 import { Globs } from "./constants";
 import { TreeItemLabel } from "vscode";
+import { TaskItem } from "../tree/item";
+import { TaskFile } from "../tree/file";
+import { TaskFolder } from "../tree/folder";
 import { IDictionary, ITaskFile, ITaskItem } from "../interface";
 import { configuration } from "./utils/configuration";
-
 
 
 export const sortFolders = (folders: IDictionary<TaskFolder>): TaskFolder[] =>

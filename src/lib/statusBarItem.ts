@@ -35,5 +35,4 @@ export const registerStatusBarItem = (context: ExtensionContext) =>
     statusBarItem.init(context);
 };
 
-const statusBarItem: TeStatusBarItem = new TeStatusBarItem();
-export default statusBarItem;
+export const statusBarItem: TeStatusBarItem = new TeStatusBarItem();

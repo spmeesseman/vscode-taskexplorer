@@ -2,9 +2,9 @@
 
 import * as util from "../utils/utils";
 import log from "../log/log";
-import TaskItem from "../../tree/item";
+import { TaskItem } from "../../tree/item";
 import { configuration } from "../utils/configuration";
-import SpecialTaskFolder from "../../tree/specialFolder";
+import { SpecialTaskFolder } from "../../tree/specialFolder";
 import { IDictionary, ITaskTreeManager } from "../../interface";
 import {
     Disposable, WorkspaceFolder, tasks, TaskStartEvent, StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent

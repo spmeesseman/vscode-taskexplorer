@@ -3,9 +3,9 @@
 import * as util from "./utils/utils";
 import * as taskTypeUtils from "./utils/taskTypeUtils";
 import log from "./log/log";
-import statusBarItem from "./statusBarItem";
 import { join } from "path";
 import { storage } from "./utils/storage";
+import { statusBarItem } from "./statusBarItem";
 import { configuration } from "./utils/configuration";
 import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";

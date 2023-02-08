@@ -2,8 +2,8 @@
 import * as minimatch from "minimatch";
 import log from "../log/log";
 import { Commands, Globs } from "../constants";
-import TaskFile from "../../tree/file";
-import TaskItem from "../../tree/item";
+import { TaskFile } from "../../tree/file";
+import { TaskItem } from "../../tree/item";
 import { configuration } from "./configuration";
 import { basename, extname, sep } from "path";
 import { ILicenseManager } from "../../interface/ILicenseManager";

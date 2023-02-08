@@ -1,17 +1,17 @@
 
-import TaskItem from "./item";
 import log from "../lib/log/log";
-import TaskFolder from "./folder";
+import { TaskItem } from "./item";
+import { TaskFolder } from "./folder";
 import { Globs } from "../lib/constants";
-import { IDictionary, ITaskTree, ITaskTreeManager } from "../interface";
 import { sortTasks } from "../lib/sortTasks";
 import { storage } from "../lib/utils/storage";
 import { TaskTreeManager } from "./treeManager";
 import { configuration } from "../lib/utils/configuration";
+import { IDictionary, ITaskTreeManager } from "../interface";
 import { isString, removeFromArray } from "../lib/utils/utils";
 import {
-    commands, ConfigurationChangeEvent, Disposable, ExtensionContext, InputBoxOptions, ThemeIcon,
-    TreeItem, TreeItemCollapsibleState, window, workspace
+    commands, ConfigurationChangeEvent, Disposable, InputBoxOptions, ThemeIcon, TreeItem,
+    TreeItemCollapsibleState, window, workspace
 } from "vscode";
 
 
@@ -20,7 +20,7 @@ import {
  *
  * A tree node that represents a special folder i.e. the `Favorites` or `Last Tasks` folder
  */
-export default class SpecialTaskFolder extends TaskFolder implements Disposable
+export class SpecialTaskFolder extends TaskFolder implements Disposable
 {
 
     public treeManager: ITaskTreeManager;

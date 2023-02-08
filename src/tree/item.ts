@@ -2,8 +2,8 @@
 import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import TaskFile from "./file";
-import TaskFolder from "./folder";
+import { TaskFile } from "./file";
+import { TaskFolder } from "./folder";
 import { ITaskItem } from "../interface";
 import { configuration } from "../lib/utils/configuration";
 import { getInstallPathSync } from "../lib/utils/pathUtils";
@@ -20,7 +20,7 @@ from "vscode";
  * A tree node that represents a task.
  * An item of this type is always a child of type TaskFile in the tree.
  */
-export default class TaskItem extends TreeItem implements ITaskItem
+export class TaskItem extends TreeItem implements ITaskItem
 {
     public readonly taskSource: string;
     public readonly isUser: boolean;

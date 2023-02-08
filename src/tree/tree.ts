@@ -1,8 +1,8 @@
 
-import TaskItem from "./item";
-import TaskFile from "./file";
 import log from "../lib/log/log";
-import TaskFolder from "./folder";
+import { TaskFile } from "./file";
+import { TaskItem } from "./item";
+import { TaskFolder } from "./folder";
 import { IEvent, ITaskTree } from "../interface";
 import { TaskTreeManager } from "./treeManager";
 import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
@@ -34,7 +34,7 @@ import { timeout } from "../lib/utils/utils";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export default class TaskTree implements ITaskTree, Disposable
+export class TaskTree implements ITaskTree, Disposable
 {
     private static loadStage = 0;
     private defaultGetChildrenLogLevel = 1;

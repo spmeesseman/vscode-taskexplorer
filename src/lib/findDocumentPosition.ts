@@ -1,7 +1,7 @@
 
 import log from "./log/log";
-import TaskItem from "../tree/item";
 import { TextDocument } from "vscode";
+import { TaskItem } from "../tree/item";
 import { TeContainer } from "./container";
 import { IDictionary } from "../interface";
 import { isWatchTask } from "./utils/taskTypeUtils";

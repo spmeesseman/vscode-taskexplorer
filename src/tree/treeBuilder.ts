@@ -2,21 +2,20 @@
 import * as utils from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
 import log from "../lib/log/log";
-import statusBarItem from "../lib/statusBarItem";
-import TaskFolder from "./folder";
-import TaskItem from "./item";
-import { TaskTreeManager } from "./treeManager";
-import { Disposable, Task, TreeItemCollapsibleState } from "vscode";
-import { configuration } from "../lib/utils/configuration";
-import SpecialTaskFolder from "./specialFolder";
-import { IDictionary, ITaskTreeManager, TaskMap } from "../interface";
-import TaskFile from "./file";
 import { join } from "path";
-import { NoScripts } from "../lib/noScripts";
+import { TaskFile } from "./file";
+import { TaskItem } from "./item";
+import { TaskFolder } from "./folder";
 import { Globs } from "../lib/constants";
+import { NoScripts } from "../lib/noScripts";
+import { SpecialTaskFolder } from "./specialFolder";
+import { statusBarItem } from "../lib/statusBarItem";
+import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
+import { Disposable, Task, TreeItemCollapsibleState } from "vscode";
+import { IDictionary, ITaskTreeManager, TaskMap } from "../interface";
 
-export default class TaskTreeBuilder implements Disposable
+export class TaskTreeBuilder implements Disposable
 {
     private static treeBuilding = false;
     private static taskMap: TaskMap = {};

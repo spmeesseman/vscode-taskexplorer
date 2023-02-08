@@ -2,13 +2,13 @@
 import * as path from "path";
 import * as util from "../lib/utils/utils";
 import log from "../lib/log/log";
-import TaskFolder  from "./folder";
+import { TaskFolder }  from "./folder";
 import { pathExistsSync } from "../lib/utils/fs";
 import { properCase } from "../lib/utils/commonUtils";
-import { getInstallPath, getInstallPathSync, getUserDataPath } from "../lib/utils/pathUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
+import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
+import { getInstallPathSync, getUserDataPath } from "../lib/utils/pathUtils";
 import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
-import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri, env } from "vscode";
 
 
 /**
@@ -22,7 +22,7 @@ import { ThemeIcon, TreeItem, TreeItemCollapsibleState, ExtensionContext, Uri, e
  * The last TaskFile in a grouping will contain items of type TaskItem.  If not grouped,
  * the TaskFile node for each task type within each TaskFolder will contain items of type TaskItem.
  */
-export default class TaskFile extends TreeItem implements ITaskFile
+export class TaskFile extends TreeItem implements ITaskFile
 {
     public path: string;
     /**

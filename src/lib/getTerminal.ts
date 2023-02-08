@@ -1,7 +1,7 @@
 
 import log from "./log/log";
-import TaskItem from "../tree/item";
 import { basename } from "path";
+import { TaskItem } from "../tree/item";
 import { window, Terminal } from "vscode";
 
 

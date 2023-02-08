@@ -2,19 +2,19 @@
 
 import * as task from "./task";
 import * as utils from "../lib/utils/utils";
-import TaskFile from "./file";
-import TaskItem from "./item";
 import log from "../lib/log/log";
-import TaskFolder from "./folder";
-import TaskTree from "../tree/tree";
+import { TaskFile } from "./file";
+import { TaskItem } from "./item";
+import { TaskFolder } from "./folder";
+import { TaskTree } from "../tree/tree";
 import { Globs } from "../lib/constants";
-import TaskTreeBuilder from "./treeBuilder";
-import SpecialTaskFolder from "./specialFolder";
-import statusBarItem from "../lib/statusBarItem";
 import { isDirectory } from "../lib/utils/fs";
 import { TeContainer } from "../lib/container";
+import { TaskTreeBuilder } from "./treeBuilder";
 import { rebuildCache } from "../lib/fileCache";
 import { getTerminal } from "../lib/getTerminal";
+import { SpecialTaskFolder } from "./specialFolder";
+import { statusBarItem } from "../lib/statusBarItem";
 import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";

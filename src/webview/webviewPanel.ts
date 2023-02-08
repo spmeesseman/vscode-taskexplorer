@@ -4,8 +4,8 @@ import { TeWebviewBase } from "./webviewBase";
 import { TeContainer } from "../lib/container";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
-import type { WebviewFocusChangedParams } from "./ipc";
 import { isObject, timeout } from "../lib/utils/utils";
+import type { WebviewFocusChangedParams } from "./ipc";
 import { Commands, ContextKeys } from "../lib/constants";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
