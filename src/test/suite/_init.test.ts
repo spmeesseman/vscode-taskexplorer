@@ -52,7 +52,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
+        await testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
         endRollingCount(this);
     });
 
@@ -63,7 +63,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
+        await testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
         expect(teApi.sidebar).to.not.be.undefined;
         expect(teApi.sidebarView).to.not.be.undefined;
         expect(teApi.explorer).to.be.undefined;
@@ -90,7 +90,7 @@ suite("Initialization", () =>
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
         setExplorer(teApi.explorer as ITaskTree);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
+        await testsApi.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
         expect(teApi.sidebar).to.not.be.undefined;
         expect(teApi.sidebarView).to.not.be.undefined;
         expect(teApi.explorer).to.be.not.undefined;
@@ -117,7 +117,7 @@ suite("Initialization", () =>
         testsApi.treeManager.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
+        await testsApi.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
         expect(teApi.sidebar).to.be.undefined;
         expect(teApi.sidebarView).to.be.undefined;
         expect(teApi.explorer).to.be.not.undefined;

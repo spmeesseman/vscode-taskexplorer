@@ -4,14 +4,13 @@ import type { WebviewIds } from "../webview/webviewPanel";
 import type { WebviewViewIds } from "../webview/webviewView";
 
 const contextStorage = new Map<string, unknown>();
+const _onDidChangeContext = new EventEmitter<AllContextKeys>();
+export const onDidChangeContext = _onDidChangeContext.event;
 
 type WebviewContextKeys =
 	| `${ContextKeys.WebviewPrefix}${WebviewIds}:active`
 	| `${ContextKeys.WebviewPrefix}${WebviewIds}:focus`
-	| `${ContextKeys.WebviewPrefix}${WebviewIds}:inputFocus`
-	| `${ContextKeys.WebviewPrefix}rebaseEditor:active`
-	| `${ContextKeys.WebviewPrefix}rebaseEditor:focus`
-	| `${ContextKeys.WebviewPrefix}rebaseEditor:inputFocus`;
+	| `${ContextKeys.WebviewPrefix}${WebviewIds}:inputFocus`;
 
 type WebviewViewContextKeys =
 	| `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}:focus`
@@ -24,14 +23,14 @@ type AllContextKeys =
 	| `${ContextKeys.ActionPrefix}${string}`
 	| `${ContextKeys.KeyPrefix}${string}`;
 
-const _onDidChangeContext = new EventEmitter<AllContextKeys>();
-export const onDidChangeContext = _onDidChangeContext.event;
-
 export function getContext<T>(key: AllContextKeys): T | undefined;
+
 // eslint-disable-next-line no-redeclare
 export function getContext<T>(key: AllContextKeys, defaultValue: T): T;
+
 // eslint-disable-next-line prefer-arrow/prefer-arrow-functions, no-redeclare
-export function getContext<T>(key: AllContextKeys, defaultValue?: T): T | undefined {
+export function getContext<T>(key: AllContextKeys, defaultValue?: T): T | undefined
+{
 	return (contextStorage.get(key) as T | undefined) ?? defaultValue;
 }
 

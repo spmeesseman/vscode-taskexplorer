@@ -43,6 +43,8 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
+import { setContext } from "./context";
+import { ContextKeys } from "./constants";
 
 
 export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
@@ -157,6 +159,8 @@ export class TeWrapper
 		this.registerTaskProviders();
 		this.registerContextMenuCommands();
 		registerStatusBarItem(this._context);
+        await setContext(ContextKeys.Enabled, this.configuration.get<boolean>("enableExplorerView") ||
+                                              this.configuration.get<boolean>("enableSideBar"));
 		this._ready = true;
 		queueMicrotask(() => this._onReady.fire());
 	};

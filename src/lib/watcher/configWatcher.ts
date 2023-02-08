@@ -10,6 +10,8 @@ import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "v
 import { pushIfNotExists } from "../utils/utils";
 import { IDictionary } from "../../interface";
 import { TeWrapper } from "../wrapper";
+import { setContext } from "../context";
+import { ContextKeys } from "../constants";
 
 let watcherEnabled = true;
 let processingConfigEvent = false;
@@ -252,6 +254,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         log.write("   the 'enableExplorerView' setting has changed", 1);
         log.value("      new value", newValue, 1);
         TeWrapper.instance.treeManager.enableTaskTree("taskExplorer", newValue, "   ");
+        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                              configuration.get<boolean>("enableSideBar"));
     }
     if (e.affectsConfiguration("taskExplorer.enableSideBar"))
     {
@@ -259,6 +263,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         log.write("   the 'enableSideBar' setting has changed", 1);
         log.value("      new value", newValue, 1);
         TeWrapper.instance.treeManager.enableTaskTree("taskExplorerSideBar", newValue, "   ");
+        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                              configuration.get<boolean>("enableSideBar"));
     }
 
     //

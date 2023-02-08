@@ -1,7 +1,9 @@
 
+import { Disposable } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
+import { registerCommand } from "../../lib/command";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { createTaskCountTable } from "../shared/taskCountTable";
 
@@ -51,6 +53,14 @@ export class TaskCountView extends TeWebviewView<State>
 
 	protected override onWindowFocusChanged(focused: boolean)
 	{
+	}
+
+
+	protected override registerCommands(): Disposable[]
+	{
+		return [
+			registerCommand(`${this.id}.refresh`, () => this.refresh(), this)
+		];
 	}
 
 }

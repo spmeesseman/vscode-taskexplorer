@@ -7,7 +7,7 @@ import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
-import { Globs } from "../lib/constants";
+import { ContextKeys, Globs } from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
 import { TeWrapper } from "../lib/wrapper";
 import { TaskTreeBuilder } from "./treeBuilder";
@@ -25,11 +25,12 @@ import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtil
 import {
     window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
+import { setContext } from "../lib/context";
 
 
 export class TaskTreeManager implements ITaskTreeManager, Disposable
 {
-    private container: TeWrapper;
+    private wrapper: TeWrapper;
     private static tasks: Task[] = [];
     private static refreshPending = false;
     private static specialFolders: {
@@ -51,11 +52,11 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    constructor(container: TeWrapper)
+    constructor(wrapper: TeWrapper)
     {
         log.methodStart("construct task tree manager", 1, "   ");
         this.tasks = TaskTreeManager.tasks;
-        this.container = container;
+        this.wrapper = wrapper;
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         TaskTreeManager.specialFolders = {
@@ -337,7 +338,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         //
         // If this is the first time the tree is being built, do a few extra things
         //
-        const licMgr = this.container.licenseManager;
+        const licMgr = this.wrapper.licenseManager;
         const maxTasks = licMgr.getMaxNumberOfTasks();
         if (!this.firstTreeBuildDone)
         {   //
@@ -490,7 +491,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 log.write("   invalidate '" + opt1 + "' task provider file ", 1, logPad);
                 log.value("      file", opt2.fsPath, 1, logPad);
                 // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
-                await this.container.providers[opt1]?.invalidate(opt2, logPad + "   ");
+                await this.wrapper.providers[opt1]?.invalidate(opt2, logPad + "   ");
             }
             else //
             {   // If opt1 is undefined, refresh all providers
@@ -498,7 +499,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 if (!opt1)
                 {
                     log.write("   invalidate all providers", 1, logPad);
-                    for (const [ key, p ] of Object.entries(this.container.providers))
+                    for (const [ key, p ] of Object.entries(this.wrapper.providers))
                     {
                         log.write("   invalidate '" + key + "' task provider", 1, logPad);
                         await p.invalidate(undefined, logPad + "   ");
@@ -506,7 +507,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 }
                 else { // NPM/Workspace/TSC tasks don't implement TaskExplorerProvider
                     log.write("   invalidate '" + opt1 + "' task provider", 1, logPad);
-                    this.container.providers[opt1]?.invalidate(undefined, logPad + "   ");
+                    this.wrapper.providers[opt1]?.invalidate(undefined, logPad + "   ");
                 }
             }
         }

@@ -11,6 +11,8 @@ import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { workspace, RelativePattern, WorkspaceFolder, Uri, ExtensionContext, commands } from "vscode";
 import { TeWrapper } from "./wrapper";
+import { setContext } from "./context";
+import { ContextKeys } from "./constants";
 
 
 let cacheBuilding = false;
@@ -386,7 +388,7 @@ const finishBuild = async(skipPersist?: boolean) =>
         }
     }
     taskFiles.sort();
-    await commands.executeCommand("setContext", "vscodeTaskExplorer.taskFiles", taskFiles);
+    await setContext(ContextKeys.TaskFiles, taskFiles);
     // await commands.executeCommand("setContext", "vscodeTaskExplorer.taskTypes", taskTypes);
     statusBarItem.hide();
     cacheBuilding = false;

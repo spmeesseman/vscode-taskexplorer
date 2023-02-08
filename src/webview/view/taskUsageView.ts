@@ -1,8 +1,11 @@
 
+import { Disposable } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
-import { ContextKeys } from "../../lib/constants";
-import { TasksChangeEvent } from "../../interface";
+import { registerCommand } from "../../lib/command";
+import { StorageChangeEvent } from "../../interface";
+import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
+import { clearTaskStats, getAvgRunCount, getMostUsedTask, getTaskStats } from "../../tree/task";
 
 
 interface State {
@@ -27,26 +30,31 @@ export class TaskUsageView extends TeWebviewView<State>
 			`${TaskUsageView.viewId}View`
 		);
 		this.disposables.push(
-			wrapper.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
+			wrapper.storage.onDidChange(e => { this.onStorageChanged(e); }, this)
 		);
 	}
 
 
-	private async onTasksChanged(e: TasksChangeEvent)
+	private async onStorageChanged(e: StorageChangeEvent)
 	{
-		if (this.isFirstLoadComplete) {
+		if (e.key ===  "taskStats") {
+			this.wrapper.log.methodStart("TaskUsageView Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
 			await this.refresh();
+			this.wrapper.log.methodDone("TaskUsageView Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
 		}
 	}
 
 
 	protected override finalizeHtml = async (html: string) =>
 	{
-		const taskCountToday = this.wrapper.storage.get<number>("taskCountToday", 0);
-		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, "0")
-				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, "n/a")
-				   .replace(/\#\{taskUsage\.today\}/g, taskCountToday.toString())
-				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, new Date().toLocaleTimeString());
+    	const taskStats = getTaskStats();
+		// const taskCountToday = this.wrapper.storage.get<number>("taskStats.today.count", 0),
+		//	  taskLastRan = this.wrapper.storage.get<number>("taskStats.today.lastTime", 0);
+		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, getAvgRunCount("d", "").toString())
+				   .replace(/\#\{taskUsage\.avgPerWeek\}/g, getAvgRunCount("w", "").toString())
+				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, getMostUsedTask(""))
+				   .replace(/\#\{taskUsage\.today\}/g, taskStats.todayCount.toString())
+				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, new Date(taskStats.lastTime).toLocaleTimeString());
 		return html;
 	};
 
@@ -58,6 +66,15 @@ export class TaskUsageView extends TeWebviewView<State>
 
 	protected override onWindowFocusChanged(focused: boolean)
 	{
+	}
+
+
+	protected override registerCommands(): Disposable[]
+	{
+		return [
+			registerCommand(`${this.id}.refresh`, () => this.refresh(), this),
+			registerCommand(Commands.ClearTaskStats, () => clearTaskStats, this),
+		];
 	}
 
 }

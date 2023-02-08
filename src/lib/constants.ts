@@ -39,6 +39,7 @@ export const Globs: IDictionary<string> =
 export const enum Commands
 {
 	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
+	ClearTaskStats = "vscode-taskexplorer.clearTaskStats",
 	Donate = "vscode-taskexplorer.donate",
     Run = "vscode-taskexplorer.run",
     RunLastTask = "vscode-taskexplorer.runLastTask",
@@ -55,16 +56,6 @@ export const enum Commands
 	ShowHomeView = "vscode-taskexplorer.showHomeView"
 }
 
-export const enum TeCommands
-{
-	GetApi = "getApi",
-	RemovefromExcludes = "removeFromExcludes",
-	ShowLicensePage = "showLicensePage",
-	ShowParsingReportPage = "showParsingReportPage",
-	ShowReleaseNotesPage = "showReleaseNotesPage",
-	ShowWelcomePage = "showWelcomePage",
-}
-
 export const enum ContextKeys
 {
 	ActionPrefix = "taskExplorer:action:",
@@ -78,6 +69,7 @@ export const enum ContextKeys
 	licensePage = "taskExplorer:licensePage",
 	ParsingReport = "taskExplorer:parsingReport",
 	ReleaseNotes = "taskExplorer:releaseNotes",
+	TaskFiles = "taskExplorer:taskFiles",
 	Tests = "taskExplorer:tests"
 }
 

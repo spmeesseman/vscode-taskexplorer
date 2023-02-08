@@ -283,6 +283,15 @@
         },
         "commands": [
             {
+                "command": "vscode-taskexplorer.clearTaskStats",
+                "title": "%command.clearTaskStats%",
+                "when": "taskExplorer:enabled",
+                "icon": {
+                    "light": "res/img/light/clear.svg",
+                    "dark": "res/img/dark/clear.svg"
+                }
+            },
+            {
                 "command": "vscode-taskexplorer.getApi",
                 "title": "%command.getApi%",
                 "enablement": "false"
@@ -290,17 +299,17 @@
             {
                 "command": "vscode-taskexplorer.showOutput",
                 "title": "Task Explorer: Show Log in Output Window",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.showParsingReportPage",
                 "title": "%command.showParsingReportPage%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.donate",
                 "title": "%command.donate%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/donate.svg",
                     "dark": "res/img/dark/donate.svg"
@@ -325,27 +334,27 @@
             {
                 "command": "vscode-taskexplorer.enableTaskType",
                 "title": "%command.enableTaskType%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.disableTaskType",
                 "title": "%command.disableTaskType%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.addToExcludesEx",
                 "title": "%command.addToExcludesEx%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.removeFromExcludes",
                 "title": "%command.removeFromExcludes%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.refresh",
                 "title": "%command.refresh%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/refresh.svg",
                     "dark": "res/img/dark/refresh.svg"
@@ -354,7 +363,7 @@
             {
                 "command": "vscode-taskexplorer.clearFavorites",
                 "title": "%command.clearFavorites%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/clear.svg",
                     "dark": "res/img/dark/clear.svg"
@@ -363,7 +372,7 @@
             {
                 "command": "vscode-taskexplorer.clearLastTasks",
                 "title": "%command.clearLastTasks%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/clear.svg",
                     "dark": "res/img/dark/clear.svg"
@@ -372,17 +381,17 @@
             {
                 "command": "vscode-taskexplorer.addRemoveCustomLabel",
                 "title": "%command.addRemoveCustomLabel%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.addToExcludes",
                 "title": "Add to Excludes List",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.run",
                 "title": "%command.run%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
@@ -391,7 +400,7 @@
             {
                 "command": "vscode-taskexplorer.runNoTerm",
                 "title": "%command.runNoTerm%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
@@ -400,7 +409,7 @@
             {
                 "command": "vscode-taskexplorer.runWithArgs",
                 "title": "%command.runWithArgs%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
@@ -409,7 +418,7 @@
             {
                 "command": "vscode-taskexplorer.runLastTask",
                 "title": "Task Explorer: Run Last Task",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
@@ -418,7 +427,7 @@
             {
                 "command": "vscode-taskexplorer.addRemoveFavorite",
                 "title": "%command.addRemoveFavorite%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/favorite.svg",
                     "light": "res/img/light/favorite.svg"
@@ -427,7 +436,7 @@
             {
                 "command": "vscode-taskexplorer.pause",
                 "title": "%command.pause%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/pause.svg",
                     "light": "res/img/light/pause.svg"
@@ -436,7 +445,7 @@
             {
                 "command": "vscode-taskexplorer.restart",
                 "title": "%command.restart%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/restart.svg",
                     "light": "res/img/light/restart.svg"
@@ -445,7 +454,7 @@
             {
                 "command": "vscode-taskexplorer.stop",
                 "title": "%command.stop%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/stop.svg",
                     "light": "res/img/light/stop.svg"
@@ -454,7 +463,7 @@
             {
                 "command": "vscode-taskexplorer.open",
                 "title": "%command.open%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/file.svg",
                     "light": "res/img/light/file.svg"
@@ -463,7 +472,7 @@
             {
                 "command": "vscode-taskexplorer.openTerminal",
                 "title": "%command.openTerminal%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar",
+                "when": "taskExplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/terminal.svg",
                     "light": "res/img/light/terminal.svg"
@@ -472,27 +481,27 @@
             {
                 "command": "vscode-taskexplorer.runInstall",
                 "title": "%command.runInstall%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.runUpdate",
                 "title": "%command.runUpdate%",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.runUpdatePackage",
                 "title": "%command.runUpdatePackage%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.runAudit",
                 "title": "%command.runAudit%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             },
             {
                 "command": "vscode-taskexplorer.runAuditFix",
                 "title": "%command.runAuditFix%",
-                "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                "when": "taskExplorer:enabled"
             }
         ],
         "keybindings": [
@@ -548,19 +557,23 @@
             "commandPalette": [
                 {
                     "command": "vscode-taskexplorer.refresh",
-                    "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                    "when": "taskExplorer:enabled"
                 },
                 {
                     "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                    "when": "taskExplorer:enabled"
                 },
                 {
                     "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                    "when": "taskExplorer:enabled"
                 },
                 {
                     "command": "vscode-taskexplorer.donate",
-                    "when": "config.taskExplorer.enableExplorerView || config.taskExplorer.enableSideBar"
+                    "when": "taskExplorer:enabled"
+                },
+                {
+                    "command": "vscode-taskexplorer.clearTaskStats",
+                    "when": "taskExplorer:enabled"
                 },
                 {
                     "command": "vscode-taskexplorer.disableTaskType",
@@ -657,6 +670,11 @@
                 {
                     "command": "vscode-taskexplorer.donate",
                     "when": "view == taskExplorer.views.home",
+                    "group": "navigation"
+                },
+                {
+                    "command": "vscode-taskexplorer.clearTaskStats",
+                    "when": "view == taskExplorer.views.taskUsage",
                     "group": "navigation"
                 }
             ],

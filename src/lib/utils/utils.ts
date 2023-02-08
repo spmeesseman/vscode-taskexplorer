@@ -1,14 +1,14 @@
 
-import * as minimatch from "minimatch";
 import log from "../log/log";
-import { Commands, Globs } from "../constants";
+import * as minimatch from "minimatch";
 import { TaskFile } from "../../tree/file";
 import { TaskItem } from "../../tree/item";
-import { configuration } from "./configuration";
-import { basename, extname, sep } from "path";
-import { ILicenseManager } from "../../interface/ILicenseManager";
-import { WorkspaceFolder, Uri, workspace, window, commands } from "vscode";
 import { executeCommand } from "../command";
+import { basename, extname, sep } from "path";
+import { Commands, Globs } from "../constants";
+import { configuration } from "./configuration";
+import { WorkspaceFolder, Uri, workspace, window } from "vscode";
+import { ILicenseManager } from "../../interface/ILicenseManager";
 
 
 export const getCombinedGlobPattern = (defaultPattern: string, globs: string[]) =>

@@ -440,19 +440,6 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
 
         this.pushToTop(taskItem);
 
-        //
-        // Track per-day tasks ran
-        //
-        let taskCountToday = storage.get<number>("taskCountToday", 0);
-        const taskCountTodayLastTime = storage.get<number>("taskCountTodayLastTime", Date.now());
-        const lastDate = new Date(taskCountTodayLastTime);
-        if (lastDate.getDate() !== new Date().getDate()) {
-            taskCountToday = 0;
-        }
-        ++taskCountToday;
-        await storage.update("taskCountToday", taskCountToday);
-        await storage.update("taskCountTodayLastTime", Date.now());
-
         log.methodDone("save task", 1, logPad, [[ "new # of saved tasks", this.store.length ]]);
     }
 
