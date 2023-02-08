@@ -11,7 +11,7 @@ button {
     color: var(--vscode-button-foreground);
     padding: 4px 2px;
     cursor: pointer;
-    width: 108px;
+    width: 80px;
 	font-size: 10px;
     border-radius: 3px;
 }
@@ -56,11 +56,12 @@ button:hover {
 }
 
 .homeview-content-title-version {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: normal;
     text-align:end;
     margin-top: 3px;
-    margin-left: 24px;
+    margin-left: 20px;
+    opacity: 0.95;
     vertical-align: bottom;
 }
 

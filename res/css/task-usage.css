@@ -7,13 +7,13 @@
 }
 
 .task-usage-table-label {
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: bold;
 	opacity: 0.95;
 }
 
 .task-usage-table-value {
-	font-size: 12px;
+	font-size: 11px;
 	opacity: 0.725;
 }
 
