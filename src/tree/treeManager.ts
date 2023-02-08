@@ -1,15 +1,14 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as task from "./task";
-import * as utils from "../lib/utils/utils";
 import log from "../lib/log/log";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
-import { ContextKeys, Globs } from "../lib/constants";
-import { isDirectory } from "../lib/utils/fs";
+import { Globs } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
+import * as utils from "../lib/utils/utils";
+import { isDirectory } from "../lib/utils/fs";
 import { TaskTreeBuilder } from "./treeBuilder";
 import { rebuildCache } from "../lib/fileCache";
 import { getTerminal } from "../lib/getTerminal";
@@ -25,20 +24,22 @@ import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtil
 import {
     window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
-import { setContext } from "../lib/context";
+import { TaskManager } from "./task";
 
 
 export class TaskTreeManager implements ITaskTreeManager, Disposable
 {
+
     private wrapper: TeWrapper;
     private static tasks: Task[] = [];
-    private static refreshPending = false;
-    private static specialFolders: {
+    private refreshPending = false;
+    private specialFolders: {
         favorites: SpecialTaskFolder;
         lastTasks: SpecialTaskFolder;
     };
 
     private tasks: Task[];
+    private _taskManager: TaskManager;
     private taskWatcher: TaskWatcher;
     private treeBuilder: TaskTreeBuilder;
     private firstTreeBuildDone = false;
@@ -59,36 +60,39 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         this.wrapper = wrapper;
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
-        TaskTreeManager.specialFolders = {
+        this.specialFolders = {
             favorites: new SpecialTaskFolder(this, Globs.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
             lastTasks: new SpecialTaskFolder(this, Globs.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
-        this.disposables.push(TaskTreeManager.specialFolders.favorites);
-        this.disposables.push(TaskTreeManager.specialFolders.lastTasks);
 
-        this.taskWatcher = new TaskWatcher(this, TaskTreeManager.specialFolders);
-        this.disposables.push(this.taskWatcher);
+        this.taskWatcher = new TaskWatcher(this, this.specialFolders);
+        this.treeBuilder = new TaskTreeBuilder(this, this.specialFolders);
+        this._taskManager = new TaskManager(wrapper, this.specialFolders);
 
-        this.treeBuilder = new TaskTreeBuilder(this, TaskTreeManager.specialFolders);
-        this.disposables.push(this.treeBuilder);
-
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.refresh", () => this.refresh(true, false, ""), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.run",  async (item: TaskItem) => task.run(item), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runNoTerm",  async (item: TaskItem) => task.run(item, true, false), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runWithArgs",  async (item: TaskItem, args?: string) => task.run(item, false, true, args), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runLastTask",  async () => task.runLastTask(this.treeBuilder.getTaskMap()), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.stop", async (item: TaskItem) => task.stop(item), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.restart",  async (item: TaskItem) => task.restart(item), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.pause",  (item: TaskItem) => task.pause(item), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.open", async (item: TaskItem, itemClick?: boolean) => task.open(item, itemClick), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.openTerminal", (item: TaskItem) => this.openTerminal(item), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runInstall", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "install"), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runUpdate", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "update"), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runUpdatePackage", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "update <packagename>"), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runAudit", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "audit"), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.runAuditFix", async (taskFile: TaskFile) => task.runNpmCommand(taskFile, "audit fix"), this));
-        this.disposables.push(commands.registerCommand("vscode-taskexplorer.addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this));
+        this.disposables.push(
+            this.specialFolders.favorites,
+            this.specialFolders.lastTasks,
+            this.taskWatcher,
+            this.treeBuilder,
+            this._taskManager,
+            commands.registerCommand("vscode-taskexplorer.refresh", () => this.refresh(true, false, ""), this),
+            commands.registerCommand("vscode-taskexplorer.addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
+            commands.registerCommand("vscode-taskexplorer.run",  async (item: TaskItem) => this.taskManager.run(item), this),
+            commands.registerCommand("vscode-taskexplorer.runNoTerm",  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
+            commands.registerCommand("vscode-taskexplorer.runWithArgs",  async (item: TaskItem, args?: string) => this.taskManager.run(item, false, true, args), this),
+            commands.registerCommand("vscode-taskexplorer.runLastTask",  async () => this.taskManager.runLastTask(this.treeBuilder.getTaskMap()), this),
+            commands.registerCommand("vscode-taskexplorer.stop", async (item: TaskItem) => this.taskManager.stop(item), this),
+            commands.registerCommand("vscode-taskexplorer.restart",  async (item: TaskItem) => this.taskManager.restart(item), this),
+            commands.registerCommand("vscode-taskexplorer.pause",  (item: TaskItem) => this.taskManager.pause(item), this),
+            commands.registerCommand("vscode-taskexplorer.open", async (item: TaskItem, itemClick?: boolean) => this.taskManager.open(item, itemClick), this),
+            commands.registerCommand("vscode-taskexplorer.openTerminal", (item: TaskItem) => this.openTerminal(item), this),
+            commands.registerCommand("vscode-taskexplorer.runInstall", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "install"), this),
+            commands.registerCommand("vscode-taskexplorer.runUpdate", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update"), this),
+            commands.registerCommand("vscode-taskexplorer.runUpdatePackage", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update <packagename>"), this),
+            commands.registerCommand("vscode-taskexplorer.runAudit", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit"), this),
+            commands.registerCommand("vscode-taskexplorer.runAuditFix", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit fix"), this),
+            commands.registerCommand("vscode-taskexplorer.addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this)
+        );
 
         this.createTaskTree("taskExplorer", "      ");
         this.createTaskTree("taskExplorerSideBar", "      ");
@@ -113,13 +117,19 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     }
 
 
+    get taskManager()
+    {
+        return this._taskManager;
+    }
+
+
     private addRemoveSpecialTaskLabel = async(taskItem: TaskItem) =>
     {
         /* istanbul ignore else */
         if (taskItem.folder)
         {
             const folderName = utils.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
-            return TaskTreeManager.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
+            return this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
         }
     };
 
@@ -385,7 +395,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    static getlastTasksFolder = () => this.specialFolders.lastTasks;
+    getlastTasksFolder = () => this.specialFolders.lastTasks;
 
 
     getTaskMap = () => this.treeBuilder.getTaskMap();
@@ -425,11 +435,11 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     loadTasks = async(logPad: string) =>
     {
         log.methodStart("construct task tree manager", 1, logPad);
-        TaskTreeManager.refreshPending = true;
+        this.refreshPending = true;
         this.treeBuilder.invalidate();
         await this.fetchTasks(logPad + "   ");
         this.fireTreeRefreshEvent(logPad + "   ", 1);
-        TaskTreeManager.refreshPending = false;
+        this.refreshPending = false;
         log.methodDone("construct task tree manager", 1, logPad);
     };
 
@@ -520,7 +530,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    static isBusy = () => this.refreshPending || TaskTreeBuilder.isBusy();
+    isBusy = () => this.refreshPending || TaskTreeBuilder.isBusy();
 
 
 	get onTasksChanged(): Event<TasksChangeEvent>
@@ -573,7 +583,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             [ "new # of tasks", tasks.length ], [ "new # of tree folders", taskTree.length ]
         ]);
         this.fireTreeRefreshEvent(logPad + "   ", 1);
-        TaskTreeManager.refreshPending = false;
+        this.refreshPending = false;
         log.write("   workspace folder event has been processed", 1, logPad);
         log.methodDone("workspace folder removed event", 1, logPad);
     };
@@ -645,7 +655,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         ]);
 
         await this.waitForRefreshComplete();
-        TaskTreeManager.refreshPending = true;
+        this.refreshPending = true;
 
         if (utils.isUri(opt) && isDirectory(opt.fsPath) && !workspace.getWorkspaceFolder(opt))
         {   //
@@ -692,10 +702,10 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     waitForRefreshComplete = async(maxWait = 15000, logPad = "   ") =>
     {
         let waited = 0;
-        if (TaskTreeManager.refreshPending) {
+        if (this.refreshPending) {
             log.write("waiting for previous refresh to complete...", 1, logPad);
         }
-        while (TaskTreeManager.refreshPending && waited < maxWait) {
+        while (this.refreshPending && waited < maxWait) {
             await utils.timeout(250);
             waited += 250;
         }

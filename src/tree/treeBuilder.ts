@@ -15,6 +15,7 @@ import { getTaskRelativePath } from "../lib/utils/pathUtils";
 import { Disposable, Task, TreeItemCollapsibleState } from "vscode";
 import { IDictionary, ITaskTreeManager, TaskMap } from "../interface";
 
+
 export class TaskTreeBuilder implements Disposable
 {
     private static treeBuilding = false;

@@ -1,45 +1,68 @@
 
-import log from "../lib/log/log";
 import { dirname } from "path";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
-import { pathExists } from "../lib/utils/fs";
 import { TeWrapper } from "../lib/wrapper";
-import { TaskTreeManager } from "./treeManager";
+import { Commands } from "../lib/constants";
+import { pathExists } from "../lib/utils/fs";
 import { getTerminal } from "../lib/getTerminal";
-import { ITaskStats, TaskMap } from "../interface";
+import { registerCommand } from "../lib/command";
+import { SpecialTaskFolder } from "./specialFolder";
+import { ILog, ITaskStats, TaskMap } from "../interface";
 import { ScriptTaskProvider } from "../providers/script";
 import { isScriptType } from "../lib/utils/taskTypeUtils";
-import { configuration } from "../lib/utils/configuration";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getDateDifference, getPackageManager, timeout } from "../lib/utils/utils";
 import {
-    CustomExecution, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
+    CustomExecution, Disposable, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
     TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace, WorkspaceFolder
 } from "vscode";
-import { storage } from "../lib/utils/storage";
 
 // const views: IDictionary<any> = {};
 
 
-// export class TaskManager
-// {
-    export const open = async(selection: TaskItem, itemClick = false) =>
+export class TaskManager implements Disposable
+{
+
+    private log: ILog;
+    private disposables: Disposable[] = [];
+
+
+    constructor(private readonly wrapper: TeWrapper, private readonly specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
     {
-        const clickAction = configuration.get<string>("taskButtons.clickAction", "Open");
+        this.log = wrapper.log;
+        this.specialFolders = specialFolders;
+        this.disposables.push(
+			registerCommand(Commands.ClearTaskStats, () => this.clearTaskStats(), this)
+        );
+    }
+
+
+    dispose()
+    {
+        this.disposables.forEach((d) => {
+            d.dispose();
+        });
+        this.disposables = [];
+    }
+
+
+    open = async(selection: TaskItem, itemClick = false) =>
+    {
+        const clickAction = this.wrapper.configuration.get<string>("taskButtons.clickAction", "Open");
 
         //
         // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
         // to re-register the handler when the setting changes, we just re-route the request here
         //
         if (clickAction === "Execute" && itemClick === true) {
-            return run(selection);
+            return this.run(selection);
         }
 
         const uri = !isScriptType(selection.taskSource) ?
                     selection.taskFile.resourceUri : Uri.file(selection.task.definition.uri.fsPath);
 
-        log.methodStart("open document at position", 1, "", true, [
+        this.log.methodStart("open document at position", 1, "", true, [
             [ "command", selection.command.command ], [ "source", selection.taskSource ],
             [ "uri path", uri.path ], [ "fs path", uri.fsPath ]
         ]);
@@ -55,7 +78,7 @@ import { storage } from "../lib/utils/storage";
     };
 
 
-    // export const registerTreeTasks = (tree: TaskTreeDataProvider, disposables: Disposable[]) =>
+    // registerTreeTasks = (tree: TaskTreeDataProvider, disposables: Disposable[]) =>
     // {
     //     const name = tree.getName();
     //     views[tree.getName()] = { tree, lastTasks };
@@ -69,15 +92,15 @@ import { storage } from "../lib/utils/storage";
     // };
 
 
-    export const pause = (taskItem: TaskItem) =>
+    pause = (taskItem: TaskItem) =>
     {
-        if (taskItem.paused || TaskTreeManager.isBusy())
+        if (taskItem.paused || this.wrapper.treeManager.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
         }
 
-        log.methodStart("pause", 1, "", true);
+        this.log.methodStart("pause", 1, "", true);
 
         /* istanbul ignore else */
         if (taskItem.task.execution)
@@ -87,7 +110,7 @@ import { storage } from "../lib/utils/storage";
             if (terminal)
             {
                 taskItem.paused = true;
-                log.value("   send to terminal", "\\u0003", 1);
+                this.log.value("   send to terminal", "\\u0003", 1);
                 terminal.sendText("\u0003");
             }
             else {
@@ -98,38 +121,38 @@ import { storage } from "../lib/utils/storage";
             window.showInformationMessage("Executing task not found");
         }
 
-        log.methodDone("pause", 1);
+        this.log.methodDone("pause", 1);
     };
 
 
-    export const restart = async(taskItem: TaskItem) =>
+    restart = async(taskItem: TaskItem) =>
     {
         let exec: TaskExecution | undefined;
-        log.methodStart("restart task", 1, "", true);
-        if (TaskTreeManager.isBusy())
+        this.log.methodStart("restart task", 1, "", true);
+        if (this.wrapper.treeManager.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
         }
         else {
-            await stop(taskItem);
-            exec = await run(taskItem);
+            await this.stop(taskItem);
+            exec = await this.run(taskItem);
         }
-        log.methodDone("restart task", 1);
+        this.log.methodDone("restart task", 1);
         return exec;
     };
 
 
-    const resumeTask = (taskItem: TaskItem) =>
+    private resumeTask = (taskItem: TaskItem) =>
     {
         let exec: TaskExecution | undefined;
-        log.methodStart("resume task", 1, "", true);
+        this.log.methodStart("resume task", 1, "", true);
         const term = getTerminal(taskItem, "   ");
         if (term)
         {   //
             // TODO - see ticket.  I guess its not CTRL+C in some parts.
             // so make the control chars a setting.  Also in stop().
             //
-            log.value("   send to terminal", "N", 1);
+            this.log.value("   send to terminal", "N", 1);
             term.sendText("N", true);
             exec = taskItem.execution;
         }
@@ -137,7 +160,7 @@ import { storage } from "../lib/utils/storage";
             window.showInformationMessage("Terminal not found");
         }
         taskItem.paused = false;
-        log.methodDone("resume task", 1);
+        this.log.methodDone("resume task", 1);
         return exec;
     };
 
@@ -153,26 +176,26 @@ import { storage } from "../lib/utils/storage";
      * @param withArgs Whether or not to prompt for arguments
      * Note that only script type tasks use arguments (and Gradle, ref ticket #88)
      */
-    export const run = async(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string) =>
+    run = async(taskItem: TaskItem, noTerminal = false, withArgs = false, args?: string) =>
     {
         let exec: TaskExecution | undefined;
 
-        if (TaskTreeManager.isBusy())
+        if (this.wrapper.treeManager.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return exec;
         }
 
-        log.methodStart("run task", 1, "", true, [[ "task name", taskItem.label ]]);
+        this.log.methodStart("run task", 1, "", true, [[ "task name", taskItem.label ]]);
         taskItem.taskDetached = undefined;
 
         if (withArgs === true)
         {
-            exec = await runWithArgs(taskItem, args, noTerminal);
+            exec = await this.runWithArgs(taskItem, args, noTerminal);
         }
         else if (taskItem.paused)
         {
-            exec = resumeTask(taskItem);
+            exec = this.resumeTask(taskItem);
         }
         else //
         {   // Create a new instance of 'task' if this is to be ran with no terminal (see notes below)
@@ -209,15 +232,15 @@ import { storage } from "../lib/utils/storage";
                     }
                 }
             }
-            exec = await runTask(newTask, taskItem, noTerminal);
+            exec = await this.runTask(newTask, taskItem, noTerminal);
         }
 
-        log.methodDone("run task", 1);
+        this.log.methodDone("run task", 1);
         return exec;
     };
 
 
-    export const runNpmCommand = async(taskFile: TaskFile, command: string) =>
+    runNpmCommand = async(taskFile: TaskFile, command: string) =>
     {
         const pkgMgr = getPackageManager(),
             uri = taskFile.resourceUri;
@@ -258,46 +281,45 @@ import { storage } from "../lib/utils/storage";
     };
 
 
-    export const runLastTask = async(taskMap: TaskMap) =>
+    runLastTask = async(taskMap: TaskMap) =>
     {
-        if (TaskTreeManager.isBusy())
+        if (this.wrapper.treeManager.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
         }
 
-        const lastTasks = TaskTreeManager.getlastTasksFolder();
+        const lastTasks = this.wrapper.treeManager.getlastTasksFolder();
         const lastTaskId = lastTasks.getLastRanId();
         if (!lastTaskId) { return; }
 
-        log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
+        this.log.methodStart("run last task", 1, "", true, [[ "last task id", lastTaskId ]]);
 
         const taskItem = taskMap[lastTaskId];
         let exec: TaskExecution | undefined;
 
         if (taskItem && taskItem instanceof TaskItem)
         {
-            exec = await run(taskItem);
+            exec = await this.run(taskItem);
         }
         else {
             window.showInformationMessage("Task not found!  Check log for details");
             await lastTasks.removeTaskFile(lastTaskId, "   ", true);
         }
 
-        log.methodDone("run last task", 1);
+        this.log.methodDone("run last task", 1);
         return exec;
     };
 
 
-    export const runTask = async (task: Task, taskItem: TaskItem, noTerminal?: boolean, logPad = "   ") =>
+    runTask = async (task: Task, taskItem: TaskItem, noTerminal?: boolean, logPad = "   ") =>
     {
-        log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
+        this.log.methodStart("run task", 1, logPad, false, [[ "no terminal", noTerminal ]]);
         task.presentationOptions.reveal = noTerminal !== true ? TaskRevealKind.Always : TaskRevealKind.Silent;
         const exec = await tasks.executeTask(task);
-        const lastTasks = TaskTreeManager.getlastTasksFolder();
-        await lastTasks.saveTask(taskItem, logPad);
-        await saveTaskRunDetails(taskItem, logPad);
-        log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
+        await this.specialFolders.lastTasks.saveTask(taskItem, logPad);
+        await this.saveTaskRunDetails(taskItem, logPad);
+        this.log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
         return exec;
     };
 
@@ -309,10 +331,10 @@ import { storage } from "../lib/utils/storage";
      * @param noTerminal Whether or not to show the terminal
      * Note that the terminal will be shown if there is an error
      */
-    export const runWithArgs = async(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ") =>
+    runWithArgs = async(taskItem: TaskItem, args?: string, noTerminal?: boolean, logPad = "   ") =>
     {
         let exec: TaskExecution | undefined;
-        log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
+        this.log.methodStart("run task with arguments", 1, logPad, false, [[ "no terminal", noTerminal ]]);
         /* istanbul ignore else */
         if (taskItem.task && !(taskItem.task.execution instanceof CustomExecution))
         {
@@ -333,7 +355,7 @@ import { storage } from "../lib/utils/storage";
                         ) as Task;
                         newTask.definition.taskItemId = def.taskItemId;
                     // }
-                    exec = await runTask(newTask, taskItem, noTerminal, logPad + "   ");
+                    exec = await this.runTask(newTask, taskItem, noTerminal, logPad + "   ");
                 }
                 return exec;
             };
@@ -349,15 +371,15 @@ import { storage } from "../lib/utils/storage";
         else {
             window.showInformationMessage("Custom execution tasks cannot have the cmd line altered");
         }
-        log.methodDone("run task with arguments", 1, logPad);
+        this.log.methodDone("run task with arguments", 1, logPad);
         return exec;
     };
 
 
-    const saveTaskRunDetails = async(taskItem: TaskItem, logPad: string) =>
+    private saveTaskRunDetails = async(taskItem: TaskItem, logPad: string) =>
     {
-        log.methodStart("save task details", 3, logPad);
-        const taskStats = storage.get<ITaskStats>("taskStats", { ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
+        this.log.methodStart("save task details", 3, logPad);
+        const taskStats = this.wrapper.storage.get<ITaskStats>("taskStats", { ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
         //
         // Track per-day tasks ran
         //
@@ -386,21 +408,21 @@ import { storage } from "../lib/utils/storage";
         //
         // Persist task stats
         //
-        await storage.update("taskStats", taskStats);
-        log.methodDone("save task details", 3, logPad, [[ "task count today", taskStats.todayCount ]]);
+        await this.wrapper.storage.update("taskStats", taskStats);
+        this.log.methodDone("save task details", 3, logPad, [[ "task count today", taskStats.todayCount ]]);
     };
 
 
-    export const clearTaskStats = () => storage.update("taskStats", getDefaultStats());
+    clearTaskStats = () => this.wrapper.storage.update("taskStats", this.getDefaultStats());
 
 
-    export const getAvgRunCount = (period: "d" | "w", logPad: string) =>
+    getAvgRunCount = (period: "d" | "w", logPad: string) =>
     {
         const now = Date.now();
         let avg = 0,
             lowestTime = now;
-        log.methodStart("get average run count", 2, logPad, false, [[ "period", period ]]);
-        const taskStats = getTaskStats();
+        this.log.methodStart("get average run count", 2, logPad, false, [[ "period", period ]]);
+        const taskStats = this.getTaskStats();
         taskStats.ranOn.forEach((t) => {
             if (t < lowestTime)  {
                 lowestTime = t;
@@ -408,38 +430,38 @@ import { storage } from "../lib/utils/storage";
         });
         const daysSinceFirstRunTask = getDateDifference(lowestTime, now, "d")  || 1;
         avg = Math.floor(taskStats.ranOn.length / daysSinceFirstRunTask / (period === "d" ? 1 : 7));
-        log.methodDone("get average run count", 2, logPad, [[ "calculated average", avg ]]);
+        this.log.methodDone("get average run count", 2, logPad, [[ "calculated average", avg ]]);
         return avg;
     };
 
 
-    const getDefaultStats = () => ({ ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
+    private getDefaultStats = () => ({ ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
 
 
-    export const getTaskStats = () => storage.get<ITaskStats>("taskStats", getDefaultStats());
+    getTaskStats = () => this.wrapper.storage.get<ITaskStats>("taskStats", this.getDefaultStats());
 
 
-    export const getMostUsedTask = (logPad: string) =>
+    getMostUsedTask = (logPad: string) =>
     {
-        log.methodStart("get most used task", 2, logPad);
+        this.log.methodStart("get most used task", 2, logPad);
         let taskName = "";
-        const taskStats = getTaskStats();
+        const taskStats = this.getTaskStats();
         for (const k of Object.keys(taskStats.runCounts))
         {
             if (!taskName || taskStats.runCounts[k] > taskStats.runCounts[taskName]) {
                 taskName = k;
             }
         }
-        log.methodDone("get most used task", 2, logPad, [[ "most used task", taskName ]]);
+        this.log.methodDone("get most used task", 2, logPad, [[ "most used task", taskName ]]);
         return taskName;
     };
 
 
-    export const stop = async(taskItem: TaskItem) =>
+    stop = async(taskItem: TaskItem) =>
     {
-        log.methodStart("stop", 1, "", true);
+        this.log.methodStart("stop", 1, "", true);
 
-        if (TaskTreeManager.isBusy())
+        if (this.wrapper.treeManager.isBusy())
         {
             window.showInformationMessage("Busy, please wait...");
             return;
@@ -448,26 +470,26 @@ import { storage } from "../lib/utils/storage";
         const exec = taskItem.isExecuting();
         if (exec)
         {
-            if (configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
+            if (this.wrapper.configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
             {
                 const terminal = getTerminal(taskItem, "   ");
                 /* istanbul ignore else */
                 if (terminal)
                 {
-                    const ctrlChar = configuration.get<string>("taskButtons.controlCharacter", "Y");
-                    log.write("   keep terminal open", 1);
+                    const ctrlChar = this.wrapper.configuration.get<string>("taskButtons.controlCharacter", "Y");
+                    this.log.write("   keep terminal open", 1);
                     if (taskItem.paused)
                     {
                         taskItem.paused = false;
-                        log.value("   send to terminal", ctrlChar, 1);
+                        this.log.value("   send to terminal", ctrlChar, 1);
                         terminal.sendText(ctrlChar);
                     }
                     else
                     {
-                        log.value("   send sequence to terminal", "\\u0003", 1);
+                        this.log.value("   send sequence to terminal", "\\u0003", 1);
                         terminal.sendText("\u0003");
                         await timeout(50);
-                        log.value("   send to terminal", ctrlChar, 1);
+                        this.log.value("   send to terminal", ctrlChar, 1);
                         // terminal = getTerminal(taskItem, "   ");
                         try { /* istanbul ignore else */if (getTerminal(taskItem, "   ")) terminal.sendText(ctrlChar, true); } catch {}
                     }
@@ -477,7 +499,7 @@ import { storage } from "../lib/utils/storage";
                 }
             }
             else {
-                log.write("   kill task execution", 1);
+                this.log.write("   kill task execution", 1);
                 try { exec.terminate(); } catch {}
             }
         }
@@ -486,6 +508,7 @@ import { storage } from "../lib/utils/storage";
         }
 
         taskItem.paused = false;
-        log.methodDone("stop", 1);
+        this.log.methodDone("stop", 1);
     };
-// }
+
+}

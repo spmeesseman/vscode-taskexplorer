@@ -104,8 +104,8 @@ export async function activate(context: ExtensionContext)
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    const container = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
-	once(container.onReady)(() =>
+    const wrapper = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
+	once(wrapper.onReady)(() =>
     {
 		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
 		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
@@ -117,20 +117,20 @@ export async function activate(context: ExtensionContext)
     //
     // Wait for ready signal from application container
     //
-	await container.ready();
+	await wrapper.ready();
 
     //
     // Instantiate the extension API
     //
-	teApi = new TeApi(container);
+	teApi = new TeApi(wrapper);
 
     //
     // Set application mode context
     //
-	if (container.debugging) {
+	if (wrapper.debugging) {
 		void setContext(ContextKeys.Debugging, true);
 	}
-	else if (container.tests) {
+	else if (wrapper.tests) {
 		void setContext(ContextKeys.Tests, true);
 	}
 
@@ -174,7 +174,7 @@ export async function activate(context: ExtensionContext)
     // Use a delayed initialization so we can display an 'Initializing...' message
     // in the tree on startup.  Really no good way to do that w/o this.
     //
-    setTimeout(initialize, 25, container);
+    setTimeout(initialize, 25, wrapper);
 
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
@@ -221,7 +221,7 @@ export async function deactivate()
 }
 
 
-const initialize = async(container: TeWrapper) =>
+const initialize = async(wrapper: TeWrapper) =>
 {
     const now = Date.now(),
           lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
@@ -237,7 +237,7 @@ const initialize = async(container: TeWrapper) =>
     //
     // Check license
     //
-    await container.licenseManager.checkLicense("   ");
+    await wrapper.licenseManager.checkLicense("   ");
     //
     // Register file type watchers
     // This "used" to also start the file scan to build the file task file cache. It now
@@ -246,7 +246,7 @@ const initialize = async(container: TeWrapper) =>
     // are enabled or disabled in settings after startup, then the individual calls to
     // registerFileWatcher() will perform the scan for that task type.
     //
-    await registerFileWatchers(container.context, "   ");
+    await registerFileWatchers(wrapper.context, "   ");
     //
     // Build the file cache, this kicks off the whole process as refreshTree() will be called
     // down the line in the initialization process.
@@ -258,7 +258,7 @@ const initialize = async(container: TeWrapper) =>
     //
     const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
     /* istanbul ignore else */
-    if (container.tests || /* istanbul ignore next */!rootFolderChanged)
+    if (wrapper.tests || /* istanbul ignore next */!rootFolderChanged)
     {
         await fileCache.rebuildCache("   ");
     }     //
@@ -276,7 +276,7 @@ const initialize = async(container: TeWrapper) =>
     //
     // Start the first tree build/load
     //
-    await container.treeManager.loadTasks("   ");
+    await wrapper.treeManager.loadTasks("   ");
     //
     // Log the environment
     //
@@ -293,7 +293,7 @@ const initialize = async(container: TeWrapper) =>
 
 export function isExtensionBusy()
 {
-    return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+    return !ready || fileCache.isBusy() || TeWrapper.instance.treeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
            isProcessingFsEvent() || isProcessingConfigChange() || TeWrapper.instance.licenseManager.isBusy();
 }
 

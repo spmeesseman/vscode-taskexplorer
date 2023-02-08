@@ -1,11 +1,10 @@
 
 import { Disposable } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
+import { ContextKeys } from "../../lib/constants";
 import { registerCommand } from "../../lib/command";
 import { StorageChangeEvent } from "../../interface";
-import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
-import { clearTaskStats, getAvgRunCount, getMostUsedTask, getTaskStats } from "../../tree/task";
 
 
 interface State {
@@ -47,12 +46,12 @@ export class TaskUsageView extends TeWebviewView<State>
 
 	protected override finalizeHtml = async (html: string) =>
 	{
-    	const taskStats = getTaskStats();
+    	const taskStats = this.wrapper.taskManager.getTaskStats();
 		// const taskCountToday = this.wrapper.storage.get<number>("taskStats.today.count", 0),
 		//	  taskLastRan = this.wrapper.storage.get<number>("taskStats.today.lastTime", 0);
-		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, getAvgRunCount("d", "").toString())
-				   .replace(/\#\{taskUsage\.avgPerWeek\}/g, getAvgRunCount("w", "").toString())
-				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, getMostUsedTask(""))
+		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, this.wrapper.taskManager.getAvgRunCount("d", "").toString())
+				   .replace(/\#\{taskUsage\.avgPerWeek\}/g, this.wrapper.taskManager.getAvgRunCount("w", "").toString())
+				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, this.wrapper.taskManager.getMostUsedTask(""))
 				   .replace(/\#\{taskUsage\.today\}/g, taskStats.todayCount.toString())
 				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, new Date(taskStats.lastTime).toLocaleTimeString());
 		return html;
@@ -72,8 +71,7 @@ export class TaskUsageView extends TeWebviewView<State>
 	protected override registerCommands(): Disposable[]
 	{
 		return [
-			registerCommand(`${this.id}.refresh`, () => this.refresh(), this),
-			registerCommand(Commands.ClearTaskStats, () => clearTaskStats, this),
+			registerCommand(`${this.id}.refresh`, () => this.refresh(), this)
 		];
 	}
 

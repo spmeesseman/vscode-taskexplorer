@@ -1,7 +1,6 @@
 
 import { TeWrapper } from "../../lib/wrapper";
-import { getTaskStats } from "../../tree/task";
-import { Commands, ContextKeys } from "../../lib/constants";
+import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
 import { registerCommand } from "../../lib/command";
 import { StorageChangeEvent } from "../../interface/IStorage";
@@ -113,7 +112,7 @@ export class HomeView extends TeWebviewView<State>
 
 	protected override finalizeHtml = async (html: string) =>
 	{
-    	const taskStats = getTaskStats(),
+    	const taskStats = this.wrapper.taskManager.getTaskStats(),
 			  taskCount = this.wrapper.treeManager.getTasks().length;
 		html = html.replace("#{taskCounts.length}",  taskCount.toString())
 				   .replace("#{taskCounts.today}", taskStats.todayCount.toString());

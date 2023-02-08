@@ -266,6 +266,10 @@ export class TeWrapper
 		return this._treeManager;
 	}
 
+	get taskManager() {
+		return this._treeManager.taskManager;
+	}
+
 	get storage(): IStorage {
 		return this._storage;
 	}
