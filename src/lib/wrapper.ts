@@ -298,6 +298,22 @@ export class TeWrapper
 		return this._releaseNotesPage;
 	}
 
+	// await window.withProgress(
+	// {
+	// 	location: ProgressLocation.Window,
+	// 	cancellable: false,
+	// 	title: "ExtJs"
+	// },
+	// async (progress) => _run(progress));
+
+    // private updateProgress = async(action: string, pct: number) =>
+    // {
+    //     (this.progress as Progress<{ message: string }>).report({
+    //         message: `: Parsing ${action} ${pct}%`
+    //     });
+    //     await utils.sleep(1); // let progress update
+    // };
+
 	// private _keyboard: Keyboard;
 	// get keyboard() {
 	// 	return this._keyboard;
