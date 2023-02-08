@@ -22,7 +22,7 @@ export class LicensePage extends TeWebviewPanel<State>
 			container,
 			"license-manager.html",
 			LicensePage.viewTitle,
-			"res/gears-r-blue.png",
+			"res/img/logo-bl.png",
 			`taskExplorer.${LicensePage.viewId}`,
 			`${ContextKeys.WebviewPrefix}licensePage`,
 			"licensePage",

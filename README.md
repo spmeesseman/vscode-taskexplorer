@@ -139,7 +139,7 @@ App-Publisher is a multi-purpose versioning/release tool that can be used for, b
 - MantisBT releases via the [Releases Plugin](https://github.com/mantisbt-plugins/Releases).
 - View/output changelogs for a pending release.
 
-![ap0](res/app-publisher-taskview.png?raw=true)
+![ap0](res/readme/app-publisher-taskview.png?raw=true)
 
 ## Configuring Global Excludes, Apache Ant and Bash Globs
 

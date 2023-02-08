@@ -25,7 +25,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 			container,
 			"license-manager.html",
 			ParsingReportPage.viewTitle,
-			"res/gears-r-blue.png",
+			"res/img/logo-bl.png",
 			`taskExplorer.${ParsingReportPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}parsingReport`,
 			"parsingReportPage",

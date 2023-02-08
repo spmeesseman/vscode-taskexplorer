@@ -3,7 +3,7 @@
     "version": "2.13.2",
     "displayName": "Task Explorer",
     "description": "Tasks management for npm, vscode, yarn, ant, gradle, grunt, gulp, batch, bash,php composer, make, maven, python, perl, powershell, ruby, pipenv, nsis, jenkins.  Supports external task providers via API.",
-    "icon": "res/gears-r-colors.png",
+    "icon": "res/img/logo-clr.png",
     "publisher": "spmeesseman",
     "license": "See LICENSE",
     "homepage": "https://github.com/spmeesseman/vscode-taskexplorer/blob/master/README.md",
@@ -228,7 +228,7 @@
                     "id": "taskActivity",
                     "title": "%view.name%",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "res/gears-r.svg"
+                    "icon": "res/logo.svg"
                 }
             ]
         },
@@ -239,7 +239,7 @@
                     "name": "%view.name%",
                     "when": "config.taskExplorer.enableExplorerView",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "res/gears-r.svg",
+                    "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 }
             ],
@@ -249,7 +249,7 @@
                     "id": "taskExplorer.views.home",
                     "name": "Home",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "res/gears-r.svg",
+                    "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 },
                 {
@@ -258,7 +258,7 @@
                     "name": "Explorer",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "res/gears-r.svg",
+                    "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 },
                 {
@@ -267,7 +267,7 @@
                     "name": "Task Count",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
-                    "icon": "$(gitlens-gitlens)",
+                    "icon": "res/img/logo.svg",
                     "visibility": "collapsed"
                 }
             ]
