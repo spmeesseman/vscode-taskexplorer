@@ -16,7 +16,7 @@ interface State {
 export class TaskUsageView extends TeWebviewView<State>
 {
 	static viewTitle = "Task Usage";
-	static viewId: WebviewViewIds = "usage";
+	static viewId: WebviewViewIds = "taskUsage"; // Must match view id in package.jso
 
 
 	constructor(container: TeWrapper)

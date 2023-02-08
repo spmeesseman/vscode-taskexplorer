@@ -263,7 +263,7 @@
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.usage",
+                    "id": "taskExplorer.views.taskUsage",
                     "name": "Task Usage",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
@@ -272,7 +272,7 @@
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.count",
+                    "id": "taskExplorer.views.taskCount",
                     "name": "Task Count",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",

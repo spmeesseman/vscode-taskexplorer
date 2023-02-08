@@ -16,7 +16,7 @@ interface State {
 export class HomeView extends TeWebviewView<State>
 {
 	static viewTitle = "Home";
-	static viewId: WebviewViewIds = "home";
+	static viewId: WebviewViewIds = "home"; // Must match view id in package.json
 
 
 	constructor(container: TeWrapper)
