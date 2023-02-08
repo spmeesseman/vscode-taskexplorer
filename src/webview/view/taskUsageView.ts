@@ -24,10 +24,10 @@ export class TaskUsageView extends TeWebviewView<State>
 		super(
 			container,
 			TaskUsageView.viewTitle,
-			"task-count.html",
+			"task-usage.html",
 			`taskExplorer.views.${TaskUsageView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
-			"taskCountView"
+			`${TaskUsageView.viewId}View`
 		);
 		this.disposables.push(
 			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),

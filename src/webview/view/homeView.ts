@@ -27,7 +27,7 @@ export class HomeView extends TeWebviewView<State>
 			"home.html",
 			`taskExplorer.views.${HomeView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
-			"homeView"
+			`${HomeView.viewId}View`
 		);
 		this.disposables.push(
 			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),

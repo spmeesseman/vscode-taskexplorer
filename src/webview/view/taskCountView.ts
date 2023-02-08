@@ -27,7 +27,7 @@ export class TaskCountView extends TeWebviewView<State>
 			"task-count.html",
 			`taskExplorer.views.${TaskCountView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
-			"taskCountView"
+			`${TaskCountView.viewId}View`
 		);
 		this.disposables.push(
 			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
