@@ -4,7 +4,8 @@ button {
     color: var(--vscode-button-foreground);
     padding: 8px 12px;
     cursor: pointer;
-    width: 150px
+    width: 150px;
+    border-radius: 5px;
 }
 
 button:hover {

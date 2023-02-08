@@ -42,6 +42,16 @@
             }
         });
     };
+    
+    const showReleaseNotes = () =>
+    {
+        vscode.postMessage({
+            method: 'command/execute',
+            params: {
+                command: 'vscode-taskexplorer.showReleaseNotesPage'
+            }
+        });
+    };
 
     let elem = document.getElementById("btnEnterlicense");
     if (elem)
@@ -63,6 +73,11 @@
     {
         elem.onclick = showParsingReport;
     }
+    elem = document.getElementById("btnViewReleaseNotes");
+    if (elem)
+    {
+        elem.onclick = showReleaseNotes;
+    }
     
     //
     // Handle message inside the webview
@@ -83,6 +98,9 @@
                 break;
             case 'showParsingReport':
                 showParsingReport();
+                break;
+            case 'showReleaseNotes':
+                showReleaseNotes();
                 break;
         }
     });

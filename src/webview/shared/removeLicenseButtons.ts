@@ -12,6 +12,9 @@ export const removeLicenseButtons = (html: string) =>
         idx2 = html.indexOf("<!-- endGetLicenseButton -->") + 28;
         html = html.replace(html.slice(idx1, idx2), "");
     }
+    else {
+        html = removeViewLicenseButton(html);
+    }
     return html;
 };
 

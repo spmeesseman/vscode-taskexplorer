@@ -1,17 +1,30 @@
+:root {
+	--container-padding: 10px;
+}
 
 .task-count {
-    font-size: 14px;
-    padding-left: 10px;
+    line-height: 16px;
+    font-size: 16px;
+    padding-left: 3px;
     padding-right: 7px;
-    padding-bottom: 3px;
+    padding-bottom: 5px;
 }
 
 .task-image {
-    height: 14px;
+    height: 18px;
+    line-height: 18px;
 }
 
 .task-image-stacked {
-    height: 7px;
+    height: 10px;
+}
+
+.task-image1-stacked-container {
+    margin-bottom: -4px;
+}
+
+.task-image2-stacked-container {
+    margin-top: -6px;
 }
 
 .task-image-stacked-container {

@@ -6,6 +6,7 @@ import { registerCommand } from "../../lib/command";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
+import { removeLicenseButtons } from "../shared/removeLicenseButtons";
 
 interface State {
 	webroot?: string;
@@ -58,8 +59,9 @@ export class HomeView extends TeWebviewView<State>
 	{
 		const taskCount = this.container.treeManager.getTasks().length,
 			  taskCountToday = this.container.storage.get<number>("taskCountToday", 0);
-		return html.replace("#{taskCounts.length}",  taskCount.toString())
+		html = html.replace("#{taskCounts.length}",  taskCount.toString())
 				   .replace("#{taskCounts.today}", taskCountToday.toString());
+		return removeLicenseButtons(html);
 	};
 
 
