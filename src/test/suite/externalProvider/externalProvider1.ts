@@ -24,7 +24,7 @@ export class ExternalTaskProvider1 extends IExternalProvider implements IExterna
             type: this.providerName,
             script: target,
             target,
-            icon: getDevPath("res/sources/ant.svg"),
+            icon: getDevPath("res/img/sources/ant.svg"),
             path: getRelativePath(folder, uri),
             fileName: path.basename(uri.path),
             uri

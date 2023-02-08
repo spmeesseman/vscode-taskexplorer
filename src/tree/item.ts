@@ -209,15 +209,15 @@ export class TaskItem extends TreeItem implements ITaskItem
         {
             const disableAnimated = configuration.get<boolean>("visual.disableAnimatedIcons");
             this.iconPath = {
-                light: path.join(installPath, "res", "light", !disableAnimated ? "loading.svg" : "loadingna.svg"),
-                dark: path.join(installPath, "res", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg")
+                light: path.join(installPath, "res", "img", "light", !disableAnimated ? "loading.svg" : "loadingna.svg"),
+                dark: path.join(installPath, "res", "img", "dark", !disableAnimated ? "loading.svg" : "loadingna.svg")
             };
         }
         else
         {
             this.iconPath = {
-                light: path.join(installPath, "res", "light", "script.svg"),
-                dark: path.join(installPath, "res", "dark", "script.svg")
+                light: path.join(installPath, "res", "img", "light", "script.svg"),
+                dark: path.join(installPath, "res", "img", "dark", "script.svg")
             };
         }
     }

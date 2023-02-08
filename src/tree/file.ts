@@ -191,15 +191,15 @@ export class TaskFile extends TreeItem implements ITaskFile
         if (!taskDef.icon)
         {
             const installPath = getInstallPathSync(),
-                  icon = path.join(installPath, "res", "sources", src + ".svg");
+                  icon = path.join(installPath, "res", "img", "sources", src + ".svg");
             if (pathExistsSync(icon))
             {
                 this.iconPath = { light: icon, dark: icon };
             }
             else
             {
-                const iconDark = path.join(installPath, "res", "sources", "light", src + ".svg");
-                const iconLight = path.join(installPath, "res", "sources", "light", src + ".svg");
+                const iconDark = path.join(installPath, "res", "img", "sources", "light", src + ".svg");
+                const iconLight = path.join(installPath, "res", "img", "sources", "light", src + ".svg");
                 if (pathExistsSync(iconDark) && pathExistsSync(iconDark))
                 {
                     this.iconPath = { light: iconLight, dark: iconDark };

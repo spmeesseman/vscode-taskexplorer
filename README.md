@@ -17,7 +17,7 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 [![GitHub last commit](https://img.shields.io/github/last-commit/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer)
 
-![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src0y](res/sources/yarn.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true) ![src13](res/sources/maven.png?raw=true)
+![src0](res/img/sources/npm.png?raw=true) ![src1](res/img/sources/ant.png?raw=true) ![src0y](res/img/sources/yarn.png?raw=true) ![src2](res/img/sources/grunt.png?raw=true) ![src3](res/img/sources/gulp.png?raw=true) ![src13](res/img/sources/gradle.png?raw=true) ![src4](res/img/sources/workspace.png?raw=true) ![src5](res/img/sources/make.png?raw=true) ![src6](res/img/sources/ts.png?raw=true) ![src7](res/img/sources/bat.png?raw=true) ![src8](res/img/sources/ruby.png?raw=true) ![src9](res/img/sources/powershell.png?raw=true) ![src10](res/img/sources/bash.png?raw=true) ![src11](res/img/sources/python.png?raw=true) ![src12](res/img/sources/nsis.png?raw=true) ![src13](res/img/sources/maven.png?raw=true)
 
 _**IMPORTANT NOTE**_: This extension has surpassed where I was ever going to take it, and the time that ended up going into it were more than I ever intended.  Considering a pay scheme (cheap, e.g. $10 - $20), with free usage up to the # of to-be-determined number of parsed tasks.  Note the license, this codebase is NOT permitted to be copied or distributed without my permission.
 
@@ -413,7 +413,7 @@ Putting it all together:
     }
 
 - As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
-- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/sources` or `res/dark` / `res/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
+- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/img/sources` or `res/img/dark` / `res/img/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
 
 ## Feedback & Contributing
 
