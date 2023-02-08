@@ -263,7 +263,16 @@
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.taskCount",
+                    "id": "taskExplorer.views.usage",
+                    "name": "Task Usage",
+                    "when": "config.taskExplorer.enableSideBar",
+                    "contextualTitle": "TaskExplorer",
+                    "icon": "res/img/logo.svg",
+                    "visibility": "collapsed"
+                },
+                {
+                    "type": "webview",
+                    "id": "taskExplorer.views.count",
                     "name": "Task Count",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",

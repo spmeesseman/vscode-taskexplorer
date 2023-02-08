@@ -36,6 +36,7 @@ Features:
         Like a micro homepage view or something to display license status
 
     ☐ Telemetry
+        Think I need a provider account?
 
     ☐ New task provider - eslint
         if eslit is present in node_modules set up basic tasks everyone would use
@@ -46,10 +47,13 @@ Features:
     ☐ Add 'Task Counts (Today)' view in Sidebar Container
         Replicate 'Task Counts', but track daily
 
+    ☐ Icons in  Task Counts view action
+        Make clickable, open up a page webview with nice large layout, can run the tasks in the group clicked from
+
 General Todos:
 
     ☐ Auth / Sign In / Integration with License Manager
-s
+
     ✔ Test visibility change event @done(23-01-13 22:22)
         Differences in tray open/closed, switching views, vscode minimized, etc
 
@@ -71,6 +75,8 @@ s
     
     ☐ Improve License Page
         Webview page currently has very basic layout and info
+    
+    ☐ License state change events
 
 Tests:
 

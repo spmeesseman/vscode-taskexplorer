@@ -22,13 +22,14 @@ import { GradleTaskProvider } from "../providers/gradle";
 import { PipenvTaskProvider } from "../providers/pipenv";
 import { PythonTaskProvider } from "../providers/python";
 import { LicensePage } from "../webview/page/licensePage";
+import { TaskCountView } from "../webview/view/countView";
+import { TaskUsageView } from "../webview/view/usageView";
 import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
-import { TaskCountView } from "../webview/view/taskCountView";
 import { ILicenseManager } from "../interface/ILicenseManager";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
 import { registerConfigWatcher } from "./watcher/configWatcher";
@@ -64,6 +65,7 @@ export class TeWrapper
 	private readonly _usage: UsageWatcher;
 	private _homeView: HomeView;
 	private _taskCountView: TaskCountView;
+	private _taskUsageView: TaskUsageView;
 	private _licensePage: LicensePage;
 	private _releaseNotesPage: ReleaseNotesPage;
 	private _parsingReportPage: ParsingReportPage;
@@ -101,6 +103,7 @@ export class TeWrapper
 
 		this._homeView = new HomeView(this);
 		this._taskCountView = new TaskCountView(this);
+		this._taskUsageView = new TaskUsageView(this);
 
 		this._licensePage = new LicensePage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
@@ -112,6 +115,8 @@ export class TeWrapper
 			this._licensePage,
 			this._parsingReportPage,
 			this._releaseNotesPage,
+			this._taskCountView,
+			this._taskUsageView,
 			this._treeManager,
 			this._usage
 		);
@@ -267,6 +272,10 @@ export class TeWrapper
 	}
 
 	get taskCountView() {
+		return this._taskCountView;
+	}
+
+	get taskUsageView() {
 		return this._taskCountView;
 	}
 

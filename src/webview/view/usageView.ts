@@ -13,19 +13,19 @@ interface State {
 }
 
 
-export class TaskCountView extends TeWebviewView<State>
+export class TaskUsageView extends TeWebviewView<State>
 {
-	static viewTitle = "Task Counts";
-	static viewId: WebviewViewIds = "taskCount";
+	static viewTitle = "Task Usage";
+	static viewId: WebviewViewIds = "usage";
 
 
 	constructor(container: TeWrapper)
 	{
 		super(
 			container,
-			TaskCountView.viewTitle,
+			TaskUsageView.viewTitle,
 			"task-count.html",
-			`taskExplorer.views.${TaskCountView.viewId}`,
+			`taskExplorer.views.${TaskUsageView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			"taskCountView"
 		);
