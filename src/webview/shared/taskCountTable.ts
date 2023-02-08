@@ -1,17 +1,23 @@
-import { Task, workspace } from "vscode";
+import { Task, Uri, workspace } from "vscode";
 import { IDictionary } from "../../interface";
 import { getTaskFiles } from "../../lib/fileCache";
+import { TaskTreeManager } from "../../tree/treeManager";
 import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
+import { getWorkspaceProjectName, isWorkspaceFolder } from "../../lib/utils/utils";
 import { removeLicenseButtons } from "./removeLicenseButtons";
 
 
-export const createTaskCountTable = async(tasks: Task[], html: string, project?: string) =>
+export const createTaskCountTable = async(extensionUri: Uri, project?: string, html?: string) =>
 {
     const projects: string[] = [],
-          taskCounts: IDictionary<number> = {};
+          taskCounts: IDictionary<number> = {},
+          tableTemplateFile = Uri.joinPath(extensionUri, "res", "page", "task-count-table.html");
 
     let fileCount = 0;
-
+    let tableTemplate = (await workspace.fs.readFile(tableTemplateFile)).toString();
+    const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
+                                 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
+                                                      project === getWorkspaceProjectName(t.scope.uri.fsPath)));
     tasks.forEach((t) =>
     {
         if (!taskCounts[t.source]) {
@@ -30,18 +36,18 @@ export const createTaskCountTable = async(tasks: Task[], html: string, project?:
                 projects.push(wf.name);
             }
         }
-        html = html.replace(/\#\{projects\.length\}/g, projects.length.toString());
+        tableTemplate = tableTemplate.replace(/\#\{projects\.length\}/g, projects.length.toString());
     }
     else {
         projects.push(project);
-        html = html.replace(/\#\{projects\.length\} project\(s\)/g, "the " + project + " project");
+        tableTemplate = tableTemplate.replace(/\#\{projects\.length\} project\(s\)/g, "the " + project + " project");
     }
 
     getTaskTypes().forEach((tcKey) =>
     {
         const taskFiles = getTaskFiles(tcKey) || [];
         fileCount += taskFiles.length;
-        html = html.replace(new RegExp(`#{taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
+        tableTemplate = tableTemplate.replace(new RegExp(`#{taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
     });
 
     // html = html.replace(/\$\{taskCounts.npm_plus_yarn\}/g, taskCounts.npm || "0");
@@ -53,9 +59,16 @@ export const createTaskCountTable = async(tasks: Task[], html: string, project?:
     //     html = html.replace(/\$\{taskCounts.yarn\}/g, "0");
     // }
 
-    html = html.replace(/\#\{taskCounts\.length\}/g, tasks.length.toString());
-    html = html.replace(/\#\{taskTypes\.length\}/g, Object.keys(taskCounts).length.toString());
-    html = html.replace(/\#\{taskFiles\.length\}/g, fileCount.toString());
+    if (html) {
+        html = html.replace(/\#\{taskCounts\.table\}/g, tableTemplate);
+        html = removeLicenseButtons(html);
+        html = html.replace(/\#\{taskCounts\.length\}/g, tasks.length.toString())
+                    .replace(/\#\{taskTypes\.length\}/g, Object.keys(taskCounts).length.toString())
+                    .replace(/\#\{taskFiles\.length\}/g, fileCount.toString());
+    }
+    else {
+        html = tableTemplate;
+    }
 
-    return removeLicenseButtons(html);
+    return html;
 };

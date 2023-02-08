@@ -34,7 +34,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override finalizeHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
+	protected override previewHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
 
 
 	// protected override includeBootstrap(): State {
@@ -49,11 +49,8 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	{
 		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
-		const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
-									 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
-											  project === getWorkspaceProjectName(t.scope.uri.fsPath)));
-		html = await createTaskCountTable(tasks, html, project);
-		const infoContent = this.getExtraContent(tasks, uri);
+		html = await createTaskCountTable(this.container.context.extensionUri, project, html);
+		const infoContent = this.getExtraContent(uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);
 		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
 			  idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
@@ -62,7 +59,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	};
 
 
-	private getExtraContent = (tasks: Task[], uri?: Uri) =>
+	private getExtraContent = (uri?: Uri) =>
 	{
 		let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 
@@ -76,7 +73,8 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 			<td class="content-section-header-nowrap" nowrap>File</td>
 		</tr><tr><td colspan="6"><hr></td></tr>`;
 
-		const projects: string[] = [];
+		const projects: string[] = [],
+			  tasks = TaskTreeManager.getTasks();
 
 		tasks.forEach((t: Task) =>
 		{

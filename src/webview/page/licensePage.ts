@@ -1,10 +1,9 @@
 
-import { Task } from "vscode";
 import { TeContainer } from "../../lib/container";
-import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../shared/taskCountTable";
+import { removeViewLicenseButton } from "../shared/removeLicenseButtons";
 
 interface State {
 	pinned: boolean;
@@ -32,32 +31,18 @@ export class LicensePage extends TeWebviewPanel<State>
 	}
 
 
-	protected override finalizeHtml = (html: string) => this.getPageContent(html);
+	protected override finalizeHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
 
 
-	private getPageContent = async (html: string, tasks?: Task[], newKey?: string) =>
+	private getPageContent = async (html: string, ...args: any[]) =>
 	{
-		if (!tasks)
-		{
-			tasks = TaskTreeManager.getTasks();
-		}
-
-		/* istanbul ignore else */
-		if (tasks)
-		{
-			html = await createTaskCountTable(tasks, "Task Explorer Licensing", html);
-
-			let infoContent = this.getExtraContent(newKey);
-			html = html.replace("<!-- addtlContentTop -->", infoContent);
-
-			infoContent = this.getExtraContent2();
-			html = html.replace("<!-- addtlContent -->", infoContent);
-
-			const idx1 = html.indexOf("<!-- startViewLicenseButton -->"),
-				idx2 = html.indexOf("<!-- endViewLicenseButton -->") + 29;
-			html = html.replace(html.slice(idx1, idx2), "");
-		}
-
+		const newKey = args[0] as string | undefined;
+		html = await createTaskCountTable(this.container.context.extensionUri, undefined, html);
+		html = removeViewLicenseButton(html);
+		let infoContent = this.getExtraContent(newKey);
+		html = html.replace("<!-- addtlContentTop -->", infoContent);
+		infoContent = this.getExtraContent2();
+		html = html.replace("<!-- addtlContent -->", infoContent);
 		return html;
 	};
 

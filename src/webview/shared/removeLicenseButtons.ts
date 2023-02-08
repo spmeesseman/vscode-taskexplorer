@@ -14,3 +14,12 @@ export const removeLicenseButtons = (html: string) =>
     }
     return html;
 };
+
+
+export const removeViewLicenseButton = (html: string) =>
+{
+    const idx1 = html.indexOf("<!-- startViewLicenseButton -->"),
+          idx2 = html.indexOf("<!-- endViewLicenseButton -->") + 29;
+    html = html.replace(html.slice(idx1, idx2), "");
+    return html;
+};

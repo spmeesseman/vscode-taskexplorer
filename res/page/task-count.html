@@ -3,18 +3,15 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src https://ka-p.fontawesome.com; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource} https://ka-p.fontawesome.com;">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Task Explorer</title>
         <link rel="stylesheet" href="[webview.cssDir]/vscode.css">
-        <link rel="stylesheet" href="[webview.cssDir]/page.css">
         <link rel="stylesheet" href="[webview.cssDir]/task-count.css">
-        <link rel="stylesheet" href="[webview.cssDir]/fa.css"> <!-- <link rel="stylesheet" href="https://kit.fontawesome.com/e5d9daff3c.css" crossorigin="anonymous"> -->
     </head>
 
-    <body class="te-page-bg">
+    <body>
         #{body}
-        <script nonce="#{cspNonce}" src="[webview.jsDir]/command.js"></script>
     </body>
 
 </html>

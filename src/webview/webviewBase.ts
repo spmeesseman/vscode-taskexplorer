@@ -100,6 +100,12 @@ export abstract class TeWebviewBase<State>
 	}
 
 
+	protected async previewHtml(html: string, ...args: unknown[])
+	{
+		return html;
+	}
+
+
 	protected async finalizeHtml(html: string, ...args: unknown[])
 	{
 		return html;
@@ -138,11 +144,13 @@ export abstract class TeWebviewBase<State>
               resourceDirUri = webview.asWebviewUri(resourceDir),
               sourceImgDirUri = webview.asWebviewUri(sourceImgDir);
 
-        let html = content.replace(/\[webview\.cssDir\]/g, cssUri.toString())
-                          .replace(/\[webview\.jsDir\]/g, jsUri.toString())
-                          .replace(/\[webview\.pageDir\]/g, pageUri.toString())
-                          .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
-                          .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString());
+		let html = await this.previewHtml(content, ...args);
+
+        html = html.replace(/\[webview\.cssDir\]/g, cssUri.toString())
+				   .replace(/\[webview\.jsDir\]/g, jsUri.toString())
+				   .replace(/\[webview\.pageDir\]/g, pageUri.toString())
+				   .replace(/\[webview\.resourceDir\]/g, resourceDirUri.toString())
+				   .replace(/\[webview\.sourceImgDir\]/g, sourceImgDirUri.toString());
 
 		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|root|title|version|webroot)}/g, (_s: string, token: string) =>
         {

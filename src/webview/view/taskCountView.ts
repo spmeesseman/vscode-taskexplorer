@@ -36,20 +36,7 @@ export class TaskCountView extends TeWebviewView<State>
 	}
 
 
-	protected override includeBody = async() =>
-	{
-		let html = "";
-		const tasks = TaskTreeManager.getTasks();
-		/* istanbul ignore else */
-		if (tasks)
-		{
-			html = await createTaskCountTable(tasks, "Task Counts", html);
-			const idx1 = html.indexOf("<!-- startViewLicenseButton -->"),
-				idx2 = html.indexOf("<!-- endViewLicenseButton -->") + 29;
-			html = html.replace(html.slice(idx1, idx2), "");
-		}
-		return html;
-	};
+	protected override includeBody = async() => createTaskCountTable(this.container.context.extensionUri);
 
 
 	protected override onVisibilityChanged(visible: boolean)

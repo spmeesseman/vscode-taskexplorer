@@ -143,7 +143,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	{
 		log.methodStart("get 30-day license command", 1, "", true);
 		const newKey = await this.requestLicense("   ");
-		const panel = await this.container.licensePage.show();
+		const panel = await this.container.licensePage.show(undefined, newKey);
 		log.methodDone("get 30-day license command", 1);
 		return { panel: panel.getWebviewPanel(), newKey };
 	};

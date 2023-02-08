@@ -1,17 +1,17 @@
 
 .task-count {
-    font-size: 42px;
+    font-size: 14px;
     padding-left: 10px;
-    padding-right: 15px;
-    padding-bottom: 7px;
+    padding-right: 7px;
+    padding-bottom: 3px;
 }
 
 .task-image {
-    height: 40px;
+    height: 14px;
 }
 
 .task-image-stacked {
-    height: 20px;
+    height: 7px;
 }
 
 .task-image-stacked-container {

@@ -44,6 +44,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     private currentInvalidation: string | undefined;
     private disposables: Disposable[] = [];
     private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
+    private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
     private _views: IDictionary<ITaskTreeView|undefined> = {
         taskExplorer: undefined,
         taskExplorerSideBar: undefined
@@ -368,6 +369,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         // Done!
         //
         this.firstTreeBuildDone = true;
+        this._onDidTasksLoad.fire({ taskCount: this.tasks.length });
         log.methodDone("fetch tasks", 1, logPad);
     };
 
@@ -523,6 +525,12 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 	get onTasksChanged(): Event<TasksChangeEvent>
     {
 		return this._onDidTasksChange.event;
+	}
+
+
+	get onTasksLoaded(): Event<TasksChangeEvent>
+    {
+		return this._onDidTasksLoad.event;
 	}
 
 
