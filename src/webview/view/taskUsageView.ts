@@ -1,11 +1,8 @@
 
-import { TeWebviewView, WebviewViewIds } from "../webviewView";
-import { ContextKeys } from "../../lib/constants";
 import { TeWrapper } from "../../lib/wrapper";
-import { ConfigurationChangeEvent } from "vscode";
+import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
-import { StorageChangeEvent } from "../../interface/IStorage";
-import { createTaskCountTable } from "../shared/taskCountTable";
+import { TeWebviewView, WebviewViewIds } from "../webviewView";
 
 
 interface State {
@@ -19,10 +16,10 @@ export class TaskUsageView extends TeWebviewView<State>
 	static viewId: WebviewViewIds = "taskUsage"; // Must match view id in package.jso
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
 	{
 		super(
-			container,
+			wrapper,
 			TaskUsageView.viewTitle,
 			"task-usage.html",
 			`taskExplorer.views.${TaskUsageView.viewId}`,
@@ -30,20 +27,8 @@ export class TaskUsageView extends TeWebviewView<State>
 			`${TaskUsageView.viewId}View`
 		);
 		this.disposables.push(
-			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
-			container.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
-			container.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
+			wrapper.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
 		);
-	}
-
-
-	private onConfigurationChanged(e: ConfigurationChangeEvent)
-	{
-	}
-
-
-	private onStorageChanged(e: StorageChangeEvent)
-	{
 	}
 
 
@@ -57,7 +42,7 @@ export class TaskUsageView extends TeWebviewView<State>
 
 	protected override finalizeHtml = async (html: string) =>
 	{
-		const taskCountToday = this.container.storage.get<number>("taskCountToday", 0);
+		const taskCountToday = this.wrapper.storage.get<number>("taskCountToday", 0);
 		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, "0")
 				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, "n/a")
 				   .replace(/\#\{taskUsage\.today\}/g, taskCountToday.toString())

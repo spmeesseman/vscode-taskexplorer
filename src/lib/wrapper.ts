@@ -1,6 +1,7 @@
 
+import log from "./log/log";
 import * as fileCache from "./fileCache";
-import { IDictionary } from "../interface";
+import { IDictionary, ILog } from "../interface";
 import { IStorage } from "../interface/IStorage";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
@@ -61,6 +62,7 @@ export class TeWrapper
 	private _onReady: EventEmitter<void> = new EventEmitter<void>();
 	private readonly _storage: IStorage;
 	private readonly _configuration: IConfiguration;
+	private readonly _log: ILog;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _usage: UsageWatcher;
 	private _homeView: HomeView;
@@ -89,6 +91,7 @@ export class TeWrapper
 		this._previousVersion = previousVersion;
         this._storage = storage;
         this._configuration = configuration;
+		this._log = log;
 		this._providers = {};
 
 		this._licenseManager = this._licenseManager = new LicenseManager(this);
@@ -229,6 +232,10 @@ export class TeWrapper
 
 	get id() {
 		return this._context.extension.id;
+	}
+
+	get log() {
+		return this._log;
 	}
 
 	get prerelease(){

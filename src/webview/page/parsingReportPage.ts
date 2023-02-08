@@ -49,7 +49,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	{
 		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
-		html = await createTaskCountTable(this.container.context.extensionUri, project, html);
+		html = await createTaskCountTable(this.wrapper.context.extensionUri, project, html);
 		const infoContent = this.getExtraContent(uri);
 		html = html.replace("<!-- addtlContent -->", infoContent);
 		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),

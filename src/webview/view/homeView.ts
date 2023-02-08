@@ -19,10 +19,10 @@ export class HomeView extends TeWebviewView<State>
 	static viewId: WebviewViewIds = "home"; // Must match view id in package.json
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
 	{
 		super(
-			container,
+			wrapper,
 			HomeView.viewTitle,
 			"home.html",
 			`taskExplorer.views.${HomeView.viewId}`,
@@ -30,35 +30,41 @@ export class HomeView extends TeWebviewView<State>
 			`${HomeView.viewId}View`
 		);
 		this.disposables.push(
-			container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
-			container.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
-			container.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
+			wrapper.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
+			wrapper.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
+			wrapper.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
 		);
 	}
 
 
 	private onConfigurationChanged(e: ConfigurationChangeEvent)
 	{
+		this.wrapper.log.methodStart("Homeview Event: onConfigurationChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("Homeview Event: onConfigurationChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
 	private onStorageChanged(e: StorageChangeEvent)
 	{
+		this.wrapper.log.methodStart("Homeview Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("Homeview Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
 	private async onTasksChanged(e: TasksChangeEvent)
 	{
+		this.wrapper.log.methodStart("Homeview Event: onTasksChanged", 2, this.wrapper.log.getLogPad());
 		if (this.isFirstLoadComplete) {
 			await this.refresh();
 		}
+		this.wrapper.log.methodDone("Homeview Event: onTasksChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
 	protected override finalizeHtml = async (html: string) =>
 	{
-		const taskCount = this.container.treeManager.getTasks().length,
-			  taskCountToday = this.container.storage.get<number>("taskCountToday", 0);
+		const taskCount = this.wrapper.treeManager.getTasks().length,
+			  taskCountToday = this.wrapper.storage.get<number>("taskCountToday", 0);
 		html = html.replace("#{taskCounts.length}",  taskCount.toString())
 				   .replace("#{taskCounts.today}", taskCountToday.toString());
 		return removeLicenseButtons(html);

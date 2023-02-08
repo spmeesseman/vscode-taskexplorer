@@ -68,7 +68,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 			enableFindWidget: true,
 			enableCommandUris: true,
 			enableScripts: true,
-			localResourceRoots: [ Uri.joinPath(this.container.context.extensionUri, "res") ]
+			localResourceRoots: [ Uri.joinPath(this.wrapper.context.extensionUri, "res") ]
 		};
 	}
 
@@ -81,7 +81,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ...args: any[])
 	{
-		void this.container.usage.track(`${this.trackingFeature}:shown`);
+		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
 
 		while (isExtensionBusy()) {
 			await timeout(100);
@@ -113,7 +113,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				);
 			}
 
-			this._view.iconPath = Uri.file(this.container.context.asAbsolutePath(this.iconPath));
+			this._view.iconPath = Uri.file(this.wrapper.context.asAbsolutePath(this.iconPath));
 			this._disposablePanel = Disposable.from(
 				this._view,
 				this._view.onDidDispose(this.onPanelDisposed, this),

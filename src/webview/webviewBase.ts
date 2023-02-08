@@ -47,7 +47,7 @@ export abstract class TeWebviewBase<State>
     private ipcSequence = 0;
 
 
-    constructor(protected readonly container: TeWrapper, title: string, protected readonly fileName: string)
+    constructor(protected readonly wrapper: TeWrapper, title: string, protected readonly fileName: string)
     {
 		this._title = title;
 		this._originalTitle = title;
@@ -109,7 +109,7 @@ export abstract class TeWebviewBase<State>
 
 	protected async getHtml(webview: Webview, ...args: unknown[])
 	{
-		const webRootUri = Uri.joinPath(this.container.context.extensionUri, "res"),
+		const webRootUri = Uri.joinPath(this.wrapper.context.extensionUri, "res"),
 			  uri = Uri.joinPath(webRootUri, "page", this.fileName),
 			  content = new TextDecoder("utf8").decode(await workspace.fs.readFile(uri)),
 			  cspSource = webview.cspSource,
@@ -124,32 +124,38 @@ export abstract class TeWebviewBase<State>
 
 		let html = await this.previewHtml(content, ...args);
 
-		html = html.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|title|version|webroot)}/g, (_s: string, token: string) =>
-        {                                            //
-            switch (token)                           // Credits to the author of the Gitlens extension for
-			{                                        // this nice little replacer.  And the encapsulation
-                case "head":                         // concepts for the webviews/webpanels that get my
-                    return head ?? "";               // praise and used in Task Explorer. Made note in top
-                case "body":                         // level file comment too.
-                    return body ?? "";               //
-                case "endOfBody":                    //
-                    return `${bootstrap ? `<script type="text/javascript" nonce="${this.cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
-                case "placement":
-                    return "editor";
-                case "cspSource":
-                    return cspSource;
-                case "cspNonce":
-                    return this.cspNonce;
-				case "title":
-					return this._title;
-				case "version":
-					return this.container.version;
-                case "webroot":
-                    return webRoot;
-                default:
-                    return "";
-            }
-        });
+		const repl = (h: string) =>
+		{
+			h = h.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|title|version|webroot)}/g, (_s: string, token: string) =>
+			{
+				switch (token)
+				{
+					case "head":
+						return repl(head ?? "");
+					case "body":
+						return repl(body ?? "");
+					case "endOfBody":
+						return `${bootstrap ? `<script type="text/javascript" nonce="${this.cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
+					case "placement":
+						return "editor";
+					case "cspSource":
+						return cspSource;
+					case "cspNonce":
+						return this.cspNonce;
+					case "title":
+						return this.title;
+					case "version":
+						return this.wrapper.version;
+					case "webroot":
+						return webRoot;
+					default:
+						return "";
+				}
+			});
+			return h;
+		};
+
+		html = repl(html);
 
 		this._isFirstLoadComplete = true;
 		return this.finalizeHtml(html, ...args);

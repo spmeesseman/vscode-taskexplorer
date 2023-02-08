@@ -1,16 +1,16 @@
 
-import figures from "../figures";
-import { dirname, join } from "path";
 import blank from "./blank";
 import error from "./error";
 import warn from "./warn";
 import write from "./write";
+import figures from "../figures";
+import { dirname, join } from "path";
 import { value, values } from "./value";
 import { createDir } from "../utils/fs";
-import { configuration } from "../utils/configuration";
-import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
-import { IDictionary, ILogQueueItem } from "../../interface";
 import { methodDone, methodStart } from "./method";
+import { configuration } from "../utils/configuration";
+import { IDictionary, ILogQueueItem } from "../../interface";
+import { OutputChannel, ExtensionContext, commands, window, workspace, ConfigurationChangeEvent } from "vscode";
 
 interface ILogControl
 {
@@ -22,6 +22,7 @@ interface ILogControl
     isTests: boolean;
     isTestsBlockScaryColors: boolean;
     lastErrorMesage: string[];
+    lastLogPad: string;
     lastWriteWasBlank: boolean;
     lastWriteWasBlankError: boolean;
     lastWriteToConsoleWasBlank: boolean;
@@ -46,6 +47,7 @@ export const logControl: ILogControl =
     isTests: false,
     isTestsBlockScaryColors: false,
     lastErrorMesage: [],
+    lastLogPad: "",
     lastWriteWasBlank: false,
     lastWriteWasBlankError: false,
     lastWriteToConsoleWasBlank: false,
@@ -128,6 +130,9 @@ const logLogFileLocation = () =>
         }
     }
 };
+
+
+const getLogPad = () => logControl.lastLogPad;
 
 
 const processConfigChanges = (ctx: ExtensionContext, e: ConfigurationChangeEvent) =>
@@ -242,6 +247,7 @@ const logFunctions =
     error,
     registerLog,
     getLogFileName,
+    getLogPad,
     isLoggingEnabled,
     methodStart,
     methodDone,

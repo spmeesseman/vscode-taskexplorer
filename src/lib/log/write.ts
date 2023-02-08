@@ -195,6 +195,12 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
     }
 
     //
+    // Record log pad.  Used by events so that inline log writes between async calls
+    // can remain properly indented
+    //
+    logControl.lastLogPad = logPad;
+
+    //
     // PREVENT DUPLICATE MESSAGES FROM EXPLORER AND SIDEBAR VIEWS
     //
     logControl.lastWriteWasBlank = (msg === "");

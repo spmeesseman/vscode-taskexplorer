@@ -25,14 +25,14 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 
 	constructor(
-		container: TeWrapper,
+		wrapper: TeWrapper,
 		title: string,
 		fileName: string,
 		public readonly id: `taskExplorer.views.${WebviewViewIds}`,
 		private readonly contextKeyPrefix: `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}`,
 		private readonly trackingFeature: TrackedUsageFeatures)
 	{
-		super(container, title, fileName);
+		super(wrapper, title, fileName);
 		this.disposables.push(window.registerWebviewViewProvider(id, this));
 	}
 
@@ -65,7 +65,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		while (isExtensionBusy()) {
 			await timeout(100);
 		}
-		void this.container.usage.track(`${this.trackingFeature}:shown`);
+		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
 		try {
 			void (await commands.executeCommand(`${this.id}.focus`, options));
 		}

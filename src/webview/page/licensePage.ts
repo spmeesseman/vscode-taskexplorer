@@ -37,7 +37,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	private getPageContent = async (html: string, ...args: any[]) =>
 	{
 		const newKey = args[0] as string | undefined;
-		html = await createTaskCountTable(this.container.context.extensionUri, undefined, html);
+		html = await createTaskCountTable(this.wrapper.context.extensionUri, undefined, html);
 		html = removeViewLicenseButton(html);
 		let infoContent = this.getExtraContent(newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);

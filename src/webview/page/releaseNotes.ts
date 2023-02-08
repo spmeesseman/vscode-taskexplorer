@@ -42,7 +42,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		const installPath = await getInstallPath(),
 			  changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),
 			  changeLogHtml = await marked(changeLogMd, { async: true }),
-			  version = this.container.context.extension.packageJSON.version;
+			  version = this.wrapper.context.extension.packageJSON.version;
 		html = html.replace("<!-- changelog -->", changeLogHtml)
 				   .replace("<!-- subtitle -->", this.getNewInThisReleaseShortDsc())
 				   .replace("<!-- releasenotes -->", this.getNewReleaseNotes(version, changeLogMd));
