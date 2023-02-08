@@ -63,3 +63,13 @@ button:hover {
     margin-left: 24px;
     vertical-align: bottom;
 }
+
+.homeview-task-count-label {
+    
+	opacity: 0.95;
+}
+
+.homeview-task-count-value {
+    
+	opacity: 0.725;
+}

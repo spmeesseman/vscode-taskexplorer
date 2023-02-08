@@ -7,10 +7,22 @@
 }
 
 .task-usage-table-label {
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: bold;
+	opacity: 0.95;
 }
 
 .task-usage-table-value {
 	font-size: 12px;
+	opacity: 0.725;
+}
+
+.task-usage-task-count-label {
+    
+	opacity: 0.95;
+}
+
+.task-usage-task-count-value {
+    
+	opacity: 0.425;
 }

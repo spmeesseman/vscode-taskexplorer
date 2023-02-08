@@ -133,3 +133,13 @@ hr {
 .padding-top-10 {
     padding-top: 10px;
 }
+
+.task-count-label {
+    
+	opacity: 0.95;
+}
+
+.task-count-value {
+    
+	opacity: 0.725;
+}
