@@ -250,7 +250,7 @@
                     "name": "Home",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/gears-r.svg",
-                    "visibility": "collapsed"
+                    "visibility": "visible"
                 },
                 {
                     "type": "tree",

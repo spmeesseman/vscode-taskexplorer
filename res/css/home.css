@@ -1,0 +1,45 @@
+:root {
+	--container-padding: 2px 5px 2px 2px;
+	--input-padding-vertical: 3px;
+	--input-padding-horizontal: 2px;
+	--input-margin-vertical: 2px;
+	--input-margin-horizontal: 0;
+}
+
+button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    padding: 4px 6px;
+    cursor: pointer;
+    width: 108px;
+	font-size: 10px;
+}
+
+button:hover {
+    opacity: 0.8;
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+.te-icon {
+    font-size: 50px;
+    --fa-primary-color: var(--vscode-button-background);
+    --fa-secondary-color: var(--vscode-button-hoverBackground);
+}
+
+.button-panel {
+    width: -webkit-fill-available
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+    width: inherit;
+}
+
+.content-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+    color: var(--vscode-button-hoverBackground);
+    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 3px 0px #777, 0px 4px 0px #666, 0px 5px 0px #555, 0px 6px 0px #444, 0px 7px 0px #333, 0px 8px 7px #001135;
+}

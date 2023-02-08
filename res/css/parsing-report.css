@@ -1,0 +1,14 @@
+
+.parsing-report-projects {
+    color: var(--vscode-foreground);
+    font-weight: bold;
+    font-size: 14px;
+    padding-top: 7px;
+}
+
+.parsing-report-projects-title {
+    color: var(--vscode-button-background);
+    font-weight: bold;
+    font-size: 24px;
+    padding-right: 10px;
+}

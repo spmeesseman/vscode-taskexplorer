@@ -42,61 +42,6 @@ hr {
     opacity: 0.04;
 }
 
-
-div.gfg {
-    margin:5px;
-    padding:5px;
-    background-color: var(--vscode-background);
-    height: 500px;
-    overflow: auto;
-    text-align:justify;
-}
-
-#releaseNotesDiv {
-    transform: scaleY(0);
-    transition: transform 400ms ease 0ms;
-}
-
-#releaseNotesDiv.is-show {
-    transform: scaleY(1);
-    transition: transform 400ms ease 0ms;
-}
-
-.change-log-container {
-    color: var(--vscode-foreground);
-    padding-top: 13px;
-    border-spacing: 0px;
-    margin: 0px;
-    padding: 0px;
-    padding-top: 15px;
-}
-
-.change-log-title {
-    color: var(--vscode-foreground);
-}
-
-.toggle-button {
-    cursor: pointer;
-}
-
-.toggle-button:hover {
-    color: var(--vscode-button-hoverBackground);
-}
-
-.parsing-report-projects {
-    color: var(--vscode-foreground);
-    font-weight: bold;
-    font-size: 14px;
-    padding-top: 7px;
-}
-
-.parsing-report-projects-title {
-    color: var(--vscode-button-background);
-    font-weight: bold;
-    font-size: 24px;
-    padding-right: 10px;
-}
-
 .button-panel {
     padding-left: 100px;
     padding-top: 7px;
@@ -186,23 +131,4 @@ div.gfg {
 
 .padding-top-10 {
     padding-top: 10px;
-}
-
-.task-count {
-    font-size: 42px;
-    padding-left: 10px;
-    padding-right: 15px;
-    padding-bottom: 7px;
-}
-
-.task-image {
-    height: 40px;
-}
-
-.task-image-stacked {
-    height: 20px;
-}
-
-.task-image-stacked-container {
-    text-align: center;
 }

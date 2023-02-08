@@ -5,7 +5,6 @@ import { Commands } from "../lib/constants";
 import { TeContainer } from "../lib/container";
 import { executeCommand } from "../lib/command";
 import { getNonce } from "../lib/env/node/crypto";
-import { WebviewManager } from "./webviewManager";
 import {
 	Disposable, Uri, Webview, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent,
 	WebviewView, workspace
