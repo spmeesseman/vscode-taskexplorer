@@ -11,37 +11,37 @@
     </head>
 
     <body>
-        <table class="task-usage-table">
+        <table class="task-usage-table" width="100%">
             <tr>
                 <td class="task-usage-table-label">
                     # of tasks ran today:
                 </td>
-                <td align="right" class="task-usage-table-value">
-                    #{taskCounts.today}
+                <td class="task-usage-table-value" align="right">
+                    #{taskUsage.today}
                 </td>
             </tr>
             <tr>
                 <td class="task-usage-table-label">
                     Avg. # of tasks ran per day:
                 </td>
-                <td align="right" class="task-usage-table-value">
-                    #{taskCounts.avgPerDay}
+                <td class="task-usage-table-value" align="right">
+                    #{taskUsage.avgPerDay}
                 </td>
             </tr>
             <tr>
                 <td class="task-usage-table-label">
                     Most Used Task:
                 </td>
-                <td align="right" class="task-usage-table-value">
-                    #{taskCounts.mostUsedTask}
+                <td class="task-usage-table-value" align="right">
+                    #{taskUsage.mostUsedTask}
                 </td>
             </tr>
             <tr>
                 <td class="task-usage-table-label">
                     Last task ran at:
                 </td>
-                <td align="right" class="task-usage-table-value">
-                    #{taskCounts.mostUsedTask}
+                <td class="task-usage-table-value" align="right">
+                    #{taskUsage.lastTaskRanAt}
                 </td>
             </tr>
         </table>

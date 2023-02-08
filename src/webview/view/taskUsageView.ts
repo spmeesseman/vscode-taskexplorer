@@ -55,7 +55,15 @@ export class TaskUsageView extends TeWebviewView<State>
 	}
 
 
-	protected override includeBody = async() => createTaskCountTable(this.container.context.extensionUri);
+	protected override finalizeHtml = async (html: string) =>
+	{
+		const taskCountToday = this.container.storage.get<number>("taskCountToday", 0);
+		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, "0")
+				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, "n/a")
+				   .replace(/\#\{taskUsage\.today\}/g, taskCountToday.toString())
+				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, new Date().toLocaleTimeString());
+		return html;
+	};
 
 
 	protected override onVisibilityChanged(visible: boolean)
