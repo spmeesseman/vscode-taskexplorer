@@ -1,17 +1,12 @@
 
-// import type { Commands, ContextKeys } from "../constants";
-// import type { Container } from "../container";
-// import { setContext } from "../context";
-// import { executeCommand, registerCommand } from "../system/command";
-// import { serialize } from "../system/decorators/serialize";
 import { setContext } from "../lib/context";
-import { isObject, timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { TeContainer } from "../lib/container";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
+import type { WebviewFocusChangedParams } from "./ipc";
+import { isObject, timeout } from "../lib/utils/utils";
 import { Commands, ContextKeys } from "../lib/constants";
-import type { WebviewFocusChangedParams } from "./protocol";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,

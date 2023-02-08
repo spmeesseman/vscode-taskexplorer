@@ -23,21 +23,13 @@ export const initStorage = async (context: ExtensionContext) =>
 
 class Storage implements IStorage, Memento
 {
-    private storage: Memento;
-    private secrets: SecretStorage;
     private isDev: boolean;
     private isTests: boolean;
+    private storage: Memento;
     private storageFile: string;
-
+    private secrets: SecretStorage;
     private _onDidChange = new EventEmitter<StorageChangeEvent>();
-	public get onDidChange(): Event<StorageChangeEvent> {
-		return this._onDidChange.event;
-	}
-
 	private _onDidChangeSecrets = new EventEmitter<SecretStorageChangeEvent>();
-	public get onDidChangeSecrets(): Event<SecretStorageChangeEvent> {
-		return this._onDidChangeSecrets.event;
-	}
 
 
     constructor(context: ExtensionContext, storageFile: string)
@@ -49,6 +41,18 @@ class Storage implements IStorage, Memento
         this.storageFile = storageFile;
         context.subscriptions.push(context.secrets.onDidChange(e => this._onDidChangeSecrets.fire(e)));
     }
+
+
+	public get onDidChange(): Event<StorageChangeEvent>
+    {
+		return this._onDidChange.event;
+	}
+
+
+	public get onDidChangeSecrets(): Event<SecretStorageChangeEvent>
+    {
+		return this._onDidChangeSecrets.event;
+	}
 
 
     keys(): readonly string[]

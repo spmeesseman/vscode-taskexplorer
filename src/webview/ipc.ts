@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+/**
+ * A nice little set of helper functions and definitions for communication between
+ * webview<->extension, credit to the author of the GitLens extension
+ */
+
 export interface IpcMessage {
 	id: string;
 	method: string;

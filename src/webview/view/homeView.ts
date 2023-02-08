@@ -1,12 +1,10 @@
 
+import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView } from "../webviewView";
-import { IpcMessage, onIpc } from "../protocol";
 import { ContextKeys } from "../../lib/constants";
 import { TeContainer } from "../../lib/container";
 import { registerCommand } from "../../lib/command";
 import { StorageChangeEvent } from "../../interface/IStorage";
-import { getContext, onDidChangeContext } from "../../lib/context";
-import { ConfigurationChangeEvent, Disposable } from "vscode";
 
 interface State {
 	webroot?: string;
@@ -20,8 +18,14 @@ export class HomeView extends TeWebviewView<State>
 	{
 		super(container, "Home", "home.html", "taskExplorer.views.home", `${ContextKeys.WebviewViewPrefix}home`, "homeView");
 		this.disposables.push(
+			this.container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
 			this.container.storage.onDidChange(e => { this.onStorageChanged(e); })
 		);
+	}
+
+
+	private onConfigurationChanged(e: ConfigurationChangeEvent)
+	{
 	}
 
 
@@ -58,24 +62,16 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
-	protected override onMessageReceived(e: IpcMessage)
-	{
-		switch (e.method) {}
-	}
+	// protected override async includeBootstrap(): Promise<State>
+	// {
+	// 	return this.getState();
+	// }
 
-
-	protected override async includeBootstrap(): Promise<State>
-	{
-		return this.getState();
-	}
-
-
-	// private async getState(subscription?: Subscription): Promise<State>
-	private async getState(): Promise<State>
-	{
-		return {
-			webroot: this.getWebRoot()
-		};
-	}
+	// private async getState(): Promise<State>
+	// {
+	// 	return {
+	// 		webroot: this.getWebRoot()
+	// 	};
+	// }
 
 }

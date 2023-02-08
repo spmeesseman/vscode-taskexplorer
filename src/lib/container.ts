@@ -39,6 +39,7 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
+import { IConfiguration } from "../interface/IConfiguration";
 
 
 export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
@@ -56,10 +57,8 @@ export class TeContainer
 	private readonly _context: ExtensionContext;
 	private readonly _previousVersion: string | undefined;
 	private _onReady: EventEmitter<void> = new EventEmitter<void>();
-	// private _subscription: SubscriptionService;
-	// private _subscriptionAuthentication: SubscriptionAuthenticationProvider;
-	// private _statusBarController: StatusBarController;
 	private readonly _storage: IStorage;
+	private readonly _configuration: IConfiguration;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _usage: UsageWatcher;
 	private _homeView: HomeView;
@@ -67,42 +66,37 @@ export class TeContainer
 	private _licensePage: LicensePage;
 	private _releaseNotesPage: ReleaseNotesPage;
 	private _parsingReportPage: ParsingReportPage;
-	// private _welcomePage: WelcomePage;
-	// private _viewCommands: ViewCommands | undefined;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
-	static create(context: ExtensionContext, storage: IStorage, prerelease: boolean, version: string, previousVersion: string | undefined)
+	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
     {
 		if (TeContainer.#instance) throw new Error("TeContainer is already initialized");
 
-		TeContainer.#instance = new TeContainer(context, storage, prerelease, version, previousVersion);
+		TeContainer.#instance = new TeContainer(context, storage, configuration, prerelease, version, previousVersion);
 		return TeContainer.#instance;
 	}
 
 
-	private constructor(context: ExtensionContext, storage: IStorage, prerelease: boolean, version: string, previousVersion: string | undefined)
+	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
     {
 		this._context = context;
 		this._prerelease = prerelease;
 		this._version = version;
 		this._previousVersion = previousVersion;
         this._storage = storage;
+        this._configuration = configuration;
 		this._providers = {};
 
 		this._licenseManager = this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
 		this._usage = new UsageWatcher(this, storage);
 
-		// context.subscriptions.push(
-		// 	new TeAuthenticationProvider(context)
-		// );
-		// const server = new ServerConnection(this);
-		// context.subscriptions.push(server);
-		// context.subscriptions.push(
-		// 	(this._subscriptionAuthentication = new SubscriptionAuthenticationProvider(this, server)),
-		// );
-		// context.subscriptions.push((this._subscription = new SubscriptionService(this, previousVersion)));
+		// context.subscriptions.push(new TeAuthenticationProvider(context));
+		// const remoteApi = new TeRemoteConnection(this);
+		// context.subscriptions.push(remoteApi);
+		// this._auth = new TeAuthenticationProvider(this, remoteApi)
+		// context.subscriptions.push(this._auth);
 
 		this._homeView = new HomeView(this);
 		this._taskCountView = new TaskCountView(this);
@@ -110,12 +104,15 @@ export class TeContainer
 		this._licensePage = new LicensePage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
-		// this._welcomePage = new WelcomePage(this);
-		// context.subscriptions.push(this._welcomePage);
 
 		context.subscriptions.push(
-			this._licenseManager, this._treeManager, this._usage, this._homeView , this._licensePage,
-			this._parsingReportPage, this._releaseNotesPage /* this._welcomePage */
+			this._homeView ,
+			this._licenseManager,
+			this._licensePage,
+			this._parsingReportPage,
+			this._releaseNotesPage,
+			this._treeManager,
+			this._usage
 		);
 	}
 
@@ -202,6 +199,11 @@ export class TeContainer
         this.registerTaskProvider("python", new PythonTaskProvider());
         this.registerTaskProvider("ruby", new RubyTaskProvider());
     };
+
+
+	get configuration(): IConfiguration {
+		return this._configuration;
+	}
 
 	get context() {
 		return this._context;

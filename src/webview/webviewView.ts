@@ -4,7 +4,7 @@ import { setContext } from "../lib/context";
 import { TeWebviewBase } from "./webviewBase";
 import { ContextKeys } from "../lib/constants";
 import { TeContainer } from "../lib/container";
-import { WebviewFocusChangedParams } from "./protocol";
+import { WebviewFocusChangedParams } from "./ipc";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,

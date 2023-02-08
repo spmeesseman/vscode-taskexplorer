@@ -1,14 +1,11 @@
 
 import { TeWebviewView } from "../webviewView";
-import { IpcMessage, onIpc } from "../protocol";
 import { ContextKeys } from "../../lib/constants";
-import type { TeContainer } from "../../lib/container";
-// import { onDidChangeContext } from "../../../lib/context";
-import { StorageChangeEvent } from "../../interface/IStorage";
-import { ConfigurationChangeEvent, Disposable, workspace } from "vscode";
-import { createTaskCountTable } from "../shared/taskCountTable";
-import { getTaskFiles } from "../../lib/fileCache";
+import { TeContainer } from "../../lib/container";
+import { ConfigurationChangeEvent } from "vscode";
 import { TaskTreeManager } from "../../tree/treeManager";
+import { StorageChangeEvent } from "../../interface/IStorage";
+import { createTaskCountTable } from "../shared/taskCountTable";
 
 
 interface State {
@@ -23,8 +20,8 @@ export class TaskCountView extends TeWebviewView<State>
 	{
 		super(container, "Home", "license-manager.html", "taskExplorer.views.taskCount", `${ContextKeys.WebviewViewPrefix}home`, "taskCountView");
 		this.disposables.push(
-			// workspace.getConfiguration().onDidChange((e: any) => { this.onConfigurationChanged(e); }, this),
-			this.container.storage.onDidChange(e => { this.onStorageChanged(e); })
+			this.container.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
+			this.container.storage.onDidChange(e => { this.onStorageChanged(e); }, this)
 		);
 	}
 
@@ -61,11 +58,6 @@ export class TaskCountView extends TeWebviewView<State>
 
 
 	protected override onWindowFocusChanged(focused: boolean)
-	{
-	}
-
-
-	protected override onMessageReceived(e: IpcMessage)
 	{
 	}
 

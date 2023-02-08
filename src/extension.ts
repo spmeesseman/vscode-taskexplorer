@@ -104,7 +104,7 @@ export async function activate(context: ExtensionContext)
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    const container = TeContainer.create(context, storage, prerelease, version, previousVersion);
+    const container = TeContainer.create(context, storage, configuration, prerelease, version, previousVersion);
 	once(container.onReady)(() =>
     {
 		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");

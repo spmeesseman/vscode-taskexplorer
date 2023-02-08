@@ -5,14 +5,11 @@ import { Commands } from "../lib/constants";
 import { TeContainer } from "../lib/container";
 import { executeCommand } from "../lib/command";
 import { getNonce } from "../lib/env/node/crypto";
-import {
-	Disposable, Uri, Webview, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent,
-	WebviewView, workspace
-} from "vscode";
+import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
-} from "./protocol";
+} from "./ipc";
 
 
 export abstract class TeWebviewBase<State>

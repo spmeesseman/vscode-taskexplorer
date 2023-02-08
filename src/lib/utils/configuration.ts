@@ -2,7 +2,7 @@
 import { isObject } from "./utils";
 import { IConfiguration } from "../../interface/IConfiguration";
 import {
-    ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext, ExtensionMode
+    ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext, ExtensionMode, Event, EventEmitter
 } from "vscode";
 
 const extensionName = "taskExplorer";
@@ -10,11 +10,12 @@ const extensionName = "taskExplorer";
 
 class Configuration implements IConfiguration
 {
-    private configuration: WorkspaceConfiguration;
-    private configurationGlobal: WorkspaceConfiguration;
     private isDev = false;
     private isTests = false;
     private pkgJsonCfgProps: any;
+    private configuration: WorkspaceConfiguration;
+    private configurationGlobal: WorkspaceConfiguration;
+    private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
 
 
     constructor()
@@ -22,6 +23,12 @@ class Configuration implements IConfiguration
         this.configuration = workspace.getConfiguration(extensionName);
         this.configurationGlobal = workspace.getConfiguration();
     }
+
+
+	public get onDidChange(): Event<ConfigurationChangeEvent>
+    {
+		return this._onDidChange.event;
+	}
 
 
     public initialize(context: ExtensionContext)
@@ -35,12 +42,13 @@ class Configuration implements IConfiguration
     }
 
 
-    private onConfigurationChanged(event: ConfigurationChangeEvent)
+    private onConfigurationChanged(e: ConfigurationChangeEvent)
     {
-        if (event.affectsConfiguration(extensionName))
+        if (e.affectsConfiguration(extensionName))
         {
             this.configuration = workspace.getConfiguration(extensionName);
             this.configurationGlobal = workspace.getConfiguration();
+            this._onDidChange.fire(e);
         }
     }
 
