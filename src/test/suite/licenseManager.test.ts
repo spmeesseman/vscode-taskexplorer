@@ -6,7 +6,7 @@ import * as utils from "../utils/utils";
 import { join } from "path";
 import { expect } from "chai";
 import { Task } from "vscode";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/container";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { LicensePage } from "../../webview/page/licensePage";
@@ -20,7 +20,7 @@ const licMgrMaxFreeTasksForTaskType = 100;  // Should be set to what the constan
 const licMgrMaxFreeTasksForScriptType = 50; // Should be set to what the constants are in lib/licenseManager
 
 let teApi: ITaskExplorerApi;
-let teContainer: TeContainer;
+let teWrapper: TeWrapper;
 let fsApi: IFilesystemApi;
 let licMgr: ILicenseManager;
 let tasks: Task[] = [];
@@ -45,7 +45,7 @@ suite("License Manager Tests", () =>
 		// and until this is resolved in vscode/test-electron (I think that's wherethe problem is?),
 		// we just disable TLS_REJECT_UNAUTHORIZED in the NodeJS environment.
 		//
-        ({ teApi, teContainer, fsApi } = await utils.activate(this));
+        ({ teApi, teWrapper, fsApi } = await utils.activate(this));
 		oLicenseKey = await teApi.testsApi.storage.getSecret("license_key");
 		oVersion = teApi.testsApi.storage.get<string>("version");
 		await teApi.testsApi.storage.updateSecret("license_key_30day", undefined);
@@ -302,11 +302,11 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.viewReport + 200);
 		const panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
-	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(50);
 		teApi.testsApi.isBusy = true;
 		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
-	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(50);
 		panel.dispose();
 		await utils.closeEditors();

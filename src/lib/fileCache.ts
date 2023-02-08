@@ -10,7 +10,7 @@ import { configuration } from "./utils/configuration";
 import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { workspace, RelativePattern, WorkspaceFolder, Uri, ExtensionContext, commands } from "vscode";
-import { TeContainer } from "./container";
+import { TeWrapper } from "./wrapper";
 
 
 let cacheBuilding = false;
@@ -61,7 +61,7 @@ const addFromStorage = async() =>
 export async function addFolder(folder: Uri, logPad: string)
 {
     let numFilesFound = 0;
-    const licMgr = TeContainer.instance.licenseManager;
+    const licMgr = TeWrapper.instance.licenseManager;
     const wsFolder = workspace.getWorkspaceFolder(folder) as WorkspaceFolder;
 
     log.methodStart("add folder to cache", 1, logPad, false, [[ "folder", folder.fsPath ]]);
@@ -71,7 +71,7 @@ export async function addFolder(folder: Uri, logPad: string)
     {
         await startBuild();
 
-        const providers = TeContainer.instance.providers;
+        const providers = TeWrapper.instance.providers;
         const taskProviders = ([ ...Object.keys(providers), ...taskTypeUtils.getWatchTaskTypes() ]).sort((a, b) => {
             return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
         });
@@ -146,7 +146,7 @@ async function addWsFolder(folder: WorkspaceFolder, taskType: string, logPad: st
     let numFilesFound = 0;
     log.methodStart(`scan workspace project folder for ${taskType} tasks`, 1, logPad, logPad === "", [[ "folder", folder.name ]]);
 
-    const providers = TeContainer.instance.providers;
+    const providers = TeWrapper.instance.providers;
     const externalProvider = providers[taskType]  && providers[taskType].isExternal;
     if (!cancel && (externalProvider || util.isTaskTypeEnabled(taskType)))
     {
@@ -172,7 +172,7 @@ export async function addWsFolders(wsf: readonly WorkspaceFolder[] | undefined, 
         await startBuild();
         if (!cancel)
         {
-            const providers = TeContainer.instance.providers;
+            const providers = TeWrapper.instance.providers;
             const taskProviders = ([ ...Object.keys(providers), ...taskTypeUtils.getWatchTaskTypes() ]).sort((a, b) => {
                 return taskTypeUtils.getTaskTypeFriendlyName(a).localeCompare(taskTypeUtils.getTaskTypeFriendlyName(b));
             });
@@ -226,7 +226,7 @@ function addToMappings(taskType: string, item: ICacheItem, logPad: string)
 async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileGlob: string, logPad: string)
 {
     let numFilesFound = 0;
-    const licMgr = TeContainer.instance.licenseManager;
+    const licMgr = TeWrapper.instance.licenseManager;
     const logMsg = "Scan project " + folder.name + " for " + taskType + " tasks",
           dspTaskType = taskTypeUtils.getTaskTypeFriendlyName(taskType);
 
@@ -235,7 +235,7 @@ async function buildFolderCache(folder: WorkspaceFolder, taskType: string, fileG
 
     initMaps(taskType, folder.name);
 
-    const providers = TeContainer.instance.providers,
+    const providers = TeWrapper.instance.providers,
           isExternal = providers[taskType] && providers[taskType].isExternal,
           fsChanged = isFsChanged(taskType, folder.name),
           globChanged = isGlobChanged(taskType, fileGlob);
@@ -306,7 +306,7 @@ export async function buildTaskTypeCache(taskType: string, wsFolder: WorkspaceFo
     let glob;
     if (!taskTypeUtils.isWatchTask(taskType))
     {
-        const providers = TeContainer.instance.providers;
+        const providers = TeWrapper.instance.providers;
         glob = providers[taskType].getGlobPattern();
     }
     if (!glob) {

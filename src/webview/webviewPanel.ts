@@ -1,7 +1,7 @@
 
 import { setContext } from "../lib/context";
 import { TeWebviewBase } from "./webviewBase";
-import { TeContainer } from "../lib/container";
+import { TeWrapper } from "../lib/wrapper";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { isObject, timeout } from "../lib/utils/utils";
@@ -23,7 +23,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	protected override _view: WebviewPanel | undefined;
 
 
-	constructor(container: TeContainer,
+	constructor(container: TeWrapper,
 				fileName: string,
 				title: string,
 				private readonly iconPath: string,

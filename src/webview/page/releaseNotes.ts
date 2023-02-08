@@ -1,7 +1,7 @@
 
 import { join } from "path";
 import { marked } from "marked";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { readFileAsync } from "../../lib/utils/fs";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { Commands, ContextKeys } from "../../lib/constants";
@@ -19,7 +19,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "releaseNotes";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
 	{
 		super(
 			container,

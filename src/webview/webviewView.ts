@@ -4,7 +4,7 @@ import { setContext } from "../lib/context";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { ContextKeys } from "../lib/constants";
-import { TeContainer } from "../lib/container";
+import { TeWrapper } from "../lib/wrapper";
 import { isExtensionBusy } from "../extension";
 import { WebviewFocusChangedParams } from "./ipc";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
@@ -25,7 +25,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 
 	constructor(
-		container: TeContainer,
+		container: TeWrapper,
 		title: string,
 		fileName: string,
 		public readonly id: `taskExplorer.views.${WebviewViewIds}`,

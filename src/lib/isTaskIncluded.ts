@@ -2,7 +2,7 @@
 import log from "./log/log";
 import { join } from "path";
 import { Task } from "vscode";
-import { TeContainer } from "./container";
+import { TeWrapper } from "./wrapper";
 import { readFileSync } from "./utils/fs";
 import { configuration } from "./utils/configuration";
 import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
@@ -39,7 +39,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     //
     // External tasks registered via Task Explorer API
     //
-    const providers = TeContainer.instance.providers;
+    const providers = TeWrapper.instance.providers;
     if (providers[task.source] && providers[task.source].isExternal) {
         return !!task.definition && !!task.name && !!task.execution;
     }

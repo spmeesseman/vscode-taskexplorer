@@ -1,7 +1,7 @@
 
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { ContextKeys } from "../../lib/constants";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { ConfigurationChangeEvent } from "vscode";
 import { TasksChangeEvent } from "../../interface";
 import { StorageChangeEvent } from "../../interface/IStorage";
@@ -19,7 +19,7 @@ export class TaskCountView extends TeWebviewView<State>
 	static viewId: WebviewViewIds = "taskCount";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
 	{
 		super(
 			container,

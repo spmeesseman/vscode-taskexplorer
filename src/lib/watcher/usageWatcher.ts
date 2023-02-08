@@ -1,5 +1,5 @@
 
-import { TeContainer } from "../container";
+import { TeWrapper } from "../wrapper";
 import { IDictionary } from "../../interface";
 import { IStorage } from "../../interface/IStorage";
 import { Disposable, Event, EventEmitter } from "vscode";
@@ -34,12 +34,12 @@ export interface UsageChangeEvent
 export class UsageWatcher implements Disposable
 {
 	private storage: IStorage;
-	private te: TeContainer;
+	private te: TeWrapper;
 
 	private _onDidChange = new EventEmitter<UsageChangeEvent | undefined>();
 
 
-	constructor(te: TeContainer, storage: IStorage)
+	constructor(te: TeWrapper, storage: IStorage)
 	{
 		this.storage = storage;
 		this.te = te;

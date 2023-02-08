@@ -6,7 +6,7 @@ import log from "./log/log";
 import { setContext } from "./context";
 import { TaskTree } from "../tree/tree";
 import { ContextKeys } from "./constants";
-import { TeContainer } from "./container";
+import { TeWrapper } from "./wrapper";
 import { storage } from "./utils/storage";
 import { registerCommand } from "./command";
 import { refreshTree } from "./refreshTree";
@@ -22,10 +22,10 @@ export class TeApi implements ITaskExplorerApi
 {
     private _tests: boolean;
 	private _testsApi: ITestsApi;
-	readonly container: TeContainer;
+	readonly container: TeWrapper;
 
 
-    constructor(container: TeContainer)
+    constructor(container: TeWrapper)
     {
         this.container = container;
         this._tests = container.tests;

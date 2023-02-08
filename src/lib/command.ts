@@ -2,10 +2,10 @@
 import { Command as CoreCommand, Disposable, Uri, commands, Command } from "vscode";
 // import { CoreGitCommands } from "../constants";
 import { VsCodeCommands, Commands, TeCommands } from "./constants";
-import { TeContainer } from "./container";
+import { TeWrapper } from "./wrapper";
 // import { Container } from "../container";
 
-// type CommandConstructor = new (container: TeContainer) => Command;
+// type CommandConstructor = new (container: TeWrapper) => Command;
 // const registrableCommands: CommandConstructor[] = [];
 
 
@@ -22,7 +22,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 	return commands.registerCommand(
 		command,
 		function (this: any, ...args) {
-			// TeContainer.instance.telemetry.sendEvent("command", { command: command });
+			// TeWrapper.instance.telemetry.sendEvent("command", { command: command });
 			return callback.call(this, ...args);
 		},
 		thisArg
@@ -30,7 +30,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 };
 
 
-// export const registerCommands = (container: TeContainer): Disposable[] =>  registrableCommands.map(c => new c(container));
+// export const registerCommands = (container: TeWrapper): Disposable[] =>  registrableCommands.map(c => new c(container));
 
 
 export const asCommand = <T extends unknown[]>(command: Omit<CoreCommand, "arguments"> & { arguments: [...T] }): CoreCommand => command;
@@ -74,7 +74,7 @@ export function executeCommand<T extends [...unknown[]] = [], U = any>(command: 
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
 // {
 // 	// if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
-// 	// 	TeContainer.instance.telemetry.sendEvent("command/core", { command: command });
+// 	// 	TeWrapper.instance.telemetry.sendEvent("command/core", { command: command });
 // 	// }
 // 	return commands.executeCommand<U>(command, ...args);
 // }

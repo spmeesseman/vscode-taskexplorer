@@ -1,6 +1,6 @@
 
 import { ContextKeys } from "../../lib/constants";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { TasksChangeEvent } from "../../interface";
 import { registerCommand } from "../../lib/command";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
@@ -18,7 +18,7 @@ export class HomeView extends TeWebviewView<State>
 	static viewId: WebviewViewIds = "home";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
 	{
 		super(
 			container,

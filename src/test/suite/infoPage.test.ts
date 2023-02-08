@@ -3,7 +3,7 @@
 
 import { Uri } from "vscode";
 import { TeCommands } from "../../lib/constants";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/container";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ParsingReportPage } from "../../webview/page/parsingReportPage";
@@ -14,7 +14,7 @@ import {
 } from "../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let teContainer: TeContainer;
+let teWrapper: TeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
 let origExplorer: ITaskTree | undefined;
@@ -27,7 +27,7 @@ suite("Info Report Tests", () =>
 	suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teContainer, teApi } = await activate(this));
+        ({ teWrapper, teApi } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teApi.explorer;
 		origSidebar = teApi.sidebar;
@@ -202,11 +202,11 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 200);
 		const panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
-	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
 		teApi.testsApi.isBusy = true;
 		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
-	    await teContainer.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
 		await closeEditors();
         endRollingCount(this);

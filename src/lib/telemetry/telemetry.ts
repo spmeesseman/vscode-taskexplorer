@@ -3,7 +3,7 @@ export default {};
 // // import { getPlatform } from "@env/platform";
 // import { getProxyAgent } from "../env/node/fetch";
 // import { getPlatform } from "../env/node/platform";
-// import type { TeContainer } from "../container";
+// import type { TeWrapper } from "../container";
 // import { configuration } from "../utils/configuration";
 // import { Disposable, version as codeVersion, env } from "vscode";
 // import type { AttributeValue, Span, TimeInput } from "@opentelemetry/api";
@@ -55,7 +55,7 @@ export default {};
 // 	private _initializationTimer: ReturnType<typeof setTimeout> | undefined;
 //
 //
-// 	constructor(private readonly container: TeContainer)
+// 	constructor(private readonly container: TeWrapper)
 // 	{
 // 		container.context.subscriptions.push(
 // 			configuration.onDidChange((e: any) =>

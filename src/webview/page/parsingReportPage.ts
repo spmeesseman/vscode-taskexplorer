@@ -1,7 +1,7 @@
 
 import { Task, Uri } from "vscode";
 import { dirname, relative } from "path";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
@@ -19,7 +19,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "parsingReport";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
 	{
 		super(
 			container,

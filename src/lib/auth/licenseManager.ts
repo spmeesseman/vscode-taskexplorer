@@ -7,7 +7,7 @@ import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { IncomingMessage } from "http";
 import { teApi } from "../../extension";
 import { Commands } from "../constants";
-import { TeContainer } from "../container";
+import { TeWrapper } from "../wrapper";
 import { storage } from "../utils/storage";
 import { refreshTree } from "../refreshTree";
 import { executeCommand, registerCommand } from "../command";
@@ -22,7 +22,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 {
 	private disposables: Disposable[] = [];
 	private busy = false;
-	private container: TeContainer;
+	private container: TeWrapper;
 	private host = "license.spmeesseman.com";
 	private licensed = false;
 	private logRequestStepsTests = false;
@@ -37,7 +37,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
     {
 		this.container = container;
 		this.disposables.push(

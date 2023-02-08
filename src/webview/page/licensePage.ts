@@ -1,5 +1,5 @@
 
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../shared/taskCountTable";
@@ -16,7 +16,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "licensePage";
 
 
-	constructor(container: TeContainer)
+	constructor(container: TeWrapper)
 	{
 		super(
 			container,
@@ -49,7 +49,7 @@ export class LicensePage extends TeWebviewPanel<State>
 
 	private getExtraContent = (newKey?: string) =>
 	{
-		const licMgr = TeContainer.instance.licenseManager;
+		const licMgr = TeWrapper.instance.licenseManager;
 		const details = !newKey ?
 	(!licMgr.isLicensed() ? `
 	<table class="margin-top-15">

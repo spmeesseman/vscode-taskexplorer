@@ -9,7 +9,7 @@ import { expect } from "chai";
 import { testControl } from "../control";
 import { deactivate } from "../../extension";
 import { startInput, stopInput } from "./input";
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/container";
 import { hasExplorerFocused } from "./commandUtils";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
@@ -175,7 +175,7 @@ export const activate = async (instance?: Mocha.Context) =>
     }
     return {
         teApi,
-        teContainer: TeContainer.instance,
+        teWrapper: TeWrapper.instance,
         extension: ext as Extension<any>,
         testsApi: teApi.testsApi,
         fsApi: teApi.testsApi.fs,
@@ -426,7 +426,7 @@ export const setFailed = (ctrlc = true) =>
 
 export const setLicensed = async (valid: boolean) =>
 {
-    const licMgr = TeContainer.instance.licenseManager;
+    const licMgr = TeWrapper.instance.licenseManager;
     teApi.setTests(!valid);
     await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
     await licMgr.checkLicense();

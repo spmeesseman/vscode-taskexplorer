@@ -8,7 +8,7 @@ import { once } from "./lib/event";
 // import { hrtime } from "@env/hrtime";
 import { setContext } from "./lib/context";
 import { Stopwatch } from "./lib/stopwatch";
-import { TeContainer } from "./lib/container";
+import { TeWrapper } from "./lib/wrapper";
 import { isWeb } from "./lib/env/node/platform";
 import { Commands, ContextKeys } from "./lib/constants";
 import { ITaskExplorerApi } from "./interface";
@@ -104,7 +104,7 @@ export async function activate(context: ExtensionContext)
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    const container = TeContainer.create(context, storage, configuration, prerelease, version, previousVersion);
+    const container = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
 	once(container.onReady)(() =>
     {
 		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
@@ -137,7 +137,7 @@ export async function activate(context: ExtensionContext)
     //
     // TODO - Telemetry
     //
-	// teContainer.telemetry.setGlobalAttributes({
+	// teWrapper.telemetry.setGlobalAttributes({
 	// 	debugging: container.debugging,
 	// 	insiders: insiders,
 	// 	prerelease: prerelease,
@@ -214,14 +214,14 @@ export async function deactivate()
     // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
     // everything here, it doesn't seem to cause any issue with Code exiting.
     //
-    TeContainer.instance.context.subscriptions.forEach((s) => {
+    TeWrapper.instance.context.subscriptions.forEach((s) => {
         s.dispose();
     });
-    TeContainer.instance.context.subscriptions.splice(0);
+    TeWrapper.instance.context.subscriptions.splice(0);
 }
 
 
-const initialize = async(container: TeContainer) =>
+const initialize = async(container: TeWrapper) =>
 {
     const now = Date.now(),
           lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
@@ -294,7 +294,7 @@ const initialize = async(container: TeContainer) =>
 export function isExtensionBusy()
 {
     return !ready || fileCache.isBusy() || TaskTreeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
-           isProcessingFsEvent() || isProcessingConfigChange() || TeContainer.instance.licenseManager.isBusy();
+           isProcessingFsEvent() || isProcessingConfigChange() || TeWrapper.instance.licenseManager.isBusy();
 }
 
 
@@ -357,7 +357,7 @@ const migrateSettings = async () =>
 };
 
 
-// async function showWelcomeOrWhatsNew(container: TeContainer, version: string, previousVersion: string | undefined, logPad: string)
+// async function showWelcomeOrWhatsNew(container: TeWrapper, version: string, previousVersion: string | undefined, logPad: string)
 // {
 // 	if (!previousVersion)
 //     {

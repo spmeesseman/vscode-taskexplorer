@@ -9,7 +9,7 @@
 import { TextDecoder } from "util";
 // import { getNonce } from "@env/crypto";
 import { Commands } from "../lib/constants";
-import { TeContainer } from "../lib/container";
+import { TeWrapper } from "../lib/wrapper";
 import { executeCommand } from "../lib/command";
 import { getNonce } from "../lib/env/node/crypto";
 import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
@@ -47,7 +47,7 @@ export abstract class TeWebviewBase<State>
     private ipcSequence = 0;
 
 
-    constructor(protected readonly container: TeContainer, title: string, protected readonly fileName: string)
+    constructor(protected readonly container: TeWrapper, title: string, protected readonly fileName: string)
     {
 		this._title = title;
 		this._originalTitle = title;

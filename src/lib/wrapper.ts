@@ -42,11 +42,11 @@ import { registerRemoveFromExcludesCommand } from "../commands/removeFromExclude
 import { IConfiguration } from "../interface/IConfiguration";
 
 
-export const isContainer = (container: any): container is TeContainer => container instanceof TeContainer;
+export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
 
-export class TeContainer
+export class TeWrapper
 {
-	static #instance: TeContainer | undefined;
+	static #instance: TeWrapper | undefined;
 
 	private _licenseManager: ILicenseManager;
 	private _treeManager: TaskTreeManager;
@@ -71,10 +71,10 @@ export class TeContainer
 
 	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
     {
-		if (TeContainer.#instance) throw new Error("TeContainer is already initialized");
+		if (TeWrapper.#instance) throw new Error("TeWrapper is already initialized");
 
-		TeContainer.#instance = new TeContainer(context, storage, configuration, prerelease, version, previousVersion);
-		return TeContainer.#instance;
+		TeWrapper.#instance = new TeWrapper(context, storage, configuration, prerelease, version, previousVersion);
+		return TeWrapper.#instance;
 	}
 
 
@@ -117,18 +117,18 @@ export class TeContainer
 	}
 
 
-	static get instance(): TeContainer {
-		return TeContainer.#instance ?? TeContainer.#proxy;
+	static get instance(): TeWrapper {
+		return TeWrapper.#instance ?? TeWrapper.#proxy;
 	}
 
 
-	static #proxy = new Proxy<TeContainer>({} as TeContainer,
+	static #proxy = new Proxy<TeWrapper>({} as TeWrapper,
     {
 		get: (_target, prop) =>
         {
-			if (!TeContainer.#instance) return (TeContainer.#instance as any)[prop];
+			if (!TeWrapper.#instance) return (TeWrapper.#instance as any)[prop];
 			if (prop === "config") return configuration;
-			throw new Error("TeContainer is not initialized");
+			throw new Error("TeWrapper is not initialized");
 		},
 	});
 
@@ -141,7 +141,7 @@ export class TeContainer
 	ready = async() =>
 	{
 		if (this._ready) {
-			throw new Error("TeContainer is already ready");
+			throw new Error("TeWrapper is already ready");
 		}
 		await fileCache.registerFileCache(this._context);
 		registerConfigWatcher(this._context);

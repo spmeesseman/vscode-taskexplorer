@@ -1,9 +1,9 @@
-import { TeContainer } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 
 
 export const removeLicenseButtons = (html: string) =>
 {
-    if (TeContainer.instance.licenseManager.isLicensed())
+    if (TeWrapper.instance.licenseManager.isLicensed())
     {
         let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
             idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;

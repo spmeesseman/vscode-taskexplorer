@@ -9,7 +9,7 @@ import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
 import { Globs } from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
-import { TeContainer } from "../lib/container";
+import { TeWrapper } from "../lib/wrapper";
 import { TaskTreeBuilder } from "./treeBuilder";
 import { rebuildCache } from "../lib/fileCache";
 import { getTerminal } from "../lib/getTerminal";
@@ -29,7 +29,7 @@ import {
 
 export class TaskTreeManager implements ITaskTreeManager, Disposable
 {
-    private container: TeContainer;
+    private container: TeWrapper;
     private static tasks: Task[] = [];
     private static refreshPending = false;
     private static specialFolders: {
@@ -51,7 +51,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     };
 
 
-    constructor(container: TeContainer)
+    constructor(container: TeWrapper)
     {
         log.methodStart("construct task tree manager", 1, "   ");
         this.tasks = TaskTreeManager.tasks;
