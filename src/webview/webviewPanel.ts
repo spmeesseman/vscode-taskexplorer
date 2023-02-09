@@ -5,7 +5,7 @@ import { TeWrapper } from "../lib/wrapper";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { isObject, timeout } from "../lib/utils/utils";
-import type { WebviewFocusChangedParams } from "./ipc";
+import type { WebviewFocusChangedParams } from "./shared/ipc";
 import { Commands, ContextKeys } from "../lib/constants";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
@@ -216,5 +216,18 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		}
 		this.onVisibilityChanged?.(visible);
 	}
+
+
+	protected override onHtml = (html: string) =>
+	{
+		return html.replace(/\#\{title\}/g,
+`<table><tr>
+<td class="content-img">
+	<!--<img src="#{webroot}/img/logo-clr.png" />-->
+	<span class="fad fa-cogs te-icon"></span>
+</td>
+<td class="content-title"> &nbsp;#{title}</td>
+</tr></table>`);
+	};
 
 }
