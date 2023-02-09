@@ -3,7 +3,7 @@
     //     "require": ["tsconfig-paths/register"]
     // },
     "compilerOptions": {
-		// "baseUrl": "src",
+		"baseUrl": ".",
         "module": "commonjs",
         "target": "es2020",
 		"lib": [ "es2020" ],

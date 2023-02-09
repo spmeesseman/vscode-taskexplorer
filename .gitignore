@@ -12,3 +12,4 @@ types/lib
 types/types
 tsconfig.tsbuildinfo
 .dccache
+/res/**/home.*

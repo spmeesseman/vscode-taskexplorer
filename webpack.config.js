@@ -55,10 +55,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
  *
  * @param {WebpackEnvironment} env Environment variable containing runtime options passed
  * to webpack on the command line (e.g. `webpack --env environment=test --env clean=true`).
- * @param {{ mode: "production" | "development" | "none" | undefined }} argv
  * @returns {WebpackConfig|WebpackConfig[]}
  */
-module.exports = (env, argv) =>
+module.exports = (env) =>
 {
 	env = {
 		clean: false,
@@ -499,17 +498,17 @@ const plugins = (env, wpConfig) =>
 	else // env.build === "webview"
 	{
 		wpConfig.plugins = [
-			new CleanPlugin(
-				wpConfig.mode === "production"
-					? {
-							cleanOnceBeforeBuildPatterns: [
-								path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res", "**"),
-							],
-							dangerouslyAllowCleanPatternsOutsideProject: true,
-							dry: false
-					  }
-					: undefined
-			),
+			// new CleanPlugin(
+			// 	wpConfig.mode === "production"
+			// 		? {
+			// 				cleanOnceBeforeBuildPatterns: [
+			// 					path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res", "**"),
+			// 				],
+			// 				dangerouslyAllowCleanPatternsOutsideProject: true,
+			// 				dry: false
+			// 		  }
+			// 		: undefined
+			// ),
 			new ForkTsCheckerPlugin({
 				async: false,
 				// eslint: {
@@ -552,7 +551,7 @@ const plugins = (env, wpConfig) =>
 							"dist",
 							"codicon.ttf",
 						),
-						to: path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page"),
+						to: path.posix.join(__dirname.replace(/\\/g, "/"), "res", "page"),
 					},
 				],
 			})

@@ -1,20 +1,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as fileCache from "./lib/fileCache";
 import log from "./lib/log/log";
 import { TeApi } from "./lib/api";
-import { once } from "./lib/event";
-// import { isWeb } from "@env/platform";
-// import { hrtime } from "@env/hrtime";
-import { setContext } from "./lib/context";
-import { Stopwatch } from "./lib/stopwatch";
 import { TeWrapper } from "./lib/wrapper";
-import { isWeb } from "./lib/env/node/platform";
-import { Commands, ContextKeys } from "./lib/constants";
+import { setContext } from "./lib/context";
+import * as fileCache from "./lib/fileCache";
+import { ContextKeys } from "./lib/constants";
 import { ITaskExplorerApi } from "./interface";
+import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
-import { TaskTreeManager } from "./tree/treeManager";
-import { ExtensionContext, env, version as codeVersion, ExtensionMode } from "vscode";
+import { ExtensionContext, env, ExtensionMode } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { enableConfigWatcher, isProcessingConfigChange } from "./lib/watcher/configWatcher";
 import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";
@@ -31,20 +26,6 @@ export async function activate(context: ExtensionContext)
     const version: string = context.extension.packageJSON.version;
 	const insiders = context.extension.id === "spmeesseman-vscode-taskexplorer-insiders";
 	const prerelease = false; // insiders || satisfies(version, "> 2023.0.0");
-
-	const sw = new Stopwatch(
-		// `TaskExplorer${prerelease ? (insiders ? " (Insiders)" : " (pre-release)") : ""} v${version}`,
-		`Task Explorer v${version}`,
-		{
-            logLevel: 1,
-			log: {
-				message: ` activating in ${env.appName}(${codeVersion}) on the ${isWeb ? "web" : "desktop"} (${
-					env.machineId
-				}|${env.sessionId})`,
-				// ${context.extensionRuntime !== ExtensionRuntime.Node ? ' in a webworker' : ''}
-			}
-		},
-	);
 
     //
     // TODO - Handle untrusted workspace
@@ -105,7 +86,7 @@ export async function activate(context: ExtensionContext)
     // Instantiate application container (beautiful concept from GitLens project)
     //
     const wrapper = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
-	once(wrapper.onReady)(() =>
+	oneTimeEvent(wrapper.onReady)(() =>
     {
 		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
 		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
@@ -145,13 +126,6 @@ export async function activate(context: ExtensionContext)
 	// 	upgrade: previousVersion != null && version !== previousVersion,
 	// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
 	// });
-
-
-    const exitMessage =
-    `syncedVersion=${syncedVersion}, localVersion=${localVersion}, previousVersion=${previousVersion}, welcome=${storage.get(
-        "views:welcome:visible",
-    )}`;
-	sw.stop({ message: ` activated${!exitMessage ? `, ${exitMessage}` : ""}` });
 
     //
     // TODO - Telemetry

@@ -7,7 +7,7 @@ import { executeCommand } from "../command";
 import { basename, extname, sep } from "path";
 import { Commands, Globs } from "../constants";
 import { configuration } from "./configuration";
-import { WorkspaceFolder, Uri, workspace, window } from "vscode";
+import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
 import { ILicenseManager } from "../../interface/ILicenseManager";
 
 
@@ -197,6 +197,16 @@ export const lowerCaseFirstChar = (s: string, removeSpaces: boolean) =>
         }
     }
     return fs;
+};
+
+
+export const oneTimeEvent = <T>(event: Event<T>): Event<T> =>
+{
+	return (listener: (e: T) => unknown, thisArgs?: unknown, disposables?: Disposable[]) =>
+    {
+		const result = event(e => { result.dispose(); return listener.call(thisArgs, e); }, null, disposables);
+		return result;
+	};
 };
 
 

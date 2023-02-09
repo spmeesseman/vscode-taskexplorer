@@ -1,7 +1,4 @@
 // A launch configuration that compiles the extension and then opens it inside a new window
-// Use IntelliSense to learn about possible attributes.
-// Hover to view descriptions of existing attributes.
-// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
     "version": "0.2.0",
     "configurations": [
@@ -10,12 +7,27 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "sourceMaps": true,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
             "preLaunchTask": "npm: tsc-watch",
+            "debugWebviews": true,
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				// "urlFilter": "*eamodio.gitlens*",
+				"webRoot": "${workspaceFolder}/res"
+			},
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "args": [
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
+            ],
+			"args": [
+                "--profile=Debugging (TaskExplorer)",
                 "--disable-extensions",
                 "--disable-workspace-trust",
                 "--extensionDevelopmentPath=${workspaceFolder}"
@@ -26,10 +38,22 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "sourceMaps": true,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
             "preLaunchTask": "npm: tsc-watch",
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				"webRoot": "${workspaceFolder}/src/webviews/apps"
+			},
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
             ],
             "args": [
                 "--disable-extensions",
@@ -43,10 +67,23 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "sourceMaps": true,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
+			"debugWebviews": true,
             "preLaunchTask": "npm: tsc-watch",
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				"webRoot": "${workspaceFolder}/src/webviews/apps"
+			},
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
             ],
             "args": [
                 "${workspaceFolder}/test-fixture/tests.code-workspace",
@@ -60,10 +97,23 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "sourceMaps": true,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
             "preLaunchTask": "npm: tsc-watch",
+			"debugWebviews": true,
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				"webRoot": "${workspaceFolder}/src/webviews/apps"
+			},
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
             ],
             "args": [
                 "${workspaceRoot}/../GEMS2",
@@ -77,12 +127,25 @@
 			"request": "launch",
 			"name": "Launch (Webpack)(TestFixture Root)",
 			"runtimeExecutable": "${execPath}",
-			"outFiles": ["${workspaceFolder}/dist/**/*.js"],
-            "sourceMaps": true,
-            "stopOnEntry": false,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
             "autoAttachChildProcesses": true,
 			"preLaunchTask": "npm: webpack-watch",
-            "cwd": "${workspaceFolder}/dist",
+			"debugWebviews": true,
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				"webRoot": "${workspaceFolder}/src/webviews/apps"
+			},
+			"outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
+            ],
 			"args": [
                 "${workspaceFolder}/test-fixture/tests.code-workspace",
 				"--disable-extensions",
@@ -95,11 +158,24 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "sourceMaps": true,
+            "smartStep": true,
+			"sourceMaps": true,
+			"sourceMapRenames": true,
+			"trace": true,
             "preLaunchTask": "npm: test:before",
             "postDebugTask": "npm: test:after",
-            "outFiles": [
+            "debugWebviews": true,
+			"rendererDebugOptions": {
+				"pauseForSourceMap": true,
+				"sourceMapRenames": true,
+				"sourceMaps": true,
+				"webRoot": "${workspaceFolder}/src/webviews/apps"
+			},
+			"outFiles": [
                 "${workspaceFolder}/dist/test/**/*.js"
+            ],
+            "skipFiles": [
+                "<node_internals>/**", "**/node_modules/**", "**/resources/app/out/vs/**"
             ],
             "args": [
                 "${workspaceFolder}/test-fixture/project1",

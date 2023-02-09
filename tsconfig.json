@@ -2,7 +2,7 @@
     "extends": "./tsconfig.base.json",
     "compilerOptions": {
         "paths": {
-			"@env/*": [ "./src/lib/env/node/*" ]
+			"@env/*": [ "src/lib/env/node/*" ]
 		}
     },
     "exclude": [
