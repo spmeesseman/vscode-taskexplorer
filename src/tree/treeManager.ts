@@ -30,23 +30,24 @@ import { TaskManager } from "./task";
 export class TaskTreeManager implements ITaskTreeManager, Disposable
 {
 
+    private tasks: Task[];
     private wrapper: TeWrapper;
-    private static tasks: Task[] = [];
     private refreshPending = false;
+    private _taskManager: TaskManager;
+    private _taskWatcher: TaskWatcher;
+    private _treeBuilder: TaskTreeBuilder;
+    private firstTreeBuildDone = false;
+    private currentInvalidation: string | undefined;
+    private disposables: Disposable[] = [];
+
+    private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
+    private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
+
     private specialFolders: {
         favorites: SpecialTaskFolder;
         lastTasks: SpecialTaskFolder;
     };
 
-    private tasks: Task[];
-    private _taskManager: TaskManager;
-    private taskWatcher: TaskWatcher;
-    private treeBuilder: TaskTreeBuilder;
-    private firstTreeBuildDone = false;
-    private currentInvalidation: string | undefined;
-    private disposables: Disposable[] = [];
-    private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
-    private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
     private _views: IDictionary<ITaskTreeView|undefined> = {
         taskExplorer: undefined,
         taskExplorerSideBar: undefined
@@ -56,7 +57,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     constructor(wrapper: TeWrapper)
     {
         log.methodStart("construct task tree manager", 1, "   ");
-        this.tasks = TaskTreeManager.tasks;
+
+        this.tasks = [];
         this.wrapper = wrapper;
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
@@ -65,22 +67,25 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             lastTasks: new SpecialTaskFolder(this, Globs.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
 
-        this.taskWatcher = new TaskWatcher(this, this.specialFolders);
-        this.treeBuilder = new TaskTreeBuilder(this, this.specialFolders);
+        this._taskWatcher = new TaskWatcher(this, this.specialFolders);
+        this._treeBuilder = new TaskTreeBuilder(this, this.specialFolders);
         this._taskManager = new TaskManager(wrapper, this.specialFolders);
 
+        this.createTaskTree("taskExplorer", "      ");
+        this.createTaskTree("taskExplorerSideBar", "      ");
+
         this.disposables.push(
+            this._taskWatcher,
+            this._treeBuilder,
+            this._taskManager,
             this.specialFolders.favorites,
             this.specialFolders.lastTasks,
-            this.taskWatcher,
-            this.treeBuilder,
-            this._taskManager,
             commands.registerCommand("vscode-taskexplorer.refresh", () => this.refresh(true, false, ""), this),
             commands.registerCommand("vscode-taskexplorer.addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
             commands.registerCommand("vscode-taskexplorer.run",  async (item: TaskItem) => this.taskManager.run(item), this),
             commands.registerCommand("vscode-taskexplorer.runNoTerm",  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
-            commands.registerCommand("vscode-taskexplorer.runWithArgs",  async (item: TaskItem, args?: string) => this.taskManager.run(item, false, true, args), this),
-            commands.registerCommand("vscode-taskexplorer.runLastTask",  async () => this.taskManager.runLastTask(this.treeBuilder.getTaskMap()), this),
+            commands.registerCommand("vscode-taskexplorer.runWithArgs",  async (item: TaskItem, args?: string) => this._taskManager.run(item, false, true, args), this),
+            commands.registerCommand("vscode-taskexplorer.runLastTask",  async () => this.taskManager.runLastTask(this._treeBuilder.getTaskMap()), this),
             commands.registerCommand("vscode-taskexplorer.stop", async (item: TaskItem) => this.taskManager.stop(item), this),
             commands.registerCommand("vscode-taskexplorer.restart",  async (item: TaskItem) => this.taskManager.restart(item), this),
             commands.registerCommand("vscode-taskexplorer.pause",  (item: TaskItem) => this.taskManager.pause(item), this),
@@ -93,9 +98,6 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             commands.registerCommand("vscode-taskexplorer.runAuditFix", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit fix"), this),
             commands.registerCommand("vscode-taskexplorer.addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this)
         );
-
-        this.createTaskTree("taskExplorer", "      ");
-        this.createTaskTree("taskExplorerSideBar", "      ");
 
         log.methodDone("construct task tree manager", 1, "   ");
     }
@@ -312,7 +314,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         {
             log.write("   fetching all tasks via VSCode fetchTasks call", 1, logPad);
             statusBarItem.update("Requesting all tasks from all providers");
-            this.tasks = TaskTreeManager.tasks = await tasks.fetchTasks();
+            this.tasks = await tasks.fetchTasks();
             //
             // Process the tasks cache array for any removals that might need to be made
             //
@@ -375,7 +377,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         //
         // Create/build the ui task tree if not built already
         //
-        await this.treeBuilder.createTaskItemTree(logPad + "   ", 2);
+        await this._treeBuilder.createTaskItemTree(logPad + "   ", 2);
         //
         // Done!
         //
@@ -398,19 +400,13 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     getlastTasksFolder = () => this.specialFolders.lastTasks;
 
 
-    getTaskMap = () => this.treeBuilder.getTaskMap();
+    getTaskMap = () => this._treeBuilder.getTaskMap();
 
 
     getTasks = () => this.tasks;
 
 
-    getTaskTree = () => this.treeBuilder.getTaskTree();
-
-
-    static getTaskMap = () => TaskTreeBuilder.getTaskMap();
-
-
-    static getTasks = () => this.tasks;
+    getTaskTree = () => this._treeBuilder.getTaskTree();
 
 
     private handleRebuildEvent = async(invalidate: any, opt: boolean | Uri | undefined, logPad: string) =>
@@ -436,7 +432,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     {
         log.methodStart("construct task tree manager", 1, logPad);
         this.refreshPending = true;
-        this.treeBuilder.invalidate();
+        this._treeBuilder.invalidate();
         await this.fetchTasks(logPad + "   ");
         this.fireTreeRefreshEvent(logPad + "   ", 1);
         this.refreshPending = false;
@@ -550,8 +546,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
         log.methodStart("workspace folder removed event", 1, logPad, false, [[ "path", uri.fsPath ]]);
         let ctRmv = 0;
         const tasks = this.tasks,
-                taskMap = this.treeBuilder.getTaskMap(),
-                taskTree = this.treeBuilder.getTaskTree() as TaskFolder[];
+                taskMap = this._treeBuilder.getTaskMap(),
+                taskTree = this._treeBuilder.getTaskTree() as TaskFolder[];
 
         log.write("   removing project tasks from cache", 1, logPad);
         log.values(1, logPad + "      ", [
@@ -689,7 +685,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
                 //
                 log.write("   invalidation is for all types", 1, logPad);
                 this.currentInvalidation = undefined;
-                this.tasks = TaskTreeManager.tasks = [];
+                this.tasks = [];
             }
             log.write("   fire tree data change event", 2, logPad);
             await this.loadTasks(logPad + "   "); // loadTasks invalidates treeBuilder, sets taskMap to {} and taskTree to null

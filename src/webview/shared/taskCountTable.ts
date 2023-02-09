@@ -1,26 +1,27 @@
 
 import { TextDecoder } from "util";
-import { Task, Uri, workspace } from "vscode";
+import { TeWrapper } from "src/lib/wrapper";
 import { IDictionary } from "../../interface";
+import { Task, Uri, workspace } from "vscode";
 import { getTaskFiles } from "../../lib/fileCache";
-import { TaskTreeManager } from "../../tree/treeManager";
 import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
 import { removeLicenseButtons } from "./removeLicenseButtons";
 import { getWorkspaceProjectName, isWorkspaceFolder } from "../../lib/utils/utils";
 
 
-export const createTaskCountTable = async(extensionUri: Uri, project?: string, html?: string) =>
+export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, html?: string) =>
 {
     const projects: string[] = [],
           taskCounts: IDictionary<number> = {},
-          tableTemplateFile = Uri.joinPath(extensionUri, "res", "page", "task-count-table.html");
+          tableTemplateFile = Uri.joinPath(wrapper.context.extensionUri, "res", "page", "task-count-table.html");
 
     let fileCount = 0;
+    const treeMgr = TeWrapper.instance.treeManager;
     let tableTemplate = new TextDecoder("utf8").decode(await workspace.fs.readFile(tableTemplateFile));
     // let tableTemplate = (await workspace.fs.readFile(tableTemplateFile)).toString();
-    const tasks = TaskTreeManager.getTasks() // Filter out 'User' tasks for project/folder reports
-                                 .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
-                                                       project === getWorkspaceProjectName(t.scope.uri.fsPath)));
+    const tasks = treeMgr.getTasks() // Filter out 'User' tasks for project/folder reports
+                         .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
+                                  project === getWorkspaceProjectName(t.scope.uri.fsPath)));
     tasks.forEach((t) =>
     {
         if (!taskCounts[t.source]) {

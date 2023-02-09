@@ -39,7 +39,7 @@ export class TaskCountView extends TeWebviewView<State>
 	}
 
 
-	protected override includeBody = async() => createTaskCountTable(this.wrapper.context.extensionUri);
+	protected override includeBody = async() => createTaskCountTable(this.wrapper);
 
 
 	protected override onVisibilityChanged(visible: boolean)

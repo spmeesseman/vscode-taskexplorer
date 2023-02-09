@@ -185,7 +185,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
         this.clearTaskItems();
         for (const tId of this.store)
         {
-            const taskItem2 = TaskTreeManager.getTaskMap()[tId];
+            const taskItem2 = this.treeManager.getTaskMap()[tId];
             /* istanbul ignore else */
             if (taskItem2 && taskItem2 instanceof TaskItem && taskItem2.task)
             {
