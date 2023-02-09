@@ -106,7 +106,7 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
-	protected override finalizeHtml = async (html: string) =>
+	protected override onHtmlFinalize = async (html: string) =>
 	{
     	const taskStats = this.wrapper.taskManager.getTaskStats(),
 			  taskCount = this.wrapper.treeManager.getTasks().length;

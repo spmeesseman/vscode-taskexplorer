@@ -143,7 +143,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 		const newKey = await this.requestLicense("   ");
 		const panel = await this.wrapper.licensePage.show(undefined, newKey);
 		log.methodDone("get 30-day license command", 1);
-		return { panel: panel.getWebviewPanel(), newKey };
+		return { panel: panel.view, newKey };
 	};
 
 
@@ -165,7 +165,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	getVersion = () => this.wrapper.version;
 
 
-	getWebviewPanel = () => this.panel?.getWebviewPanel() as WebviewPanel | undefined;
+	getWebviewPanel = () => this.panel?.view as WebviewPanel | undefined;
 
 
 	isBusy = () => this.busy;
