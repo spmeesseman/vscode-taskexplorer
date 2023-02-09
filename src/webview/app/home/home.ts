@@ -1,12 +1,13 @@
 
 import "./home.css";
+import { State } from "../../shared/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
-import { ExecuteCommandType, IpcMessage, TeState } from "../../shared/ipc";
+import { ExecuteCommandType, IpcMessage } from "../../shared/ipc";
 import { provideVSCodeDesignSystem, vsCodeButton, Button } from "@vscode/webview-ui-toolkit";
 
 
-export class HomeApp extends TeWebviewApp<TeState>
+export class HomeApp extends TeWebviewApp<State>
 {
 	constructor()
     {

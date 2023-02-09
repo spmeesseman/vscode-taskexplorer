@@ -682,13 +682,6 @@ const rules = (env, wpConfig) =>
 				},
 			},
 		},
-		// {
-		// 	test: /\.css$/,
-		// 	exclude: /node_modules/,
-		// 	use: [
-		// 		MiniCssExtractPlugin.loader, "css-loader"
-		// 	]
-		// },
 		{
 			test: /\.s?css$/,
 			exclude: /node_modules/,
