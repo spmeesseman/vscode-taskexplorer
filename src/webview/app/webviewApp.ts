@@ -2,15 +2,17 @@
 import { DOM } from "./common/dom";
 import type { Disposable } from "./common/vscode";
 import {
-	IpcCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, WebviewFocusChangedParams,
-	onIpc, WebviewFocusChangedCommandType, WebviewReadyCommandType
+	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
+	WebviewFocusChangedCommandType, WebviewReadyCommandType
 } from "../shared/ipc";
+
 
 interface VsCodeApi {
 	postMessage(msg: unknown): void;
 	setState(state: unknown): void;
 	getState(): unknown;
 }
+
 
 declare function acquireVsCodeApi(): VsCodeApi;
 
@@ -29,7 +31,7 @@ const  nextIpcId = () =>
 };
 
 
-export abstract class TeApp<State = undefined>
+export abstract class TeWebviewApp<State = undefined>
 {
 
 	protected onInitialize?(): void;
@@ -37,7 +39,7 @@ export abstract class TeApp<State = undefined>
 	protected onInitialized?(): void;
 	protected onMessageReceived?(e: MessageEvent): void;
 
-	private readonly _api: VsCodeApi;
+	private readonly _vscode: VsCodeApi;
 	protected state: State;
 	private _focused?: boolean;
 	private _inputFocused?: boolean;
@@ -51,7 +53,7 @@ export abstract class TeApp<State = undefined>
 
 		this.log(`${this.appName}()`);
 
-		this._api = acquireVsCodeApi();
+		this._vscode = acquireVsCodeApi();
 
 		const disposables: Disposable[] = [];
 
@@ -86,6 +88,11 @@ export abstract class TeApp<State = undefined>
 				this.bindDisposables = undefined;
 			}),
 		);
+	}
+
+
+	get vscode() {
+		return this._vscode;
 	}
 
 
@@ -127,10 +134,10 @@ export abstract class TeApp<State = undefined>
 	protected log = (message: string, ...optionalParams: any[]) => console.log(message, ...optionalParams);
 
 
-	protected getState = () => this._api.getState() as State;
+	protected getState = () => this._vscode.getState() as State;
 
 
-	private postMessage = (e: IpcMessage) => this._api.postMessage(e);
+	private postMessage = (e: IpcMessage) => this._vscode.postMessage(e);
 
 
 	protected sendCommand<TCommand extends IpcCommandType<any>>(command: TCommand, params: IpcMessageParams<TCommand>)
@@ -146,7 +153,7 @@ export abstract class TeApp<State = undefined>
 	{
 		this.state = state;
 		if (state) {
-			this._api.setState(state);
+			this._vscode.setState(state);
 		}
 	}
 

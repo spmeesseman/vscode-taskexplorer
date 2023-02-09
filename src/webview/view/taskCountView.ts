@@ -1,16 +1,12 @@
 
 import { Disposable } from "vscode";
+import { State } from "../shared/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
 import { registerCommand } from "../../lib/command";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { createTaskCountTable } from "../shared/taskCountTable";
-
-
-interface State {
-	pinStatus: boolean;
-}
 
 
 export class TaskCountView extends TeWebviewView<State>

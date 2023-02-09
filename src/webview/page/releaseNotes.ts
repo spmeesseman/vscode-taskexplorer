@@ -1,16 +1,13 @@
 
 import { join } from "path";
 import { marked } from "marked";
+import { State } from "../shared/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { readFileAsync } from "../../lib/utils/fs";
 import { getInstallPath } from "../../lib/utils/pathUtils";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { removeLicenseButtons } from "../shared/removeLicenseButtons";
-
-interface State {
-	pinned: boolean;
-};
 
 
 export class ReleaseNotesPage extends TeWebviewPanel<State>
@@ -19,12 +16,12 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "releaseNotes";
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
 	{
 		super(
-			container,
+			wrapper,
 			"release-notes.html",
-			ReleaseNotesPage.viewTitle.replace("#{version}", container.context.extension.packageJSON.version),
+			ReleaseNotesPage.viewTitle.replace("#{version}", wrapper.context.extension.packageJSON.version),
 			"res/img/logo-bl.png",
 			`taskExplorer.${ReleaseNotesPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}releaseNotes`,

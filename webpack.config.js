@@ -412,6 +412,8 @@ const output = (env, wpConfig) =>
 		wpConfig.output = {
 			clean: env.clean === true,
 			filename: "[name].js",
+			// libraryTarget: "module",
+    		// chunkFormat: "module",
 			path: path.join(__dirname, "res", "js"),
 			publicPath: "#{webroot}/js/",
 		};
@@ -527,7 +529,7 @@ const plugins = (env, wpConfig) =>
 					configFile: path.join(env.basePath, "tsconfig.json"),
 				},
 			}),
-			new MiniCssExtractPlugin({ filename: "[name].css" }),
+			new MiniCssExtractPlugin({ filename: "[name].css", }),
 			getHtmlPlugin("home", env, wpConfig),
 			// getHtmlPlugin("licensePage", env, wpConfig),
 			// getHtmlPlugin("parsingReport", env, wpConfig),
@@ -535,7 +537,8 @@ const plugins = (env, wpConfig) =>
 			// getHtmlPlugin("taskCount", env, wpConfig),
 			// getHtmlPlugin("taskUsage", env, wpConfig),
 			// getHtmlPlugin("welcome", env, wpConfig),
-			/** @type {any} */(getCspHtmlPlugin(env, wpConfig)),
+			/** @type {any} */
+			(getCspHtmlPlugin(env, wpConfig)),
 			new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []),
 			new CopyPlugin({
 				patterns: [
@@ -612,31 +615,21 @@ const resolve = (env, wpConfig) =>
 	{
 		wpConfig.resolve =
 		{   
-			extensions: [ ".ts", ".js" ],
 			alias: {
-				"@env": path.resolve(__dirname, "src", "env", "node"),
-			}
-			// alias: {
-			// 	// @ts-ignore
-			// 	"@env": path.resolve(__dirname, "src", "env", wpConfig.target === "webworker" ? "browser" : wpConfig.target),
-			// 	// This dependency is very large, and isn"t needed for our use-case
-			// 	tr46: path.resolve(__dirname, "patches", "tr46.js"),
-			// },
-			// fallback: wpConfig.target === "webworker" ?
-			// 			{ path: require.resolve("path-browserify"), os: require.resolve("os-browserify/browser") } :
-			// 			undefined,
-			// mainFields: wpConfig.target === "webworker" ? [ "browser", "module", "main" ] :
-			// 											  [ "module", "main" ],
-			// extensions: [
-			// 	".ts", ".tsx", ".js", ".jsx", ".json"
-			// ]
+				"@env": path.resolve(__dirname, "src", "lib", "env", env.build === "extension_web" ? "browser" : "node")
+			},
+			fallback: env.build === "extension_web" ? { path: require.resolve("path-browserify"), os: require.resolve("os-browserify/browser") } : undefined,
+			mainFields: env.build === "extension_web" ? [ "browser", "module", "main" ] : [ "module", "main" ],
+			extensions: [
+				".ts", ".tsx", ".js", ".jsx", ".json"
+			]
 		};
 	}
 	else
 	{
 		wpConfig.resolve = {
 			alias: {
-				"@env": path.resolve(__dirname, "src", "env", "browser"),
+				"@env": path.resolve(__dirname, "src", "lib", "env", "browser"),
 			},
 			extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
 			modules: [env.basePath, "node_modules"],
@@ -689,8 +682,15 @@ const rules = (env, wpConfig) =>
 				},
 			},
 		},
+		// {
+		// 	test: /\.css$/,
+		// 	exclude: /node_modules/,
+		// 	use: [
+		// 		MiniCssExtractPlugin.loader, "css-loader"
+		// 	]
+		// },
 		{
-			test: /\.scss$/,
+			test: /\.s?css$/,
 			exclude: /node_modules/,
 			use: [
 			{
@@ -707,18 +707,6 @@ const rules = (env, wpConfig) =>
 				loader: "sass-loader",
 				options: {
 					sourceMap: wpConfig.mode !== "production",
-				},
-			}]
-		},
-		{
-			test: /\.css$/,
-			exclude: /node_modules/,
-			use: [
-			{
-				loader: "css-loader",
-				options: {
-					sourceMap: wpConfig.mode !== "production",
-					url: false,
 				},
 			}]
 		}]);

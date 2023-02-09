@@ -55,3 +55,17 @@ export interface ExecuteCommandParams {
 	args?: [];
 }
 export const ExecuteCommandType = new IpcCommandType<ExecuteCommandParams>("command/execute");
+
+export interface DidChangeExtensionEnabledParams {
+	extensionEnabled: boolean;
+}
+export const DidChangeExtensionEnabledType = new IpcNotificationType<DidChangeExtensionEnabledParams>(
+	"extensionEnabled/didChange",
+);
+
+export interface DidChangeConfigurationParams {
+	plusEnabled: boolean;
+}
+export const DidChangeConfigurationType = new IpcNotificationType<DidChangeConfigurationParams>(
+	"configuration/didChange",
+);

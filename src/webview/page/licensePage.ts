@@ -1,14 +1,10 @@
 
+import { State } from "../shared/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../shared/taskCountTable";
 import { removeViewLicenseButton } from "../shared/removeLicenseButtons";
-
-interface State {
-	pinned: boolean;
-};
-
 
 export class LicensePage extends TeWebviewPanel<State>
 {
@@ -16,10 +12,10 @@ export class LicensePage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "licensePage";
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
 	{
 		super(
-			container,
+			wrapper,
 			"license-manager.html",
 			LicensePage.viewTitle,
 			"res/img/logo-bl.png",

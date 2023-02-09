@@ -1,4 +1,5 @@
 
+import { State } from "../shared/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
@@ -56,10 +57,6 @@ function main() {
   setVSCodeMessageListener();
 }
 */
-
-interface State {
-	webroot?: string;
-}
 
 
 export class HomeView extends TeWebviewView<State>

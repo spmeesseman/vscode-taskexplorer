@@ -1,5 +1,6 @@
 
 import { Task, Uri } from "vscode";
+import { State } from "../shared/state";
 import { dirname, relative } from "path";
 import { TeWrapper } from "../../lib/wrapper";
 import { TaskTreeManager } from "../../tree/treeManager";
@@ -8,10 +9,6 @@ import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../shared/taskCountTable";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
 
-interface State {
-	pinned: boolean;
-};
-
 
 export class ParsingReportPage extends TeWebviewPanel<State>
 {
@@ -19,10 +16,10 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	static viewId: WebviewIds = "parsingReport";
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
 	{
 		super(
-			container,
+			wrapper,
 			"license-manager.html",
 			ParsingReportPage.viewTitle,
 			"res/img/logo-bl.png",
