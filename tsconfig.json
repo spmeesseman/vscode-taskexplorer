@@ -1,10 +1,10 @@
 {
     "extends": "./tsconfig.base.json",
-    // "compilerOptions": {
-    //     "paths": {
-	// 		"@env/*": [ "lib/env/node/*" ]
-	// 	}
-    // },
+    "compilerOptions": {
+        "paths": {
+			"@env/*": [ "./src/lib/env/node/*" ]
+		}
+    },
     "exclude": [
         "node_modules",
         ".vscode-test",
@@ -12,10 +12,12 @@
         "test-fixture",
         "script",
         "types",
-        "src/test",
         "res",
         "dist",
         ".nyc_output",
-        "coverage"
+        "coverage",
+        "src/test/**/*",
+        "src/webview/app/**/*",
+        "src/lib/env/browser/**/*"
     ]
 }

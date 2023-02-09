@@ -14,16 +14,17 @@ Happy linting! 💖
 module.exports = {
     "root": true,
     "env": {
-        "es6": true,
-        "node": true
+        "node": true,
+        "web":true,
+        "es2020": true
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "project": [
-            "tsconfig.json", "tsconfig.test.json"
+            "tsconfig.json", "tsconfig.browser.json", "tsconfig.test.json"
         ],
         "sourceType": "module",
-        "ecmaVersion": 2019
+        "ecmaVersion": 2020
     },
     "ignorePatterns": ["**/test-fixture/*.js", "types", "**/*.js", "*.json" ],
     "overrides": [

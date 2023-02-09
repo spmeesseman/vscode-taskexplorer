@@ -3,11 +3,14 @@
 	"compilerOptions": {
 		"lib": ["dom", "dom.iterable", "es2020"],
 		"paths": {
-			"@env/*": ["src/env/browser/*"],
-			"path": ["node_modules/path-browserify"]
+			"@env/*": ["./src/lib/env/browser/*"],
+			"path": ["./node_modules/path-browserify"]
 		},
 		"tsBuildInfoFile": "tsconfig.browser.tsbuildinfo"
 	},
-	"include": ["src/**/*"],
-	"exclude": ["src/test/**/*", "src/webviews/apps/**/*", "src/env/node/**/*"]
+	"exclude": [
+		"src/test/**/*",
+		"src/webview/app/**/*",
+		"src/lib/env/node/**/*"
+	]
 }

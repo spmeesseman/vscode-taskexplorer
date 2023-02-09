@@ -1,11 +1,10 @@
 {
     "extends": "./tsconfig.base.json",
-    // "compilerOptions": {
-    //     "paths": {
-	// 		"@env/*": [ "src/lib/env/node/*" ]
-	// 	},
-    //     // "tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
-    // },
+    "compilerOptions": {
+        "paths": {
+			"@env/*": [ "./src/lib/env/node/*" ]
+		}
+    },
     "exclude": [
         "node_modules",
         ".vscode-test",
@@ -16,6 +15,8 @@
         "res",
         "dist",
         ".nyc_output",
-        "coverage"
+        "coverage",
+        "src/webview/app/**/*",
+        "src/lib/env/browser/**/*"
     ]
 }
