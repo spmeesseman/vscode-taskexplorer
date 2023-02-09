@@ -5,6 +5,7 @@ import { IDictionary, ILog } from "../interface";
 import { IStorage } from "../interface/IStorage";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
+import { ContextKeys, setContext } from "./context";
 import { BashTaskProvider } from "../providers/bash";
 import { GulpTaskProvider } from "../providers/gulp";
 import { MakeTaskProvider } from "../providers/make";
@@ -43,8 +44,6 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
-import { setContext } from "./context";
-import { ContextKeys } from "./constants";
 
 
 export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;

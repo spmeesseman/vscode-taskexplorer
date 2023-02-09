@@ -1,12 +1,11 @@
 
 import { log } from "../lib/log/log";
 import { TeWrapper } from "../lib/wrapper";
-import { setContext } from "../lib/context";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
-import { ContextKeys } from "../lib/constants";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
+import { setContext, ContextKeys } from "../lib/context";
 import { WebviewFocusChangedParams } from "./shared/ipc";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {

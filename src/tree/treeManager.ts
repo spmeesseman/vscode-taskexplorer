@@ -5,7 +5,7 @@ import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
-import { Globs } from "../lib/constants";
+import { Strings } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import * as utils from "../lib/utils/utils";
 import { isDirectory } from "../lib/utils/fs";
@@ -63,8 +63,8 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
         this.specialFolders = {
-            favorites: new SpecialTaskFolder(this, Globs.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
-            lastTasks: new SpecialTaskFolder(this, Globs.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
+            favorites: new SpecialTaskFolder(this, Strings.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
+            lastTasks: new SpecialTaskFolder(this, Strings.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
 
         this._taskWatcher = new TaskWatcher(this, this.specialFolders);

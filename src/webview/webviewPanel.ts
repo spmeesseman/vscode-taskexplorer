@@ -1,12 +1,12 @@
 
-import { setContext } from "../lib/context";
-import { TeWebviewBase } from "./webviewBase";
+import { Commands } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
+import { TeWebviewBase } from "./webviewBase";
 import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { isObject, timeout } from "../lib/utils/utils";
+import { ContextKeys, setContext } from "../lib/context";
 import type { WebviewFocusChangedParams } from "./shared/ipc";
-import { Commands, ContextKeys } from "../lib/constants";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,

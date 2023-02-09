@@ -1,17 +1,16 @@
 
+import { log } from "./log/log";
 import * as fs from "./utils/fs";
 import * as util from "./utils/utils";
 import * as fileCache from "./fileCache";
-import { log } from "./log/log";
-import { setContext } from "./context";
 import { TaskTree } from "../tree/tree";
-import { ContextKeys } from "./constants";
 import { TeWrapper } from "./wrapper";
 import { storage } from "./utils/storage";
 import { registerCommand } from "./command";
 import { refreshTree } from "./refreshTree";
 import { isExtensionBusy } from "../extension";
 import { workspace, WorkspaceFolder } from "vscode";
+import { ContextKeys, setContext } from "./context";
 import { configuration } from "./utils/configuration";
 import { onWsFoldersChange } from "./watcher/fileWatcher";
 import { enableConfigWatcher } from "./watcher/configWatcher";

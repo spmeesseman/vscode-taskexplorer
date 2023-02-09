@@ -2,10 +2,9 @@
 import { TaskItem } from "./item";
 import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
-import { Globs } from "../lib/constants";
+import { Globs, Strings } from "../lib/constants";
 import { sortTasks } from "../lib/sortTasks";
 import { storage } from "../lib/utils/storage";
-import { TaskTreeManager } from "./treeManager";
 import { configuration } from "../lib/utils/configuration";
 import { IDictionary, ITaskTreeManager } from "../interface";
 import { isString, removeFromArray } from "../lib/utils/utils";
@@ -38,9 +37,9 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
         super(label, state);
         this.treeManager = treeManager;
         this.iconPath = ThemeIcon.Folder;
-        this.isFavorites = label === Globs.FAV_TASKS_LABEL;
+        this.isFavorites = label === Strings.FAV_TASKS_LABEL;
         this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
-        this.storeName = this.isFavorites ? Globs.FAV_TASKS_STORE : Globs.LAST_TASKS_STORE;
+        this.storeName = this.isFavorites ? Strings.FAV_TASKS_STORE : Strings.LAST_TASKS_STORE;
         this.store = storage.get<string[]>(this.storeName, []);
         this.settingNameEnabled = "specialFolders.show" + label.replace(/ /g, "");
         this.enabled = configuration.get<boolean>(this.settingNameEnabled);
@@ -116,7 +115,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
 
     async addRemoveRenamedLabel(taskItem: TaskItem)
     {
-        const renames = storage.get<string[][]>(Globs.TASKS_RENAME_STORE, []),
+        const renames = storage.get<string[][]>(Strings.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
 
         log.methodStart("add/remove rename special", 1, "", false, [[ "id", id ], [ "current # of items in store", renames.length ]]);
@@ -148,7 +147,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
         //
         // Persist to storage and refresh this tree node
         //
-        await storage.update(Globs.TASKS_RENAME_STORE, renames);
+        await storage.update(Strings.TASKS_RENAME_STORE, renames);
         this.treeManager.fireTreeRefreshEvent("   ", 1, this);
 
         log.methodDone("add/remove rename special", 1, "", [[ "new # of items in store", renames.length ]]);
@@ -243,11 +242,11 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
             this.taskFiles = [];
             if (this.isFavorites) {
                 this.store = [];
-                await storage.update(Globs.FAV_TASKS_STORE, this.store);
+                await storage.update(Strings.FAV_TASKS_STORE, this.store);
                 this.refresh(true);
             }
             else {
-                await storage.update(Globs.LAST_TASKS_STORE, this.store);
+                await storage.update(Strings.LAST_TASKS_STORE, this.store);
                 this.refresh(true);
             }
         }
@@ -282,7 +281,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
     private getRenamedTaskName(taskItem: TaskItem)
     {
         let label = taskItem.taskFile.folder.label + " - " + taskItem.taskSource;
-        const renames = storage.get<string[][]>(Globs.TASKS_RENAME_STORE, []),
+        const renames = storage.get<string[][]>(Strings.TASKS_RENAME_STORE, []),
               id = this.getTaskItemId(taskItem);
         for (const i in renames)
         {
@@ -301,9 +300,9 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
 
     getTaskItemId(taskItem: TaskItem)
     {
-        return taskItem.id.replace(Globs.LAST_TASKS_LABEL + ":", "")
-                          .replace(Globs.FAV_TASKS_LABEL + ":", "")
-                          .replace(Globs.USER_TASKS_LABEL + ":", "");
+        return taskItem.id.replace(Strings.LAST_TASKS_LABEL + ":", "")
+                          .replace(Strings.FAV_TASKS_LABEL + ":", "")
+                          .replace(Strings.USER_TASKS_LABEL + ":", "");
     }
 
 
@@ -407,7 +406,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
             {
                 const idx = this.store.findIndex(f => f === id);
                 this.store.splice(idx, 1);
-                await storage.update(Globs.LAST_TASKS_STORE, this.store);
+                await storage.update(Strings.LAST_TASKS_STORE, this.store);
             }
             this.treeManager.fireTreeRefreshEvent(logPad, 1, this);
         }
@@ -446,7 +445,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
 
     private sort(logPad: string)
     {
-        if (this.label === Globs.LAST_TASKS_LABEL)
+        if (this.label === Strings.LAST_TASKS_LABEL)
         {
             this.sortLastTasks(this.taskFiles, this.store, logPad, 4);
         }
@@ -461,8 +460,8 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
         log.methodStart("sort last tasks", logLevel, logPad);
         items?./* istanbul ignore else */sort((a: TaskItem, b: TaskItem) =>
         {
-            const aIdx = lastTasks.indexOf(a.id.replace(Globs.LAST_TASKS_LABEL + ":", ""));
-            const bIdx = lastTasks.indexOf(b.id.replace(Globs.LAST_TASKS_LABEL + ":", ""));
+            const aIdx = lastTasks.indexOf(a.id.replace(Strings.LAST_TASKS_LABEL + ":", ""));
+            const bIdx = lastTasks.indexOf(b.id.replace(Strings.LAST_TASKS_LABEL + ":", ""));
             return aIdx < bIdx ? 1 : -1;
         });
         log.methodDone("sort last tasks", logLevel, logPad);

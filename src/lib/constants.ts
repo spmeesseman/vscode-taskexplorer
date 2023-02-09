@@ -3,15 +3,19 @@
 import { IDictionary } from "../interface";
 
 
-export const Globs: IDictionary<string> =
+export const Strings =
 {
-    DEFAULT_SEPARATOR: "-",
+	DEFAULT_SEPARATOR: "-",
     LAST_TASKS_STORE: "lastTasks",
     LAST_TASKS_LABEL: "Last Tasks",
     FAV_TASKS_STORE: "favoriteTasks",
     FAV_TASKS_LABEL: "Favorites",
     USER_TASKS_LABEL: "User Tasks",
     TASKS_RENAME_STORE: "Renames",
+};
+
+export const Globs =
+{
     GLOB_ANT: "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]",
     GLOB_APPPUBLISHER: "**/.publishrc*",
     GLOB_MAVEN: "**/pom.xml",
@@ -56,23 +60,6 @@ export const enum Commands
 	ShowHomeView = "vscode-taskexplorer.showHomeView"
 }
 
-export const enum ContextKeys
-{
-	ActionPrefix = "taskExplorer:action:",
-	KeyPrefix = "taskExplorer:key:",
-	WebviewPrefix = "taskExplorer:webview:",
-	WebviewViewPrefix = "taskExplorer:webviewView:",
-	Debugging = "taskExplorer:debugging",
-	Disabled = "taskExplorer:disabled",
-	Enabled = "taskExplorer:enabled",
-	Untrusted = "taskExplorer:untrusted",
-	licensePage = "taskExplorer:licensePage",
-	ParsingReport = "taskExplorer:parsingReport",
-	ReleaseNotes = "taskExplorer:releaseNotes",
-	TaskFiles = "taskExplorer:taskFiles",
-	Tests = "taskExplorer:tests"
-}
-
 export const enum VsCodeCommands
 {
 	CloseActiveEditor = "workbench.action.closeActiveEditor",
@@ -103,7 +90,6 @@ export const enum VsCodeCommands
 	ShowSCM = "workbench.view.scm",
 	UninstallExtension = "workbench.extensions.uninstallExtension",
 }
-
 
 export const enum GlyphChars
 {
