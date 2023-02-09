@@ -410,9 +410,10 @@ const output = (env, wpConfig) =>
 	if (env.build === "webview")
 	{
 		wpConfig.output = {
+			clean: env.clean === true,
 			filename: "[name].js",
 			path: path.join(__dirname, "res", "js"),
-			publicPath: "#{root}/dist/res/js/",
+			publicPath: "#{webroot}/js/",
 		};
 	}
 	else
@@ -670,46 +671,56 @@ const rules = (env, wpConfig) =>
 			exclude: /\.d\.ts$/,
 			include: path.join(__dirname, "src"),
 			test: /\.tsx?$/,
-			use: env.esbuild
-				? {
-						loader: "esbuild-loader",
-						options: {
-							implementation: esbuild,
-							loader: "tsx",
-							target: "es2020",
-							tsconfigRaw: resolveTSConfig(path.join(env.basePath, "tsconfig.json")),
-						},
-					}
-				: {
-						loader: "ts-loader",
-						options: {
-							configFile: path.join(env.basePath, "tsconfig.json"),
-							experimentalWatchApi: true,
-							transpileOnly: true,
-						},
-					},
+			use: env.esbuild ?
+			{
+				loader: "esbuild-loader",
+				options: {
+					implementation: esbuild,
+					loader: "tsx",
+					target: "es2020",
+					tsconfigRaw: resolveTSConfig(path.join(env.basePath, "tsconfig.json")),
+				},
+			}:{
+				loader: "ts-loader",
+				options: {
+					configFile: path.join(env.basePath, "tsconfig.json"),
+					experimentalWatchApi: true,
+					transpileOnly: true,
+				},
+			},
 		},
 		{
 			test: /\.scss$/,
-			use: [
-				{
-					loader: MiniCssExtractPlugin.loader,
-				},
-				{
-					loader: "css-loader",
-					options: {
-						sourceMap: wpConfig.mode !== "production",
-						url: false,
-					},
-				},
-				{
-					loader: "sass-loader",
-					options: {
-						sourceMap: wpConfig.mode !== "production",
-					},
-				},
-			],
 			exclude: /node_modules/,
+			use: [
+			{
+				loader: MiniCssExtractPlugin.loader,
+			},
+			{
+				loader: "css-loader",
+				options: {
+					sourceMap: wpConfig.mode !== "production",
+					url: false,
+				},
+			},
+			{
+				loader: "sass-loader",
+				options: {
+					sourceMap: wpConfig.mode !== "production",
+				},
+			}]
+		},
+		{
+			test: /\.css$/,
+			exclude: /node_modules/,
+			use: [
+			{
+				loader: "css-loader",
+				options: {
+					sourceMap: wpConfig.mode !== "production",
+					url: false,
+				},
+			}]
 		}]);
 	}
 	else
@@ -737,7 +748,7 @@ const rules = (env, wpConfig) =>
 					tsconfigRaw: resolveTSConfig(
 						path.join(
 							__dirname,
-							wpConfig.target === "webworker" ? "tsconfig.browser.json" : "tsconfig.json",
+							env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
 						),
 					),
 				},
@@ -747,7 +758,7 @@ const rules = (env, wpConfig) =>
 				options: {
 					configFile: path.join(
 						__dirname,
-						wpConfig.target === "webworker" ? "tsconfig.browser.json" : "tsconfig.json",
+						env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
 					),
 					experimentalWatchApi: true,
 					transpileOnly: true
@@ -818,7 +829,7 @@ const getImageMinimizerConfig = (env, wpConfig) =>
 {
 	/** @type ImageMinimizerPlugin.Generator<any> */
 	// @ts-ignore
-	return env.useSharpForImages ?
+	return env.imageOpt ?
 	{
 		type: "asset",
 		implementation: ImageMinimizerPlugin.sharpGenerate,

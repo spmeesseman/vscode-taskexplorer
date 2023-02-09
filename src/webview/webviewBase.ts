@@ -113,8 +113,7 @@ export abstract class TeWebviewBase<State>
 			  uri = Uri.joinPath(webRootUri, "page", this.fileName),
 			  content = new TextDecoder("utf8").decode(await workspace.fs.readFile(uri)),
 			  cspSource = webview.cspSource,
-			  webRoot = webview.asWebviewUri(webRootUri).toString(),
-			  root = webview.asWebviewUri(this.wrapper.context.extensionUri).toString();
+			  webRoot = webview.asWebviewUri(webRootUri).toString();
 
 		const [ bootstrap, head, body, endOfBody ] = await Promise.all([
 			this.includeBootstrap?.(),
@@ -144,8 +143,6 @@ export abstract class TeWebviewBase<State>
 						return cspSource;
 					case "cspNonce":
 						return this.cspNonce;
-					case "root":
-						return root;
 					case "title":
 						return this.title;
 					case "version":

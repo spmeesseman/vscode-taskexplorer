@@ -13,3 +13,4 @@ types/types
 tsconfig.tsbuildinfo
 .dccache
 /res/**/home.*
+/res/page/codicon.*
