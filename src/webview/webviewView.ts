@@ -6,7 +6,7 @@ import { TeWebviewBase } from "./webviewBase";
 import { ContextKeys } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import { isExtensionBusy } from "../extension";
-import { WebviewFocusChangedParams } from "./ipc";
+import { WebviewFocusChangedParams } from "./shared/ipc";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,

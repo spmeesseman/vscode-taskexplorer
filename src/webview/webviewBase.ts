@@ -16,7 +16,7 @@ import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
-} from "./ipc";
+} from "./shared/ipc";
 
 
 export abstract class TeWebviewBase<State>
@@ -123,6 +123,7 @@ export abstract class TeWebviewBase<State>
 		]);
 
 		let html = await this.previewHtml(content, ...args);
+		html = this.onHtml(html);
 
 		const repl = (h: string) =>
 		{
@@ -185,6 +186,12 @@ export abstract class TeWebviewBase<State>
 			completionId,
 		});
 	}
+
+
+	protected onHtml = (html: string) =>
+	{
+		return html;
+	};
 
 
 	protected onMessageReceivedCore(e: IpcMessage)
