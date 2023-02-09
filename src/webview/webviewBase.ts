@@ -24,8 +24,6 @@ export abstract class TeWebviewBase<State>
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
     protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
 
-	protected isReady = false;
-	protected _view: WebviewView | WebviewPanel | undefined;
 	protected includeBootstrap?(): any;
 	protected includeBody?(): string | Promise<string>;
 	protected includeEndOfBody?(): string | Promise<string>;
@@ -34,10 +32,12 @@ export abstract class TeWebviewBase<State>
 	protected onInitializing?(): Disposable[] | undefined;
 	protected onFocusChanged?(focused: boolean): void;
 	protected onMessageReceived?(e: IpcMessage): void;
-	protected onReady?(): void;
 	protected onVisibilityChanged?(visible: boolean): void;
 	protected onWindowFocusChanged?(focused: boolean): void;
 	protected registerCommands?(): Disposable[];
+
+	protected _isReady = false;
+	protected _view: WebviewView | WebviewPanel | undefined;
 
 	private readonly _cspNonce = getNonce();
 	private _isFirstLoadComplete = false;
@@ -54,23 +54,13 @@ export abstract class TeWebviewBase<State>
     }
 
 
-	private get cspNonce()
-	{
-		return this._cspNonce;
-	}
-
-
-	get isFirstLoadComplete()
-	{
+	get isFirstLoadComplete() {
 		return this._isFirstLoadComplete;
 	}
 
-
-	get title()
-	{
+	get title() {
 		return this._view?.title ?? this._title;
 	}
-
 
 	set title(title: string)
 	{
@@ -79,32 +69,18 @@ export abstract class TeWebviewBase<State>
 		this._view.title = title;
 	}
 
-
-	get originalTitle()
-	{
+	get originalTitle() {
 		return this._originalTitle;
 	}
 
+	get view() {
+		return this._view;
+	}
 
-	get visible()
-	{
+
+	get visible() {
 		return this._view?.visible ?? false;
 	}
-
-
-	protected async previewHtml(html: string, ...args: unknown[])
-	{
-		return html;
-	}
-
-
-	protected async finalizeHtml(html: string, ...args: unknown[])
-	{
-		return html;
-	}
-
-
-	getWebviewPanel = () => this._view;
 
 
 	protected async getHtml(webview: Webview, ...args: unknown[])
@@ -122,8 +98,8 @@ export abstract class TeWebviewBase<State>
 			this.includeEndOfBody?.(),
 		]);
 
-		let html = await this.previewHtml(content, ...args);
-		html = this.onHtml(html);
+		let html = content;
+		html = await this.onHtmlPreview?.(content, ...args);
 
 		const repl = (h: string) =>
 		{
@@ -136,13 +112,13 @@ export abstract class TeWebviewBase<State>
 					case "body":
 						return repl(body ?? "");
 					case "endOfBody":
-						return `${bootstrap ? `<script type="text/javascript" nonce="${this.cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
+						return `${bootstrap ? `<script type="text/javascript" nonce="${this._cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
 					case "placement":
 						return "editor";
 					case "cspSource":
 						return cspSource;
 					case "cspNonce":
-						return this.cspNonce;
+						return this._cspNonce;
 					case "title":
 						return this.title;
 					case "version":
@@ -159,7 +135,7 @@ export abstract class TeWebviewBase<State>
 		html = repl(html);
 
 		this._isFirstLoadComplete = true;
-		return this.finalizeHtml(html, ...args);
+		return this.onHtmlFinalize(html, ...args);
 	}
 
 
@@ -188,10 +164,10 @@ export abstract class TeWebviewBase<State>
 	}
 
 
-	protected onHtml = (html: string) =>
-	{
-		return html;
-	};
+	protected onHtmlPreview = async(html: string, ...args: unknown[]): Promise<string> => html;
+
+
+	protected onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => html;
 
 
 	protected onMessageReceivedCore(e: IpcMessage)
@@ -203,8 +179,7 @@ export abstract class TeWebviewBase<State>
 			case WebviewReadyCommandType.method:
 				onIpc(WebviewReadyCommandType, e, () =>
 				{
-					this.isReady = true;
-					this.onReady?.();
+					this._isReady = true;
 				});
 				break;
 
@@ -236,7 +211,7 @@ export abstract class TeWebviewBase<State>
 
 	private postMessage(message: IpcMessage)
 	{
-		if (!this._view || !this.isReady || !this.visible) return Promise.resolve(false);
+		if (!this._view || !this._isReady || !this.visible) return Promise.resolve(false);
 		//
 		// From GitLens:
 		//     It looks like there is a bug where `postMessage` can sometimes just hang infinitely.
@@ -253,13 +228,13 @@ export abstract class TeWebviewBase<State>
 	protected async refresh(force?: boolean)
     {
 		if (!this._view) return;
-		this.isReady = false;
+		this._isReady = false;
 		const html = await this.getHtml(this._view.webview);
 		if (force) {
 			this._view.webview.html = "";
 		}
 		if (this._view.webview.html === html) {
-			this.isReady = true;
+			this._isReady = true;
 			return;
 		}
 		this._view.webview.html = html;

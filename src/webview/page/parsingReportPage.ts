@@ -31,7 +31,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override previewHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
+	protected override onHtmlPreview = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
 
 
 	// protected override includeBootstrap(): State {

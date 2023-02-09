@@ -32,7 +32,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override finalizeHtml = (html: string) =>  this.getPageContent(html);
+	protected override onHtmlFinalize = (html: string) =>  this.getPageContent(html);
 
 
 	private getPageContent = async (html: string) =>

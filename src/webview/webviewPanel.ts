@@ -178,7 +178,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		this.onFocusChanged?.(false);
 		this.onVisibilityChanged?.(false);
 
-		this.isReady = false;
+		this._isReady = false;
 		this._disposablePanel?.dispose();
 		this._disposablePanel = undefined;
 		this._view = undefined;
@@ -218,7 +218,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	protected override onHtml = (html: string) =>
+	protected override onHtmlPreview = async(html: string) =>
 	{
 		return html.replace(/\#\{title\}/g,
 `<table><tr>

@@ -125,7 +125,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		this.resetContextKeys();
 		this.onFocusChanged?.(false);
 		this.onVisibilityChanged?.(false);
-		this.isReady = false;
+		this._isReady = false;
 		this._disposableView?.dispose();
 		this._disposableView = undefined;
 		this._view = undefined;
