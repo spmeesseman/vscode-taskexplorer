@@ -6,7 +6,7 @@ import { join } from "path";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
-import { Globs } from "../lib/constants";
+import { Strings } from "../lib/constants";
 import { NoScripts } from "../lib/noScripts";
 import { SpecialTaskFolder } from "./specialFolder";
 import { statusBarItem } from "../lib/statusBarItem";
@@ -185,7 +185,7 @@ export class TaskTreeBuilder implements Disposable
         }     //
         else // User Task (not related to a ws or project)
         {   //
-            scopeName = Globs.USER_TASKS_LABEL;
+            scopeName = Strings.USER_TASKS_LABEL;
             folder = folders[scopeName];
             if (!folder)
             {

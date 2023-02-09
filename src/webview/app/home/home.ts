@@ -1,9 +1,9 @@
 
 import "./home.css";
-import { State } from "../../shared/state";
+import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
-import { ExecuteCommandType, IpcMessage } from "../../shared/ipc";
+import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
 import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 

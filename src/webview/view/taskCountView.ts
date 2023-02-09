@@ -2,9 +2,8 @@
 import { Disposable } from "vscode";
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
-import { ContextKeys } from "../../lib/constants";
+import { ContextKeys } from "../../lib/context";
 import { TasksChangeEvent } from "../../interface";
-import { registerCommand } from "../../lib/command";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { createTaskCountTable } from "../common/taskCountTable";
 

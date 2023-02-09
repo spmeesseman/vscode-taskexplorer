@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { IDictionary } from "../interface";
+
+
 export const Strings =
 {
 	DEFAULT_SEPARATOR: "-",
@@ -11,7 +14,7 @@ export const Strings =
     TASKS_RENAME_STORE: "Renames",
 };
 
-export const Globs =
+export const Globs: IDictionary<string> =
 {
     GLOB_ANT: "**/[Bb][Uu][Ii][Ll][Dd].[Xx][Mm][Ll]",
     GLOB_APPPUBLISHER: "**/.publishrc*",
@@ -55,6 +58,7 @@ export const enum Commands
     RunLastTask = "vscode-taskexplorer.runLastTask",
 	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
 	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
+	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
 	ShowTaskCountView = "vscode-taskexplorer.showTaskCountView",
 	ShowTaskStatsView = "vscode-taskexplorer.showTaskStatsView",
 	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage"

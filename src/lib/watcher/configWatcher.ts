@@ -1,17 +1,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { log } from "../log/log";
+import { TeWrapper } from "../wrapper";
 import { persistCache } from "../fileCache";
 import { refreshTree } from "../refreshTree";
+import { IDictionary } from "../../interface";
+import { pushIfNotExists } from "../utils/utils";
 import { registerFileWatcher } from "./fileWatcher";
+import { setContext, ContextKeys } from "../context";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
-import { pushIfNotExists } from "../utils/utils";
-import { IDictionary } from "../../interface";
-import { TeWrapper } from "../wrapper";
-import { setContext } from "../context";
-import { ContextKeys } from "../constants";
 
 let watcherEnabled = true;
 let processingConfigEvent = false;

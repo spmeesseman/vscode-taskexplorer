@@ -4,7 +4,7 @@ import type { Disposable } from "./common/vscode";
 import {
 	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
 	WebviewFocusChangedCommandType, WebviewReadyCommandType
-} from "../shared/ipc";
+} from "../common/ipc";
 
 
 interface VsCodeApi {

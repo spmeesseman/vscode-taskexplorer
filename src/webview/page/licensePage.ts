@@ -1,7 +1,8 @@
 
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
-import { Commands, ContextKeys } from "../../lib/constants";
+import { Commands } from "../../lib/constants";
+import { ContextKeys } from "../../lib/context";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../common/taskCountTable";
 import { removeViewLicenseButton } from "../common/removeLicenseButtons";
@@ -28,7 +29,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	}
 
 
-	protected override finalizeHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
+	protected override previewHtml = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
 
 
 	private getPageContent = async (html: string, ...args: any[]) =>

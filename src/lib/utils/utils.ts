@@ -5,7 +5,7 @@ import { TaskFile } from "../../tree/file";
 import { TaskItem } from "../../tree/item";
 import { executeCommand } from "../command";
 import { basename, extname, sep } from "path";
-import { Commands, Globs } from "../constants";
+import { Commands, Globs, Strings } from "../constants";
 import { configuration } from "./configuration";
 import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
 import { ILicenseManager } from "../../interface/ILicenseManager";
@@ -46,7 +46,7 @@ export const getDateDifference = (date1: Date | number, date2: Date | number, ty
 };
 
 
-export const getGroupSeparator = () => configuration.get<string>("groupSeparator", Globs.DEFAULT_SEPARATOR);
+export const getGroupSeparator = () => configuration.get<string>("groupSeparator", Strings.DEFAULT_SEPARATOR);
 
 
 export const getGlobPattern = (taskType: string) =>
@@ -152,9 +152,9 @@ export const isObjectEmpty = (value: any) =>
 export const isSpecial = (taskItem: TaskItem) =>
 {
     return taskItem && taskItem.id &&
-           (taskItem.id.includes(Globs.LAST_TASKS_LABEL + ":") ||
-            taskItem.id.includes(Globs.FAV_TASKS_LABEL + ":") ||
-            taskItem.id.includes(Globs.USER_TASKS_LABEL + ":"));
+           (taskItem.id.includes(Strings.LAST_TASKS_LABEL + ":") ||
+            taskItem.id.includes(Strings.FAV_TASKS_LABEL + ":") ||
+            taskItem.id.includes(Strings.USER_TASKS_LABEL + ":"));
 };
 
 

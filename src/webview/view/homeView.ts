@@ -1,9 +1,8 @@
 
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
-import { ContextKeys } from "../../lib/constants";
+import { ContextKeys } from "../../lib/context";
 import { TasksChangeEvent } from "../../interface";
-import { registerCommand } from "../../lib/command";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";

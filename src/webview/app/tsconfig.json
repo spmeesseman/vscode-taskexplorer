@@ -5,7 +5,7 @@
 		"lib": [ "DOM", "DOM.Iterable", "ES2020" ],
 		"outDir": "../../",
 		"paths": {
-			"@env/*": [ "./src/lib/env/browser/*" ]
+			"@env/*": [ "src/lib/env/browser/*" ]
 		},
 		"useDefineForClassFields": false,
 		"skipLibCheck": true

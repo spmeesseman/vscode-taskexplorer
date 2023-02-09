@@ -2,8 +2,7 @@
 import { Disposable } from "vscode";
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
-import { ContextKeys } from "../../lib/constants";
-import { registerCommand } from "../../lib/command";
+import { ContextKeys } from "../../lib/context";
 import { StorageChangeEvent } from "../../interface";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 
