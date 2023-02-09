@@ -4,7 +4,7 @@ import { State } from "../../shared/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
 import { ExecuteCommandType, IpcMessage } from "../../shared/ipc";
-import { provideVSCodeDesignSystem, vsCodeButton, Button } from "@vscode/webview-ui-toolkit";
+import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
 export class HomeApp extends TeWebviewApp<State>

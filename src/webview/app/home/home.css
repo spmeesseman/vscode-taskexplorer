@@ -12,6 +12,17 @@ button {
     padding: 4px 2px;
     cursor: pointer;
     width: 80px;
+    font-size: 10px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+
+.homeview-button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    padding: 4px 2px;
+    cursor: pointer;
+    width: 90px;
 	font-size: 10px;
     border-radius: 3px;
 }

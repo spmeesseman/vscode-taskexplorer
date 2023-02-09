@@ -8,11 +8,6 @@ button {
     border-radius: 5px;
 }
 
-button:hover {
-    opacity: 0.8;
-    background-color: var(--vscode-button-hoverBackground);
-}
-
 hr {
     height: 2px;
     border: none;

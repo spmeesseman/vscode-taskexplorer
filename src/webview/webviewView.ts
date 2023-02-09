@@ -1,18 +1,18 @@
 
 import log from "../lib/log/log";
+import { TeWrapper } from "../lib/wrapper";
 import { setContext } from "../lib/context";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { ContextKeys } from "../lib/constants";
-import { TeWrapper } from "../lib/wrapper";
 import { isExtensionBusy } from "../extension";
+import { registerCommand } from "../lib/command";
 import { WebviewFocusChangedParams } from "./shared/ipc";
 import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands
 } from "vscode";
-import { registerCommand } from "src/lib/command";
 
 
 export type WebviewViewIds = "home" | "taskCount" | "taskUsage";
