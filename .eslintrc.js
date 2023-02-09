@@ -15,7 +15,6 @@ module.exports = {
     "root": true,
     "env": {
         "node": true,
-        "web":true,
         "es2020": true
     },
     "parser": "@typescript-eslint/parser",

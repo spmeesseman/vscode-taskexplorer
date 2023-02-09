@@ -1,0 +1,76 @@
+:root {
+	--container-padding: 2px 5px 2px 2px;
+	--input-padding-vertical: 3px;
+	--input-padding-horizontal: 2px;
+	--input-margin-vertical: 2px;
+	--input-margin-horizontal: 0;
+}
+
+button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    padding: 4px 2px;
+    cursor: pointer;
+    width: 80px;
+	font-size: 10px;
+    border-radius: 3px;
+}
+
+button:hover {
+    opacity: 0.8;
+    background-color: var(--vscode-button-hoverBackground);
+}
+
+.te-icon {
+    font-size: 50px;
+    --fa-primary-color: var(--vscode-button-background);
+    --fa-secondary-color: var(--vscode-button-hoverBackground);
+}
+
+.button-panel {
+    width: -webkit-fill-available
+}
+
+.margin-top-3 {
+    margin-top: 3px;
+    width: inherit;
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+    width: inherit;
+}
+
+.margin-top-minus-5 {
+    margin-top: -6px;
+    width: inherit;
+}
+
+.homeview-content-title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+    margin-top: -5px;
+    color: var(--vscode-button-background);
+    text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 2px 1px #777, 1px 1px 0px #666, 0px 2px 0px #555, 1px 2px 0px #444, 0px 2px 0px #333, 0px 3px 1px #001135;
+}
+
+.homeview-content-title-version {
+    font-size: 10px;
+    font-weight: normal;
+    text-align:end;
+    margin-top: 3px;
+    margin-left: 20px;
+    opacity: 0.95;
+    vertical-align: bottom;
+}
+
+.homeview-task-count-label {
+    
+	opacity: 0.95;
+}
+
+.homeview-task-count-value {
+    
+	opacity: 0.725;
+}

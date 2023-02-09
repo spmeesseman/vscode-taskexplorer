@@ -1,0 +1,12 @@
+{
+	"extends": ["../../../.eslintrc.js"],
+	"env": {
+		"browser": true
+	},
+	"rules": {
+		"import/extensions": ["error", "never", { "js": "always" }]
+	},
+	"parserOptions": {
+		"project": "src/webview/app/tsconfig.json"
+	}
+}

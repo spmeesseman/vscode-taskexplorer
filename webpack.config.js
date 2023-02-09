@@ -43,6 +43,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
  * @property {WebpackBuild} [build]
  * @property {String} [target]
  * @property {String} [environment]
+ * @property {String} basePath
  * @property {Boolean|String} [analyze]
  * @property {Boolean|String} [clean]
  * @property {Boolean|String} [esbuild]
@@ -98,6 +99,7 @@ module.exports = (env, argv) =>
 const getWebpackConfig = (build, env) =>
 {   
 	env.build = build;
+	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
 	entryPoints(env, wpConfig);   // Entry points for built output
 	externals(wpConfig)           // External modules
@@ -172,6 +174,7 @@ const entryPoints = (env, wpConfig) =>
 {
 	if (env.build === "webview")
 	{
+		wpConfig.context = env.basePath;
 		wpConfig.entry = {
 			home: "./home/home.ts",
 			// licensePage: "./licensePage/licensePage.ts",
@@ -409,8 +412,8 @@ const output = (env, wpConfig) =>
 	{
 		wpConfig.output = {
 			filename: "[name].js",
-			path: path.join(__dirname, "dist", "res", "page"),
-			publicPath: "#{root}/dist/res/page/",
+			path: path.join(__dirname, "res", "js"),
+			publicPath: "#{root}/dist/res/js/",
 		};
 	}
 	else
@@ -495,7 +498,6 @@ const plugins = (env, wpConfig) =>
 	}
 	else // env.build === "webview"
 	{
-		const basePath = path.join(__dirname, "src", "webview", "app");
 		wpConfig.plugins = [
 			new CleanPlugin(
 				wpConfig.mode === "production"
@@ -522,7 +524,7 @@ const plugins = (env, wpConfig) =>
 				// },
 				formatter: "basic",
 				typescript: {
-					configFile: path.join(basePath, "tsconfig.json"),
+					configFile: path.join(env.basePath, "tsconfig.json"),
 				},
 			}),
 			new MiniCssExtractPlugin({ filename: "[name].css" }),
@@ -537,10 +539,10 @@ const plugins = (env, wpConfig) =>
 			new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []),
 			new CopyPlugin({
 				patterns: [
-					{
-						from: path.posix.join(basePath.replace(/\\/g, "/"), "media", "*.*"),
-						to: path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res"),
-					},
+					// {
+					// 	from: path.posix.join(basePath.replace(/\\/g, "/"), "media", "*.*"),
+					// 	to: path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res"),
+					// },
 					{
 						from: path.posix.join(
 							__dirname.replace(/\\/g, "/"),
@@ -632,13 +634,12 @@ const resolve = (env, wpConfig) =>
 	}
 	else
 	{
-		const basePath = path.join(__dirname, "src", "webview", "app");
 		wpConfig.resolve = {
 			alias: {
 				"@env": path.resolve(__dirname, "src", "env", "browser"),
 			},
 			extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
-			modules: [basePath, "node_modules"],
+			modules: [env.basePath, "node_modules"],
 		};
 	}
 };
@@ -661,7 +662,6 @@ const rules = (env, wpConfig) =>
 
 	if (env.build === "webview")
 	{
-		const basePath = path.join(__dirname, "src", "webview", "app");
 		wpConfig.module.rules.push(...[
 		{
 			test: /\.m?js/,
@@ -678,13 +678,13 @@ const rules = (env, wpConfig) =>
 							implementation: esbuild,
 							loader: "tsx",
 							target: "es2020",
-							tsconfigRaw: resolveTSConfig(path.join(basePath, "tsconfig.json")),
+							tsconfigRaw: resolveTSConfig(path.join(env.basePath, "tsconfig.json")),
 						},
 					}
 				: {
 						loader: "ts-loader",
 						options: {
-							configFile: path.join(basePath, "tsconfig.json"),
+							configFile: path.join(env.basePath, "tsconfig.json"),
 							experimentalWatchApi: true,
 							transpileOnly: true,
 						},
@@ -774,17 +774,17 @@ const getCspHtmlPlugin = (env, wpConfig) =>
 {
 	const cspPlugin = new CspHtmlPlugin(
 	{
-		'default-src': "'none'",
-		'img-src': ['#{cspSource}', 'https:', 'data:'],
-		'script-src':
+		"default-src": "'none'",
+		"img-src": ["#{cspSource}", "https:", "data:"],
+		"script-src":
 		wpConfig.mode !== 'production'
-				? ['#{cspSource}', "'nonce-#{cspNonce}'", "'unsafe-eval'"]
-				: ['#{cspSource}', "'nonce-#{cspNonce}'"],
-		'style-src':
+				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-eval'"]
+				: ["#{cspSource}", "'nonce-#{cspNonce}'"],
+		"style-src":
 		wpConfig.mode === 'production'
-				? ['#{cspSource}', "'nonce-#{cspNonce}'", "'unsafe-hashes'"]
-				: ['#{cspSource}', "'unsafe-hashes'", "'unsafe-inline'"],
-		'font-src': ['#{cspSource}'],
+				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'", "https://ka-p.fontawesome.com" ]
+				: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'", "https://ka-p.fontawesome.com" ],
+		"font-src": ["#{cspSource}", "https://ka-p.fontawesome.com" ],
 	},
 	{
 		enabled: true,
@@ -932,9 +932,9 @@ const resolveTSConfig = (tsConfigFile) =>
 function getHtmlPlugin(name, env, wpConfig)
 {
 	return new HtmlPlugin({
-		template: path.join(__dirname, "res", "page", `${name}.html`),
+		template: path.join(name, `${name}.html`),
 		chunks: [name],
-		filename: path.join(__dirname, "dist", "res", "page", `${name}.html`),
+		filename: path.join(__dirname, "res", "page", `${name}.html`),
 		inject: true,
 		scriptLoading: "module",
 		inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
