@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { IDictionary } from "../interface";
-
-
 export const Strings =
 {
 	DEFAULT_SEPARATOR: "-",
@@ -45,19 +42,22 @@ export const enum Commands
 	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
 	ClearTaskStats = "vscode-taskexplorer.clearTaskStats",
 	Donate = "vscode-taskexplorer.donate",
-    Run = "vscode-taskexplorer.run",
-    RunLastTask = "vscode-taskexplorer.runLastTask",
 	DisableTaskType = "vscode-taskexplorer.disableTaskType",
 	EnableTaskType = "vscode-taskexplorer.enableTaskType",
 	EnterLicense = "vscode-taskexplorer.enterLicense",
 	GetApi = "vscode-taskexplorer.getApi",
 	GetLicense = "vscode-taskexplorer.getLicense",
+    Open = "vscode-taskexplorer.open",
 	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
+    Run = "vscode-taskexplorer.run",
+    RunWithArgs = "vscode-taskexplorer.runWithArgs",
+	ShowHomeView = "vscode-taskexplorer.showHomeView",
+    RunLastTask = "vscode-taskexplorer.runLastTask",
 	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
 	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
-	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
-	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage",
-	ShowHomeView = "vscode-taskexplorer.showHomeView"
+	ShowTaskCountView = "vscode-taskexplorer.showTaskCountView",
+	ShowTaskStatsView = "vscode-taskexplorer.showTaskStatsView",
+	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage"
 }
 
 export const enum VsCodeCommands

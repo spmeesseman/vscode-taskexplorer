@@ -158,6 +158,12 @@ export class TeWrapper
 		this.registerTaskProviders();
 		this.registerContextMenuCommands();
 		registerStatusBarItem(this._context);
+		if (this.debugging) {
+			await setContext(ContextKeys.Debugging, true);
+		}
+		else if (this.tests) {
+			await setContext(ContextKeys.Tests, true);
+		}
         await setContext(ContextKeys.Enabled, this.configuration.get<boolean>("enableExplorerView") ||
                                               this.configuration.get<boolean>("enableSideBar"));
 		this._ready = true;

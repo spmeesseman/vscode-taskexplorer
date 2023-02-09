@@ -1,12 +1,12 @@
 
 import { Task, Uri } from "vscode";
-import { State } from "../shared/state";
+import { State } from "../common/state";
 import { dirname, relative } from "path";
 import { TeWrapper } from "../../lib/wrapper";
 import { TaskTreeManager } from "../../tree/treeManager";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
-import { createTaskCountTable } from "../shared/taskCountTable";
+import { createTaskCountTable } from "../common/taskCountTable";
 import { getWorkspaceProjectName, isWorkspaceFolder, pushIfNotExists } from "../../lib/utils/utils";
 
 

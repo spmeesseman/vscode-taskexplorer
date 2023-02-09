@@ -3,9 +3,7 @@
 import { log } from "./lib/log/log";
 import { TeApi } from "./lib/api";
 import { TeWrapper } from "./lib/wrapper";
-import { setContext } from "./lib/context";
 import * as fileCache from "./lib/fileCache";
-import { ContextKeys } from "./lib/constants";
 import { ITaskExplorerApi } from "./interface";
 import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
@@ -17,8 +15,8 @@ import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } f
 
 // import "tsconfig-paths/register";
 
-export let teApi: ITaskExplorerApi;
 let ready = false;
+let teApi: ITaskExplorerApi;
 
 
 export async function activate(context: ExtensionContext)
@@ -104,16 +102,6 @@ export async function activate(context: ExtensionContext)
     // Instantiate the extension API
     //
 	teApi = new TeApi(wrapper);
-
-    //
-    // Set application mode context
-    //
-	if (wrapper.debugging) {
-		void setContext(ContextKeys.Debugging, true);
-	}
-	else if (wrapper.tests) {
-		void setContext(ContextKeys.Tests, true);
-	}
 
     //
     // TODO - Telemetry
@@ -329,85 +317,3 @@ const migrateSettings = async () =>
         await storage.update("DID_SETTINGS_UPGRADE", true);
     }
 };
-
-
-// async function showWelcomeOrWhatsNew(container: TeWrapper, version: string, previousVersion: string | undefined, logPad: string)
-// {
-// 	if (!previousVersion)
-//     {
-// 		log.write(`First-time install; window.focused=${window.state.focused}`, 1, logPad);
-//
-// 		if (configuration.get<boolean>("showWelcomeOnInstall") === false) return;
-//
-// 		if (window.state.focused) {
-// 			await container.storage.delete("pendingWelcomeOnFocus");
-// 			await executeCommand(Commands.ShowWelcomePage);
-// 		}     //
-//         else // Save pending on window getting focus
-// 		{   //
-//             await container.storage.update("pendingWelcomeOnFocus", true);
-// 			const disposable = window.onDidChangeWindowState(e =>
-//             {
-// 				if (!e.focused) return;
-// 				disposable.dispose();
-//                 //
-// 				// If the window is now focused and we are pending the welcome, clear the pending state and show
-//                 //
-// 				if (container.storage.get("pendingWelcomeOnFocus") === true)
-//                 {
-// 					void container.storage.delete("pendingWelcomeOnFocus");
-// 					if (configuration.get("showWelcomeOnInstall")) {
-// 						void executeCommand(Commands.ShowWelcomePage);
-// 					}
-// 				}
-// 			});
-// 			container.context.subscriptions.push(disposable);
-// 		}
-// 		return;
-// 	}
-//
-// 	if (previousVersion !== version) {
-// 		log.write(`GitLens upgraded from v${previousVersion} to v${version}; window.focused=${window.state.focused}`, 1, logPad);
-// 	}
-//
-// 	const [ major, minor ] = version.split(".").map(v => parseInt(v, 10));
-// 	const [ prevMajor, prevMinor ] = previousVersion.split(".").map(v => parseInt(v, 10));
-//
-//     //
-// 	// Don't notify on downgrades
-//     //
-// 	if (major === prevMajor || major < prevMajor || (major === prevMajor && minor < prevMinor)) {
-// 		return;
-// 	}
-//
-// 	if (major !== prevMajor) {
-// 		version = String(major);
-// 	}
-//
-// 	void executeCommand(Commands.ShowHomeView);
-//
-// 	if (configuration.get("showWhatsNewAfterUpgrades"))
-//     {
-// 		if (window.state.focused) {
-// 			await container.storage.delete("pendingWhatsNewOnFocus");
-// 			await showWhatsNewMessage(version);
-// 		}     //
-//         else // Save pending on window getting focus
-//         {   //
-// 			await container.storage.update("pendingWhatsNewOnFocus", true);
-// 			const disposable = window.onDidChangeWindowState(e =>
-//             {
-// 				if (!e.focused) return;
-// 				disposable.dispose();
-// 				if (container.storage.get("pendingWhatsNewOnFocus") === true)
-//                 {
-// 					void container.storage.delete("pendingWhatsNewOnFocus");
-// 					if (configuration.get("showWhatsNewAfterUpgrades")) {
-// 						void showWhatsNewMessage(version);
-// 					}
-// 				}
-// 			});
-// 			container.context.subscriptions.push(disposable);
-// 		}
-// 	}
-// }

@@ -1,6 +1,6 @@
 
 import { Disposable } from "vscode";
-import { State } from "../shared/state";
+import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/constants";
 import { registerCommand } from "../../lib/command";

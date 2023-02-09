@@ -6,7 +6,7 @@ import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { isObject, timeout } from "../lib/utils/utils";
 import { ContextKeys, setContext } from "../lib/context";
-import type { WebviewFocusChangedParams } from "./shared/ipc";
+import type { WebviewFocusChangedParams } from "./common/ipc";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,

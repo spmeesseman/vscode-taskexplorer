@@ -1,28 +1,26 @@
 
 // import * as https from "http";
 import * as https from "https";
-import figures from "../figures";
-import log, { logControl } from "../log/log";
-import { TeWebviewPanel } from "../../webview/webviewPanel";
-import { IncomingMessage } from "http";
-import { teApi } from "../../extension";
-import { Commands } from "../constants";
+import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
+import { IncomingMessage } from "http";
+import { Commands } from "../constants";
 import { storage } from "../utils/storage";
+import { log, logControl } from "../log/log";
 import { refreshTree } from "../refreshTree";
-import { executeCommand, registerCommand } from "../command";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { ILicenseManager } from "../../interface/ILicenseManager";
-import { commands, Disposable, env, InputBoxOptions, Task, WebviewPanel, WebviewPanelSerializer, window } from "vscode";
 import { LicensePage } from "../../webview/page/licensePage";
+import { executeCommand, registerCommand } from "../command";
+import { ILicenseManager } from "../../interface/ILicenseManager";
+import { Disposable, env, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
 
 export class LicenseManager implements ILicenseManager, Disposable
 {
 	private disposables: Disposable[] = [];
 	private busy = false;
-	private container: TeWrapper;
+	private wrapper: TeWrapper;
 	private host = "license.spmeesseman.com";
 	private licensed = false;
 	private logRequestStepsTests = false;
@@ -37,9 +35,9 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
 
-	constructor(container: TeWrapper)
+	constructor(wrapper: TeWrapper)
     {
-		this.container = container;
+		this.wrapper = wrapper;
 		this.disposables.push(
 			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey(), this),
 			registerCommand(Commands.GetLicense, () => this.getLicense(), this)
@@ -143,7 +141,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	{
 		log.methodStart("get 30-day license command", 1, "", true);
 		const newKey = await this.requestLicense("   ");
-		const panel = await this.container.licensePage.show(undefined, newKey);
+		const panel = await this.wrapper.licensePage.show(undefined, newKey);
 		log.methodDone("get 30-day license command", 1);
 		return { panel: panel.getWebviewPanel(), newKey };
 	};
@@ -164,7 +162,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	getToken = () => this.token;
 
 
-	getVersion = () => this.container.version;
+	getVersion = () => this.wrapper.version;
 
 
 	getWebviewPanel = () => this.panel?.getWebviewPanel() as WebviewPanel | undefined;
@@ -179,7 +177,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
 		/* istanbul ignore if */
-		if (teApi.isTests() && !logControl.writeToConsole && this.logRequestStepsTests)
+		if (this.wrapper.tests && !logControl.writeToConsole && this.logRequestStepsTests)
 		{
 			if (!value && value !== false) {
 				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
@@ -296,7 +294,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 				ip: "*",
 				json: true,
 				license: true,
-				tests: teApi.isTests()
+				tests: this.wrapper.tests
 			}),
 			() => {
 				this.log("   output stream written, ending request and waiting for response...", logPad);
@@ -341,7 +339,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 		let displayPopup = !this.licensed;
 		const storedVersion = storage.get<string>("version"),
 			  lastNag = storage.get<string>("lastLicenseNag"),
-			  versionChange = this.container.version !== storedVersion;
+			  versionChange = this.wrapper.version !== storedVersion;
 
 		if (this.numTasks === tasks.length) {
 			return;
@@ -367,8 +365,8 @@ export class LicenseManager implements ILicenseManager, Disposable
 
 		if (versionChange)
 		{
-			this.panel = await this.container.licensePage.show();
-			await storage.update("version", this.container.version);
+			this.panel = await this.wrapper.licensePage.show();
+			await storage.update("version", this.wrapper.version);
 			await storage.update("lastLicenseNag", Date.now().toString());
 		}
 		else if (displayPopup)

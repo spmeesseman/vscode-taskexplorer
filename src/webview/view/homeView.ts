@@ -1,5 +1,5 @@
 
-import { State } from "../shared/state";
+import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/constants";
 import { TasksChangeEvent } from "../../interface";
@@ -7,7 +7,7 @@ import { registerCommand } from "../../lib/command";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
-import { removeLicenseButtons } from "../shared/removeLicenseButtons";
+import { removeLicenseButtons } from "../common/removeLicenseButtons";
 
 /*
 https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/webview/main.ts

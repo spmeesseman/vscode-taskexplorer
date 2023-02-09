@@ -1,10 +1,10 @@
 
-import { State } from "../shared/state";
+import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { Commands, ContextKeys } from "../../lib/constants";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
-import { createTaskCountTable } from "../shared/taskCountTable";
-import { removeViewLicenseButton } from "../shared/removeLicenseButtons";
+import { createTaskCountTable } from "../common/taskCountTable";
+import { removeViewLicenseButton } from "../common/removeLicenseButtons";
 
 
 export class LicensePage extends TeWebviewPanel<State>

@@ -16,7 +16,7 @@ import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
-} from "./shared/ipc";
+} from "./common/ipc";
 
 
 export abstract class TeWebviewBase<State>
