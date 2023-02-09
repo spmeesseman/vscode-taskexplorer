@@ -82,9 +82,9 @@ export class TaskItem extends TreeItem implements ITaskItem
         this.task = task;                   // Save a reference to the Task that this TaskItem represents
         this.groupLevel = 0;                // Grouping level - will get set by treefile.addTreeNode()
         this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
-            title: "Open definition",       // Default click action is Open file since it's easy to click on accident
-            command: "taskExplorer.open",   // Default click action can be set to 'Execute/Run' in Settings
-            arguments: [ this, true ]         // If the def. action is 'Run', then it is redirected in the 'Open' cmd
+            title: "Open definition",       // Default click action is just Open file since it's easy to click on accident
+            command: "vscode-taskexplorer.open",
+            arguments: [ this, true ]
         };
         //
         // The task source, i.e. "npm", "Workspace", or any of the TaskExplorer provided task mnemonics,
