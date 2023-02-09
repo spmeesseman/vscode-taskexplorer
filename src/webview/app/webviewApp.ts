@@ -17,20 +17,6 @@ interface VsCodeApi {
 declare function acquireVsCodeApi(): VsCodeApi;
 
 
-const maxSmallIntegerV8 = 2 ** 30; // Max number that can be stored in V8's smis (small integers)
-let ipcSequence = 0;
-const  nextIpcId = () =>
-{
-	if (ipcSequence === maxSmallIntegerV8) {
-		ipcSequence = 1;
-	}
-	else {
-		ipcSequence++;
-	}
-	return `webview:${ipcSequence}`;
-};
-
-
 export abstract class TeWebviewApp<State = undefined>
 {
 	protected onInitialize?(): void;
@@ -43,6 +29,8 @@ export abstract class TeWebviewApp<State = undefined>
 	private _focused?: boolean;
 	private _inputFocused?: boolean;
 	private bindDisposables: Disposable[] | undefined;
+	private ipcSequence = 0;
+	private maxSmallIntegerV8 = 2 ** 30; // Max # that can be stored in V8's smis (small ints)
 
 
 	constructor(protected readonly appName: string)
@@ -138,12 +126,24 @@ export abstract class TeWebviewApp<State = undefined>
 	protected getState = () => this._vscode.getState() as State;
 
 
+	private nextIpcId = () =>
+	{
+		if (this.ipcSequence === this.maxSmallIntegerV8) {
+			this.ipcSequence = 1;
+		}
+		else {
+			this.ipcSequence++;
+		}
+		return `webview:${this.ipcSequence}`;
+	};
+
+
 	private postMessage = (e: IpcMessage) => this._vscode.postMessage(e);
 
 
 	protected sendCommand<TCommand extends IpcCommandType<any>>(command: TCommand, params: IpcMessageParams<TCommand>)
 	{
-		const id = nextIpcId();
+		const id = this.nextIpcId();
 		this.log(`${this.appName}.sendCommand(${id}): name=${command.method}`);
 		this.postMessage({ id, method: command.method, params });
 	}

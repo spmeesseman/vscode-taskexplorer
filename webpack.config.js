@@ -24,6 +24,16 @@ const HtmlPlugin = require("html-webpack-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const webviewApps = {
+	home: "./home/home.ts",
+	// licensePage: "./licensePage/licensePage.ts",
+	// parsingReport: "./parsingReport/parsingReport.ts",
+	// releaseNotes: "./releaseNotes/releaseNotes.ts",
+	// taskCount: "./taskCount/taskCount.ts",
+	// taskUsage: "./taskUsage/taskUsage.ts",
+	// welcome: "./welcome/welcome.ts",
+};
+
 /**
  * @typedef {Object} WebpackBuildEnv
  * @property {Boolean} clean If set,will clean the output directory before build
@@ -100,10 +110,10 @@ const getWebpackConfig = (build, env) =>
 	env.build = build;
 	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
+	mode(env, wpConfig);          // Mode i.e. "production", "development", "none"
 	entryPoints(env, wpConfig);   // Entry points for built output
 	externals(wpConfig)           // External modules
 	optimization(env, wpConfig);  // Build optimization
-	mode(env, wpConfig);          // Mode i.e. "production", "development", "none"
 	output(env, wpConfig);        // Output specifications
 	plugins(env, wpConfig);       // Webpack plugins
 	resolve(env, wpConfig);       // Resolve config
@@ -113,6 +123,53 @@ const getWebpackConfig = (build, env) =>
 	wpConfig.name = `${build}:${wpConfig.mode}`;
 	return wpConfig;
 };
+
+
+//
+// *************************************************************
+// *** CSP                                                   ***
+// *************************************************************
+//
+/**
+ * @param {WebpackEnvironment} env
+ * @param {WebpackConfig} wpConfig Webpack config object
+ * @returns { CspHtmlPlugin }
+ */
+// @ts-ignore
+const cspHtmlPlugin = (env, wpConfig) =>
+{
+	const cspPlugin = new CspHtmlPlugin(
+	{
+		"default-src": "'none'",
+		"img-src": ["#{cspSource}", "https:", "data:"],
+		"script-src":
+		wpConfig.mode !== 'production'
+				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-eval'"]
+				: ["#{cspSource}", "'nonce-#{cspNonce}'"],
+		"style-src":
+		wpConfig.mode === 'production'
+				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'", "https://ka-p.fontawesome.com" ]
+				: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'", "https://ka-p.fontawesome.com" ],
+		"font-src": ["#{cspSource}", "https://ka-p.fontawesome.com" ],
+	},
+	{
+		enabled: true,
+		hashingMethod: 'sha256',
+		hashEnabled: {
+			'script-src': true,
+			'style-src': wpConfig.mode === 'production',
+		},
+		nonceEnabled: {
+			'script-src': true,
+			'style-src': wpConfig.mode === 'production',
+		},
+	});
+	// Override the nonce creation so we can dynamically generate them at runtime
+	// @ts-ignore
+	cspPlugin.createNonce = () => '#{cspNonce}';
+	return cspPlugin;
+};
+
 
 //
 // *************************************************************
@@ -174,15 +231,7 @@ const entryPoints = (env, wpConfig) =>
 	if (env.build === "webview")
 	{
 		wpConfig.context = env.basePath;
-		wpConfig.entry = {
-			home: "./home/home.ts",
-			// licensePage: "./licensePage/licensePage.ts",
-			// parsingReport: "./parsingReport/parsingReport.ts",
-			// releaseNotes: "./releaseNotes/releaseNotes.ts",
-			// taskCount: "./taskCount/taskCount.ts",
-			// taskUsage: "./taskUsage/taskUsage.ts",
-			// welcome: "./welcome/welcome.ts",
-		};
+		wpConfig.entry = webviewApps;
 	}
 	else
 	{
@@ -208,6 +257,80 @@ const externals = (wpConfig) =>
 		// be webpack"ed, -> https://webpack.js.org/configuration/externals/
 		//
 		vscode: "commonjs vscode"
+	};
+};
+
+
+/**
+ * @param { string } name
+ * @param {WebpackEnvironment} env
+ * @returns { HtmlPlugin }
+ */
+function htmlPlugin(name, env, wpConfig)
+{
+	return new HtmlPlugin({
+		template: path.posix.join(name, `${name}.html`),
+		chunks: [name],
+		filename: path.posix.join(__dirname, "res", "page", `${name}.html`),
+		inject: true,
+		scriptLoading: "module",
+		inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
+		minify: wpConfig.mode !== "production" ? false :
+		{
+			removeComments: true,
+			collapseWhitespace: true,
+			removeRedundantAttributes: false,
+			useShortDoctype: true,
+			removeEmptyAttributes: true,
+			removeStyleLinkTypeAttributes: true,
+			keepClosingSlash: true,
+			minifyCSS: true,
+		}
+	});
+}
+
+
+//
+// *************************************************************
+// *** IMAGES                                                ***
+// *************************************************************
+//
+/**
+ * @param {WebpackEnvironment} env
+ * @param {WebpackConfig} wpConfig Webpack config object
+ * @returns { ImageMinimizerPlugin.Generator<any> }
+ */
+const imgConfig = (env, wpConfig) =>
+{
+	/** @type ImageMinimizerPlugin.Generator<any> */
+	// @ts-ignore
+	return env.imageOpt ?
+	{
+		type: "asset",
+		implementation: ImageMinimizerPlugin.sharpGenerate,
+		options: {
+			encodeOptions: {
+				webp: {
+					lossless: true,
+				},
+			},
+		},
+	} :
+	{
+		type: "asset",
+		implementation: ImageMinimizerPlugin.imageminGenerate,
+		options: {
+			plugins: [
+			[
+				"imagemin-webp",
+				{
+					lossless: true,
+					nearLossless: 0,
+					quality: 100,
+					method: wpConfig.mode === "production" ? 4 : 0,
+				},
+			]]
+		}
 	};
 };
 
@@ -286,7 +409,7 @@ const minification = (wpConfig) =>
 						ie8: false,
 						keep_classnames: undefined,
 						// pass true to prevent discarding or mangling of function names.
-						keep_fnames: false,
+						keep_names: false,
 						safari10: false,
 					}
 				})
@@ -411,11 +534,11 @@ const output = (env, wpConfig) =>
 	{
 		wpConfig.output = {
 			clean: env.clean === true,
-			filename: "[name].js",
+			filename: "js/[name].js",
 			// libraryTarget: "module",
     		// chunkFormat: "module",
-			path: path.join(__dirname, "res", "js"),
-			publicPath: "#{webroot}/js/",
+			path: path.join(__dirname, "res"),
+			publicPath: "#{webroot}/",
 		};
 	}
 	else
@@ -448,7 +571,7 @@ const plugins = (env, wpConfig) =>
 {
 	wpConfig.plugins = [];
 	// @ts-ignore
-	const imageGeneratorConfig = getImageMinimizerConfig(wpConfig.mode, env);
+	const imageGeneratorConfig = imgConfig(wpConfig.mode, env);
 
 	if (env.build !== "webview")
 	{
@@ -500,6 +623,11 @@ const plugins = (env, wpConfig) =>
 	}
 	else // env.build === "webview"
 	{
+		const webviewAppPlugins = [];
+		Object.keys(webviewApps).forEach(k =>
+		{
+			webviewAppPlugins.push(htmlPlugin(k, env, wpConfig));
+		});
 		wpConfig.plugins = [
 			// new CleanPlugin(
 			// 	wpConfig.mode === "production"
@@ -529,16 +657,10 @@ const plugins = (env, wpConfig) =>
 					configFile: path.join(env.basePath, "tsconfig.json"),
 				},
 			}),
-			new MiniCssExtractPlugin({ filename: "[name].css", }),
-			getHtmlPlugin("home", env, wpConfig),
-			// getHtmlPlugin("licensePage", env, wpConfig),
-			// getHtmlPlugin("parsingReport", env, wpConfig),
-			// getHtmlPlugin("releaseNotes", env, wpConfig),
-			// getHtmlPlugin("taskCount", env, wpConfig),
-			// getHtmlPlugin("taskUsage", env, wpConfig),
-			// getHtmlPlugin("welcome", env, wpConfig),
+			new MiniCssExtractPlugin({ filename: "css/[name].css", }),
+			...webviewAppPlugins,
 			/** @type {any} */
-			(getCspHtmlPlugin(env, wpConfig)),
+			(cspHtmlPlugin(env, wpConfig)),
 			new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []),
 			new CopyPlugin({
 				patterns: [
@@ -752,97 +874,6 @@ const rules = (env, wpConfig) =>
 
 //
 // *************************************************************
-// *** CSP                                                   ***
-// *************************************************************
-//
-/**
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns { CspHtmlPlugin }
- */
-// @ts-ignore
-const getCspHtmlPlugin = (env, wpConfig) =>
-{
-	const cspPlugin = new CspHtmlPlugin(
-	{
-		"default-src": "'none'",
-		"img-src": ["#{cspSource}", "https:", "data:"],
-		"script-src":
-		wpConfig.mode !== 'production'
-				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-eval'"]
-				: ["#{cspSource}", "'nonce-#{cspNonce}'"],
-		"style-src":
-		wpConfig.mode === 'production'
-				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'", "https://ka-p.fontawesome.com" ]
-				: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'", "https://ka-p.fontawesome.com" ],
-		"font-src": ["#{cspSource}", "https://ka-p.fontawesome.com" ],
-	},
-	{
-		enabled: true,
-		hashingMethod: 'sha256',
-		hashEnabled: {
-			'script-src': true,
-			'style-src': wpConfig.mode === 'production',
-		},
-		nonceEnabled: {
-			'script-src': true,
-			'style-src': wpConfig.mode === 'production',
-		},
-	});
-	// Override the nonce creation so we can dynamically generate them at runtime
-	// @ts-ignore
-	cspPlugin.createNonce = () => '#{cspNonce}';
-	return cspPlugin;
-};
-
-
-//
-// *************************************************************
-// *** IMAGES                                                ***
-// *************************************************************
-//
-/**
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns { ImageMinimizerPlugin.Generator<any> }
- */
-const getImageMinimizerConfig = (env, wpConfig) =>
-{
-	/** @type ImageMinimizerPlugin.Generator<any> */
-	// @ts-ignore
-	return env.imageOpt ?
-	{
-		type: "asset",
-		implementation: ImageMinimizerPlugin.sharpGenerate,
-		options: {
-			encodeOptions: {
-				webp: {
-					lossless: true,
-				},
-			},
-		},
-	} :
-	{
-		type: "asset",
-		implementation: ImageMinimizerPlugin.imageminGenerate,
-		options: {
-			plugins: [
-			[
-				"imagemin-webp",
-				{
-					lossless: true,
-					nearLossless: 0,
-					quality: 100,
-					method: wpConfig.mode === "production" ? 4 : 0,
-				},
-			]]
-		}
-	};
-};
-
-
-//
-// *************************************************************
 // *** STATS                                                 ***
 // *************************************************************
 //
@@ -914,34 +945,6 @@ const resolveTSConfig = (tsConfigFile) =>
 	return JSON5.parse(data.substring(start, end));
 };
 
-
-/**
- * @param { string } name
- * @param {WebpackEnvironment} env
- * @returns { HtmlPlugin }
- */
-function getHtmlPlugin(name, env, wpConfig)
-{
-	return new HtmlPlugin({
-		template: path.join(name, `${name}.html`),
-		chunks: [name],
-		filename: path.join(__dirname, "res", "page", `${name}.html`),
-		inject: true,
-		scriptLoading: "module",
-		inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
-		minify: wpConfig.mode !== "production" ? false :
-		{
-			removeComments: true,
-			collapseWhitespace: true,
-			removeRedundantAttributes: false,
-			useShortDoctype: true,
-			removeEmptyAttributes: true,
-			removeStyleLinkTypeAttributes: true,
-			keepClosingSlash: true,
-			minifyCSS: true,
-		}
-	});
-}
 
 class InlineChunkHtmlPlugin
 {
