@@ -12,6 +12,7 @@ import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands
 } from "vscode";
+import { registerCommand } from "src/lib/command";
 
 
 export type WebviewViewIds = "home" | "taskCount" | "taskUsage";
@@ -98,6 +99,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 			window.onDidChangeWindowState(this.onWindowStateChanged, this),
 			...(this.onInitializing?.() ?? []),
 			...(this.registerCommands?.() ?? []),
+			registerCommand(`${this.id}.refresh`, () => this.refresh(), this)
 		);
 
 		await this.refresh();

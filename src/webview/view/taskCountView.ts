@@ -54,9 +54,7 @@ export class TaskCountView extends TeWebviewView<State>
 
 	protected override registerCommands(): Disposable[]
 	{
-		return [
-			registerCommand(`${this.id}.refresh`, () => this.refresh(), this)
-		];
+		return [];
 	}
 
 }

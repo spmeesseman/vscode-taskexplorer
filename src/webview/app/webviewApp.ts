@@ -33,7 +33,6 @@ const  nextIpcId = () =>
 
 export abstract class TeWebviewApp<State = undefined>
 {
-
 	protected onInitialize?(): void;
 	protected onBind?(): Disposable[];
 	protected onInitialized?(): void;
@@ -48,14 +47,12 @@ export abstract class TeWebviewApp<State = undefined>
 
 	constructor(protected readonly appName: string)
 	{
-		this.state = (window as any).bootstrap;
-		(window as any).bootstrap = undefined;
-
+		const disposables: Disposable[] = [];
 		this.log(`${this.appName}()`);
 
 		this._vscode = acquireVsCodeApi();
-
-		const disposables: Disposable[] = [];
+		this.state = (window as any).bootstrap;
+		(window as any).bootstrap = undefined;
 
 		requestAnimationFrame(() =>
 		{
@@ -72,7 +69,8 @@ export abstract class TeWebviewApp<State = undefined>
 				this.sendCommand(WebviewReadyCommandType, undefined);
 
 				this.onInitialized?.();
-			} finally {
+			}
+			finally {
 				if (document.body.classList.contains("preload")) {
 					setTimeout(() => {
 						document.body.classList.remove("preload");
@@ -91,7 +89,7 @@ export abstract class TeWebviewApp<State = undefined>
 	}
 
 
-	get vscode() {
+	protected get vscode() {
 		return this._vscode;
 	}
 
@@ -104,7 +102,10 @@ export abstract class TeWebviewApp<State = undefined>
 			this.bindDisposables = [];
 		}
 
-		// Reduces event jankiness when only moving focus
+		//
+		// GitLens author uses this debounce method here for some reason...  i'm sure it'll
+		// smack me in the fac one of these days and I'll find out why
+		//
 		// const sendWebviewFocusChangedCommand = debounce((params: WebviewFocusChangedParams) => {
 		// 	this.sendCommand(WebviewFocusChangedCommandType, params);
 		// }, 150);
@@ -144,7 +145,6 @@ export abstract class TeWebviewApp<State = undefined>
 	{
 		const id = nextIpcId();
 		this.log(`${this.appName}.sendCommand(${id}): name=${command.method}`);
-
 		this.postMessage({ id, method: command.method, params });
 	}
 

@@ -14,21 +14,10 @@ export class HomeApp extends TeWebviewApp<State>
 		super("HomeApp");
 	}
 
+
 	protected override onInitialize()
     {
 		provideVSCodeDesignSystem().register(vsCodeButton());
-
-        let elem = document.getElementById("btnViewReleaseNotes");
-        elem?.addEventListener("click", this.showReleaseNotes);
-        elem = document.getElementById("btnEnterlicense") as Button;
-        elem?.addEventListener("click", this.enterLicense); elem.onclick = this.enterLicense;
-        elem = document.getElementById("btnGetLicense") as Button;
-        elem?.addEventListener("click", this.getLicense);
-        elem = document.getElementById("btnViewLicense") as Button;
-        elem?.addEventListener("click", this.showLicensePage);
-        elem = document.getElementById("btnViewReport") as Button;
-        elem?.addEventListener("click", this.showParsingReport);
-
 		this.updateState();
 	}
 
@@ -38,6 +27,11 @@ export class HomeApp extends TeWebviewApp<State>
 		const disposables = super.onBind?.() ?? [];
 		disposables.push(
 			DOM.on("[data-action]", "click", (e, target: HTMLElement) => this.onButtonClicked(e, target)),
+			// DOM.on("btnEnterlicense", "click", () => this.enterLicense()),
+			// DOM.on("btnGetLicense", "click", () => this.getLicense()),
+			// DOM.on("btnViewLicense", "click", () => this.showLicensePage()),
+			// DOM.on("btnViewReport", "click", () => this.showParsingReport()),
+			// DOM.on("btnViewReleaseNotes", "click", () => this.showReleaseNotes()),
 		);
 		return disposables;
     }
@@ -55,7 +49,7 @@ export class HomeApp extends TeWebviewApp<State>
 	protected override onMessageReceived(e: MessageEvent)
     {
 		const msg = e.data as IpcMessage;
-        this.log(`${this.appName}.onMessageReceived(${msg.id}): name=${msg.method}`);
+        this.log(`${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
 
 		const message = e.data; // JSON data from tests
         switch (message.command)
@@ -100,6 +94,7 @@ export class HomeApp extends TeWebviewApp<State>
         });
     };
 
+
     private showLicensePage = () =>
     {
         this.vscode.postMessage({
@@ -110,6 +105,7 @@ export class HomeApp extends TeWebviewApp<State>
         });
     };
 
+
     private showParsingReport = () =>
     {
         this.vscode.postMessage({
@@ -119,6 +115,7 @@ export class HomeApp extends TeWebviewApp<State>
             }
         });
     };
+
 
     private showReleaseNotes = () =>
     {
@@ -136,3 +133,6 @@ export class HomeApp extends TeWebviewApp<State>
 	}
 
 }
+
+
+new HomeApp();
