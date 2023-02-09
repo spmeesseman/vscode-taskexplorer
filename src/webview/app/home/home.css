@@ -15,17 +15,21 @@ button {
     font-size: 10px;
     border-radius: 3px;
     margin-right: 5px;
+    border: gray 1px solid;
   }
-
-.homeview-button {
-    background-color: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
+  /*
+  .homeview-button {
+    background-color: #151515;
+    color: gray;
     padding: 4px 2px;
     cursor: pointer;
-    width: 90px;
-	font-size: 10px;
+    width: 80px;
+    font-size: 10px;
     border-radius: 3px;
-}
+    margin-right: 5px;
+    border: gray 1px solid;
+  }
+  */
 
 button:hover {
     opacity: 0.8;
@@ -58,13 +62,13 @@ button:hover {
 }
 
 .homeview-content-title {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
     text-align: left;
     margin-top: -5px;
     color: var(--vscode-button-background);
     text-shadow: 0px 1px 0px #999, 0px 2px 0px #888, 0px 2px 1px #777, 1px 1px 0px #666, 0px 2px 0px #555, 1px 2px 0px #444, 0px 2px 0px #333, 0px 3px 1px #001135;
-}
+  }
 
 .homeview-content-title-version {
     font-size: 10px;
