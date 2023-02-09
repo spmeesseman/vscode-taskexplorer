@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { execSync } from "child_process";
 import { parseStringPromise } from "xml2js";

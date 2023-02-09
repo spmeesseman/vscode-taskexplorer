@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { ExtensionContext, window } from "vscode";
 import { Commands } from "../lib/constants";
 import { registerCommand } from "../lib/command";

@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";

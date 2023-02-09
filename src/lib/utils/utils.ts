@@ -1,5 +1,5 @@
 
-import log from "../log/log";
+import { log } from "../log/log";
 import * as minimatch from "minimatch";
 import { TaskFile } from "../../tree/file";
 import { TaskItem } from "../../tree/item";

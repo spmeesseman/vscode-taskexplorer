@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { exec } from "child_process";
 import { basename, dirname } from "path";
 import { promisify } from "util";

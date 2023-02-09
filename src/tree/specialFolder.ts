@@ -1,6 +1,6 @@
 
-import log from "../lib/log/log";
 import { TaskItem } from "./item";
+import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
 import { Globs } from "../lib/constants";
 import { sortTasks } from "../lib/sortTasks";
@@ -37,9 +37,9 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
     {
         super(label, state);
         this.treeManager = treeManager;
-        this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.iconPath = ThemeIcon.Folder;
         this.isFavorites = label === Globs.FAV_TASKS_LABEL;
+        this.contextValue = label.toLowerCase().replace(/[\W \_\-]/g, "");
         this.storeName = this.isFavorites ? Globs.FAV_TASKS_STORE : Globs.LAST_TASKS_STORE;
         this.store = storage.get<string[]>(this.storeName, []);
         this.settingNameEnabled = "specialFolders.show" + label.replace(/ /g, "");

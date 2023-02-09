@@ -1,7 +1,7 @@
 
 import * as utils from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { join } from "path";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";

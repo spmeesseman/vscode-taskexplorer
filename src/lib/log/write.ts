@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import figures from "../figures";
 import { logControl } from "./log";
 import { appendFileSync } from "fs";
+import { figures } from "../figures";
 import { window } from "vscode"; // TODO - this is used as scope but thought browser 'window' duh
 import { IDictionary } from "../../interface";
 
@@ -158,7 +158,7 @@ const _write = (msg: string, logPad: string, queueId: string | undefined, isValu
 };
 
 
-const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
+export const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
     // if (shouldSkip(msg)) {
     if (msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "")) {
@@ -215,5 +215,3 @@ const write = (msg: string, level?: number, logPad = "", queueId?: string, isVal
     }
 
 };
-
-export default write;

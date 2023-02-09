@@ -1,6 +1,6 @@
 
 import { TextDecoder } from "util";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../../lib/wrapper";
 import { IDictionary } from "../../interface";
 import { Task, Uri, workspace } from "vscode";
 import { getTaskFiles } from "../../lib/fileCache";

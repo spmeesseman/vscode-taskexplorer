@@ -1,5 +1,5 @@
 
-import log from "./log/log";
+import { log } from "./log/log";
 import { Globs } from "./constants";
 import { TreeItemLabel } from "vscode";
 import { TaskItem } from "../tree/item";

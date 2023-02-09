@@ -1,5 +1,5 @@
 
-import log from "./log/log";
+import { log } from "./log/log";
 import { TextDocument } from "vscode";
 import { TaskItem } from "../tree/item";
 import { TeWrapper } from "./wrapper";

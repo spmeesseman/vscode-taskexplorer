@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import log from "./lib/log/log";
+import { log } from "./lib/log/log";
 import { TeApi } from "./lib/api";
 import { TeWrapper } from "./lib/wrapper";
 import { setContext } from "./lib/context";

@@ -1,5 +1,5 @@
 
-import log from "../log/log";
+import { log } from "../log/log";
 import { dirname, join, relative, resolve, sep } from "path";
 import { Task, Uri, WorkspaceFolder } from "vscode";
 import { pathExists, pathExistsSync } from "./fs";

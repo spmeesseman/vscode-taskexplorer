@@ -1,6 +1,6 @@
 
 import * as bombadil from "@sgarciac/bombadil";
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";

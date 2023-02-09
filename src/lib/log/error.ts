@@ -1,14 +1,14 @@
 
-import figures from "../figures";
-import write from "./write";
+import { write } from "./write";
 import { value } from "./value";
 import { logControl } from "./log";
+import { figures } from "../figures";
 import { isArray, isError, isFunction, isObject, isObjectEmpty, isString } from "../utils/utils";
 
 const colors = figures.colors;
 
 
-const error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
+export const error = (msg: any, params?: (string|any)[][], queueId?: string, symbols: [ string, string ] = [ "", "" ]) =>
 {
     if (!msg) { return; }
 
@@ -177,6 +177,3 @@ const errorParse = (err: any, symbols: [ string, string ], queueId?: string, cal
     }
     return accumulated;
 };
-
-
-export default error;

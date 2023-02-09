@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { basename, dirname, sep, extname, join } from "path";
 import { TaskExplorerProvider } from "./provider";

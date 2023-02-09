@@ -2,7 +2,7 @@ export default {};
 //
 // import * as url from "url";
 // import * as process from "process";
-// import log from "../../log/log";
+// import { log } from "../../log/log";
 // import fetch from "node-fetch";
 // import { HttpsProxyAgent } from "https-proxy-agent";
 // import { configuration } from "../../utils/configuration";

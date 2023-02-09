@@ -6,7 +6,7 @@
 
 import * as cache from "../fileCache";
 import * as util from "../utils/utils";
-import log from "../log/log";
+import { log } from "../log/log";
 import { extname } from "path";
 import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";

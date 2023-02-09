@@ -1,6 +1,6 @@
 
 
-import log from "./log/log";
+import { log } from "./log/log";
 import { configuration } from "./utils/configuration";
 import { pushIfNotExists, removeFromArray } from "./utils/utils";
 import { enableConfigWatcher } from "./watcher/configWatcher";

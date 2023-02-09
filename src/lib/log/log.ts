@@ -1,9 +1,9 @@
 
-import blank from "./blank";
-import error from "./error";
-import warn from "./warn";
-import write from "./write";
-import figures from "../figures";
+import { warn } from "./warn";
+import { write } from "./write";
+import { blank } from "./blank";
+import { error } from "./error";
+import { figures } from "../figures";
 import { dirname, join } from "path";
 import { value, values } from "./value";
 import { createDir } from "../utils/fs";
@@ -259,4 +259,4 @@ const logFunctions =
     write
 };
 
-export default logFunctions;
+export const log = logFunctions;

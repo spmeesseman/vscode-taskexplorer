@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
 import { IDictionary } from "../interface";
 import { getRelativePath } from "../lib/utils/pathUtils";

@@ -1,18 +1,18 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "./utils/utils";
-import * as taskTypeUtils from "./utils/taskTypeUtils";
-import log from "./log/log";
 import { join } from "path";
+import { log } from "./log/log";
+import * as util from "./utils/utils";
+import { TeWrapper } from "./wrapper";
+import { setContext } from "./context";
 import { storage } from "./utils/storage";
+import { ContextKeys } from "./constants";
 import { statusBarItem } from "./statusBarItem";
 import { configuration } from "./utils/configuration";
+import * as taskTypeUtils from "./utils/taskTypeUtils";
 import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
 import { workspace, RelativePattern, WorkspaceFolder, Uri, ExtensionContext, commands } from "vscode";
-import { TeWrapper } from "./wrapper";
-import { setContext } from "./context";
-import { ContextKeys } from "./constants";
 
 
 let cacheBuilding = false;

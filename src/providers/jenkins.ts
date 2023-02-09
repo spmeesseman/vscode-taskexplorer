@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";

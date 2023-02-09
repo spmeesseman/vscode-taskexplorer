@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as util from "../utils/utils";
-import log from "../log/log";
+import { log } from "../log/log";
 import { TaskItem } from "../../tree/item";
 import { configuration } from "../utils/configuration";
 import { SpecialTaskFolder } from "../../tree/specialFolder";

@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";

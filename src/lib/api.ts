@@ -2,7 +2,7 @@
 import * as fs from "./utils/fs";
 import * as util from "./utils/utils";
 import * as fileCache from "./fileCache";
-import log from "./log/log";
+import { log } from "./log/log";
 import { setContext } from "./context";
 import { TaskTree } from "../tree/tree";
 import { ContextKeys } from "./constants";

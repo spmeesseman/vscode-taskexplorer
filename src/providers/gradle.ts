@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";

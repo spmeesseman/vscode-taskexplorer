@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { TeWrapper } from "../lib/wrapper";
 import { setContext } from "../lib/context";
 import { timeout } from "../lib/utils/utils";

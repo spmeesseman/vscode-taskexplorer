@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import log from "../log/log";
+import { log } from "../log/log";
 import { persistCache } from "../fileCache";
 import { refreshTree } from "../refreshTree";
 import { registerFileWatcher } from "./fileWatcher";

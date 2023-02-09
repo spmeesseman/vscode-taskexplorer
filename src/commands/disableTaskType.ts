@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { ExtensionContext, Uri } from "vscode";
 import { registerCommand } from "../lib/command";
 import { testPattern } from "../lib/utils/utils";

@@ -1,5 +1,5 @@
 
-import log from "./log/log";
+import { log } from "./log/log";
 import * as fileCache from "./fileCache";
 import { IDictionary, ILog } from "../interface";
 import { IStorage } from "../interface/IStorage";

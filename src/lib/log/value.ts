@@ -1,5 +1,5 @@
 
-import write from "./write";
+import { write } from "./write";
 import { logControl } from "./log";
 import { isArray, isObject, isString } from "../utils/utils";
 

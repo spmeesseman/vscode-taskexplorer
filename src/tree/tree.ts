@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";

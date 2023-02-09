@@ -1,7 +1,6 @@
 import { colors, withColor } from "../interface/ILog";
 
-export default
-{
+export const figures = {
     colors,
     withColor,
 

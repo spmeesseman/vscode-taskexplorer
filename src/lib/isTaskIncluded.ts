@@ -1,5 +1,5 @@
 
-import log from "./log/log";
+import { log } from "./log/log";
 import { join } from "path";
 import { Task } from "vscode";
 import { TeWrapper } from "./wrapper";

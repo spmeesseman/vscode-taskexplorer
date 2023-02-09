@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
 import { registerCommand } from "../lib/command";

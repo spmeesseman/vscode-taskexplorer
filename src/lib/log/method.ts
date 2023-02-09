@@ -1,6 +1,6 @@
 
-import blank from "./blank";
-import write from "./write";
+import { blank } from "./blank";
+import { write } from "./write";
 import { values } from "./value";
 
 

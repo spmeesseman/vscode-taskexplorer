@@ -1,5 +1,5 @@
 
-import log from "../lib/log/log";
+import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { extname } from "path";
 import { TeWrapper } from "../lib/wrapper";
