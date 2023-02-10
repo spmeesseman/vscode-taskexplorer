@@ -76,6 +76,7 @@ const wpPlugin =
 		return plugin;
 	},
 
+
 	analyze:
 	{
 		/**
@@ -108,10 +109,12 @@ const wpPlugin =
 		}
 	},
 
+
 	banner: ()=>
 	{
 		// return new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
 	},
+
 
 	/**
 	 * @param {WebpackEnvironment} env
@@ -145,6 +148,7 @@ const wpPlugin =
 		}
 		return plugin;
 	},
+
 
 	/**
 	 * @param {WebpackEnvironment} env
@@ -184,6 +188,7 @@ const wpPlugin =
 		return plugin;
 	},
 
+
 	/**
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
@@ -193,6 +198,7 @@ const wpPlugin =
 	{
 		return new MiniCssExtractPlugin({ filename: "css/[name].css", });
 	},
+
 
 	/**
 	 * @param { string } name
@@ -223,6 +229,7 @@ const wpPlugin =
 			}
 		});
 	},
+
 
 	/**
 	 * @param {WebpackEnvironment} env
@@ -264,6 +271,7 @@ const wpPlugin =
 		return plugin;
 	},
 
+
 	/**
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
@@ -273,6 +281,7 @@ const wpPlugin =
 	{
 		return new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []);
 	},
+
 
 	/**
 	 * @param {WebpackEnvironment} env
@@ -287,6 +296,7 @@ const wpPlugin =
 		});
 	},
 
+
 	/**
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
@@ -296,6 +306,7 @@ const wpPlugin =
 	{
 		return new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 });
 	},
+
 
 	/**
 	 * @param {WebpackEnvironment} env
@@ -356,6 +367,7 @@ const wpPlugin =
 		return plugin;
 	},
 
+
 	/**
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
@@ -375,6 +387,7 @@ const wpPlugin =
 		}
 		return plugins;
 	}
+
 };
 
 
@@ -385,7 +398,6 @@ const wpPlugin =
  */
 const imgConfig = (env, wpConfig) =>
 {
-	/** @type ImageMinimizerPlugin.Generator<any> */
 	// @ts-ignore
 	return env.imageOpt ?
 	{
