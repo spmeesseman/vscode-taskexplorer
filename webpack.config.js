@@ -2,63 +2,15 @@
 // const fs = require("fs");
 const path = require("path");
 const JSON5 = require("json5");
-const webpack = require("webpack");
-const { renameSync } = require("fs");
-const { validate } = require("schema-utils");
-const { spawnSync } = require("child_process");
-// const { IgnorePlugin } = require("webpack");
-const CopyPlugin = require("copy-webpack-plugin");
-const { WebpackError, optimize } = require("webpack");
-// const ShebangPlugin = require("webpack-shebang-plugin");
-// const CopyWebpackPlugin = require("copy-webpack-plugin");
-// const FilterWarningsPlugin = require("webpack-filter-warnings-plugin");
-// const TerserPlugin = require("terser-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-const CircularDependencyPlugin = require("circular-dependency-plugin");
-const { CleanWebpackPlugin: CleanPlugin } = require("clean-webpack-plugin");
-const CspHtmlPlugin = require("csp-html-webpack-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const esbuild = require("esbuild");
-const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
-const HtmlPlugin = require("html-webpack-plugin");
-const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
+const { spawnSync } = require("child_process");
+const { wpPlugin, webviewApps } = require("./webpack.plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
-const webviewApps = {
-	home: "./home/home.ts",
-	// licensePage: "./licensePage/licensePage.ts",
-	// parsingReport: "./parsingReport/parsingReport.ts",
-	// releaseNotes: "./releaseNotes/releaseNotes.ts",
-	// taskCount: "./taskCount/taskCount.ts",
-	// taskUsage: "./taskUsage/taskUsage.ts",
-	// welcome: "./welcome/welcome.ts",
-};
+/** @typedef {import("./types/webpack").WebpackBuild} WebpackBuild */
+/** @typedef {import("./types/webpack").WebpackConfig} WebpackConfig */
+/** @typedef {import("./types/webpack").WebpackEnvironment} WebpackEnvironment */
 
-/**
- * @typedef {Object} WebpackBuildEnv
- * @property {Boolean} clean If set,will clean the output directory before build
- * @property {String} environment The environment to compile for, one of `prod`, `dev`, or `test`,
- * or `test`.  Note this is not the same as webpack `mode`.
- */
-/** @typedef {import("webpack").Configuration} WebpackConfig */
-/** @typedef {*} PluginInstance */
-/** @typedef {"extension"|"extension_web"|"webview"} WebpackBuild*/
-/** @typedef {"extension"|"extension_web"|"webview"|undefined} WebpackBuildOrUndefined */
-
-
-/** @param {{ analyzeBundle?: boolean; analyzeDeps?: boolean; esbuild?: boolean; useSharpForImageOptimization?: boolean } | undefined } en */
-
-/**
- * @typedef {Object} WebpackEnvironment
- * @property {WebpackBuild} [build]
- * @property {String} [target]
- * @property {String} [environment]
- * @property {String} basePath
- * @property {Boolean|String} [analyze]
- * @property {Boolean|String} [clean]
- * @property {Boolean|String} [esbuild]
- * @property {Boolean|String} [imageOpt]
- */
 
 /**
  * Webpack Export
@@ -111,9 +63,11 @@ const getWebpackConfig = (build, env) =>
 	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
 	mode(env, wpConfig);          // Mode i.e. "production", "development", "none"
-	entryPoints(env, wpConfig);   // Entry points for built output
+	context(env, wpConfig);       // Context for build
+	entry(env, wpConfig);         // Entry points for built output
 	externals(wpConfig)           // External modules
 	optimization(env, wpConfig);  // Build optimization
+	minification(env, wpConfig);  // Minification / Terser plugin options
 	output(env, wpConfig);        // Output specifications
 	plugins(env, wpConfig);       // Webpack plugins
 	resolve(env, wpConfig);       // Resolve config
@@ -127,47 +81,20 @@ const getWebpackConfig = (build, env) =>
 
 //
 // *************************************************************
-// *** CSP                                                   ***
+// *** CONTEXT                                               ***
 // *************************************************************
 //
 /**
- * @param {WebpackEnvironment} env
+ * @method
+ * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
- * @returns { CspHtmlPlugin }
  */
-// @ts-ignore
-const cspHtmlPlugin = (env, wpConfig) =>
+const context = (env, wpConfig) =>
 {
-	const cspPlugin = new CspHtmlPlugin(
+	if (env.build === "webview")
 	{
-		"default-src": "'none'",
-		"img-src": ["#{cspSource}", "https:", "data:"],
-		"script-src":
-		wpConfig.mode !== 'production'
-				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-eval'"]
-				: ["#{cspSource}", "'nonce-#{cspNonce}'"],
-		"style-src":
-		wpConfig.mode === 'production'
-				? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'", "https://ka-p.fontawesome.com" ]
-				: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'", "https://ka-p.fontawesome.com" ],
-		"font-src": ["#{cspSource}", "https://ka-p.fontawesome.com" ],
-	},
-	{
-		enabled: true,
-		hashingMethod: 'sha256',
-		hashEnabled: {
-			'script-src': true,
-			'style-src': wpConfig.mode === 'production',
-		},
-		nonceEnabled: {
-			'script-src': true,
-			'style-src': wpConfig.mode === 'production',
-		},
-	});
-	// Override the nonce creation so we can dynamically generate them at runtime
-	// @ts-ignore
-	cspPlugin.createNonce = () => '#{cspNonce}';
-	return cspPlugin;
+		wpConfig.context = env.basePath;
+	}
 };
 
 
@@ -226,11 +153,10 @@ const devTool = (env, wpConfig) =>
  * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-const entryPoints = (env, wpConfig) =>
+const entry = (env, wpConfig) =>
 {
 	if (env.build === "webview")
 	{
-		wpConfig.context = env.basePath;
 		wpConfig.entry = webviewApps;
 	}
 	else
@@ -245,6 +171,11 @@ const entryPoints = (env, wpConfig) =>
 };
 
 
+//
+// *************************************************************
+// *** EXTERNALS                                             ***
+// *************************************************************
+//
 /**
  * @method
  * @param {WebpackConfig} wpConfig Webpack config object
@@ -261,85 +192,10 @@ const externals = (wpConfig) =>
 };
 
 
-/**
- * @param { string } name
- * @param {WebpackEnvironment} env
- * @returns { HtmlPlugin }
- */
-function htmlPlugin(name, env, wpConfig)
-{
-	return new HtmlPlugin({
-		template: path.posix.join(name, `${name}.html`),
-		chunks: [name],
-		filename: path.posix.join(__dirname, "res", "page", `${name}.html`),
-		inject: true,
-		scriptLoading: "module",
-		inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
-		minify: wpConfig.mode !== "production" ? false :
-		{
-			removeComments: true,
-			collapseWhitespace: true,
-			removeRedundantAttributes: false,
-			useShortDoctype: true,
-			removeEmptyAttributes: true,
-			removeStyleLinkTypeAttributes: true,
-			keepClosingSlash: true,
-			minifyCSS: true,
-		}
-	});
-}
-
-
-//
-// *************************************************************
-// *** IMAGES                                                ***
-// *************************************************************
-//
-/**
- * @param {WebpackEnvironment} env
- * @param {WebpackConfig} wpConfig Webpack config object
- * @returns { ImageMinimizerPlugin.Generator<any> }
- */
-const imgConfig = (env, wpConfig) =>
-{
-	/** @type ImageMinimizerPlugin.Generator<any> */
-	// @ts-ignore
-	return env.imageOpt ?
-	{
-		type: "asset",
-		implementation: ImageMinimizerPlugin.sharpGenerate,
-		options: {
-			encodeOptions: {
-				webp: {
-					lossless: true,
-				},
-			},
-		},
-	} :
-	{
-		type: "asset",
-		implementation: ImageMinimizerPlugin.imageminGenerate,
-		options: {
-			plugins: [
-			[
-				"imagemin-webp",
-				{
-					lossless: true,
-					nearLossless: 0,
-					quality: 100,
-					method: wpConfig.mode === "production" ? 4 : 0,
-				},
-			]]
-		}
-	};
-};
-
-
 //
 // *************************************************************
 // *** LIBRARY MODE                                          ***
 // *************************************************************
-//
 /**
  * Adds library mode webpack config `output` object.
  *
@@ -370,84 +226,70 @@ const library = (env, wpConfig) =>
 // *************************************************************
 // *** MINIFICATION                                          ***
 // *************************************************************
-//
 /**
  * @method
+ * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-const minification = (wpConfig) =>
+const minification = (env, wpConfig) =>
 {   //
 	// For production build, customize the minify stage
+	// Webpack 5 performs minification built-in now for production builds.
+	// Leaving this commented here in case it is ever needed again.
 	//
-	if (wpConfig.mode === "production")
-	{   /*
-		Object.assign(wpConfig.optimization,
-		{
-			minimize: true,
-			minimizer: [
-				new TerserPlugin({
-					extractComments: false,
-					parallel: true,
-					terserOptions: {
-						ecma: undefined,
-						parse: {},
-						compress: true,
-						mangle: true,   // Default `false`
-						module: false,
-						sourceMap: false,
-						// Deprecated
-						output: null,
-						format: {},
-						// format: {       // Default {}
-						// 	comments: false, // default "some"
-						// 	shebang: true
-						// },
-						// toplevel (default false) - set to true to enable top level variable
-						// and function name mangling and to drop unused variables and functions.
-						toplevel: false,
-						nameCache: null,
-						ie8: false,
-						keep_classnames: undefined,
-						// pass true to prevent discarding or mangling of function names.
-						keep_names: false,
-						safari10: false,
-					}
-				})
-			]
-		});*/
-		/*
-			minimizer: [
-				new TerserPlugin(
-				env.esbuild ?
-				{
-					minify: TerserPlugin.esbuildMinify,
-					terserOptions: {
-						// @ts-ignore
-						drop: ["debugger"],
-						format: "cjs",
-						minify: true,
-						treeShaking: true,
-						// Keep the class names otherwise @log won"t provide a useful name
-						keepNames: true,
-						target: "es2020",
-					}
-				} :
-				{
-					extractComments: false,
-					parallel: true,
-					terserOptions: {
-						compress: {
-							drop_debugger: true,
-						},
-						ecma: 2020,
-						// Keep the class names otherwise @log won"t provide a useful name
-						keep_classnames: true,
-						module: true,
-					},
-				})
-			]
-		});*/
-	}
+	// if (wpConfig.mode === "production")
+	// {
+	// 	Object.assign(/** @type {WebpackOptimization}*/(wpConfig.optimization),
+	// 	{
+	// 		minimize: true,
+	// 		minimizer: [
+	// 			new TerserPlugin(
+	// 			env.esbuild ?
+	// 			{
+	// 				minify: TerserPlugin.esbuildMinify,
+	// 				terserOptions: {
+	// 					// @ts-ignore
+	// 					drop: ["debugger"],
+	// 					// compress: true,
+	// 					// mangle: true,   // Default `false`
+	// 					format: "cjs",
+	// 					minify: true,
+	// 					sourceMap: false,
+	// 					treeShaking: true,
+	// 					// Keep the class names otherwise @log won"t provide a useful name
+	// 					keepNames: true,
+	// 					// keep_names: true,
+	// 					target: "es2020",
+	// 				}
+	// 			} :
+	// 			{
+	// 				extractComments: false,
+	// 				parallel: true,
+	// 				terserOptions: {
+	// 					compress: {
+	// 						drop_debugger: true,
+	// 					},
+	// 					// compress: true,
+	// 					// mangle: true,   // Default `false`
+	// 					ecma: 2020,
+	// 					sourceMap: false,
+	// 					format: {},
+	// 					// format: {       // Default {}
+	// 					// 	comments: false, // default "some"
+	// 					// 	shebang: true
+	// 					// },
+	// 					// toplevel (default false) - set to true to enable top level variable
+	// 					// and function name mangling and to drop unused variables and functions.
+	// 					// toplevel: false,
+	// 					// nameCache: null,
+	// 					// Keep the class names otherwise @log won"t provide a useful name
+	// 					keep_classnames: true,
+	// 					module: true,
+	// 				},
+	// 			})
+	// 		]
+	// 	});
+	// }
 };
 
 
@@ -455,7 +297,6 @@ const minification = (wpConfig) =>
 // *************************************************************
 // *** MODE                                                  ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -478,7 +319,6 @@ const mode = (env, wpConfig) =>
 // *************************************************************
 // *** OPTIMIZATION                                          ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -514,7 +354,6 @@ const optimization = (env, wpConfig) =>
 	else {
 		wpConfig.optimization = {};
 	}
-	minification(wpConfig);  // Minification / Terser plugin options
 };
 
 
@@ -522,7 +361,6 @@ const optimization = (env, wpConfig) =>
 // *************************************************************
 // *** OUTPUT                                                ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -561,7 +399,6 @@ const output = (env, wpConfig) =>
 // *************************************************************
 // *** PLUGINS                                               ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -570,153 +407,53 @@ const output = (env, wpConfig) =>
 const plugins = (env, wpConfig) =>
 {
 	wpConfig.plugins = [];
-	// @ts-ignore
-	const imageGeneratorConfig = imgConfig(wpConfig.mode, env);
 
 	if (env.build !== "webview")
 	{
 		if (wpConfig.mode === "production")
 		{
-			wpConfig.plugins = [
-				// new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
-				// new CleanPlugin(
-				// {
-				// 	cleanOnceBeforeBuildPatterns: [ "!dist/lib/page/**" ]
-				//  cleanOnceBeforeBuildPatterns: ["!dist/webview/**"] 
-				// }),
-				// new ForkTsCheckerPlugin({
-				// 	async: false,
-				// 	// @ts-ignore
-				// 	eslint: {
-				// 		enabled: true,
-				// 		files: "src/**/*.ts?(x)",
-				// 		options: {
-				// 			cache: true,
-				// 			cacheLocation: path.join(__dirname, ".eslintcache/", wpConfig.target === "webworker" ? "browser/" : ""),
-				// 			cacheStrategy: "content",
-				// 			fix: wpConfig.mode !== "production",
-				// 			overrideConfigFile: path.join(
-				// 				__dirname,
-				// 				wpConfig.target === "webworker" ? ".eslintrc.browser.json" : ".eslintrc.json",
-				// 			),
-				// 		},
-				// 	},
-				// 	formatter: "basic",
-				// 	typescript: {
-				// 		configFile: path.join(__dirname, wpConfig.target === "webworker" ? "tsconfig.browser.json" : "tsconfig.json"),
-				// 	}
-				// })
-				{   // "AfterDonePlugin" MUST BE LAST IN THE PLUGINS ARRAY!!
-					/** @param {PluginInstance} compiler Compiler */
-					apply: (compiler) =>   
-					{
-						compiler.hooks.done.tap("AfterDonePlugin", () =>
-						{
-							try {
-								renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
-							} catch {}
-						});
-					}
-				},
-			];
+			wpConfig.plugins.push(
+				// plugin.clean(env, wpConfig),
+				// plugin.tscheck(env, wpConfig),
+				wpPlugin.afterdone(env, wpConfig)
+			);
 		}
 	}
 	else // env.build === "webview"
 	{
-		const webviewAppPlugins = [];
-		Object.keys(webviewApps).forEach(k =>
-		{
-			webviewAppPlugins.push(htmlPlugin(k, env, wpConfig));
-		});
-		wpConfig.plugins = [
-			// new CleanPlugin(
-			// 	wpConfig.mode === "production"
-			// 		? {
-			// 				cleanOnceBeforeBuildPatterns: [
-			// 					path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res", "**"),
-			// 				],
-			// 				dangerouslyAllowCleanPatternsOutsideProject: true,
-			// 				dry: false
-			// 		  }
-			// 		: undefined
-			// ),
-			new ForkTsCheckerPlugin({
-				async: false,
-				// eslint: {
-				// 	enabled: true,
-				// 	files: path.join(basePath, "**", "*.ts?(x)"),
-				// 	options: {
-				// 		cache: true,
-				// 		cacheLocation: path.join(__dirname, ".eslintcache", "webviews/"),
-				// 		cacheStrategy: "content",
-				// 		fix: mode !== "production",
-				// 	},
-				// },
-				formatter: "basic",
-				typescript: {
-					configFile: path.join(env.basePath, "tsconfig.json"),
-				},
-			}),
-			new MiniCssExtractPlugin({ filename: "css/[name].css", }),
-			...webviewAppPlugins,
-			/** @type {any} */
-			(cspHtmlPlugin(env, wpConfig)),
-			new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []),
-			new CopyPlugin({
-				patterns: [
-					// {
-					// 	from: path.posix.join(basePath.replace(/\\/g, "/"), "media", "*.*"),
-					// 	to: path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res"),
-					// },
-					{
-						from: path.posix.join(
-							__dirname.replace(/\\/g, "/"),
-							"node_modules",
-							"@vscode",
-							"codicons",
-							"dist",
-							"codicon.ttf",
-						),
-						to: path.posix.join(__dirname.replace(/\\/g, "/"), "res", "page"),
-					},
-				],
-			})
-		];
+		wpConfig.plugins.push(
+			// wpPlugin.clean(env, wpConfig),
+			wpPlugin.tscheck(env, wpConfig),
+			wpPlugin.cssextract(env, wpConfig),
+			...wpPlugin.webviewapps(env, wpConfig),
+			// @ts-ignore
+			wpPlugin.htmlcsp(env, wpConfig),
+			wpPlugin.htmlinlinechunks(env, wpConfig),
+			wpPlugin.copy(env, wpConfig)
+		);
 
 		if (wpConfig.mode !== "production")
 		{
-			/** @type {any[]} */(wpConfig.plugins).push(
-				new ImageMinimizerPlugin({
-					deleteOriginalAssets: true,
-					generator: [imageGeneratorConfig],
-				}),
-			);
+			wpConfig.plugins.push(wpPlugin.imageminimizer);
 		}
 	}
 
-	if (env.build === "extension_web") {
-		/** @type {any[]} */(wpConfig.plugins).push(new optimize.LimitChunkCountPlugin({ maxChunks: 1 }));
+	if (wpConfig.mode !== "production")
+	{
+		// wpConfig.plugins.push(plugin.banner());
+	}
+
+	if (env.build === "extension_web")
+	{
+		wpConfig.plugins.push(wpPlugin.limitchunks(env, wpConfig));
 	}
 
 	if (env.analyze === true)
 	{
-		/** @type {any[]} */(wpConfig.plugins).push(
-			/** @type {PluginInstance} */
-			(new BundleAnalyzerPlugin({ analyzerPort: "auto" }))
-		);
-
-		/** @type {any[]} */(wpConfig.plugins).push(
-			/** @type {PluginInstance} */(new CircularDependencyPlugin(
-			{
-				cwd: __dirname,
-				exclude: /node_modules/,
-				failOnError: false,
-				onDetected: function ({ module: _webpackModuleRecord, paths, compilation })
-				{   // @ts-ignore
-					compilation.warnings.push(new WebpackError(paths.join(" -> ")));
-				},
-			}))
-		);
+		// @ts-ignore
+		wpConfig.plugins.push(wpPlugin.analyze.bundle(env, wpConfig));
+		// @ts-ignore
+		wpConfig.plugins.push(wpPlugin.analyze.circular(env, wpConfig));
 	}
 };
 
@@ -725,7 +462,6 @@ const plugins = (env, wpConfig) =>
 // *************************************************************
 // *** RESOLVE                                               ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -764,7 +500,6 @@ const resolve = (env, wpConfig) =>
 // *************************************************************
 // *** RULES                                                 ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -876,7 +611,6 @@ const rules = (env, wpConfig) =>
 // *************************************************************
 // *** STATS                                                 ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackConfig} wpConfig Webpack config object
@@ -904,7 +638,6 @@ const stats = (wpConfig) =>
 // *************************************************************
 // *** TARGET                                               ***
 // *************************************************************
-//
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
@@ -923,11 +656,8 @@ const target = (env, wpConfig) =>
 
 //
 // *************************************************************
-// *** HELPER FUNCTIONS AND FUTURE TODOS                     ***
+// *** RESOLVE TS.CONFIG                                     ***
 // *************************************************************
-//
-
-
 /**
  * @param {String} tsConfigFile
  * @returns {String}
@@ -944,56 +674,3 @@ const resolveTSConfig = (tsConfigFile) =>
 		  end = data.lastIndexOf("}") + 1;
 	return JSON5.parse(data.substring(start, end));
 };
-
-
-class InlineChunkHtmlPlugin
-{
-	constructor(htmlPlugin, patterns)
-	{
-		this.htmlPlugin = htmlPlugin;
-		this.patterns = patterns;
-	}
-
-	getInlinedTag(publicPath, assets, tag)
-	{
-		if (
-			(tag.tagName !== "script" || !(tag.attributes && tag.attributes.src)) &&
-			(tag.tagName !== "link" || !(tag.attributes && tag.attributes.href))
-		) {
-			return tag;
-		}
-
-		let chunkName = tag.tagName === "link" ? tag.attributes.href : tag.attributes.src;
-		if (publicPath) {
-			chunkName = chunkName.replace(publicPath, "");
-		}
-		if (!this.patterns.some(pattern => chunkName.match(pattern))) {
-			return tag;
-		}
-
-		const asset = assets[chunkName];
-		if (asset == null) {
-			return tag;
-		}
-
-		return { tagName: tag.tagName === "link" ? "style" : tag.tagName, innerHTML: asset.source(), closeTag: true };
-	}
-
-	apply(compiler)
-	{
-		let publicPath = compiler.options.output.publicPath || "";
-		if (publicPath && !publicPath.endsWith("/")) {
-			publicPath += "/";
-		}
-
-		compiler.hooks.compilation.tap("InlineChunkHtmlPlugin", compilation => {
-			const getInlinedTagFn = tag => this.getInlinedTag(publicPath, compilation.assets, tag);
-			const sortFn = (a, b) => (a.tagName === "script" ? 1 : -1) - (b.tagName === "script" ? 1 : -1);
-			this.htmlPlugin.getHooks(compilation).alterAssetTagGroups.tap("InlineChunkHtmlPlugin", assets => {
-				assets.headTags = assets.headTags.map(getInlinedTagFn).sort(sortFn);
-				assets.bodyTags = assets.bodyTags.map(getInlinedTagFn).sort(sortFn);
-			});
-		});
-	}
-}
-
