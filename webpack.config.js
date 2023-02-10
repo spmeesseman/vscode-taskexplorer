@@ -400,11 +400,16 @@ const output = (env, wpConfig) =>
 	{
 		wpConfig.output = {
 			clean: env.clean === true,
-			filename: "js/[name].js",
-			// libraryTarget: "module",
-    		// chunkFormat: "module",
 			path: path.join(__dirname, "res"),
 			publicPath: "#{webroot}/",
+			filename: (pathData, assetInfo) =>
+			{
+				let name = "[name]";
+				if (pathData.chunk?.name) {
+					name = pathData.chunk.name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
+				}
+				return `js/${name}.js`;
+			}
 		};
 	}
 	else

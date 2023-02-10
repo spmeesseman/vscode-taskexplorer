@@ -133,7 +133,7 @@ const wpPlugin =
 		{
 			if (env.build === "webview")
 			{
-				const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res");
+				const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "res");
 				plugin = new CleanWebpackPlugin(
 				{
 					cleanOnceBeforeBuildPatterns: [
@@ -241,7 +241,7 @@ const wpPlugin =
 		const wwwName = name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
 		return new HtmlPlugin(
 		{
-			chunks: [ wwwName ],
+			chunks: [ name, wwwName ],
 			filename: path.posix.join(__dirname, "res", "page", `${wwwName}.html`),
 			inject: true,
 			inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
