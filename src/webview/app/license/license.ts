@@ -1,6 +1,7 @@
 
 import "./page.css";
 import "./license.css";
+import "../common/css/fa.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 

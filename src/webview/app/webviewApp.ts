@@ -1,5 +1,4 @@
 
-import "./common/css/fa.css";
 import "./common/css/vscode.css";
 import { DOM } from "./common/dom";
 import type { Disposable } from "./common/vscode";
