@@ -4,12 +4,23 @@ const path = require("path");
 const JSON5 = require("json5");
 const esbuild = require("esbuild");
 const { spawnSync } = require("child_process");
-const { wpPlugin, webviewApps } = require("./webpack.plugin");
+const { wpPlugin } = require("./webpack.plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /** @typedef {import("./types/webpack").WebpackBuild} WebpackBuild */
 /** @typedef {import("./types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("./types/webpack").WebpackEnvironment} WebpackEnvironment */
+
+const webviewApps =
+{
+	home: "./home/home.ts",
+	license: "./license/license.ts",
+	parsingReport: "./parsingReport/parsingReport.ts",
+	releaseNotes: "./releaseNotes/releaseNotes.ts",
+	taskCount: "./taskCount/taskCount.ts",
+	taskUsage: "./taskUsage/taskUsage.ts",
+	welcome: "./welcome/welcome.ts",
+};
 
 
 /**
@@ -425,7 +436,7 @@ const plugins = (env, wpConfig) =>
 			// wpPlugin.clean(env, wpConfig),
 			wpPlugin.tscheck(env, wpConfig),
 			wpPlugin.cssextract(env, wpConfig),
-			...wpPlugin.webviewapps(env, wpConfig),
+			...wpPlugin.webviewapps(Object.keys(webviewApps), env, wpConfig),
 			// @ts-ignore
 			wpPlugin.htmlcsp(env, wpConfig),
 			wpPlugin.htmlinlinechunks(env, wpConfig),

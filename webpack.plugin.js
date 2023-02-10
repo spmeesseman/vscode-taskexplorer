@@ -27,18 +27,6 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 /** @typedef {import("./types/webpack").WebpackPluginInstance} WebpackPluginInstance */
 
 
-const webviewApps =
-{
-	home: "./home/home.ts",
-	license: "./license/license.ts",
-	parsingReport: "./parsingReport/parsingReport.ts",
-	releaseNotes: "./releaseNotes/releaseNotes.ts",
-	taskCount: "./taskCount/taskCount.ts",
-	taskUsage: "./taskUsage/taskUsage.ts",
-	welcome: "./welcome/welcome.ts",
-};
-
-
 const wpPlugin =
 {
 	/**
@@ -369,17 +357,18 @@ const wpPlugin =
 
 
 	/**
+	 * @param {String[]} apps
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {HtmlPlugin[]}
 	 */
-	webviewapps: (env, wpConfig) =>
+	webviewapps: (apps, env, wpConfig) =>
 	{
 		/** @type {HtmlPlugin[]} */
 		const plugins = [];
 		if (env.build === "webview")
 		{
-			Object.keys(webviewApps).forEach(k => plugins.push(wpPlugin.html(k, env, wpConfig)));
+			apps.forEach(k => plugins.push(wpPlugin.html(k, env, wpConfig)));
 		}
 		else
 		{
@@ -481,5 +470,5 @@ class InlineChunkHtmlPlugin
 }
 
 module.exports = {
-	wpPlugin, webviewApps
+	wpPlugin
 }
