@@ -16,7 +16,6 @@ export class HomeWebviewApp extends TeWebviewApp<State>
 
 	protected override onInitialize()
     {
-		// provideVSCodeDesignSystem().register(vsCodeButton());
 		this.updateState();
 	}
 
