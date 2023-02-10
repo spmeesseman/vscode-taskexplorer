@@ -30,12 +30,12 @@ const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPl
 const webviewApps =
 {
 	home: "./home/home.ts",
-	// licensePage: "./licensePage/licensePage.ts",
-	// parsingReport: "./parsingReport/parsingReport.ts",
-	// releaseNotes: "./releaseNotes/releaseNotes.ts",
-	// taskCount: "./taskCount/taskCount.ts",
-	// taskUsage: "./taskUsage/taskUsage.ts",
-	// welcome: "./welcome/welcome.ts",
+	license: "./license/license.ts",
+	parsingReport: "./parsingReport/parsingReport.ts",
+	releaseNotes: "./releaseNotes/releaseNotes.ts",
+	taskCount: "./taskCount/taskCount.ts",
+	taskUsage: "./taskUsage/taskUsage.ts",
+	welcome: "./welcome/welcome.ts",
 };
 
 
