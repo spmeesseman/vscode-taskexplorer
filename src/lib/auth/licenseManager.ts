@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 
-// import * as https from "http";
-import * as https from "https";
+import { request } from "https";
+// import fetch from "@env/fetch";
 import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
 import { IncomingMessage } from "http";
@@ -32,6 +33,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private maxTasksReached = false;
 	private panel: LicensePage | undefined;
 	private port = 443;
+	private authApiEndpoint = "/api/license/validate/v1";
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
 
@@ -250,7 +252,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 			let rspData = "";
 			this.log("starting https get 30-day license request to license server", logPad + "   ");
 
-			const req = https.request(this.getDefaultServerOptions("/token"), (res) =>
+			const req = request(this.getDefaultServerOptions("/token"), (res) =>
 			{
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
@@ -399,7 +401,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 			let rspData = "";
 			this.log("starting https validate request to license server", logPad);
 
-			const req = https.request(this.getDefaultServerOptions("/api/license/validate/v1"), (res) =>
+			const req = request(this.getDefaultServerOptions(this.authApiEndpoint), (res) =>
 			{
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
@@ -447,62 +449,43 @@ export class LicenseManager implements ILicenseManager, Disposable
 		});
 	};
 
-	/*
-	async resendVerification(): Promise<boolean> {
-		if (this._subscription.account?.verified) return true;
+	// private validateLicenseFetch = async(licenseKey: string, logPad: string) =>
+	// {
+	// 	const res = await fetch(Uri.joinPath(this.host, this.authApiEndpoint).toString(),
+	// 	{
+	// 		method: "POST",
+	// 		agent: getProxyAgent(),
+	// 		headers: {
+	// 			// "Authorization": `Bearer ${codeSession.token}`,
+	// 			"Authorization": `Bearer ${this.token}`,
+	// 			"User-Agent": "VSCode-TaskExplorer",
+	// 			"Content-Type": "application/json",
+	// 		},
+	// 		body: JSON.stringify(
+	// 		{
+	// 			licensekey: licenseKey,
+	// 			appid: env.machineId,
+	// 			appname: "vscode-taskexplorer-prod",
+	// 			ip: "*"
+	// 		}),
+	// 	});
 
-		const scope = getLogScope();
-
-		void this.showHomeView(true);
-
-		const session = await this.ensureSession(false);
-		if (session == null) return false;
-
-		try {
-			const rsp = await fetch(Uri.joinPath(this.baseApiUri, 'resend-email').toString(), {
-				method: 'POST',
-				agent: getProxyAgent(),
-				headers: {
-					Authorization: `Bearer ${session.accessToken}`,
-					'User-Agent': userAgent,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ id: session.account.id }),
-			});
-
-			if (!rsp.ok) {
-				debugger;
-				Logger.error(
-					'',
-					scope,
-					`Unable to resend verification email; status=(${rsp.status}): ${rsp.statusText}`,
-				);
-
-				void window.showErrorMessage(`Unable to resend verification email; Status: ${rsp.statusText}`, 'OK');
-
-				return false;
-			}
-
-			const confirm = { title: 'Recheck' };
-			const cancel = { title: 'Cancel' };
-			const result = await window.showInformationMessage(
-				"Once you have verified your email address, click 'Recheck'.",
-				confirm,
-				cancel,
-			);
-
-			if (result === confirm) {
-				await this.validate();
-				return true;
-			}
-		} catch (ex) {
-			Logger.error(ex, scope);
-			debugger;
-
-			void window.showErrorMessage('Unable to resend verification email', 'OK');
-		}
-
-		return false;
-	}*/
+	// 	let licensed = true;
+	// 	try
+	// 	{   const jso = JSON.parse(res.body);
+	// 		licensed = res.ok && jso.success && jso.message === "Success";
+	// 		this.logServerResponse(res, jso, res.data, logPad);
+	// 		jso.token = licenseKey;
+	// 		await this.setLicenseKeyFromRsp(licensed, jso, logPad);
+	// 	}
+	// 	catch (e) {
+	// 		/* istanbul ignore next*/
+	// 		this.onServerError(e, "validate", logPad, res.data);
+	// 	}
+	// 	finally {
+	// 		this.busy = false;
+	// 	}
+	// 	log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
+	// };
 
 }
