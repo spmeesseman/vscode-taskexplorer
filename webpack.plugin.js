@@ -193,15 +193,15 @@ const wpPlugin =
 	 */
 	html: (name, env, wpConfig) =>
 	{
-		name = name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
+		const wwwName = name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
 		return new HtmlPlugin(
 		{
-			chunks: [ name ],
-			filename: path.posix.join(__dirname, "res", "page", `${name}.html`),
+			chunks: [ wwwName ],
+			filename: path.posix.join(__dirname, "res", "page", `${wwwName}.html`),
 			inject: true,
 			inlineSource: wpConfig.mode === "production" ? ".css$" : undefined,
 			scriptLoading: "module",
-			template: path.posix.join(name, `${name}.html`),
+			template: path.posix.join(name, `${wwwName}.html`),
 			minify: wpConfig.mode !== "production" ? false :
 			{
 				removeComments: true,
