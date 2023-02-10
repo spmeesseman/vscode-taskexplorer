@@ -16,7 +16,7 @@ declare interface WebpackEnvironment
     basePath: string;
     build: WebpackBuild;
     clean: boolean;
-    environment: string;
+    environment: "dev"|"prod"|"test";
     esbuild: boolean; // Is ES build
     imageOpt: boolean; // Perform image optimization
     target: string;

@@ -11,6 +11,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 /** @typedef {import("./types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("./types/webpack").WebpackEnvironment} WebpackEnvironment */
 /** @typedef {"true"|"false"} BooleanString */
+/** @typedef {{ mode: "none"|"development"|"production"|undefined, env: WebpackEnvironment, config: String[] }} WebpackArgs */
+
 
 const webviewApps =
 {
@@ -29,9 +31,10 @@ const webviewApps =
  *
  * @param {WebpackEnvironment} env Environment variable containing runtime options passed
  * to webpack on the command line (e.g. `webpack --env environment=test --env clean=true`).
+ * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig|WebpackConfig[]}
  */
-module.exports = (env) =>
+module.exports = (env, argv) =>
 {
 	env = Object.assign(
 	{
@@ -50,13 +53,13 @@ module.exports = (env) =>
 
 	if (env.build)
 	{
-		return getWebpackConfig(env.build, env);
+		return getWebpackConfig(env.build, env, argv);
 	}
 
 	return [
-		getWebpackConfig("extension", env),
-		// getWebpackConfig("extension_web", env),
-		getWebpackConfig("webview", env),
+		getWebpackConfig("extension", env, argv),
+		// getWebpackConfig("extension_web", env, argv),
+		getWebpackConfig("webview", env, argv),
 	];
 };
 
@@ -66,14 +69,15 @@ module.exports = (env) =>
  * @private
  * @param {WebpackBuild} build
  * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig}
  */
-const getWebpackConfig = (build, env) =>
+const getWebpackConfig = (build, env, argv) =>
 {   
 	env.build = build;
 	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
-	mode(env, wpConfig);          // Mode i.e. "production", "development", "none"
+	mode(env, argv, wpConfig);    // Mode i.e. "production", "development", "none"
 	context(env, wpConfig);       // Context for build
 	entry(env, wpConfig);         // Entry points for built output
 	externals(wpConfig)           // External modules
@@ -311,17 +315,30 @@ const minification = (env, wpConfig) =>
 /**
  * @method
  * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WebpackArgs} argv Webpack command line args
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-const mode = (env, wpConfig) =>
+const mode = (env, argv, wpConfig) =>
 {
-	if (env.environment === "dev" || env.environment === "test") {
-		wpConfig.mode = "development";
+	if (!argv.mode)
+	{
+		if (env.environment === "dev" || env.environment === "test") {
+			wpConfig.mode = "development";
+		}
+		else {
+			wpConfig.mode = "production";
+			env.environment = "prod";
+		}
 	}
-	else //
-	{   // env.environment === "prod"
-		wpConfig.mode = "production";
-		env.environment = "prod";
+	else
+	{
+		wpConfig.mode = argv.mode;
+		if (argv.mode === "development") {
+			env.environment = "dev";
+		}
+		else if (argv.mode === "production") {
+			env.environment = "prod";
+		}
 	}
 };
 
