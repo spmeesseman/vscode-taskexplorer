@@ -45,21 +45,17 @@ export abstract class TeWebviewApp<State = undefined>
 		requestAnimationFrame(() =>
 		{
 			this.log(`${this.appName}.initializing`);
-
-			try {
-				this.onInitialize?.();
+			try
+			{   this.onInitialize?.();
 				this.initialize();
-
 				if (this.onMessageReceived) {
 					disposables.push(DOM.on(window, "message", this.onMessageReceived.bind(this)));
 				}
-
 				this.sendCommand(WebviewReadyCommandType, undefined);
-
 				this.onInitialized?.();
 			}
-			finally {
-				if (document.body.classList.contains("preload")) {
+			finally
+			{   if (document.body.classList.contains("preload")) {
 					setTimeout(() => {
 						document.body.classList.remove("preload");
 					}, 500);
@@ -68,7 +64,8 @@ export abstract class TeWebviewApp<State = undefined>
 		});
 
 		disposables.push(
-			DOM.on(window, "pagehide", () => {
+			DOM.on(window, "pagehide", () =>
+			{
 				disposables?.forEach(d => d.dispose());
 				this.bindDisposables?.forEach(d => d.dispose());
 				this.bindDisposables = undefined;
