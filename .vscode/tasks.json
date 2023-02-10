@@ -17,7 +17,7 @@
     {
         "type": "npm",
         "script": "webpack-watch",
-        "problemMatcher": "$webpackte",
+        "problemMatcher": "$webpackTe",
         "isBackground": true,
         "presentation": {
             "reveal": "always"

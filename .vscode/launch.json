@@ -123,9 +123,9 @@
             ]
         },
         {
+			"name": "Launch (Webpack)(TestFixture Root)",
 			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch (Webpack)(TestFixture Root)",
 			"runtimeExecutable": "${execPath}",
             "smartStep": true,
 			"sourceMaps": true,
