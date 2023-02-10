@@ -440,16 +440,10 @@ const plugins = (env, wpConfig) =>
 	{
 		wpConfig.plugins.push(wpPlugin.clean(env, wpConfig));
 		// plugin.tscheck(env, wpConfig);
-	}
-
-	if (env.build === "extension_web")
-	{
-		wpConfig.plugins.push(wpPlugin.limitchunks(env, wpConfig));
-	}
-
-	if (wpConfig.mode === "production")
-	{
-		wpConfig.plugins.push(wpPlugin.banner());
+		if (env.build === "extension_web")
+		{
+			wpConfig.plugins.push(wpPlugin.limitchunks(env, wpConfig));
+		}
 	}
 
 	if (env.analyze === true)
@@ -460,7 +454,15 @@ const plugins = (env, wpConfig) =>
 		wpConfig.plugins.push(wpPlugin.analyze.circular(env, wpConfig));
 	}
 
+	wpConfig.plugins.push(wpPlugin.banner(env, wpConfig));
 	wpConfig.plugins.push(wpPlugin.afterdone(env, wpConfig));
+
+	wpConfig.plugins.slice().reverse().forEach((p, index, object) =>
+	{
+		if (!p) {
+			/** @type {*} */(wpConfig.plugins).splice(object.length - 1 - index, 1);
+		}
+	});
 };
 
 

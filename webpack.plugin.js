@@ -6,15 +6,14 @@ const { renameSync } = require("fs");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const CspHtmlPlugin = require("csp-html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ForkTsCheckerPlugin = require("fork-ts-checker-webpack-plugin");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-const { CleanWebpackPlugin: CleanPlugin } = require("clean-webpack-plugin");
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 
 // const { IgnorePlugin } = require("webpack");
-// const { validate } = require("schema-utils");
 // const TerserPlugin = require("terser-webpack-plugin");
 // const ShebangPlugin = require("webpack-shebang-plugin");
 // const CopyWebpackPlugin = require("copy-webpack-plugin");
@@ -39,31 +38,24 @@ const wpPlugin =
 		// "AfterDonePlugin" MUST BE LAST IN THE PLUGINS ARRAY!!
 		/** @type {WebpackPluginInstance | undefined} */
 		let plugin;
-		if (env.build === "webview") {}
-		else
+		if (env.build !== "webview" && wpConfig.mode === "production")
 		{
-			if (wpConfig.mode === "production")
-			{
-				plugin = {
-					/** @param {import("webpack").Compiler} compiler Compiler */
-					apply: (compiler) =>   
+			plugin =
+			{   /** @param {import("webpack").Compiler} compiler Compiler */
+				apply: (compiler) =>   
+				{
+					compiler.hooks.done.tap("AfterDonePlugin", () =>
 					{
-						compiler.hooks.done.tap("AfterDonePlugin", () =>
-						{
-							try {
-								renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
-							} catch {}
-						});
-					}
-				};
-			}
-		}
-		if (!plugin)
-		{
-			plugin = {
-				/** @param {import("webpack").Compiler} compiler Compiler */
-				apply: (compiler) => {}
+						try {
+							renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
+							renameSync(path.join(__dirname, "dist", "extension.js.LICENSE.txt"), path.join(__dirname, "dist", "extension.LICENSE"));
+						} catch {}
+					});
+				}
 			};
+		}
+		if (!plugin) {
+			plugin = /** @type {webpack.BannerPlugin} */(/** @type {unknown} */(undefined));
 		}
 		return plugin;
 	},
@@ -102,23 +94,47 @@ const wpPlugin =
 	},
 
 
-	banner: ()=> new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
+	/**
+	 * @param {WebpackEnvironment} env
+	 * @param {WebpackConfig} wpConfig Webpack config object
+	 * @returns {webpack.BannerPlugin}
+	 */
+	banner: (env, wpConfig) =>
+	{
+		/** @type {webpack.BannerPlugin | undefined} */
+		let plugin;
+		if (wpConfig.mode === "production")
+		{
+			plugin = new webpack.BannerPlugin(
+			{
+				banner: `Copyright ${(new Date()).getFullYear()} Scott Meesseman`,
+				entryOnly: true,
+				test: /extension\.js/ //s,
+				// raw: true
+			});
+		}
+		if (!plugin) {
+			plugin = /** @type {webpack.BannerPlugin} */(/** @type {unknown} */(undefined));
+		}
+		return plugin;
+	},
 
 
 	/**
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
-	 * @returns {CleanPlugin}
+	 * @returns {CleanWebpackPlugin}
 	 */
 	clean: (env, wpConfig) =>
 	{
-		/** @type {CleanPlugin} */
+		/** @type {CleanWebpackPlugin | undefined} */
 		let plugin;
-		const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res");
-		if (env.build === "webview")
+		if (env.clean === true)
 		{
-			plugin = new CleanPlugin(
-				wpConfig.mode === "production" ?
+			if (env.build === "webview")
+			{
+				const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res");
+				plugin = new CleanWebpackPlugin(
 				{
 					cleanOnceBeforeBuildPatterns: [
 						path.posix.join(basePath, "css", "**"),
@@ -128,24 +144,28 @@ const wpPlugin =
 					],
 					dangerouslyAllowCleanPatternsOutsideProject: true,
 					dry: false
-				} :
-				undefined
-			);
-		}
-		else
-		{
-			plugin = new CleanPlugin(
-				wpConfig.mode === "production" ?
+				});
+			}
+			else
+			{
+				plugin = new CleanWebpackPlugin(
 				{
-					cleanOnceBeforeBuildPatterns: [
-						path.posix.join(basePath, "dist", "**"),
+					cleanOnceBeforeBuildPatterns: wpConfig.mode === "production" ? [
+						path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "**"),
+						path.posix.join(__dirname.replace(/\\/g, "/"), "coverage", "**"),
+						path.posix.join(__dirname.replace(/\\/g, "/"), ".nyc-output", "**"),
+						"!dist/webview/app/**"
+					] : [
+						path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "**"),
 						"!dist/webview/app/**"
 					],
 					dangerouslyAllowCleanPatternsOutsideProject: true,
 					dry: false
-				} :
-				undefined
-			);
+				});
+			}
+		}
+		if (!plugin) {
+			plugin = /** @type {CleanWebpackPlugin} */(/** @type {unknown} */(undefined));
 		}
 		return plugin;
 	},
