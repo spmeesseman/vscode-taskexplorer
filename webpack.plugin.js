@@ -182,10 +182,7 @@ const wpPlugin =
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {MiniCssExtractPlugin}
 	 */
-	cssextract: (env, wpConfig) =>
-	{
-		return new MiniCssExtractPlugin({ filename: "css/[name].css", });
-	},
+	cssextract: (env, wpConfig) => new MiniCssExtractPlugin({ filename: "css/[name].css", }),
 
 
 	/**
@@ -196,6 +193,7 @@ const wpPlugin =
 	 */
 	html: (name, env, wpConfig) =>
 	{
+		name = name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
 		return new HtmlPlugin(
 		{
 			chunks: [ name ],
