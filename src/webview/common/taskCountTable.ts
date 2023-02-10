@@ -12,12 +12,10 @@ import { getWorkspaceProjectName, isWorkspaceFolder } from "../../lib/utils/util
 export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, html?: string) =>
 {
     const projects: string[] = [],
-          taskCounts: IDictionary<number> = {},
-          tableTemplateFile = Uri.joinPath(wrapper.context.extensionUri, "res", "page", "task-count-table.html");
+          taskCounts: IDictionary<number> = {};
 
     let fileCount = 0;
     const treeMgr = TeWrapper.instance.treeManager;
-    let tableTemplate = new TextDecoder("utf8").decode(await workspace.fs.readFile(tableTemplateFile));
     // let tableTemplate = (await workspace.fs.readFile(tableTemplateFile)).toString();
     const tasks = treeMgr.getTasks() // Filter out 'User' tasks for project/folder reports
                          .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
@@ -30,6 +28,7 @@ export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, 
         taskCounts[t.source]++;
     });
 
+    let tableTemplate = getHtml();
     getTaskTypes().forEach((tcKey) =>
     {
         const taskFiles = getTaskFiles(tcKey) || [];
@@ -75,4 +74,151 @@ export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, 
     }
 
     return html;
+};
+
+
+const getHtml = () =>
+{
+    return `
+<table width="100%">
+    <tr>
+        <td width="10%">
+            <img src="#{webroot}/img/sources/ant.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value" width="12%">
+            #{taskCounts.ant}
+        </td>
+        <td width="10%">
+            <img src="#{webroot}/img/sources/apppublisher.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value" width="12%">
+            #{taskCounts.apppublisher}
+        </td>
+        <td width="10%">
+            <img src="#{webroot}/img/sources/bash.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value" width="12%">
+            #{taskCounts.bash}
+        </td>
+        <td width="10%">
+            <img src="#{webroot}/img/sources/bat.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value" width="12%">
+            #{taskCounts.batch}
+        </td>
+        <td width="10%">
+            <img src="#{webroot}/img/sources/bat.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value" width="12%">
+            #{taskCounts.composer}
+        </td>
+    </tr><tr>
+        <td>
+            <img src="#{webroot}/img/sources/gradle.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.gradle}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/grunt.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.grunt}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/gulp.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.gulp}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/jenkins.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.jenkins}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/make.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.make}
+        </td>
+    </tr><tr>
+        <td>
+            <img src="#{webroot}/img/sources/maven.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.maven}
+        </td>
+        <td class="task-image-stacked-container">
+            <span class="task-image1-stacked-container"><img src="#{webroot}/img/sources/npm.png" class="task-image-stacked" /></span>
+            <div class="task-image2-stacked-container"><img src="#{webroot}/img/sources/yarn.png" class="task-image-stacked" /></div>
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.npm}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/nsis.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.nsis}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/powershell.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.powershell}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/python.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.python}
+        </td>
+    </tr><tr>
+        <td>
+            <img src="#{webroot}/img/sources/perl.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.perl}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/ruby.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.ruby}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/ts.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.tsc}
+        </td>
+        <td class="task-count-label task-usage-task-count-label">
+            <img src="#{webroot}/img/sources/webpack.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.webpack}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/workspace.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.Workspace}
+        </td>
+    </tr><!--<tr>
+        <td>
+            <img src="#{webroot}/img/sources/npm.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.npm}
+        </td>
+        <td>
+            <img src="#{webroot}/img/sources/yarn.png" class="task-image" />
+        </td>
+        <td class="task-count task-count-value">
+            #{taskCounts.yarn}
+        </td>
+    </tr>-->
+</table>`;
 };

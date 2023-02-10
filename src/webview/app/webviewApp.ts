@@ -1,12 +1,10 @@
 
 import "./common/css/vscode.css";
-import { DOM } from "./common/dom";
-import type { Disposable } from "./common/vscode";
+import { Disposable, DOM } from "./common/dom";
 import {
 	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
 	WebviewFocusChangedCommandType, WebviewReadyCommandType
 } from "../common/ipc";
-
 
 interface VsCodeApi {
 	postMessage(msg: unknown): void;

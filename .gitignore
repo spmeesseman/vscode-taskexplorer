@@ -15,5 +15,4 @@ tsconfig.tsbuildinfo
 /res/**/home.*
 /res/css
 /res/js
-/res/page/*
-!/res/page/task-cout-table.html
+/res/page

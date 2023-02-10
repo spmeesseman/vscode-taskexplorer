@@ -139,8 +139,7 @@ const wpPlugin =
 					cleanOnceBeforeBuildPatterns: [
 						path.posix.join(basePath, "css", "**"),
 						path.posix.join(basePath, "js", "**"),
-						path.posix.join(basePath, "page", "**"),
-						"!res/page/task-count-table.html"
+						path.posix.join(basePath, "page", "**")
 					],
 					dangerouslyAllowCleanPatternsOutsideProject: true,
 					dry: false
