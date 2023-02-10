@@ -4,7 +4,7 @@ import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
-import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
+// import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
 export class HomeApp extends TeWebviewApp<State>
@@ -17,7 +17,7 @@ export class HomeApp extends TeWebviewApp<State>
 
 	protected override onInitialize()
     {
-		provideVSCodeDesignSystem().register(vsCodeButton());
+		// provideVSCodeDesignSystem().register(vsCodeButton());
 		this.updateState();
 	}
 
