@@ -419,21 +419,10 @@ const plugins = (env, wpConfig) =>
 {
 	wpConfig.plugins = [];
 
-	if (env.build !== "webview")
-	{
-		if (wpConfig.mode === "production")
-		{
-			wpConfig.plugins.push(
-				// plugin.clean(env, wpConfig),
-				// plugin.tscheck(env, wpConfig),
-				wpPlugin.afterdone(env, wpConfig)
-			);
-		}
-	}
-	else // env.build === "webview"
+	if (env.build === "webview")
 	{
 		wpConfig.plugins.push(
-			// wpPlugin.clean(env, wpConfig),
+			wpPlugin.clean(env, wpConfig),
 			wpPlugin.tscheck(env, wpConfig),
 			wpPlugin.cssextract(env, wpConfig),
 			...wpPlugin.webviewapps(Object.keys(webviewApps), env, wpConfig),
@@ -442,21 +431,25 @@ const plugins = (env, wpConfig) =>
 			wpPlugin.htmlinlinechunks(env, wpConfig),
 			wpPlugin.copy(env, wpConfig)
 		);
-
-		if (wpConfig.mode !== "production")
-		{
-			wpConfig.plugins.push(wpPlugin.imageminimizer);
-		}
+		// if (wpConfig.mode !== "production")
+		// {
+		// 	wpConfig.plugins.push(wpPlugin.imageminimizer);
+		// }
 	}
-
-	if (wpConfig.mode !== "production")
+	else
 	{
-		// wpConfig.plugins.push(plugin.banner());
+		wpConfig.plugins.push(wpPlugin.clean(env, wpConfig));
+		// plugin.tscheck(env, wpConfig);
 	}
 
 	if (env.build === "extension_web")
 	{
 		wpConfig.plugins.push(wpPlugin.limitchunks(env, wpConfig));
+	}
+
+	if (wpConfig.mode === "production")
+	{
+		wpConfig.plugins.push(wpPlugin.banner());
 	}
 
 	if (env.analyze === true)
@@ -466,6 +459,8 @@ const plugins = (env, wpConfig) =>
 		// @ts-ignore
 		wpConfig.plugins.push(wpPlugin.analyze.circular(env, wpConfig));
 	}
+
+	wpConfig.plugins.push(wpPlugin.afterdone(env, wpConfig));
 };
 
 

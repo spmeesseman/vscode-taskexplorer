@@ -39,26 +39,30 @@ const wpPlugin =
 		// "AfterDonePlugin" MUST BE LAST IN THE PLUGINS ARRAY!!
 		/** @type {WebpackPluginInstance | undefined} */
 		let plugin;
-		if (env.build === "webview")
+		if (env.build === "webview") {}
+		else
+		{
+			if (wpConfig.mode === "production")
+			{
+				plugin = {
+					/** @param {import("webpack").Compiler} compiler Compiler */
+					apply: (compiler) =>   
+					{
+						compiler.hooks.done.tap("AfterDonePlugin", () =>
+						{
+							try {
+								renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
+							} catch {}
+						});
+					}
+				};
+			}
+		}
+		if (!plugin)
 		{
 			plugin = {
 				/** @param {import("webpack").Compiler} compiler Compiler */
 				apply: (compiler) => {}
-			};
-		}
-		else
-		{
-			plugin = {
-				/** @param {import("webpack").Compiler} compiler Compiler */
-				apply: (compiler) =>   
-				{
-					compiler.hooks.done.tap("AfterDonePlugin", () =>
-					{
-						try {
-							renameSync(path.join(__dirname, "dist", "vendor.js.LICENSE.txt"), path.join(__dirname, "dist", "vendor.LICENSE"));
-						} catch {}
-					});
-				}
 			};
 		}
 		return plugin;
@@ -98,10 +102,7 @@ const wpPlugin =
 	},
 
 
-	banner: ()=>
-	{
-		// return new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
-	},
+	banner: ()=> new webpack.BannerPlugin("Copyright 2023 Scott Meesseman"),
 
 
 	/**
@@ -113,26 +114,38 @@ const wpPlugin =
 	{
 		/** @type {CleanPlugin} */
 		let plugin;
+		const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res");
 		if (env.build === "webview")
 		{
 			plugin = new CleanPlugin(
-				wpConfig.mode === "production"
-					? {
-							cleanOnceBeforeBuildPatterns: [
-								path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res", "page", "res", "**"),
-							],
-							dangerouslyAllowCleanPatternsOutsideProject: true,
-							dry: false
-					  }
-					: undefined
+				wpConfig.mode === "production" ?
+				{
+					cleanOnceBeforeBuildPatterns: [
+						path.posix.join(basePath, "css", "**"),
+						path.posix.join(basePath, "js", "**"),
+						path.posix.join(basePath, "page", "**"),
+						"!res/page/task-count-table.html"
+					],
+					dangerouslyAllowCleanPatternsOutsideProject: true,
+					dry: false
+				} :
+				undefined
 			);
 		}
 		else
 		{
 			plugin = new CleanPlugin(
-			{
-				cleanOnceBeforeBuildPatterns: [ "!dist/lib/page/**" ]
-			});
+				wpConfig.mode === "production" ?
+				{
+					cleanOnceBeforeBuildPatterns: [
+						path.posix.join(basePath, "dist", "**"),
+						"!dist/webview/app/**"
+					],
+					dangerouslyAllowCleanPatternsOutsideProject: true,
+					dry: false
+				} :
+				undefined
+			);
 		}
 		return plugin;
 	},
@@ -182,7 +195,20 @@ const wpPlugin =
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {MiniCssExtractPlugin}
 	 */
-	cssextract: (env, wpConfig) => new MiniCssExtractPlugin({ filename: "css/[name].css", }),
+	cssextract: (env, wpConfig) =>
+	{
+		return new MiniCssExtractPlugin(
+		{
+			filename: (pathData, assetInfo) =>
+			{
+				let name = "[name]";
+				if (pathData.chunk?.name) {
+					name = pathData.chunk.name.replace(/[a-z]+([A-Z])/g, (substr, token) => substr.replace(token, "-" + token.toLowerCase()));
+				}
+				return `css/${name}.css`
+			}
+		});
+	},
 
 
 	/**
