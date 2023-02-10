@@ -5,6 +5,7 @@ import "../common/css/page.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
+import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
 export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
@@ -12,6 +13,12 @@ export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
 	constructor()
     {
 		super("ReleaseNotesWebviewApp");
+	}
+
+
+	protected override onInitialize()
+    {
+		provideVSCodeDesignSystem().register(vsCodeButton());
 	}
 
 

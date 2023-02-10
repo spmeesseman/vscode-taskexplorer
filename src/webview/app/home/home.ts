@@ -3,9 +3,7 @@ import "./home.css";
 import "../common/css/fa.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
-// import { Disposable, DOM } from "../common/dom";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
-// import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
 export class HomeWebviewApp extends TeWebviewApp<State>

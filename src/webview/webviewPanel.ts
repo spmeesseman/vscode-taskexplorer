@@ -216,16 +216,16 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	protected override onHtmlPreview = async(html: string) =>
+	protected override _onHtmlPreview = async(html: string, ...args: unknown[]) =>
 	{
-		return html.replace(/\#\{title\}/g,
+		return this.onHtmlPreview(html.replace(/\#\{title\}/g,
 `<table><tr>
 <td class="content-img">
 	<!--<img src="#{webroot}/img/logo-clr.png" />-->
 	<span class="fad fa-cogs te-icon"></span>
 </td>
 <td class="content-title"> &nbsp;#{title}</td>
-</tr></table>`);
+</tr></table>`), ...args);
 	};
 
 }

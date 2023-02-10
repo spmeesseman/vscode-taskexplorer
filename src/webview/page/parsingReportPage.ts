@@ -33,7 +33,6 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 
 	protected override onHtmlPreview = async(html: string, ...args: any[]) =>
 	{
-		html = await super.onHtmlPreview(html);
 		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 		html = await createTaskCountTable(this.wrapper, project, html);

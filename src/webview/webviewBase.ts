@@ -11,7 +11,6 @@ import { getNonce } from "@env/crypto";
 import { Commands } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import { executeCommand } from "../lib/command";
-// import { getNonce } from "../lib/env/node/crypto";
 import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
@@ -99,7 +98,7 @@ export abstract class TeWebviewBase<State>
 		]);
 
 		let html = content;
-		html = await this.onHtmlPreview(content, ...args);
+		html = await this._onHtmlPreview(content, ...args);
 
 		const repl = (h: string) =>
 		{
@@ -135,7 +134,7 @@ export abstract class TeWebviewBase<State>
 		html = repl(html);
 
 		this._isFirstLoadComplete = true;
-		return this.onHtmlFinalize(html, ...args);
+		return this._onHtmlFinalize(html, ...args);
 	}
 
 
@@ -168,6 +167,12 @@ export abstract class TeWebviewBase<State>
 
 
 	protected onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => html;
+
+
+	protected _onHtmlPreview = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
+
+
+	protected _onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
 
 
 	protected onMessageReceivedCore(e: IpcMessage)

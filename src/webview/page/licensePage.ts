@@ -31,7 +31,6 @@ export class LicensePage extends TeWebviewPanel<State>
 
 	protected override onHtmlPreview = async (html: string, ...args: any[]) =>
 	{
-		html = await super.onHtmlPreview(html);
 		const newKey = args[0] as string | undefined;
 		html = await createTaskCountTable(this.wrapper, undefined, html);
 		html = removeViewLicenseButton(html);
