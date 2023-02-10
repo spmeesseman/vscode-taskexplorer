@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src #{cspSource}; script-src 'nonce-#{cspNonce}'; style-src #{cspSource}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Task Explorer</title>
+        <link rel="stylesheet" href="#{webroot}/css/vscode.css">
+        <link rel="stylesheet" href="#{webroot}/css/task-usage.css">
+    </head>
+
+    <body>
+        <table class="task-usage-table" width="100%">
+            <tr>
+                <td class="task-count-label task-usage-table-label">
+                    # of tasks ran today:
+                </td>
+                <td class="task-count-value task-usage-table-value" align="right">
+                    #{taskUsage.today}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-count-label task-usage-table-label">
+                    Avg. # of tasks / day:
+                </td>
+                <td class="task-count-value task-usage-table-value" align="right">
+                    #{taskUsage.avgPerDay}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-count-label task-usage-table-label">
+                    Avg. # of tasks / week:
+                </td>
+                <td class="task-count-value task-usage-table-value" align="right">
+                    #{taskUsage.avgPerWeek}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-count-label task-usage-table-label">
+                    Most used task:
+                </td>
+                <td class="task-usage-table-value" align="right">
+                    #{taskUsage.mostUsedTask}
+                </td>
+            </tr>
+            <tr>
+                <td class="task-count-label task-usage-table-label">
+                    Last task ran at:
+                </td>
+                <td class="task-count-value task-usage-table-value" align="right">
+                    #{taskUsage.lastTaskRanAt}
+                </td>
+            </tr>
+        </table>
+    </body>
+
+</html>

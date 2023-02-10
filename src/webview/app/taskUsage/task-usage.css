@@ -1,0 +1,18 @@
+:root {
+	--container-padding: 10px;
+}
+
+.task-usage-table {
+	font-size: 12px;
+}
+
+.task-usage-table-label {
+	font-size: 12px;
+	font-weight: bold;
+	opacity: 0.95;
+}
+
+.task-usage-table-value {
+	font-size: 11px;
+	opacity: 0.885;
+}

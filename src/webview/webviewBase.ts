@@ -99,7 +99,7 @@ export abstract class TeWebviewBase<State>
 		]);
 
 		let html = content;
-		html = await this._onHtmlPreview(content, ...args);
+		html = await this.onHtmlPreview(content, ...args);
 
 		const repl = (h: string) =>
 		{
@@ -135,7 +135,7 @@ export abstract class TeWebviewBase<State>
 		html = repl(html);
 
 		this._isFirstLoadComplete = true;
-		return this._onHtmlFinalize(html, ...args);
+		return this.onHtmlFinalize(html, ...args);
 	}
 
 
@@ -168,12 +168,6 @@ export abstract class TeWebviewBase<State>
 
 
 	protected onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => html;
-
-
-	protected _onHtmlPreview = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
-
-
-	protected _onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
 
 
 	protected onMessageReceivedCore(e: IpcMessage)

@@ -7,11 +7,11 @@ import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
 // import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
-export class HomeApp extends TeWebviewApp<State>
+export class HomeWebviewApp extends TeWebviewApp<State>
 {
 	constructor()
     {
-		super("HomeApp");
+		super("HomeWebviewApp");
 	}
 
 
@@ -22,22 +22,7 @@ export class HomeApp extends TeWebviewApp<State>
 	}
 
 
-    protected override onBind(): Disposable[]
-    {
-		const disposables = super.onBind?.() ?? [];
-		disposables.push(
-			DOM.on("[data-action]", "click", (e, target: HTMLElement) => this.onButtonClicked(e, target)),
-			// DOM.on("btnEnterlicense", "click", () => this.enterLicense()),
-			// DOM.on("btnGetLicense", "click", () => this.getLicense()),
-			// DOM.on("btnViewLicense", "click", () => this.showLicensePage()),
-			// DOM.on("btnViewReport", "click", () => this.showParsingReport()),
-			// DOM.on("btnViewReleaseNotes", "click", () => this.showReleaseNotes()),
-		);
-		return disposables;
-    }
-
-
-	private onButtonClicked(_e: MouseEvent, target: HTMLElement)
+	protected override onDataActionClicked(_e: MouseEvent, target: HTMLElement)
     {
 		const action = target.dataset.action;
 		if (action) {
@@ -135,4 +120,4 @@ export class HomeApp extends TeWebviewApp<State>
 }
 
 
-new HomeApp();
+new HomeWebviewApp();

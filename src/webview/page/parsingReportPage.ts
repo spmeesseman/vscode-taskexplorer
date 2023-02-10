@@ -31,19 +31,9 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override onHtmlPreview = (html: string, ...args: any[]) => this.getPageContent(html, ...args);
-
-
-	// protected override includeBootstrap(): State {
-	// 	return {
-	// 		// Make sure to get the raw config, not from the container which has the modes mixed in
-	// 		config: configuration.getAll(true),
-	// 	};
-	// }
-
-
-	private getPageContent = async(html: string, ...args: any[]) =>
+	protected override onHtmlPreview = async(html: string, ...args: any[]) =>
 	{
+		html = await super.onHtmlPreview(html);
 		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 		html = await createTaskCountTable(this.wrapper, project, html);

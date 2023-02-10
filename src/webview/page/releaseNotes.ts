@@ -32,10 +32,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override onHtmlFinalize = (html: string) =>  this.getPageContent(html);
-
-
-	private getPageContent = async (html: string) =>
+	protected override onHtmlFinalize = async(html: string) =>
 	{
 		const installPath = await getInstallPath(),
 			  changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),

@@ -21,6 +21,7 @@ export abstract class TeWebviewApp<State = undefined>
 {
 	protected onInitialize?(): void;
 	protected onBind?(): Disposable[];
+	protected onDataActionClicked?(e: MouseEvent, target: HTMLElement): void;
 	protected onInitialized?(): void;
 	protected onMessageReceived?(e: MessageEvent): void;
 
@@ -72,7 +73,7 @@ export abstract class TeWebviewApp<State = undefined>
 				disposables?.forEach(d => d.dispose());
 				this.bindDisposables?.forEach(d => d.dispose());
 				this.bindDisposables = undefined;
-			}),
+			})
 		);
 	}
 
@@ -98,6 +99,14 @@ export abstract class TeWebviewApp<State = undefined>
 		// 	this.sendCommand(WebviewFocusChangedCommandType, params);
 		// }, 150);
 		const sendWebviewFocusChangedCommand = (p: WebviewFocusChangedParams) => this.sendCommand(WebviewFocusChangedCommandType, p);
+
+		if (this.onDataActionClicked) {
+			this.bindDisposables.push(
+				// DOM.on("[data-action]", "click", this.onDataActionClicked.bind(this))
+				// DOM.on("[data-action]", "click", (e, target: HTMLElement) => this.onDataActionClicked(e, target))
+				DOM.on("[data-action]", "click", this.onDataActionClicked)
+			);
+		}
 
 		this.bindDisposables.push(
 			DOM.on(document, "focusin", e => {

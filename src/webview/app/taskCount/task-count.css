@@ -1,0 +1,40 @@
+:root {
+	--container-padding: 10px;
+}
+
+.task-count {
+    line-height: 15px;
+    font-size: 15px;
+    padding-left: 3px;
+    padding-right: 7px;
+    padding-bottom: 5px;
+}
+
+.task-image {
+    height: 18px;
+    line-height: 18px;
+}
+
+.task-image-stacked {
+    height: 10px;
+}
+
+.task-image1-stacked-container {
+    margin-bottom: -4px;
+}
+
+.task-image2-stacked-container {
+    margin-top: -6px;
+}
+
+.task-image-stacked-container {
+    text-align: center;
+}
+
+.task-count-label {
+	opacity: 0.95;
+}
+
+.task-count-value {
+	opacity: 0.885;
+}
