@@ -18,7 +18,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	{
 		super(
 			wrapper,
-			"license-manager.html",
+			"license.html",
 			LicensePage.viewTitle,
 			"res/img/logo-bl.png",
 			`taskExplorer.${LicensePage.viewId}`,

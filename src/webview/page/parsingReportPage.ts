@@ -20,7 +20,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	{
 		super(
 			wrapper,
-			"license-manager.html",
+			"parsing-report.html",
 			ParsingReportPage.viewTitle,
 			"res/img/logo-bl.png",
 			`taskExplorer.${ParsingReportPage.viewId}`,
