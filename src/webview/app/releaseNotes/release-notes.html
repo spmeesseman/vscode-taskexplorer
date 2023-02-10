@@ -121,7 +121,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="6">
-                                                    <div id="releaseNotesDiv" class="gfg">
+                                                    <div id="releaseNotesDiv" class="full-release-notes-container">
                                                         <!-- changelog -->
                                                     </div>
                                                 </td>
@@ -135,22 +135,22 @@
                     <td valign="top" align="right" class="button-panel">
                         <!-- startEnterLicenseButton -->
                         <div>
-                            <vscode-button id="btnEnterLicense">Enter License Key</vscode-button>
+                            <vscode-button data-action="command:vscode-taskexplorer.enterLicense" id="btnEnterLicense">Enter License Key</vscode-button>
                         </div>
                         <!-- endEnterLicenseButton -->
                         <!-- startGetLicenseButton -->
                         <div class="margin-top-10">
-                            <vscode-button id="btnGetLicense">Get License Key</vscode-button>
+                            <vscode-button data-action="command:vscode-taskexplorer.getLicense" id="btnGetLicense">Get License Key</vscode-button>
                         </div>
                         <!-- endGetLicenseButton -->
                         <!-- startViewLicenseButton -->
                         <div class="margin-top-10">
-                            <vscode-button id="btnViewLicense">View License Info</vscode-button>
+                            <vscode-button data-action="command:vscode-taskexplorer.showLicensePage" id="btnViewLicense">View License Info</vscode-button>
                         </div>
                         <!-- endViewLicenseButton -->
                         <!-- startParsingReportButton -->
                         <div class="margin-top-10">
-                            <vscode-button id="btnViewReport">View Parsing Report</vscode-button>
+                            <vscode-button data-action="command:vscode-taskexplorer.showParsingReportPage" id="btnViewReport">View Parsing Report</vscode-button>
                         </div>
                         <!-- endParsingReportButton -->
                     </td></tr>

@@ -30,7 +30,7 @@
     color: var(--vscode-button-hoverBackground);
 }
 
-div.gfg {
+div.full-release-notes-container {
     margin:5px;
     padding:5px;
     background-color: var(--vscode-background);

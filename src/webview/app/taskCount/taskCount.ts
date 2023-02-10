@@ -1,4 +1,5 @@
 
+import "../common/css/vscode.css";
 import "./task-count.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";

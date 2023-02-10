@@ -1,6 +1,7 @@
 
-import "./home.css";
+import "../common/css/vscode.css";
 import "../common/css/fa.css";
+import "./home.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";

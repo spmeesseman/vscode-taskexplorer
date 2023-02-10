@@ -1,12 +1,11 @@
 
-import { join } from "path";
 import { marked } from "marked";
+import { TextDecoder } from "util";
 import { State } from "../common/state";
+import { Uri, workspace } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
 import { Commands } from "../../lib/constants";
 import { ContextKeys } from "../../lib/context";
-import { readFileAsync } from "../../lib/utils/fs";
-import { getInstallPath } from "../../lib/utils/pathUtils";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { removeLicenseButtons } from "../common/removeLicenseButtons";
 
@@ -34,8 +33,8 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 
 	protected override onHtmlFinalize = async(html: string) =>
 	{
-		const installPath = await getInstallPath(),
-			  changeLogMd = await readFileAsync(join(installPath, "CHANGELOG.md")),
+		const changelogUri = Uri.joinPath(this.wrapper.context.extensionUri, "CHANGELOG.md"),
+			  changeLogMd = new TextDecoder("utf8").decode(await workspace.fs.readFile(changelogUri)),
 			  changeLogHtml = await marked(changeLogMd, { async: true }),
 			  version = this.wrapper.context.extension.packageJSON.version;
 		html = html.replace("<!-- changelog -->", changeLogHtml)
