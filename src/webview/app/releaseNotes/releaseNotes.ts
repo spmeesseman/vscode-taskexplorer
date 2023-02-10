@@ -1,6 +1,7 @@
 
 import "./release-notes.css";
 import "../common/css/fa.css";
+import "../common/css/page.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";

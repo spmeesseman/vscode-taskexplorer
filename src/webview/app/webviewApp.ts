@@ -98,9 +98,9 @@ export abstract class TeWebviewApp<State = undefined>
 
 		if (this.onDataActionClicked) {
 			this.bindDisposables.push(
-				// DOM.on("[data-action]", "click", this.onDataActionClicked.bind(this))
+				DOM.on("[data-action]", "click", this.onDataActionClicked.bind(this))
 				// DOM.on("[data-action]", "click", (e, target: HTMLElement) => this.onDataActionClicked(e, target))
-				DOM.on("[data-action]", "click", this.onDataActionClicked)
+				// DOM.on("[data-action]", "click", this.onDataActionClicked)
 			);
 		}
 
