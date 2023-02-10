@@ -10,6 +10,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 /** @typedef {import("./types/webpack").WebpackBuild} WebpackBuild */
 /** @typedef {import("./types/webpack").WebpackConfig} WebpackConfig */
 /** @typedef {import("./types/webpack").WebpackEnvironment} WebpackEnvironment */
+/** @typedef {"true"|"false"} BooleanString */
 
 const webviewApps =
 {
@@ -32,25 +33,24 @@ const webviewApps =
  */
 module.exports = (env) =>
 {
-	env = {
+	env = Object.assign(
+	{
 		clean: false,
 		analyze: false,
 		esbuild: false,
 		imageOpt: true,
 		environment: "prod",
-		target: "node",
-		...env
-	};
-
-	// @ts-ignore
-	if (env.analyze === "true")  { env.analyze = true;  }
-	if (env.clean === "true")    { env.clean = true;    }
-	if (env.esbuild === "true")  { env.esbuild = true;  }
-	if (env.imageOpt === "true") { env.imageOpt = true; }
+		target: "node"
+	}, env);
+	
+	if (typeof env.analyze === "string") { env.analyze = String(env.analyze).toLowerCase() == "true"; }
+	if (typeof env.clean === "string") { env.clean = String(env.clean).toLowerCase() == "true"; }
+	if (typeof env.esbuild === "string") { env.esbuild = String(env.esbuild).toLowerCase() == "true"; }
+	if (typeof env.imageOpt === "string") { env.imageOpt = String(env.imageOpt).toLowerCase() == "true"; }
 
 	if (env.build)
 	{
-		return getWebpackConfig(/**@type {WebpackBuild}*/(env.build), env);
+		return getWebpackConfig(env.build, env);
 	}
 
 	return [

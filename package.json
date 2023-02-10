@@ -127,6 +127,8 @@
         "tsc-watch": "tsc -watch -p ./",
         "webpack-watch": "webpack -w --env environment=dev --config ./webpack.config.js",
         "webpack-build": "webpack --mode production --config ./webpack.config.js",
+        "webpack-build:extension": "webpack --mode production --env build=extension --env analyze=true --config ./webpack.config.js",
+        "webpack-build:webviews": "webpack --mode production --env build=webview --config ./webpack.config.js",
         "webpack-build_analyze": "webpack --mode production --env analyze=true --config ./webpack.config.js",
         "webpack-build_ww": "webpack --mode production --env target=webworker --config ./webpack.config.js",
         "webpack-rebuild": "webpack --mode production --env clean=true --config ./webpack.config.js",

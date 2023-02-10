@@ -1,7 +1,7 @@
 
 //@ts-check
 declare type WebpackBuild = "extension"|"extension_web"|"webview";
-declare type WebpackBuildOrUndefined = "extension"|"extension_web"|"webview"|undefined;
+declare type WebpackBuildOrUndefined = WebpackBuild|undefined;
 declare type WebpackConfig = import("webpack").Configuration;
 declare type WebpackPluginInstance = import("webpack").WebpackPluginInstance;
 declare type WebpackOptimization = any;
@@ -12,14 +12,14 @@ declare interface WebpackBuildEnv
 }
 declare interface WebpackEnvironment
 {
-    analyze?: boolean | string;
+    analyze: boolean;
     basePath: string;
-    build: string;
-    clean?: boolean | string;
-    environment?: string;
-    esbuild?: boolean | string; // Is ES build
-    imageOpt?: boolean | string; // Perform image optimization
-    target?: string;
+    build: WebpackBuild;
+    clean: boolean;
+    environment: string;
+    esbuild: boolean; // Is ES build
+    imageOpt: boolean; // Perform image optimization
+    target: string;
 }
 
 export {
