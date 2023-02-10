@@ -13,5 +13,7 @@ types/types
 tsconfig.tsbuildinfo
 .dccache
 /res/**/home.*
+/res/css
+/res/js
 /res/page/*
 !/res/page/task-cout-table.html
