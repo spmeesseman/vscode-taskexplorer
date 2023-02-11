@@ -10,6 +10,7 @@ import {
     authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession,
     Disposable, env, EventEmitter, ExtensionContext, ProgressLocation, Uri, UriHandler, window
 } from "vscode";
+import { TeWrapper } from "../wrapper";
 
 export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
@@ -36,7 +37,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     private _onSessionChange = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
 
 
-    constructor(private readonly context: ExtensionContext)
+    constructor(private readonly wrapper: TeWrapper)
     {
         this._disposable = Disposable.from(
             authentication.registerAuthenticationProvider(AUTH_TYPE, AUTH_NAME, this, { supportsMultipleAccounts: false }),
@@ -53,8 +54,8 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
 
     get redirectUri()
     {
-        const publisher = this.context.extension.packageJSON.publisher;
-        const name = this.context.extension.packageJSON.name;
+        const publisher = this.wrapper.context.extension.packageJSON.publisher;
+        const name = this.wrapper.context.extension.packageJSON.name;
         return `${env.uriScheme}://${publisher}.${name}`;
     }
 
@@ -94,7 +95,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
                 scopes: []
             };
 
-            await this.context.secrets.store(SESSIONS_SECRET_KEY, JSON.stringify([ session ]));
+            await this.wrapper.storage.updateSecret(SESSIONS_SECRET_KEY, JSON.stringify([ session ]));
 
             this._onSessionChange.fire({ added: [ session ], removed: [], changed: [] });
 

@@ -14,7 +14,8 @@ import { isScriptType } from "../utils/taskTypeUtils";
 import { LicensePage } from "../../webview/page/licensePage";
 import { executeCommand, registerCommand } from "../command";
 import { ILicenseManager } from "../../interface/ILicenseManager";
-import { Disposable, env, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
+import { AuthenticationProviderAuthenticationSessionsChangeEvent, Disposable, env, EventEmitter, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
+import { TeAuthenticationProvider } from "./authProvider";
 
 
 export class LicenseManager implements ILicenseManager, Disposable
@@ -33,14 +34,19 @@ export class LicenseManager implements ILicenseManager, Disposable
 	private maxTasksReached = false;
 	private panel: LicensePage | undefined;
 	private port = 443;
+	private _auth: TeAuthenticationProvider;
 	private authApiEndpoint = "/api/license/validate/v1";
+    private _onSessionChange = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
 	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 
 
 	constructor(wrapper: TeWrapper)
     {
 		this.wrapper = wrapper;
+		this._auth = new TeAuthenticationProvider(wrapper);
+		this._auth.onDidChangeSessions(this.onSessionChanged);
 		this.disposables.push(
+			this._auth,
 			registerCommand(Commands.EnterLicense, () => this.enterLicenseKey(), this),
 			registerCommand(Commands.GetLicense, () => this.getLicense(), this)
 		);
@@ -73,6 +79,11 @@ export class LicenseManager implements ILicenseManager, Disposable
 		this.licensed = false;
 		this.panel = undefined;
 	}
+
+
+    get onDidSessionChange() {
+        return this._onSessionChange.event;
+    }
 
 
 	private displayPopup = async (message: string) =>
@@ -215,6 +226,12 @@ export class LicenseManager implements ILicenseManager, Disposable
 		this.log("      length", logPad, rspData.length);
 		this.log("      success", logPad, jso.success);
 		this.log("      message", logPad, jso.message);
+	};
+
+
+	private onSessionChanged = (e: AuthenticationProviderAuthenticationSessionsChangeEvent) =>
+	{
+		this._onSessionChange.fire(e);
 	};
 
 

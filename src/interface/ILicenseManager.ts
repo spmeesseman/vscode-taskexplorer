@@ -1,7 +1,13 @@
-import { Task, WebviewPanel } from "vscode";
+import { AuthenticationProviderAuthenticationSessionsChangeEvent, Event, Task, WebviewPanel } from "vscode";
+
+export interface TeSessionChangeEvent extends AuthenticationProviderAuthenticationSessionsChangeEvent
+{
+
+};
 
 export interface ILicenseManager
 {
+    onDidSessionChange: Event<TeSessionChangeEvent>;
     checkLicense: (logPad?: string) => Promise<void>;
     dispose: () => void;
     enterLicenseKey: () => Promise<void>;

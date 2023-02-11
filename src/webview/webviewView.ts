@@ -33,7 +33,9 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		private readonly trackingFeature: TrackedUsageFeatures)
 	{
 		super(wrapper, title, fileName);
-		this.disposables.push(window.registerWebviewViewProvider(id, this));
+		this.disposables.push(
+			window.registerWebviewViewProvider(id, this)
+		);
 	}
 
 

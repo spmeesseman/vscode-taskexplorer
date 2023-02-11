@@ -31,6 +31,7 @@ export abstract class TeWebviewBase<State>
 	protected onInitializing?(): Disposable[] | undefined;
 	protected onFocusChanged?(focused: boolean): void;
 	protected onMessageReceived?(e: IpcMessage): void;
+	protected onReady?(): void;
 	protected onVisibilityChanged?(visible: boolean): void;
 	protected onWindowFocusChanged?(focused: boolean): void;
 	protected registerCommands?(): Disposable[];
@@ -185,6 +186,7 @@ export abstract class TeWebviewBase<State>
 				onIpc(WebviewReadyCommandType, e, () =>
 				{
 					this._isReady = true;
+					this.onReady?.();
 				});
 				break;
 

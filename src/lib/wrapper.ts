@@ -33,6 +33,7 @@ import { IConfiguration } from "../interface/IConfiguration";
 import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
 import { ILicenseManager } from "../interface/ILicenseManager";
+import { TeAuthenticationProvider } from "./auth/authProvider";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
 import { registerConfigWatcher } from "./watcher/configWatcher";
 import { PowershellTaskProvider } from "../providers/powershell";
@@ -95,15 +96,9 @@ export class TeWrapper
 		this._log = log;
 		this._providers = {};
 
-		this._licenseManager = this._licenseManager = new LicenseManager(this);
+		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
 		this._usage = new UsageWatcher(this, storage);
-
-		// context.subscriptions.push(new TeAuthenticationProvider(context));
-		// const remoteApi = new TeRemoteConnection(this);
-		// context.subscriptions.push(remoteApi);
-		// this._auth = new TeAuthenticationProvider(this, remoteApi)
-		// context.subscriptions.push(this._auth);
 
 		this._homeView = new HomeView(this);
 		this._taskCountView = new TaskCountView(this);

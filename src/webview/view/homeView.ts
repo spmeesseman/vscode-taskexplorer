@@ -6,7 +6,9 @@ import { TasksChangeEvent } from "../../interface";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
+import { TeSessionChangeEvent } from "src/interface/ILicenseManager";
 import { removeLicenseButtons } from "../common/removeLicenseButtons";
+import { IpcMessage, onIpc } from "../common/ipc";
 
 /*
 https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default/weather-webview/src/webview/main.ts
@@ -75,6 +77,7 @@ export class HomeView extends TeWebviewView<State>
 			`${HomeView.viewId}View`
 		);
 		this.disposables.push(
+			wrapper.licenseManager.onDidSessionChange(this.onSessionChanged),
 			wrapper.configuration.onDidChange(e => { this.onConfigurationChanged(e); }, this),
 			wrapper.storage.onDidChange(e => { this.onStorageChanged(e); }, this),
 			wrapper.treeManager.onTasksChanged(e => { this.onTasksChanged(e); }, this)
@@ -89,14 +92,22 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
-	private onStorageChanged(e: StorageChangeEvent)
+	private onSessionChanged = (_e: TeSessionChangeEvent) =>
+	{
+		this.wrapper.log.methodStart("HomeView Event: onSessionChanged", 2, this.wrapper.log.getLogPad());
+		console.log("AuthenticationProviderAuthenticationSessionsChangeEvent!!!!!!!!!!!!!!!!");
+		this.wrapper.log.methodDone("HomeView Event: onSessionChanged", 2, this.wrapper.log.getLogPad());
+	};
+
+
+	private onStorageChanged(_e: StorageChangeEvent)
 	{
 		this.wrapper.log.methodStart("HomeView Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
 		this.wrapper.log.methodDone("HomeView Event: onStorageChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
-	private async onTasksChanged(e: TasksChangeEvent)
+	private async onTasksChanged(_e: TasksChangeEvent)
 	{
 		this.wrapper.log.methodStart("HomeView Event: onTasksChanged", 2, this.wrapper.log.getLogPad());
 		if (this.isFirstLoadComplete) {
@@ -116,13 +127,17 @@ export class HomeView extends TeWebviewView<State>
 	};
 
 
-	protected override onVisibilityChanged(visible: boolean)
+	protected override onVisibilityChanged(_visible: boolean)
 	{
+		this.wrapper.log.methodStart("HomeView Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("HomeView Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
-	protected override onWindowFocusChanged(focused: boolean)
+	protected override onWindowFocusChanged(_focused: boolean)
 	{
+		this.wrapper.log.methodStart("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
