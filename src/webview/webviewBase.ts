@@ -77,7 +77,6 @@ export abstract class TeWebviewBase<State>
 		return this._view;
 	}
 
-
 	get visible() {
 		return this._view?.visible ?? false;
 	}

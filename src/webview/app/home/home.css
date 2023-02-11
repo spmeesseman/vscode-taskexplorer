@@ -7,23 +7,36 @@
 }
 
 button {
-    background-color: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
+    /* background-color: var(--vscode-button-background); */
+    background-color: var(--vscode-background);
+    /* color: var(--vscode-button-foreground); */
+    color: var(--vscode-foreground);
     padding: 4px 2px;
     cursor: pointer;
-    width: 80px;
+    width: -webkit-fill-available;
     font-size: 10px;
     border-radius: 3px;
     margin-right: 5px;
     border: gray 1px solid;
+    background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000);
 }
-
+/*
+button:hover {
+	cursor: pointer;
+	background: var(--vscode-background--50);
+}
+*/
 .te-icon {
     height: 46px;
 }
 
+.homeview-info-panel {
+    max-width: 190px
+}
+
 .button-panel {
-    width: -webkit-fill-available
+    width: -webkit-fill-available;
+    align-content: flex-start;
 }
 
 .margin-top-3 {
@@ -53,9 +66,9 @@ button {
 .homeview-content-title-version {
     font-size: 10px;
     font-weight: normal;
-    text-align:end;
+    text-align: end;
     margin-top: 3px;
-    margin-left: 20px;
+    margin-left: 22px;
     opacity: 0.95;
     vertical-align: bottom;
 }
@@ -68,4 +81,14 @@ button {
 .homeview-task-count-value {
     
 	opacity: 0.725;
+}
+
+.homeview-license-status {
+    border: gray 1px solid;
+    text-align: center;
+    opacity: .92;
+    border-radius: 3px;
+    box-shadow: 0 0 2px 0 var(--vscode-background) inset;
+    background: var(--vscode-background);
+    /* background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000); */
 }

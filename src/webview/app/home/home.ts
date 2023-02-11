@@ -4,6 +4,7 @@ import "./home.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
+import { Disposable } from "vscode";
 
 
 export class HomeWebviewApp extends TeWebviewApp<State>
@@ -27,6 +28,13 @@ export class HomeWebviewApp extends TeWebviewApp<State>
 			this.sendCommand(ExecuteCommandType, { command: action.slice(8) });
 		}
 	}
+
+
+    protected override onInitialized()
+    {
+		const disposables: Disposable[] = [];
+		return disposables;
+    }
 
 
 	protected override onMessageReceived(e: MessageEvent)

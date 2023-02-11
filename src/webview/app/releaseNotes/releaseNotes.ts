@@ -2,6 +2,8 @@
 import "../common/css/vscode.css";
 import "../common/css/page.css";
 import "./release-notes.css";
+import "../common/css/fa.css";
+// import "../common/scss/codicons.scss";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
@@ -45,8 +47,9 @@ export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
 	private toggle = (element: HTMLElement) =>
 	{
 		const x = document.getElementById("releaseNotesDiv") as HTMLElement;
-		x.classList.toggle("is-show");
-		element.classList.toggle("is-show");
+		const showing = x.classList.toggle("is-show");
+		element.classList.remove(!showing ? "fa-chevron-down" : "fa-chevron-up");
+		element.classList.add(!showing ? "fa-chevron-up" : "fa-chevron-down");
 	};
 
 }

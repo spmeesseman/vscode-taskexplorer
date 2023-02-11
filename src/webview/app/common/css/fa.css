@@ -1,0 +1,164 @@
+/*!
+ * Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Commercial License)
+ * Copyright 2022 Fonticons, Inc.
+ */
+ .fa {
+  font-family: var(--fa-style-family, "Font Awesome 6 Pro");
+  font-weight: var(--fa-style, 900); }
+
+.fa,
+.fa-classic,
+.fa-sharp,
+.fas,
+.fa-solid,
+.far,
+.fa-regular,
+.fal,
+.fa-light,
+.fat,
+.fa-thin,
+.fad,
+.fa-duotone,
+.fass,
+.fa-sharp-solid,
+.fab,
+.fa-brands {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: var(--fa-display, inline-block);
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto; }
+
+.fas,
+.fa-classic,
+.fa-solid,
+.far,
+.fa-regular,
+.fal,
+.fa-light,
+.fat,
+.fa-thin {
+  font-family: 'Font Awesome 6 Pro'; }
+
+.fab,
+.fa-brands {
+  font-family: 'Font Awesome 6 Brands'; }
+
+.fad,
+.fa-classic.fa-duotone,
+.fa-duotone {
+  font-family: 'Font Awesome 6 Duotone'; }
+
+.fass,
+.fa-sharp {
+  font-family: 'Font Awesome 6 Sharp';
+  font-weight: 900; }
+
+.fa-asterisk::before {
+  content: "\2a"; }
+
+.fa-bugs::before {
+  content: "\e4d0"; }
+
+.fa-bug::before {
+  content: "\f188"; }
+
+.fa-circle-chevron-down::before {
+  content: "\f13a"; }
+
+.fa-square-chevron-down::before {
+  content: "\f329"; }
+
+.fa-chevron-down::before {
+  content: "\f078"; }
+                                          
+.fa-chevron-up::before {
+  content: "\f077"; }
+
+.fa-circle-chevron-up::before {
+  content: "\f139"; }
+
+.fa-square-chevron-up::before {
+  content: "\f32c"; }
+        
+.fa-cogs::before {
+  content: "\f085"; }
+
+.fa-cog::before {
+  content: "\f013"; }
+
+.fa-gear::before {
+  content: "\f013"; }
+  
+.fa-gears::before {
+  content: "\f085"; }
+
+.fa-lock::before {
+  content: "\f023"; }
+
+.fa-plus::before {
+  content: "\2b"; }
+
+.fad.fa-chevron-up::after, .fa-duotone.fa-chevron-up::after {
+  content: "\f077\f077"; }
+
+.fad.fa-circle-chevron-up::after, .fa-duotone.fa-circle-chevron-up::after {
+  content: "\f139\f139"; }
+  
+.fad.fa-cog::after, .fa-duotone.fa-cog::after {
+  content: "\f013\f013"; }
+
+.fad.fa-cogs::after, .fa-duotone.fa-cogs::after {
+  content: "\f085\f085"; }
+
+.fad.fa-gears::after, .fa-duotone.fa-gears::after {
+  content: "\f085\f085"; }
+  
+.fad.fa-gear::after, .fa-duotone.fa-gear::after {
+  content: "\f013\f013"; }
+
+.fad.fa-lock::after, .fa-duotone.fa-lock::after {
+  content: "\f023\f023"; }
+  
+.fad.fa-square-chevron-up::after, .fa-duotone.fa-square-chevron-up::after {
+  content: "\f32c\f32c"; }
+
+.fad.fa-circle-chevron-down::after, .fa-duotone.fa-circle-chevron-down::after {
+  content: "\f13a\f13a"; }
+
+.fad.fa-square-chevron-down::after, .fa-duotone.fa-square-chevron-down::after {
+  content: "\f329\f329"; }
+
+.fad.fa-chevron-down::after, .fa-duotone.fa-chevron-down::after {
+  content: "\f078\f078"; }
+
+/*
+:root, :host {
+  --fa-style-family-classic: 'Font Awesome 6 Free';
+  --fa-font-regular: normal 400 1em/1 'Font Awesome 6 Free'; }
+
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../page/fa-regular-400.woff2") format("woff2"), url("../page/fa-regular-400.ttf") format("truetype"); }
+*/
+
+:root, :host {
+  --fa-style-family-classic: 'Font Awesome 6 Pro';
+  --fa-font-regular: normal 400 1em/1 'Font Awesome 6 Pro'; }
+
+@font-face {
+  font-family: 'Font Awesome 6 Pro';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("../page/fa-regular-400.woff2") format("woff2"), url("../page/fa-regular-400.ttf") format("truetype"); }
+
+.far,
+.fa-regular {
+  font-weight: 400; }

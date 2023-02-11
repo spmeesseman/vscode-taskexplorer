@@ -15,11 +15,6 @@ body {
 	background-color: var(--vscode-editor-background);
 }
 
-ol,
-ul {
-	padding-left: var(--container-padding);
-}
-
 body > *,
 form > * {
 	margin-block-start: var(--input-margin-vertical);

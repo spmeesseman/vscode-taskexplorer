@@ -22,6 +22,7 @@
     color: var(--vscode-foreground);
 }
 
+/*
 .toggle-button {
     cursor: pointer;
     height: 18px;
@@ -41,7 +42,20 @@
 .toggle-button:hover {
     background: var(--vscode-button-hoverBackground);
 }
+*/
 
+.toggle-button {
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    color: var(--vscode-button-hoverBackground);
+}
+/*
+.toggle-button.is-show  {
+    content: url( '../img/webview/chevron-down.svg');
+}
+*/
 div.full-release-notes-container {
     margin:5px;
     padding:5px;

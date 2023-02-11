@@ -117,6 +117,13 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
+	protected override async onReady()
+	{
+		this.wrapper.log.methodStart("HomeView Event: onReady", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("HomeView Event: onReady", 2, this.wrapper.log.getLogPad());
+	}
+
+
 	protected override onHtmlFinalize = async (html: string) =>
 	{
     	const taskStats = this.wrapper.taskManager.getTaskStats(),
