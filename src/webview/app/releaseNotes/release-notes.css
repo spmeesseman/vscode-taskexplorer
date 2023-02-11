@@ -23,7 +23,9 @@
 }
 
 .toggle-button {
+    background-image: url( '../img/webview/far/chevron-down.svg');
     cursor: pointer;
+    height: 14px;
 }
 
 .toggle-button:hover {

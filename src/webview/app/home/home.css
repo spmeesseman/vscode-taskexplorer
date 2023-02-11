@@ -19,9 +19,7 @@ button {
 }
 
 .te-icon {
-    font-size: 50px;
-    --fa-primary-color: var(--vscode-button-background);
-    --fa-secondary-color: var(--vscode-button-hoverBackground);
+    height: 50px;
 }
 
 .button-panel {

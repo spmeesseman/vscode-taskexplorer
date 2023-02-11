@@ -62,9 +62,6 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	async show(options?: { preserveFocus?: boolean })
 	{
-		while (isExtensionBusy()) {
-			await timeout(100);
-		}
 		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
 		try {
 			void (await commands.executeCommand(`${this.id}.focus`, options));
@@ -78,10 +75,6 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	async resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Promise<void>
 	{
-		while (isExtensionBusy()) {
-			await timeout(100);
-		}
-
 		this._view = webviewView;
 
 		webviewView.webview.options = {
