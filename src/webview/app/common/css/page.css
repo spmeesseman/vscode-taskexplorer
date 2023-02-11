@@ -83,6 +83,7 @@ hr {
 .content-section-header {
     font-size: 16px;
     font-weight: bold;
+    line-height:16px;
 }
 
 .content-subsection-header {
@@ -91,7 +92,8 @@ hr {
 }
 
 .content-section-subheader {
-    font-size:14px;
+    font-size:18px;
+    line-height:18px;
     text-decoration: italic;
     padding-right:20px
 }

@@ -64,3 +64,21 @@ div.full-release-notes-container {
     overflow: auto;
     text-align:justify;
 }
+
+.te-release-notes-section-header-icon {
+    font-size: 18px;
+    font-weight: bold;
+    line-height:18px;
+    padding-right: 2px;
+    max-width: 20px;
+    vertical-align: middle;
+}
+
+.te-release-notes-section-header-title {
+    width: fit-content;
+    align-content: stretch;
+    font-size: 16px;
+    font-weight: bold;
+    line-height:16px;
+    vertical-align: middle;
+}

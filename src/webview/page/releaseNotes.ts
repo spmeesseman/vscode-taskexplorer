@@ -54,25 +54,25 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	<table style="margin-top:15px" width="100%">
 		${this.getNewReleaseNotesHdr("Features", "plus")}
 		<tr>
-			<td>
+			<td colspan="2">
 				${this.getReleaseNotes("Features", version, "feature", changeLogMd)}
 			</td>
 		</tr>
 		${this.getNewReleaseNotesHdr("Bug Fixes", "bug")}
 		<tr>
-			<td>
+			<td colspan="2">
 				${this.getReleaseNotes("Bug Fixes", version, "bug fix", changeLogMd)}
 			</td>
 		</tr>
-		${this.getNewReleaseNotesHdr("Refactoring", "cog")}
+		${this.getNewReleaseNotesHdr("Refactoring", "gear")}
 		<tr>
-			<td>
+			<td colspan="2">
 				${this.getReleaseNotes("Refactoring", version, "refactoring", changeLogMd)}
 			</td>
 		</tr>
-		${this.getNewReleaseNotesHdr("Miscellaneous", "asterisk")}
+		${this.getNewReleaseNotesHdr("Miscellaneous", "star")}
 		<tr>
-			<td>
+			<td colspan="2">
 				${this.getReleaseNotes("Miscellaneous", version, "miscellaneous", changeLogMd)}
 			</td>
 		</tr>
@@ -86,13 +86,16 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		// <span class=\"far fa-${icon} content-section-fa-img\"></span>
 		//
 		return `
-		<tr><td width="100%">
+		<tr><td width="100%" colspan="2">
 			<hr>
 		</td></tr>
 		<tr class="content-section-header">
-		<td class="content-section-header-nowrap" nowrap>&nbsp;<span class=\"codicon codicon-${icon} content-section-fa-img\"></span> &nbsp;${title}</td>
+			<td>
+				<span class="te-release-notes-section-header-icon">&nbsp;<span class=\"codicon codicon-${icon} content-section-fa-img\"></span></span>
+				<span class="te-release-notes-section-header-title">&nbsp;${title}</span>
+			</td>
 		</tr>
-		<tr><td width="100%">
+		<tr><td width="100%" colspan="2">
 			<hr>
 		</td></tr>`;
 	};

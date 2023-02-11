@@ -1,6 +1,7 @@
 
 import "../common/css/vscode.css";
 import "./home.css";
+import "./home.scss";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
