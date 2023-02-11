@@ -127,7 +127,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 			this._view.webview.html = await this.getHtml(this._view.webview, ...args);
 		}
 		else {
-			await this.refresh(true);
+			await this.refresh(true, ...args);
 			this._view.reveal(this._view.viewColumn ?? ViewColumn.Active, options?.preserveFocus ?? false);
 		}
 

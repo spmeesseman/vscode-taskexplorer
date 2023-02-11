@@ -230,11 +230,11 @@ export abstract class TeWebviewBase<State>
 	}
 
 
-	protected async refresh(force?: boolean)
+	protected async refresh(force?: boolean, ...args: unknown[])
     {
 		if (!this._view) return;
 		this._isReady = false;
-		const html = await this.getHtml(this._view.webview);
+		const html = await this.getHtml(this._view.webview, ...args);
 		if (force) {
 			this._view.webview.html = "";
 		}

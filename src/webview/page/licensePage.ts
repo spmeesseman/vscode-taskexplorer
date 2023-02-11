@@ -107,7 +107,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	<table class="margin-top-15">
 		<tr><td class="content-section-header">Example Parsing Report:</td></tr>
 		<tr><td>
-			<img src="[webview.resourceDir]/readme/parsingreport.png">
+			<img src="#{webroot}/readme/parsingreport.png">
 		</td></tr>
 	</td></tr>`;
 		return `<tr><td>${details}</td></tr>`;

@@ -41,25 +41,15 @@ export abstract class TeWebviewApp<State = undefined>
 		this.state = (window as any).bootstrap;
 		(window as any).bootstrap = undefined;
 
-		requestAnimationFrame(() =>
-		{
+		window.addEventListener("load", (event) => {
 			this.log(`${this.appName}.initializing`);
-			try
-			{   this.onInitialize?.();
-				this.initialize();
-				if (this.onMessageReceived) {
-					disposables.push(DOM.on(window, "message", this.onMessageReceived.bind(this)));
-				}
-				this.sendCommand(WebviewReadyCommandType, undefined);
-				this.onInitialized?.();
+			this.onInitialize?.();
+			this.initialize();
+			if (this.onMessageReceived) {
+				disposables.push(DOM.on(window, "message", this.onMessageReceived.bind(this)));
 			}
-			finally
-			{   if (document.body.classList.contains("preload")) {
-					setTimeout(() => {
-						document.body.classList.remove("preload");
-					}, 500);
-				}
-			}
+			this.sendCommand(WebviewReadyCommandType, undefined);
+			this.onInitialized?.();
 		});
 
 		disposables.push(
