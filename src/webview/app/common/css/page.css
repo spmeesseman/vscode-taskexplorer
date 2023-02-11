@@ -19,7 +19,6 @@ hr {
     height: 56px;
 }
 
-/*
 .te-page-bg {
     position: relative;
 }
@@ -36,7 +35,8 @@ hr {
     background-repeat: no-repeat;
     background-image: url('../img/logo-fas.svg');
 }
-*/
+
+/*
 .te-page-bg {
     padding-left: 32px;
     position: relative;
@@ -54,6 +54,7 @@ hr {
     -webkit-font-smoothing: antialiased;
     opacity: 0.04;
 }
+*/
 
 .button-panel {
     padding-left: 100px;

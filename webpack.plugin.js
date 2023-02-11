@@ -220,14 +220,24 @@ const wpPlugin =
 					context: path.posix.join(psxBasePath, "res")
 				});
 			}
-			patterns.push({
+			patterns.push(
+			{
 				from: path.posix.join(psx__dirname, "node_modules", "@vscode", "codicons", "dist", "codicon.ttf"),
 				to: path.posix.join(psx__dirname, "res", "page"),
-			});
-			patterns.push({
-				from: path.posix.join(psx__dirname, "node_modules", "@fortawesome", "fontawesome-free", "webfonts", "fa-regular-400.woff2"),
-				to: path.posix.join(psx__dirname, "res", "page"),
-			});
+			} // ,
+			// {
+			// 	from: path.posix.join(psx__dirname, "node_modules", "@fortawesome", "fontawesome-pro", "webfonts", "fa-regular-400.woff2"),
+			// 	to: path.posix.join(psx__dirname, "res", "page"),
+			// },
+			// {
+			// 	from: path.posix.join(psx__dirname, "node_modules", "@fortawesome", "fontawesome-pro", "webfonts", "fa-solid-900.woff2"),
+			// 	to: path.posix.join(psx__dirname, "res", "page"),
+			// },
+			// {
+			// 	from: path.posix.join(psx__dirname, "node_modules", "@fortawesome", "fontawesome-pro", "webfonts", "fa-duotone-900.woff2"),
+			// 	to: path.posix.join(psx__dirname, "res", "page"),
+			// }
+			);
 			plugin = new CopyPlugin({ patterns: patterns });
 		}
 		if (!plugin) {

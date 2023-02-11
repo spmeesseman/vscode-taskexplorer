@@ -81,15 +81,16 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 
 
 	private getNewReleaseNotesHdr = (title: string, icon: string) =>
-	{
-		// <span class="codicon codicon-git-commit">
-		// 
+	{   //
+		// <span class="codicon codicon-${icon} content-section-fa-img"></span>
+		// <span class=\"far fa-${icon} content-section-fa-img\"></span>
+		//
 		return `
 		<tr><td width="100%">
 			<hr>
 		</td></tr>
 		<tr class="content-section-header">
-		<td class="content-section-header-nowrap" nowrap>&nbsp;<span class=\"far fa-${icon} content-section-fa-img\"></span> &nbsp;${title}</td>
+		<td class="content-section-header-nowrap" nowrap>&nbsp;<span class=\"codicon codicon-${icon} content-section-fa-img\"></span> &nbsp;${title}</td>
 		</tr>
 		<tr><td width="100%">
 			<hr>
