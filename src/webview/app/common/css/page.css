@@ -20,12 +20,20 @@ hr {
 }
 
 .te-page-bg {
-    padding-left: 32px;
     position: relative;
-    background-image: url( '../img/webview/page-bg.png');
-    background-size: 500px;
+}
+
+.te-page-bg::before {
+    content: "";
+    position: absolute;
+    top: 20px; 
+    left: 20px;
+    width: 640px;
+    height: 512px;
+    z-index: -1;
+    opacity: 0.1;
     background-repeat: no-repeat;
-    background-position: 20px 20px;
+    background-image: url('../img/logo.svg');
 }
 
 .button-panel {

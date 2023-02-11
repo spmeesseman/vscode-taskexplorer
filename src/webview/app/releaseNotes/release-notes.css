@@ -22,14 +22,6 @@
     color: var(--vscode-foreground);
 }
 
-.toggle-button-svg {
-    background: var(--vscode-button-background);
-}
-
-.toggle-button-svg:hover {
-    background: var(--vscode-button-hoverBackground);
-}
-
 .toggle-button {
     cursor: pointer;
     height: 18px;
