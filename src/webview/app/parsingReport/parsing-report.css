@@ -40,3 +40,7 @@ button {
 .task-image-stacked-container {
     text-align: center;
 }
+
+.task-count-value { 
+	opacity: 0.885;
+}

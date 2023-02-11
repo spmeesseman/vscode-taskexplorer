@@ -8,8 +8,25 @@ button {
     border-radius: 5px;
 }
 
+.task-count {
+    font-size: 42px;
+    padding-left: 10px;
+    padding-right: 15px;
+    padding-bottom: 7px;
+}
+
+.task-image {
+    height: 40px;
+}
+
+.task-image-stacked {
+    height: 20px;
+}
+
+.task-image-stacked-container {
+    text-align: center;
+}
+
 .task-count-value { 
 	opacity: 0.885;
-    line-height: 15px;
-    font-size: 32px;
 }
