@@ -33,7 +33,7 @@ hr {
     z-index: -1;
     opacity: 0.1;
     background-repeat: no-repeat;
-    background-image: url('../img/logo.svg');
+    background-image: url('../img/logo-fas.svg');
 }
 
 .button-panel {
