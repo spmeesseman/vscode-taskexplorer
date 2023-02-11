@@ -41,7 +41,9 @@ export abstract class TeWebviewApp<State = undefined>
 		this.state = (window as any).bootstrap;
 		(window as any).bootstrap = undefined;
 
-		window.addEventListener("load", (event) => {
+		// requestAnimationFrame(() =>
+		window.addEventListener("load", (_e) =>
+		{
 			this.log(`${this.appName}.initializing`);
 			this.onInitialize?.();
 			this.initialize();
