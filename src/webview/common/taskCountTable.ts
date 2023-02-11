@@ -194,7 +194,7 @@ const getHtml = () =>
         <td class="task-count task-count-value">
             #{taskCounts.tsc}
         </td>
-        <td class="task-count-label task-usage-task-count-label">
+        <td>
             <img src="#{webroot}/img/sources/webpack.png" class="task-image" />
         </td>
         <td class="task-count task-count-value">

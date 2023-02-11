@@ -6,6 +6,7 @@ import "./release-notes.css";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { Disposable, DOM } from "../common/dom";
+import { ExecuteCommandType } from "../../common/ipc";
 import { provideVSCodeDesignSystem, vsCodeButton } from "@vscode/webview-ui-toolkit";
 
 
@@ -31,6 +32,15 @@ export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
 		);
 		return disposables;
     }
+
+
+	protected override onDataActionClicked(_e: MouseEvent, target: HTMLElement)
+    {
+		const action = target.dataset.action;
+		if (action) {
+			this.sendCommand(ExecuteCommandType, { command: action.slice(8) });
+		}
+	}
 
 
 	private toggle = (_element: HTMLElement) =>

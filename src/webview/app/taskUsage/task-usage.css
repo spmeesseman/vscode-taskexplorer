@@ -16,3 +16,7 @@
 	font-size: 11px;
 	opacity: 0.885;
 }
+
+.task-count-label {
+	opacity: 0.95;
+}

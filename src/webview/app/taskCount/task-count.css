@@ -31,10 +31,6 @@
     text-align: center;
 }
 
-.task-count-label {
-	opacity: 0.95;
-}
-
 .task-count-value {
 	opacity: 0.885;
 }
