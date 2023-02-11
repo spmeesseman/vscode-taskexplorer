@@ -2,14 +2,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import * as treeUtils from "./treeUtils";
-import figures from "../../lib/figures";
-import { Globs } from "../../lib/constants";
 import { expect } from "chai";
+import * as treeUtils from "./treeUtils";
+import { figures } from "../../lib/figures";
+import { Globs } from "../../lib/constants";
 import { testControl } from "../control";
 import { deactivate } from "../../extension";
 import { startInput, stopInput } from "./input";
-import { TeWrapper } from "../../lib/container";
+import { TeWrapper } from "../../lib/wrapper";
 import { hasExplorerFocused } from "./commandUtils";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";

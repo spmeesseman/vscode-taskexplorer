@@ -1,10 +1,12 @@
 //@ts-check
 // const fs = require("fs");
+var glob = require('glob');
 const path = require("path");
 const JSON5 = require("json5");
 const esbuild = require("esbuild");
 const { spawnSync } = require("child_process");
 const { wpPlugin } = require("./webpack.plugin");
+const nodeExternals = require('webpack-node-externals');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /** @typedef {import("./types/webpack").WebpackBuild} WebpackBuild */
@@ -66,20 +68,20 @@ module.exports = (env, argv) =>
 /**
  * @method
  * @private
- * @param {WebpackBuild} target
+ * @param {WebpackBuild} buildTarget
  * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig}
  */
-const getWebpackConfig = (target, env, argv) =>
+const getWebpackConfig = (buildTarget, env, argv) =>
 {   
-	env.target = target;
+	env.target = buildTarget;
 	env.basePath = env.target === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
 	mode(env, argv, wpConfig);    // Mode i.e. "production", "development", "none"
 	context(env, wpConfig);       // Context for build
 	entry(env, wpConfig);         // Entry points for built output
-	externals(wpConfig)           // External modules
+	externals(env, wpConfig)      // External modules
 	optimization(env, wpConfig);  // Build optimization
 	minification(env, wpConfig);  // Minification / Terser plugin options
 	output(env, wpConfig);        // Output specifications
@@ -87,7 +89,8 @@ const getWebpackConfig = (target, env, argv) =>
 	resolve(env, wpConfig);       // Resolve config
 	rules(env, wpConfig);         // Loaders & build rules
 	stats(wpConfig);              // Stats i.e. console output & verbosity
-	wpConfig.name = `${target}:${wpConfig.mode}`;
+	target(env, wpConfig);        // Target i.e. "node", "webworker", "tests"
+	wpConfig.name = `${buildTarget}:${wpConfig.mode}`;
 	return wpConfig;
 };
 
@@ -174,12 +177,28 @@ const entry = (env, wpConfig) =>
 	}
 	else
 	{
-		wpConfig.entry = {
-			"extension": {
-				import: "./src/extension.ts",
-				filename: "extension.js"
-			}
-		};
+		if (env.environment !== "test")
+		{
+			wpConfig.entry =
+			{
+				"extension": {
+					import: "./src/extension.ts",
+					filename: "extension.js"
+				}
+			};
+		}
+		else
+		{
+			wpConfig.entry =
+			{
+				runTest: './src/test/runTest.ts',
+				'suite/index': './src/test/suite/index.ts',
+				...glob.sync('./src/test/suite/**/*.test.ts').reduce(function (obj, e) {
+					obj['suite/' + path.parse(e).name] = e;
+					return obj;
+				}, {}),
+			};
+		}
 	}
 };
 
@@ -191,17 +210,29 @@ const entry = (env, wpConfig) =>
 //
 /**
  * @method
+ * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackConfig} wpConfig Webpack config object
  */
-const externals = (wpConfig) =>
+const externals = (env, wpConfig) =>
 {
-	wpConfig.externals =
-	{   //
-		// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
-		// be webpack"ed, -> https://webpack.js.org/configuration/externals/
-		//
-		vscode: "commonjs vscode"
-	};
+	if (env.environment !== "test")
+	{
+		wpConfig.externals =
+		{   //
+			// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
+			// be webpack"ed, -> https://webpack.js.org/configuration/externals/
+			//
+			vscode: "commonjs vscode"
+		};
+	}
+	else
+	{
+		wpConfig.externals = [
+			{ vscode: 'commonjs vscode' },
+			/** @type {import("webpack").WebpackPluginInstance}*/
+			(nodeExternals())
+		];
+	}
 };
 
 
@@ -352,7 +383,7 @@ const mode = (env, argv, wpConfig) =>
  */
 const optimization = (env, wpConfig) =>
 {
-	if (env.target !== "webview")
+	if (env.target !== "webview" && env.environment !== "test")
 	{
 		wpConfig.optimization =
 		{
@@ -412,13 +443,25 @@ const output = (env, wpConfig) =>
 	}
 	else
 	{
-		wpConfig.output = {
-			clean: env.clean === true,
-			path: env.target === "extension_web" ? path.join(__dirname, "dist", "browser") :
-												  path.join(__dirname, "dist"),
-			libraryTarget: "commonjs2",
-			filename: "[name].js"
-		};
+		if (env.environment !== "test")
+		{
+			wpConfig.output = {
+				clean: env.clean === true,
+				path: env.target === "extension_web" ? path.join(__dirname, "dist", "browser") :
+													path.join(__dirname, "dist"),
+				libraryTarget: "commonjs2",
+				filename: "[name].js"
+			};
+		}
+		else
+		{
+			wpConfig.output = {
+				path: env.target === "extension_web" ? path.join(__dirname, 'out', 'test', 'browser') : path.join(__dirname, 'out', 'test'),
+				filename: '[name].js',
+				sourceMapFilename: '[name].js.map',
+				libraryTarget: 'commonjs2',
+			};
+		}
 	}
 	
 	devTool(env, wpConfig);
@@ -500,9 +543,7 @@ const resolve = (env, wpConfig) =>
 			},
 			fallback: env.target === "extension_web" ? { path: require.resolve("path-browserify"), os: require.resolve("os-browserify/browser") } : undefined,
 			mainFields: env.target === "extension_web" ? [ "browser", "module", "main" ] : [ "module", "main" ],
-			extensions: [
-				".ts", ".tsx", ".js", ".jsx", ".json"
-			]
+			extensions: [ ".ts", ".tsx", ".js", ".jsx", ".json" ]
 		};
 	}
 	else
@@ -594,7 +635,8 @@ const rules = (env, wpConfig) =>
 		// 	}]
 		// },
 		{
-			exclude: [/node_modules/, /test/, /\.d\.ts$/ ],
+			exclude: env.environment !== "test" ? [/node_modules/, /test/, /\.d\.ts$/ ] : [/node_modules/, /\.d\.ts$/ ],
+			// include: env.environment !== "test" ? path.join(__dirname, "src") : path.join(__dirname, "src", "test"),
 			include: path.join(__dirname, "src"),
 			test: /\.tsx?$/,
 			// @ts-ignore
@@ -651,7 +693,7 @@ const stats = (wpConfig) =>
 	};
 
 	wpConfig.infrastructureLogging = {
-		level: "log", // enables logging required for problem matchers
+		level: "log" // enables logging required for problem matchers
 	};
 };
 
@@ -675,4 +717,24 @@ const resolveTSConfig = (tsConfigFile) =>
 		  start = data.indexOf("{"),
 		  end = data.lastIndexOf("}") + 1;
 	return JSON5.parse(data.substring(start, end));
+};
+
+
+//
+// *************************************************************
+// *** TARGET                                               ***
+// *************************************************************
+/**
+ * @method
+ * @param {WebpackEnvironment} env Webpack build environment
+ * @param {WebpackConfig} wpConfig Webpack config object
+ */
+const target = (env, wpConfig) =>
+{
+	if (env.target === "webview") {
+		wpConfig.target = "webworker";
+	}
+	else {
+		wpConfig.target = "node";
+	}
 };

@@ -4,7 +4,7 @@
 /* tslint:disable */
 
 import { expect } from "chai";
-import { TeWrapper } from "../../../lib/container";
+import { TeWrapper } from "../../../lib/wrapper";
 import { startupFocus } from "../../utils/suiteUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, suiteFinished, testControl as tc } from "../../utils/utils";
@@ -60,7 +60,10 @@ suite("Container Tests", () =>
     test("Re-Access Initialization Properties (Throws)", async function()
     {
         if (exitRollingCount(this)) return;
-        try { TeWrapper.create(teWrapper.context, teWrapper.storage, false, teWrapper.version, teWrapper.version); } catch { /* will throw */ }
+        try {
+            TeWrapper.create(teWrapper.context, teWrapper.storage, teWrapper.configuration, false, teWrapper.version, teWrapper.version);
+        }
+        catch { /* will throw */ }
         try { await teWrapper.ready(); } catch { /* will throw */ }
         endRollingCount(this);
     });
