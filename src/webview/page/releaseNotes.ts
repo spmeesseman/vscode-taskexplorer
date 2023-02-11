@@ -37,9 +37,9 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 			  changeLogMd = new TextDecoder("utf8").decode(await workspace.fs.readFile(changelogUri)),
 			  changeLogHtml = await marked(changeLogMd, { async: true }),
 			  version = this.wrapper.context.extension.packageJSON.version;
-		html = html.replace("<!-- changelog -->", changeLogHtml)
-				   .replace("<!-- subtitle -->", this.getNewInThisReleaseShortDsc())
-				   .replace("<!-- releasenotes -->", this.getNewReleaseNotes(version, changeLogMd));
+		html = html.replace("#{changelog}", changeLogHtml)
+				   .replace("#{subtitle}", this.getNewInThisReleaseShortDsc())
+				   .replace("#{releasenotes}", this.getNewReleaseNotes(version, changeLogMd));
 		html = removeLicenseButtons(html);
 		return html;
 	};

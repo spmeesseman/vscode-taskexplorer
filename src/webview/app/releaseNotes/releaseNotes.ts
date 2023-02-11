@@ -42,12 +42,13 @@ export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
 	}
 
 
-	private toggle = (_element: HTMLElement) =>
+	private toggle = (element: HTMLElement) =>
 	{
 		const x = document.getElementById("releaseNotesDiv") as HTMLElement;
 		const showing = x.classList.toggle("is-show");
-		x.classList.remove(!showing ? "fa-chevron-down" : "fa-chevron-up");
-		x.classList.add(!showing ? "fa-chevron-up" : "fa-chevron-down");
+		// element.("src");
+		element.classList.toggle("is-show");
+		// element.setAttribute("src", !showing ? "../img/webview/chevron-down.svg" : "../img/webview/chevron-down.svg");
 	};
 
 }

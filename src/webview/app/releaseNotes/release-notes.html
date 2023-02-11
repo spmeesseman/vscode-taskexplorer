@@ -92,12 +92,12 @@
                             </tr>
                             <tr>
                                 <td class="padding-top-10 padding-bottom-10">
-                                    <!-- subtitle -->
+                                    #{subtitle}
                                 </td>
                             </tr>
                             <tr><td><table width="100%">
                                 <tr>
-                                    <td><!-- releasenotes --></td>
+                                    <td>#{releasenotes}</td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -107,8 +107,7 @@
                                                     <hr>
                                                 </td>
                                                 <td width="15" align="center">
-                                                    <!--<span id="btnToggleReleaseNotes" class="far fa-chevron-up toggle-button"></span>-->
-                                                    <img src="#{webroot}/img/webview/far/chevron-down.svg" class="toggle-button" />
+                                                    <img id="btnToggleReleaseNotes" class="toggle-button" />
                                                 </td>
                                                 <td width="10">
                                                     <hr>
@@ -123,7 +122,7 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div id="releaseNotesDiv" class="full-release-notes-container">
-                                                        <!-- changelog -->
+                                                        #{changelog}
                                                     </div>
                                                 </td>
                                             </tr>

@@ -24,22 +24,10 @@ hr {
 .te-page-bg {
     padding-left: 32px;
     position: relative;
-    background-image: url( '../img/webview/gear.svg');
+    background-image: url( '../img/webview/page-bg.png');
     background-size: 500px;
     background-repeat: no-repeat;
     background-position: 20px 20px;
-}
-
-.te-page-bg:before {
-    background-image: url( '../img/webview/gear.svg');
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size:500px;
-    display: inline-block;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    opacity: 0.04;
 }
 
 .button-panel {
