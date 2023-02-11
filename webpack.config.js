@@ -443,41 +443,35 @@ const plugins = (env, wpConfig) =>
 
 	if (env.build === "webview")
 	{
+		const apps = Object.keys(webviewApps);
 		wpConfig.plugins.push(
 			wpPlugin.clean(env, wpConfig),
 			wpPlugin.tscheck(env, wpConfig),
 			wpPlugin.cssextract(env, wpConfig),
-			...wpPlugin.webviewapps(Object.keys(webviewApps), env, wpConfig),
+			...wpPlugin.webviewapps(apps, env, wpConfig),
 			// @ts-ignore
 			wpPlugin.htmlcsp(env, wpConfig),
 			wpPlugin.htmlinlinechunks(env, wpConfig),
-			wpPlugin.copy(env, wpConfig)
+			wpPlugin.copy(apps, env, wpConfig),
+			wpPlugin.imageminimizer(env, wpConfig)
 		);
-		// if (wpConfig.mode !== "production")
-		// {
-		// 	wpConfig.plugins.push(wpPlugin.imageminimizer);
-		// }
 	}
 	else
 	{
-		wpConfig.plugins.push(wpPlugin.clean(env, wpConfig));
-		// plugin.tscheck(env, wpConfig);
-		if (env.build === "extension_web")
-		{
-			wpConfig.plugins.push(wpPlugin.limitchunks(env, wpConfig));
-		}
+		wpConfig.plugins.push(
+			wpPlugin.clean(env, wpConfig),
+			wpPlugin.tscheck(env, wpConfig),
+			wpPlugin.limitchunks(env, wpConfig)
+		);
 	}
 
-	if (env.analyze === true)
-	{
+	wpConfig.plugins.push(
 		// @ts-ignore
-		wpConfig.plugins.push(wpPlugin.analyze.bundle(env, wpConfig));
-		// @ts-ignore
-		wpConfig.plugins.push(wpPlugin.analyze.circular(env, wpConfig));
-	}
-
-	wpConfig.plugins.push(wpPlugin.banner(env, wpConfig));
-	wpConfig.plugins.push(wpPlugin.afterdone(env, wpConfig));
+		wpPlugin.analyze.bundle(env, wpConfig),
+		wpPlugin.analyze.circular(env, wpConfig),
+		wpPlugin.banner(env, wpConfig),
+		wpPlugin.afterdone(env, wpConfig)
+	);
 
 	wpConfig.plugins.slice().reverse().forEach((p, index, object) =>
 	{

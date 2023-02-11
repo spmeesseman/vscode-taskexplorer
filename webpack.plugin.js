@@ -1,5 +1,6 @@
 //@ts-check
 
+const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
 const { renameSync } = require("fs");
@@ -70,7 +71,16 @@ const wpPlugin =
 		*/
 		bundle: (env, wpConfig) =>
 		{
-			return new BundleAnalyzerPlugin({ analyzerPort: "auto" });
+			/** @type {BundleAnalyzerPlugin | undefined} */
+			let plugin;
+			if (env.analyze === true)
+			{
+				plugin = new BundleAnalyzerPlugin({ analyzerPort: "auto" });
+			}
+			if (!plugin) {
+				plugin = /** @type {BundleAnalyzerPlugin} */(/** @type {unknown} */(undefined));
+			}
+			return plugin;
 		},
 
 		/**
@@ -80,16 +90,25 @@ const wpPlugin =
 		*/
 		circular: (env, wpConfig) =>
 		{
-			return new CircularDependencyPlugin(
+			/** @type {CircularDependencyPlugin | undefined} */
+			let plugin;
+			if (env.analyze === true)
 			{
-				cwd: __dirname,
-				exclude: /node_modules/,
-				failOnError: false,
-				onDetected: function ({ module: _webpackModuleRecord, paths, compilation })
-				{   // @ts-ignore
-					compilation.warnings.push(new WebpackError(paths.join(" -> ")));
-				}
-			});
+				plugin = new CircularDependencyPlugin(
+				{
+					cwd: __dirname,
+					exclude: /node_modules/,
+					failOnError: false,
+					onDetected: function ({ module: _webpackModuleRecord, paths, compilation })
+					{   // @ts-ignore
+						compilation.warnings.push(new WebpackError(paths.join(" -> ")));
+					}
+				});
+			}
+			if (!plugin) {
+				plugin = /** @type {CircularDependencyPlugin} */(/** @type {unknown} */(undefined));
+			}
+			return plugin;
 		}
 	},
 
@@ -171,39 +190,43 @@ const wpPlugin =
 
 
 	/**
+	 * @param {String[]} apps
 	 * @param {WebpackEnvironment} env
 	 * @param {WebpackConfig} wpConfig Webpack config object
 	 * @returns {CopyPlugin}
 	 */
-	copy: (env, wpConfig) =>
+	copy: (apps, env, wpConfig) =>
 	{
-		/** @type {CopyPlugin} */
+		/** @type {CopyPlugin | undefined} */
 		let plugin;
 		if (env.build === "webview")
 		{
-			plugin = new CopyPlugin({
-				patterns: [
-					// {
-					// 	from: path.posix.join(basePath.replace(/\\/g, "/"), "media", "*.*"),
-					// 	to: path.posix.join(__dirname.replace(/\\/g, "/"), "dist", "res"),
-					// },
-					{
-						from: path.posix.join(
-							__dirname.replace(/\\/g, "/"),
-							"node_modules",
-							"@vscode",
-							"codicons",
-							"dist",
-							"codicon.ttf",
-						),
-						to: path.posix.join(__dirname.replace(/\\/g, "/"), "res", "page"),
-					},
-				],
+			const /** @type {CopyPlugin.Pattern[]} */patterns = [],
+				  psx__dirname = __dirname.replace(/\\/g, "/"),
+				  psxBasePath = env.basePath.replace(/\\/g, "/");
+			apps.filter(app => fs.existsSync(path.join(env.basePath, app, "res"))).forEach(
+				app => patterns.push(
+				{
+					from: path.posix.join(psxBasePath, app, "res", "*.*"),
+					to: path.posix.join(psx__dirname, "res", "img", "webview"),
+					context: path.posix.join(psxBasePath, app, "res")
+				})
+			);
+			if (fs.existsSync(path.join(env.basePath, "res")))
+			{
+				patterns.push({
+					from: path.posix.join(psxBasePath, "res", "*.*"),
+					to: path.posix.join(psx__dirname, "res", "img", "webview"),
+				});
+			}
+			patterns.push({
+				from: path.posix.join(psx__dirname, "node_modules", "@vscode", "codicons", "dist", "codicon.ttf"),
+				to: path.posix.join(psx__dirname, "res", "page"),
 			});
+			plugin = new CopyPlugin({ patterns: patterns });
 		}
-		else
-		{
-			plugin = new CopyPlugin();
+		if (!plugin) {
+			plugin = /** @type {CopyPlugin} */(/** @type {unknown} */(undefined));
 		}
 		return plugin;
 	},
@@ -310,7 +333,16 @@ const wpPlugin =
 	 */
 	htmlinlinechunks: (env, wpConfig) =>
 	{
-		return new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []);
+		/** @type {InlineChunkHtmlPlugin | undefined} */
+		let plugin;
+		if (env.build === "webview")
+		{
+			plugin = new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []);
+		}
+		if (!plugin) {
+			plugin = /** @type {InlineChunkHtmlPlugin} */(/** @type {unknown} */(undefined));
+		}
+		return plugin;
 	},
 
 
@@ -321,10 +353,19 @@ const wpPlugin =
 	 */
 	imageminimizer: (env, wpConfig) =>
 	{
-		return new ImageMinimizerPlugin({
-			deleteOriginalAssets: true,
-			generator: [ imgConfig(env, wpConfig) ]
-		});
+		/** @type {ImageMinimizerPlugin | undefined} */
+		let plugin;
+		if (env.build === "webview" && wpConfig.mode !== "production")
+		{
+			// plugin = new ImageMinimizerPlugin({
+			// 	deleteOriginalAssets: true,
+			// 	generator: [ imgConfig(env, wpConfig) ]
+			// });
+		}
+		if (!plugin) {
+			plugin = /** @type {ImageMinimizerPlugin} */(/** @type {unknown} */(undefined));
+		}
+		return plugin;
 	},
 
 
@@ -335,7 +376,16 @@ const wpPlugin =
 	 */
 	limitchunks: (env, wpConfig) =>
 	{
-		return new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 });
+		/** @type {webpack.optimize.LimitChunkCountPlugin | undefined} */
+		let plugin;
+		if (env.build === "extension_web")
+		{
+			plugin = new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 });
+		}
+		if (!plugin) {
+			plugin = /** @type {webpack.optimize.LimitChunkCountPlugin} */(/** @type {unknown} */(undefined));
+		}
+		return plugin;
 	},
 
 
@@ -346,7 +396,7 @@ const wpPlugin =
 	 */
 	tscheck: (env, wpConfig) =>
 	{
-		/** @type {ForkTsCheckerPlugin} */
+		/** @type {ForkTsCheckerPlugin | undefined} */
 		let plugin;
 		if (env.build === "webview")
 		{
@@ -355,7 +405,7 @@ const wpPlugin =
 				async: false,
 				// eslint: {
 				// 	enabled: true,
-				// 	files: path.join(basePath, "**", "*.ts?(x)"),
+				// 	files: path.join(env.basePath, "**", "*.ts?(x)"),
 				// 	options: {
 				// 		cache: true,
 				// 		cacheLocation: path.join(__dirname, ".eslintcache", "webviews/"),
@@ -371,7 +421,7 @@ const wpPlugin =
 		}
 		else
 		{
-			plugin = new ForkTsCheckerPlugin({});
+			// plugin = new ForkTsCheckerPlugin({});
 			// plugin = new ForkTsCheckerPlugin({
 			// 	async: false,
 			// 	// @ts-ignore
@@ -394,6 +444,9 @@ const wpPlugin =
 			// 		configFile: path.join(__dirname, wpConfig.target === "webworker" ? "tsconfig.browser.json" : "tsconfig.json"),
 			// 	}
 			// })
+		}
+		if (!plugin) {
+			plugin = /** @type {ForkTsCheckerPlugin} */(/** @type {unknown} */(undefined));
 		}
 		return plugin;
 	},
