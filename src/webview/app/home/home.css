@@ -16,11 +16,6 @@ button {
     border-radius: 3px;
     margin-right: 5px;
     border: gray 1px solid;
-  }
-
-button:hover {
-    opacity: 0.8;
-    background-color: var(--vscode-button-hoverBackground);
 }
 
 .te-icon {
