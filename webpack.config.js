@@ -51,9 +51,8 @@ module.exports = (env, argv) =>
 	if (typeof env.esbuild === "string") { env.esbuild = String(env.esbuild).toLowerCase() == "true"; }
 	if (typeof env.imageOpt === "string") { env.imageOpt = String(env.imageOpt).toLowerCase() == "true"; }
 
-	if (env.build)
-	{
-		return getWebpackConfig(env.build, env, argv);
+	if (env.target){
+		return getWebpackConfig(env.target, env, argv);
 	}
 
 	return [
@@ -67,15 +66,15 @@ module.exports = (env, argv) =>
 /**
  * @method
  * @private
- * @param {WebpackBuild} build
+ * @param {WebpackBuild} target
  * @param {WebpackEnvironment} env Webpack build environment
  * @param {WebpackArgs} argv Webpack command line args
  * @returns {WebpackConfig}
  */
-const getWebpackConfig = (build, env, argv) =>
+const getWebpackConfig = (target, env, argv) =>
 {   
-	env.build = build;
-	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
+	env.target = target;
+	env.basePath = env.target === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
 	/**@type {WebpackConfig}*/const wpConfig = {};
 	mode(env, argv, wpConfig);    // Mode i.e. "production", "development", "none"
 	context(env, wpConfig);       // Context for build
@@ -88,8 +87,7 @@ const getWebpackConfig = (build, env, argv) =>
 	resolve(env, wpConfig);       // Resolve config
 	rules(env, wpConfig);         // Loaders & build rules
 	stats(wpConfig);              // Stats i.e. console output & verbosity
-	target(env,wpConfig);         // Target i.e. "node", "webworker", "tests"
-	wpConfig.name = `${build}:${wpConfig.mode}`;
+	wpConfig.name = `${target}:${wpConfig.mode}`;
 	return wpConfig;
 };
 
@@ -106,7 +104,7 @@ const getWebpackConfig = (build, env, argv) =>
  */
 const context = (env, wpConfig) =>
 {
-	if (env.build === "webview")
+	if (env.target === "webview")
 	{
 		wpConfig.context = env.basePath;
 	}
@@ -170,7 +168,7 @@ const devTool = (env, wpConfig) =>
  */
 const entry = (env, wpConfig) =>
 {
-	if (env.build === "webview")
+	if (env.target === "webview")
 	{
 		wpConfig.entry = webviewApps;
 	}
@@ -354,12 +352,12 @@ const mode = (env, argv, wpConfig) =>
  */
 const optimization = (env, wpConfig) =>
 {
-	if (env.build !== "webview")
+	if (env.target !== "webview")
 	{
 		wpConfig.optimization =
 		{
 			runtimeChunk: env.environment !== "dev" ? "single" : undefined,
-			splitChunks: wpConfig.target === "webworker" ? false : {
+			splitChunks: env.target === "extension_web" ? false : {
 				cacheGroups: {
 					vendor: {
 						test: /[\\/]node_modules[\\/]((?!(node-windows)).*)[\\/]/,
@@ -396,7 +394,7 @@ const optimization = (env, wpConfig) =>
  */
 const output = (env, wpConfig) =>
 {
-	if (env.build === "webview")
+	if (env.target === "webview")
 	{
 		wpConfig.output = {
 			clean: env.clean === true,
@@ -416,7 +414,7 @@ const output = (env, wpConfig) =>
 	{
 		wpConfig.output = {
 			clean: env.clean === true,
-			path: env.build === "extension_web" ? path.join(__dirname, "dist", "browser") :
+			path: env.target === "extension_web" ? path.join(__dirname, "dist", "browser") :
 												  path.join(__dirname, "dist"),
 			libraryTarget: "commonjs2",
 			filename: "[name].js"
@@ -441,7 +439,7 @@ const plugins = (env, wpConfig) =>
 {
 	wpConfig.plugins = [];
 
-	if (env.build === "webview")
+	if (env.target === "webview")
 	{
 		const apps = Object.keys(webviewApps);
 		wpConfig.plugins.push(
@@ -493,15 +491,15 @@ const plugins = (env, wpConfig) =>
  */
 const resolve = (env, wpConfig) =>
 {
-	if (env.build !== "webview")
+	if (env.target !== "webview")
 	{
 		wpConfig.resolve =
 		{   
 			alias: {
-				"@env": path.resolve(__dirname, "src", "lib", "env", env.build === "extension_web" ? "browser" : "node")
+				"@env": path.resolve(__dirname, "src", "lib", "env", env.target === "extension_web" ? "browser" : "node")
 			},
-			fallback: env.build === "extension_web" ? { path: require.resolve("path-browserify"), os: require.resolve("os-browserify/browser") } : undefined,
-			mainFields: env.build === "extension_web" ? [ "browser", "module", "main" ] : [ "module", "main" ],
+			fallback: env.target === "extension_web" ? { path: require.resolve("path-browserify"), os: require.resolve("os-browserify/browser") } : undefined,
+			mainFields: env.target === "extension_web" ? [ "browser", "module", "main" ] : [ "module", "main" ],
 			extensions: [
 				".ts", ".tsx", ".js", ".jsx", ".json"
 			]
@@ -534,7 +532,7 @@ const rules = (env, wpConfig) =>
 	wpConfig.module = {};
 	wpConfig.module.rules = [];
 
-	if (env.build === "webview")
+	if (env.target === "webview")
 	{
 		wpConfig.module.rules.push(...[
 		{
@@ -610,7 +608,7 @@ const rules = (env, wpConfig) =>
 					tsconfigRaw: resolveTSConfig(
 						path.join(
 							__dirname,
-							env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
+							env.target === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
 						),
 					),
 				},
@@ -620,7 +618,7 @@ const rules = (env, wpConfig) =>
 				options: {
 					configFile: path.join(
 						__dirname,
-						env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
+						env.target === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
 					),
 					experimentalWatchApi: true,
 					transpileOnly: true
@@ -655,26 +653,6 @@ const stats = (wpConfig) =>
 	wpConfig.infrastructureLogging = {
 		level: "log", // enables logging required for problem matchers
 	};
-};
-
-
-//
-// *************************************************************
-// *** TARGET                                               ***
-// *************************************************************
-/**
- * @method
- * @param {WebpackEnvironment} env Webpack build environment
- * @param {WebpackConfig} wpConfig Webpack config object
- */
-const target = (env, wpConfig) =>
-{
-	if (env.build === "webview") {
-		wpConfig.target = "web";
-	}
-	else {
-		wpConfig.target = env.target || "node";
-	}
 };
 
 
