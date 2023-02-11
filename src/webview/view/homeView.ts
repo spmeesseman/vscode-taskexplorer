@@ -129,7 +129,8 @@ export class HomeView extends TeWebviewView<State>
     	const taskStats = this.wrapper.taskManager.getTaskStats(),
 			  taskCount = this.wrapper.treeManager.getTasks().length;
 		html = html.replace("#{taskCounts.length}",  taskCount.toString())
-				   .replace("#{taskCounts.today}", taskStats.todayCount.toString());
+				   .replace("#{taskCounts.today}", taskStats.todayCount.toString())
+				   .replace("#{license.status}", "UNLICENSED");
 		return removeLicenseButtons(html);
 	};
 

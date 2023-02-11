@@ -22,28 +22,6 @@
     color: var(--vscode-foreground);
 }
 
-/*
-.toggle-button {
-    cursor: pointer;
-    height: 18px;
-    margin-top: 6px;
-    background: var(--vscode-button-background);
-    content: url( '../img/webview/chevron-up.svg');
-    mask-image: url( '../img/webview/chevron-up.svg');
-    -webkit-mask-image: url( '../img/webview/chevron-up.svg');
-}
-
-.toggle-button.is-show  {
-    content: url( '../img/webview/chevron-down.svg');
-    mask-image: url( '../img/webview/chevron-down.svg');
-    -webkit-mask-image: url( '../img/webview/chevron-down.svg');
-}
-
-.toggle-button:hover {
-    background: var(--vscode-button-hoverBackground);
-}
-*/
-
 .toggle-button {
     cursor: pointer;
 }
@@ -51,11 +29,7 @@
 .toggle-button:hover {
     color: var(--vscode-button-hoverBackground);
 }
-/*
-.toggle-button.is-show  {
-    content: url( '../img/webview/chevron-down.svg');
-}
-*/
+
 div.full-release-notes-container {
     margin:5px;
     padding:5px;
@@ -66,10 +40,9 @@ div.full-release-notes-container {
 }
 
 .te-release-notes-section-header-icon {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
-    line-height:18px;
-    padding-right: 2px;
+    line-height:16px;
     max-width: 20px;
     vertical-align: middle;
 }

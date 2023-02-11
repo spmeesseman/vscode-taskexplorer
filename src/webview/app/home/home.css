@@ -87,8 +87,20 @@ button:hover {
     border: gray 1px solid;
     text-align: center;
     opacity: .92;
+    width: 100%;
     border-radius: 3px;
     box-shadow: 0 0 2px 0 var(--vscode-background) inset;
     background: var(--vscode-background);
     /* background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000); */
+}
+
+.homeview-license-status-label {
+    text-align: left;
+    background: var(--vscode-background);
+    padding-right: 6px;
+}
+
+.homeview-license-status-container {
+    padding: 0px;
+    margin-top: 3px;
 }
