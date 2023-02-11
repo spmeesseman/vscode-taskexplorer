@@ -217,6 +217,7 @@ const wpPlugin =
 				patterns.push({
 					from: path.posix.join(psxBasePath, "res", "*.*"),
 					to: path.posix.join(psx__dirname, "res", "img", "webview"),
+					context: path.posix.join(psxBasePath, "res")
 				});
 			}
 			patterns.push({
