@@ -31,12 +31,15 @@ button:hover {
 }
 
 .homeview-info-panel {
-    max-width: 190px
+    min-width: 170px;
+    max-width: 190px;
+    padding-right: 5px;
+    display: inline-block;
 }
 
 .button-panel {
     width: -webkit-fill-available;
-    align-content: flex-start;
+    align-content:stretch;
 }
 
 .margin-top-3 {
@@ -102,5 +105,10 @@ button:hover {
 
 .homeview-license-status-container {
     padding: 0px;
-    margin-top: 3px;
+}
+
+.homeview-button-container {
+    width: -webkit-fill-available;
+    align-content: flex-end;
+    display: inline-block;
 }

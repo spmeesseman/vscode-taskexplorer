@@ -9,83 +9,86 @@
 
     <body>
 
-        <table width="100%"">
+        <table width="100%">
 
-            <tr><td class="homeview-info-panel" valign="top">
-
-                <table>
-                    <tr>
-                    <td valign="top">
-                        <table>
-                            <tr>
-                                <td>
-                                    <img src="#{webroot}/img/logo-bl.png" class="te-icon" />
-                                </td>
-                                <td valign="top">
-                                    <span class="homeview-content-title">Task</span>
-                                    <span class="homeview-content-title-version">v#{version}</span>
-                                    <div class="homeview-content-title margin-top-minus-5"> &nbsp;&nbsp;&nbsp;Explorer</div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2">
-                                    <table width="100%">
-                                        <tr>
-                                            <td class="homeview-task-count-label">
-                                                Total Tasks Parsed:
-                                            </td>
-                                            <td class="task-count-value homeview-task-count-value" align="right">
-                                                #{taskCounts.length} 
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">
-                                                <table class="homeview-license-status-container">
-                                                    <tr>
-                                                        <td class="homeview-license-status-label">
-                                                            MODE:
-                                                        </td>
-                                                        <td class="homeview-license-status">
-                                                            #{license.status}
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td></tr>
-                </table>
-            </td>
-            <td valign="top" align="right" class="button-panel" width="100%">
-                <!-- startEnterLicenseButton -->
-                <div>
-                    <button data-action="command:vscode-taskexplorer.enterLicense" id="btnEnterLicense">Enter License</button>
-                </div>
-                <!-- endEnterLicenseButton -->
-                <!-- startGetLicenseButton -->
-                <div class="margin-top-5">
-                    <button data-action="command:vscode-taskexplorer.getLicense" id="btnGetLicense">Get License</button>
-                </div>
-                <!-- endGetLicenseButton -->
-                <!-- startViewLicenseButton -->
-                <div class="margin-top-5">
-                    <button data-action="command:vscode-taskexplorer.showLicensePage" id="btnViewLicense">License Info</button>
-                </div>
-                <!-- endViewLicenseButton -->
-                <!-- startParsingReportButton -->
-                <div class="margin-top-5">
-                    <button data-action="command:vscode-taskexplorer.showParsingReportPage" id="btnViewReport">Parsing Report</button>
-                </div>
-                <!-- endParsingReportButton -->
-                <!-- startReleaseNotesButton -->
-                <div class="margin-top-5">
-                    <button data-action="command:vscode-taskexplorer.showReleaseNotesPage" id="btnViewReleaseNotes">Release Notes</button>
-                </div>
-                <!-- endReleaseNotesButton -->
-            </td></tr>
+            <tr>
+                <td class="homeview-info-panel" valign="top" >
+                    <span class="homeview-info-panel">
+                    <table>
+                        <tr>
+                        <td valign="top">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <img src="#{webroot}/img/logo-bl.png" class="te-icon" />
+                                    </td>
+                                    <td valign="top">
+                                        <span class="homeview-content-title">Task</span>
+                                        <span class="homeview-content-title-version">v#{version}</span>
+                                        <div class="homeview-content-title margin-top-minus-5"> &nbsp;&nbsp;&nbsp;Explorer</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <table width="100%">
+                                            <tr>
+                                                <td class="homeview-task-count-label">
+                                                    Total Tasks Parsed:
+                                                </td>
+                                                <td class="task-count-value homeview-task-count-value" align="right">
+                                                    #{taskCounts.length} 
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    <table class="homeview-license-status-container">
+                                                        <tr>
+                                                            <td class="homeview-license-status-label">
+                                                                MODE:
+                                                            </td>
+                                                            <td class="homeview-license-status">
+                                                                #{license.status}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td></tr>
+                    </table>
+                    </span>
+                </td>
+                <td valign="top" class="button-panel" width="100%">
+                    <!-- startEnterLicenseButton -->
+                    <div class="homeview-button-container">
+                        <button data-action="command:vscode-taskexplorer.enterLicense" id="btnEnterLicense">Enter License</button>
+                    </div>
+                    <!-- endEnterLicenseButton -->
+                    <!-- startGetLicenseButton -->
+                    <div class="homeview-button-container margin-top-5">
+                        <button data-action="command:vscode-taskexplorer.getLicense" id="btnGetLicense">Get License</button>
+                    </div>
+                    <!-- endGetLicenseButton -->
+                    <!-- startViewLicenseButton -->
+                    <div class="homeview-button-container margin-top-5">
+                        <button data-action="command:vscode-taskexplorer.showLicensePage" id="btnViewLicense">License Info</button>
+                    </div>
+                    <!-- endViewLicenseButton -->
+                    <!-- startParsingReportButton -->
+                    <div class="homeview-button-container margin-top-5">
+                        <button data-action="command:vscode-taskexplorer.showParsingReportPage" id="btnViewReport">Parsing Report</button>
+                    </div>
+                    <!-- endParsingReportButton -->
+                    <!-- startReleaseNotesButton -->
+                    <div class="homeview-button-container margin-top-5">
+                        <button data-action="command:vscode-taskexplorer.showReleaseNotesPage" id="btnViewReleaseNotes">Release Notes</button>
+                    </div>
+                    <!-- endReleaseNotesButton -->
+                </td>
+            </tr>
 
         </table>
 
