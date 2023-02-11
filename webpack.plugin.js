@@ -279,9 +279,9 @@ const wpPlugin =
 					: ["#{cspSource}", "'nonce-#{cspNonce}'"],
 			"style-src":
 			wpConfig.mode === 'production'
-					? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'", "https://ka-p.fontawesome.com" ]
-					: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'", "https://ka-p.fontawesome.com" ],
-			"font-src": ["#{cspSource}", "https://ka-p.fontawesome.com" ],
+					? ["#{cspSource}", "'nonce-#{cspNonce}'", "'unsafe-hashes'" ]
+					: ["#{cspSource}", "'unsafe-hashes'", "'unsafe-inline'" ],
+			"font-src": ["#{cspSource}" ],
 		},
 		{
 			enabled: true,
