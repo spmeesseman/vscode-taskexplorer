@@ -221,8 +221,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		return this.onHtmlPreview(html.replace(/\#\{title\}/g,
 `<table><tr>
 <td class="content-img">
-	<!--<img src="#{webroot}/img/logo-clr.png" />-->
-	<span class="fad fa-cogs te-icon"></span>
+	<img class="te-icon" src="#{webroot}/img/logo-bl.png" />
 </td>
 <td class="content-title"> &nbsp;#{title}</td>
 </tr></table>`), ...args);

@@ -22,27 +22,32 @@
     color: var(--vscode-foreground);
 }
 
-.toggle-button.toggle-button-svg {
-    fill: var(--vscode-button-background);
+.toggle-button-svg {
+    background: var(--vscode-button-background);
 }
 
-.toggle-button.toggle-button-svg:hover {
-    fill: var(--vscode-button-hoverBackground);
+.toggle-button-svg:hover {
+    background: var(--vscode-button-hoverBackground);
 }
 
 .toggle-button {
     cursor: pointer;
     height: 18px;
+    margin-top: 6px;
+    background: var(--vscode-button-background);
     content: url( '../img/webview/chevron-up.svg');
-    filter: invert(11%) sepia(100%) saturate(6481%) hue-rotate(246deg) brightness(77%) contrast(123%);
+    mask-image: url( '../img/webview/chevron-up.svg');
+    -webkit-mask-image: url( '../img/webview/chevron-up.svg');
 }
 
 .toggle-button.is-show  {
     content: url( '../img/webview/chevron-down.svg');
+    mask-image: url( '../img/webview/chevron-down.svg');
+    -webkit-mask-image: url( '../img/webview/chevron-down.svg');
 }
 
 .toggle-button:hover {
-    fill: var(--vscode-button-hoverBackground);
+    background: var(--vscode-button-hoverBackground);
 }
 
 div.full-release-notes-container {

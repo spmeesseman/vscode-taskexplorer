@@ -16,9 +16,7 @@ hr {
 }
 
 .te-icon {
-    font-size: 56px;
-    --fa-primary-color: var(--vscode-button-background);
-    --fa-secondary-color: var(--vscode-button-hoverBackground);
+    height: 56px;
 }
 
 .te-page-bg {

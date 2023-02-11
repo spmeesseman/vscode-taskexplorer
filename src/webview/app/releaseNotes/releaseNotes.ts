@@ -45,10 +45,8 @@ export class ReleaseNotesWebviewApp extends TeWebviewApp<State>
 	private toggle = (element: HTMLElement) =>
 	{
 		const x = document.getElementById("releaseNotesDiv") as HTMLElement;
-		const showing = x.classList.toggle("is-show");
-		// element.("src");
+		x.classList.toggle("is-show");
 		element.classList.toggle("is-show");
-		// element.setAttribute("src", !showing ? "../img/webview/chevron-down.svg" : "../img/webview/chevron-down.svg");
 	};
 
 }
