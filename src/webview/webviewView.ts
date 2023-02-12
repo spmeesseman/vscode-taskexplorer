@@ -3,7 +3,6 @@ import { log } from "../lib/log/log";
 import { TeWrapper } from "../lib/wrapper";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
-import { isExtensionBusy } from "../extension";
 import { registerCommand } from "../lib/command";
 import { setContext, ContextKeys } from "../lib/context";
 import { WebviewFocusChangedParams } from "./common/ipc";
@@ -64,7 +63,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	async show(options?: { preserveFocus?: boolean })
 	{
-		while (isExtensionBusy()) {
+		while (this.wrapper.busy) {
 			await timeout(100);
 		}
 		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
@@ -80,7 +79,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	async resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Promise<void>
 	{
-		while (isExtensionBusy()) {
+		while (this.wrapper.busy) {
 			await timeout(100);
 		}
 

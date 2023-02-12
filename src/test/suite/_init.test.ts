@@ -10,9 +10,9 @@ import {
 } from "../utils/utils";
 import { TeWrapper } from "../../lib/wrapper";
 import { TaskTree } from "../../tree/tree";
+import { Commands, executeCommand } from "../../lib/command";
 
 
-let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 
 
@@ -21,7 +21,7 @@ suite("Initialization", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, teWrapper } = await activate(this));
+        ({ teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -47,7 +47,7 @@ suite("Initialization", () =>
     });
 
 
-    test("Focus SideBar Tree", async function()
+    test("Focus Sidebar Views - Tree", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh);
@@ -69,7 +69,22 @@ suite("Initialization", () =>
         expect(teWrapper.sidebarView).to.not.be.undefined;
         expect(teWrapper.explorer).to.be.undefined;
         expect(teWrapper.explorerView).to.be.undefined;
-        expect(teWrapper.explorer).to.not.be.undefined;
+        endRollingCount(this);
+    });
+
+
+    test("Focus Sidebar Views - Task Usage", async function()
+    {
+        if (exitRollingCount(this)) return;
+        await executeCommand("taskExplorer.view.taskUsage.focus");
+        endRollingCount(this);
+    });
+
+
+    test("Focus Sidebar View - Task Counts", async function()
+    {
+        if (exitRollingCount(this)) return;
+        await executeCommand("taskExplorer.view.taskCount.focus");
         endRollingCount(this);
     });
 
@@ -96,7 +111,6 @@ suite("Initialization", () =>
         expect(teWrapper.sidebarView).to.not.be.undefined;
         expect(teWrapper.explorer).to.be.not.undefined;
         expect(teWrapper.explorerView).to.not.be.undefined;
-        expect(teWrapper.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 
@@ -123,7 +137,6 @@ suite("Initialization", () =>
         expect(teWrapper.sidebarView).to.be.undefined;
         expect(teWrapper.explorer).to.be.not.undefined;
         expect(teWrapper.explorerView).to.not.be.undefined;
-        expect(teWrapper.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 

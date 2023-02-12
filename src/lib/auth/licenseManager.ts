@@ -5,15 +5,17 @@ import { request } from "https";
 import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
 import { IncomingMessage } from "http";
-import { Commands } from "../constants";
 import { storage } from "../utils/storage";
 import { log, logControl } from "../log/log";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { LicensePage } from "../../webview/page/licensePage";
-import { executeCommand, registerCommand } from "../command";
-import { AuthenticationProviderAuthenticationSessionsChangeEvent, Disposable, env, EventEmitter, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 import { TeAuthenticationProvider } from "./authProvider";
+import { LicensePage } from "../../webview/page/licensePage";
+import { executeCommand, registerCommand, Commands } from "../command";
+import {
+	AuthenticationProviderAuthenticationSessionsChangeEvent, Disposable, env, EventEmitter,
+	InputBoxOptions, Task, WebviewPanel, window
+} from "vscode";
 
 
 export class LicenseManager implements Disposable

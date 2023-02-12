@@ -5,8 +5,8 @@
 import { join } from "path";
 import fsUtils from "../../utils/fsUtils";
 import { refresh } from "../../utils/treeUtils";
+import { Commands } from "../../../lib/command";
 import { TeWrapper } from "../../../lib/wrapper";
-import { Commands } from "../../../lib/constants";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";

@@ -261,7 +261,7 @@
             "taskActivity": [
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.home",
+                    "id": "taskExplorer.view.home",
                     "name": "Home",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
@@ -278,7 +278,7 @@
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.taskUsage",
+                    "id": "taskExplorer.view.taskUsage",
                     "name": "Task Usage",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
@@ -287,7 +287,7 @@
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.views.taskCount",
+                    "id": "taskExplorer.view.taskCount",
                     "name": "Task Count",
                     "when": "config.taskExplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",

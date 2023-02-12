@@ -20,8 +20,6 @@ const startTaskCount = 8;
 
 let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let pathToProgram: string;
-let rootPath: string;
 let fileUri: Uri;
 
 
@@ -31,17 +29,8 @@ suite("Maven Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        //
-        // Initialize
-        //
-        ({ teApi } = await activate(this));
-        rootPath = getWsPath(".");
-        fileUri = Uri.file(path.join(rootPath, "pom.xml"));
-        //
-        // Store / set initial settings
-        //
-        pathToProgram = teWrapper.configuration.get<string>(`pathToPrograms.${testsName}`);
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
+        ({ teApi, teWrapper } = await activate(this));
+        fileUri = Uri.file(path.join(getWsPath("."), "pom.xml"));
         endRollingCount(this, true);
     });
 
@@ -49,7 +38,6 @@ suite("Maven Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await executeSettingsUpdate(`pathToPrograms.${testsName}`, pathToProgram);
         suiteFinished(this);
     });
 

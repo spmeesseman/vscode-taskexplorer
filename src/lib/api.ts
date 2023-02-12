@@ -1,10 +1,8 @@
 
-import { log } from "./log/log";
 import { TeWrapper } from "./wrapper";
-import { executeCommand, registerCommand } from "./command";
 import { ContextKeys, setContext } from "./context";
-import { IExternalProvider, ITaskExplorerApi, ITaskTreeView } from "../interface";
-import { Commands } from "./constants";
+import { IExternalProvider, ITaskExplorerApi } from "../interface";
+import { executeCommand, registerCommand, Commands } from "./command";
 
 
 export class TeApi implements ITaskExplorerApi

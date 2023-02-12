@@ -52,6 +52,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     get redirectUri()
     {
         const publisher = this.wrapper.context.extension.packageJSON.publisher;
@@ -60,6 +61,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     public async getSessions(scopes?: string[]): Promise<readonly AuthenticationSession[]>
     {
         const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
@@ -73,6 +75,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     public async createSession(scopes: string[]): Promise<AuthenticationSession>
     {
         try
@@ -108,6 +111,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     public async removeSession(sessionId: string): Promise<void>
     {
         const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
@@ -134,6 +138,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     private login(scopes: string[] = [])
     {
         return window.withProgress<string>({
@@ -197,6 +202,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     }
 
 
+    /* istanbul ignore next */
     private handleUri: (scopes: readonly string[]) => PromiseAdapter<Uri, string> =
         (scopes) => async (uri, resolve, reject) =>
         {
@@ -225,7 +231,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             resolve(token);
         };
 
-
+    /* istanbul ignore next */
     private async getUserInfo(token: string): Promise<{ name: string; email: string }>
     {
         const response = await fetch(`https://${TEAUTH_DOMAIN}/userinfo`, {

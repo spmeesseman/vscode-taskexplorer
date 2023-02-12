@@ -416,7 +416,7 @@ export class TaskTreeManager implements Disposable
         // we don't double scan for nothing.
         //
         log.methodStart("handle tree rebuild event", 1, logPad);
-        if (invalidate === true && !opt)
+        if (invalidate === undefined && opt === undefined) // i.e. refresh button was clicked
         {
             log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             await rebuildCache(logPad + "   ");

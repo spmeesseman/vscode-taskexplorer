@@ -7,11 +7,10 @@ import { IDictionary } from "../../interface";
 import { pushIfNotExists } from "../utils/utils";
 import { registerFileWatcher } from "./fileWatcher";
 import { setContext, ContextKeys } from "../context";
+import { Commands, executeCommand } from "../command";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
-import { executeCommand } from "../command";
-import { Commands } from "../constants";
 
 let _wrapper: TeWrapper;
 let watcherEnabled = true;
@@ -285,7 +284,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     try
     {   if (refresh || refreshTaskTypes.length > 3)
         {
-            await executeCommand(Commands.Refresh, undefined, undefined, "   ");
+            await executeCommand(Commands.Refresh, undefined, false, "   ");
         }
         else if (refreshTaskTypes.length > 0)
         {

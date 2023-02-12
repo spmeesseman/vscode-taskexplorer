@@ -254,11 +254,7 @@ const initialize = async(wrapper: TeWrapper) =>
 };
 
 
-export function isExtensionBusy()
-{
-    return !ready || fileCache.isBusy() || teWrapper.treeManager.isBusy() || isProcessingFsEvent() ||
-           isProcessingConfigChange() || teWrapper.licenseManager.isBusy();
-}
+export const isReady = () => ready;
 
 
 /* istanbul ignore next */

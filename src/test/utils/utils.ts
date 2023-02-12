@@ -144,10 +144,9 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         // Ensure extension initialized successfully
         //
-        expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
         teWrapper = TeWrapper.instance;
         expect(teWrapper.explorer).to.not.be.empty;
-        teWrapper = TeWrapper.instance;
+        expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
         //
         // Set a valid license key to run in 'licensed mode' at startup
         //

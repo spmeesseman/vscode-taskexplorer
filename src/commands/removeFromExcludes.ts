@@ -1,12 +1,12 @@
 
 import { log } from "../lib/log/log";
+import { Globs } from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
-import { Commands, Globs } from "../lib/constants";
 import { ExtensionContext, Uri, window } from "vscode";
 import { removeFromExcludes } from "../lib/addToExcludes";
-import { executeCommand, registerCommand } from "../lib/command";
+import { Commands, executeCommand, registerCommand } from "../lib/command";
 
 const localize = loadMessageBundle();
 

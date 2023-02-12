@@ -40,62 +40,6 @@ export const Globs: IDictionary<string> =
     GLOB_WORKSPACE: "**/.vscode/tasks.json"
 };
 
-export const enum Commands
-{
-	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
-	ClearTaskStats = "vscode-taskexplorer.clearTaskStats",
-	Donate = "vscode-taskexplorer.donate",
-	DisableTaskType = "vscode-taskexplorer.disableTaskType",
-	EnableTaskType = "vscode-taskexplorer.enableTaskType",
-	EnterLicense = "vscode-taskexplorer.enterLicense",
-	GetApi = "vscode-taskexplorer.getApi",
-	GetLicense = "vscode-taskexplorer.getLicense",
-    Open = "vscode-taskexplorer.open",
-	Refresh = "vscode-taskexplorer.refresh",
-	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
-    Run = "vscode-taskexplorer.run",
-    RunWithArgs = "vscode-taskexplorer.runWithArgs",
-	ShowHomeView = "vscode-taskexplorer.showHomeView",
-    RunLastTask = "vscode-taskexplorer.runLastTask",
-	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
-	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
-	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
-	ShowTaskCountView = "vscode-taskexplorer.showTaskCountView",
-	ShowTaskStatsView = "vscode-taskexplorer.showTaskStatsView",
-	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage"
-}
-
-export const enum VsCodeCommands
-{
-	CloseActiveEditor = "workbench.action.closeActiveEditor",
-	CloseAllEditors = "workbench.action.closeAllEditors",
-	CursorMove = "cursorMove",
-	CustomEditorShowFindWidget = "editor.action.webvieweditor.showFind",
-	Diff = "vscode.diff",
-	EditorScroll = "editorScroll",
-	EditorShowHover = "editor.action.showHover",
-	ExecuteDocumentSymbolProvider = "vscode.executeDocumentSymbolProvider",
-	ExecuteCodeLensProvider = "vscode.executeCodeLensProvider",
-	FocusFilesExplorer = "workbench.files.action.focusFilesExplorer",
-	InstallExtension = "workbench.extensions.installExtension",
-	MoveViews = "vscode.moveViews",
-	Open = "vscode.open",
-	OpenFolder = "vscode.openFolder",
-	OpenInTerminal = "openInTerminal",
-	OpenWalkthrough = "workbench.action.openWalkthrough",
-	OpenWith = "vscode.openWith",
-	NextEditor = "workbench.action.nextEditor",
-	PreviewHtml = "vscode.previewHtml",
-	RevealLine = "revealLine",
-	RevealInExplorer = "revealInExplorer",
-	RevealInFileExplorer = "revealFileInOS",
-	SetContext = "setContext",
-	ShowExplorer = "workbench.view.explorer",
-	ShowReferences = "editor.action.showReferences",
-	ShowSCM = "workbench.view.scm",
-	UninstallExtension = "workbench.extensions.uninstallExtension",
-}
-
 export const enum GlyphChars
 {
 	AngleBracketLeftHeavy = "\u2770",

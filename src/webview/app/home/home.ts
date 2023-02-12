@@ -64,66 +64,15 @@ export class HomeWebviewApp extends TeWebviewApp<State>
         }
 	}
 
-
-    private enterLicense = () =>
-    {
-        this.vscode.postMessage({
-            method: "command/execute",
-            params: {
-                command: "vscode-taskexplorer.enterLicense"
-            }
-        });
-    };
-
-
-    private getLicense = () =>
-    {
-        this.vscode.postMessage({
-            method: "command/execute",
-            params: {
-                command: "vscode-taskexplorer.getLicense"
-            }
-        });
-    };
-
-
-    private showLicensePage = () =>
-    {
-        this.vscode.postMessage({
-            method: "command/execute",
-            params: {
-                command: "vscode-taskexplorer.showLicensePage"
-            }
-        });
-    };
-
-
-    private showParsingReport = () =>
-    {
-        this.vscode.postMessage({
-            method: "command/execute",
-            params: {
-                command: "vscode-taskexplorer.showParsingReportPage"
-            }
-        });
-    };
-
-
-    private showReleaseNotes = () =>
-    {
-        this.vscode.postMessage({
-            method: "command/execute",
-            params: {
-                command: "vscode-taskexplorer.showReleaseNotesPage"
-            }
-        });
-    };
-
-
 	private updateState()
     {
 	}
 
+	private enterLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.enterLicense"});
+    private getLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.getLicense"});
+    private showReleaseNotes = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.showReleaseNotesPage"});
+    private showParsingReport = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.showParsingReportPage"});
+    private showLicensePage = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.showLicensePage"});
 }
 
 

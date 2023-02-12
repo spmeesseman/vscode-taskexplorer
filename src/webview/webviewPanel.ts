@@ -1,11 +1,9 @@
 
-import { Commands } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import { TeWebviewBase } from "./webviewBase";
-import { isExtensionBusy } from "../extension";
-import { registerCommand } from "../lib/command";
 import { isObject, timeout } from "../lib/utils/utils";
 import { ContextKeys, setContext } from "../lib/context";
+import { Commands, registerCommand } from "../lib/command";
 import type { WebviewFocusChangedParams } from "./common/ipc";
 import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
@@ -83,7 +81,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	{
 		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
 
-		while (isExtensionBusy()) {
+		while (this.wrapper.busy) {
 			await timeout(100);
 		}
 

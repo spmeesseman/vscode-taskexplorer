@@ -1,10 +1,10 @@
 
 import { log } from "./log/log";
 import * as fs from "./utils/fs";
+import { isReady } from "../extension";
 import * as fileCache from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
-import { isExtensionBusy } from "src/extension";
 import { IStorage } from "../interface/IStorage";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
@@ -30,6 +30,7 @@ import { LicensePage } from "../webview/page/licensePage";
 import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
+import { isProcessingFsEvent } from "./watcher/fileWatcher";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
@@ -37,7 +38,6 @@ import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
 import { TeAuthenticationProvider } from "./auth/authProvider";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
-import { enableConfigWatcher, registerConfigWatcher } from "./watcher/configWatcher";
 import { IDictionary, ILog, ITaskTreeView } from "../interface";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
@@ -48,6 +48,7 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder } from "vscode";
+import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
 
 
 export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
@@ -56,28 +57,27 @@ export class TeWrapper
 {
 	static #instance: TeWrapper | undefined;
 
-	private _licenseManager: LicenseManager;
-	private _treeManager: TaskTreeManager;
-
 	private _ready = false;
 	private _busy = false;
 	private _tests = false;
-	private readonly _version: string;
 	private readonly _prerelease;
-	private readonly _context: ExtensionContext;
-	private readonly _previousVersion: string | undefined;
-	private _onReady: EventEmitter<void> = new EventEmitter<void>();
-	private readonly _storage: IStorage;
-	private readonly _configuration: IConfiguration;
 	private readonly _log: ILog;
-	// private readonly _telemetry: TelemetryService;
-	private readonly _usage: UsageWatcher;
 	private _homeView: HomeView;
-	private _taskCountView: TaskCountView;
-	private _taskUsageView: TaskUsageView;
+	private readonly _version: string;
 	private _licensePage: LicensePage;
+	private readonly _storage: IStorage;
+	private readonly _usage: UsageWatcher;
+	private _taskCountView: TaskCountView;
+	private _treeManager: TaskTreeManager;
+	private _taskUsageView: TaskUsageView;
+	private _licenseManager: LicenseManager;
+	private readonly _context: ExtensionContext;
 	private _releaseNotesPage: ReleaseNotesPage;
 	private _parsingReportPage: ParsingReportPage;
+	private readonly _configuration: IConfiguration;
+	// private readonly _telemetry: TelemetryService;
+	private readonly _previousVersion: string | undefined;
+	private _onReady: EventEmitter<void> = new EventEmitter<void>();
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
@@ -125,11 +125,9 @@ export class TeWrapper
 		);
 	}
 
-
 	static get instance(): TeWrapper {
 		return TeWrapper.#instance ?? TeWrapper.#proxy;
 	}
-
 
 	static #proxy = new Proxy<TeWrapper>({} as TeWrapper,
     {
@@ -141,11 +139,9 @@ export class TeWrapper
 		},
 	});
 
-
 	get onReady() {
 		return this._onReady.event;
 	}
-
 
 	ready = async() =>
 	{
@@ -169,7 +165,6 @@ export class TeWrapper
 		queueMicrotask(() => this._onReady.fire());
 	};
 
-
 	private registerContextMenuCommands = () =>
 	{
 		registerDonateCommand(this._context);
@@ -179,13 +174,11 @@ export class TeWrapper
 		registerRemoveFromExcludesCommand(this._context);
 	};
 
-
     private registerTaskProvider = (providerName: string, provider: TaskExplorerProvider) =>
     {
         this.context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
         this._providers[providerName] = provider;
     };
-
 
 	private registerTaskProviders = () =>
     {   //
@@ -217,7 +210,6 @@ export class TeWrapper
         this.registerTaskProvider("python", new PythonTaskProvider(this));
         this.registerTaskProvider("ruby", new RubyTaskProvider(this));
     };
-
 
 	get configuration(): IConfiguration {
 		return this._configuration;
@@ -269,7 +261,8 @@ export class TeWrapper
 	}
 
 	get busy() {
-		return isExtensionBusy() || this._busy;
+		return this._busy || !this.ready || fileCache.isBusy() || this.treeManager.isBusy() || isProcessingFsEvent() ||
+			   isProcessingConfigChange() || this.licenseManager.isBusy() || !isReady();
 	}
 
 	get log() {
@@ -291,7 +284,6 @@ export class TeWrapper
 	get licenseManager() {
 		return this._licenseManager;
 	}
-
 
     get sidebar() {
         return this.treeManager.views.taskExplorerSideBar?.tree;

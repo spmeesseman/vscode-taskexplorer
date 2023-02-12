@@ -3,12 +3,12 @@ import { log } from "../log/log";
 import * as minimatch from "minimatch";
 import { TaskFile } from "../../tree/file";
 import { TaskItem } from "../../tree/item";
-import { executeCommand } from "../command";
 import { basename, extname, sep } from "path";
-import { Commands, Globs, Strings } from "../constants";
+import { Globs, Strings } from "../constants";
 import { configuration } from "./configuration";
-import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
+import { Commands, executeCommand } from "../command";
 import { LicenseManager } from "../auth/licenseManager";
+import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
 
 
 export const getCombinedGlobPattern = (defaultPattern: string, globs: string[]) =>

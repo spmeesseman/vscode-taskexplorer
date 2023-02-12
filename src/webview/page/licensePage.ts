@@ -1,7 +1,7 @@
 
 import { State } from "../common/state";
+import { Commands } from "../../lib/command";
 import { TeWrapper } from "../../lib/wrapper";
-import { Commands } from "../../lib/constants";
 import { ContextKeys } from "../../lib/context";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 import { createTaskCountTable } from "../common/taskCountTable";

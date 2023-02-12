@@ -1,8 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { ExtensionContext, window } from "vscode";
-import { Commands } from "../lib/constants";
-import { registerCommand } from "../lib/command";
+import { Commands, registerCommand } from "../lib/command";
 
 
 const donate = async() =>

@@ -4,14 +4,13 @@ import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskMap } from "./treeBuilder";
 import { TeWrapper } from "../lib/wrapper";
-import { Commands } from "../lib/constants";
 import { pathExists } from "../lib/utils/fs";
 import { getTerminal } from "../lib/getTerminal";
-import { registerCommand } from "../lib/command";
 import { SpecialTaskFolder } from "./specialFolder";
 import { ILog, ITaskStats } from "../interface";
 import { ScriptTaskProvider } from "../providers/script";
 import { isScriptType } from "../lib/utils/taskTypeUtils";
+import { Commands, registerCommand } from "../lib/command";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getDateDifference, getPackageManager, timeout } from "../lib/utils/utils";
 import {

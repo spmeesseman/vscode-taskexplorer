@@ -1,13 +1,77 @@
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable no-redeclare */
+/* eslint-disable @typescript-eslint/naming-convention */
 
-import { Command as CoreCommand, Disposable, Uri, commands, Command } from "vscode";
-// import { CoreGitCommands } from "../constants";
-import { VsCodeCommands, Commands } from "./constants";
-import { TeWrapper } from "./wrapper";
-// import { Container } from "../container";
+import {
+	Command as VsCodeCommand, Disposable, Uri, commands, Command
+} from "vscode";
+
+type SupportedCommands = Commands | `taskExplorer.view.${string}.focus` | `taskExplorer.view.${string}.resetViewLocation`;
+
+
+export const enum Commands
+{
+	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
+	ClearTaskStats = "vscode-taskexplorer.clearTaskStats",
+	Donate = "vscode-taskexplorer.donate",
+	DisableTaskType = "vscode-taskexplorer.disableTaskType",
+	EnableTaskType = "vscode-taskexplorer.enableTaskType",
+	EnterLicense = "vscode-taskexplorer.enterLicense",
+	FocusExplorerView  = "taskExplorerSideBar.focus",
+	FocusSidebarView  = "taskExplorer.focus",
+	FocusHomeView  = "taskExplorer.view.home.focus",
+	FocusTaskCountView  = "taskExplorer.view.taskCount.focus",
+	FocusTaskUsageView  = "taskExplorer.view.taskUsage.focus",
+	GetApi = "vscode-taskexplorer.getApi",
+	GetLicense = "vscode-taskexplorer.getLicense",
+    Open = "vscode-taskexplorer.open",
+	Refresh = "vscode-taskexplorer.refresh",
+	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
+    Run = "vscode-taskexplorer.run",
+    RunWithArgs = "vscode-taskexplorer.runWithArgs",
+	ShowHomeView = "vscode-taskexplorer.showHomeView",
+    RunLastTask = "vscode-taskexplorer.runLastTask",
+	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
+	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
+	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
+	ShowTaskCountView = "vscode-taskexplorer.showTaskCountView",
+	ShowTaskStatsView = "vscode-taskexplorer.showTaskStatsView",
+	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage"
+}
+
+export const enum VsCodeCommands
+{
+	CloseActiveEditor = "workbench.action.closeActiveEditor",
+	CloseAllEditors = "workbench.action.closeAllEditors",
+	CursorMove = "cursorMove",
+	CustomEditorShowFindWidget = "editor.action.webvieweditor.showFind",
+	Diff = "vscode.diff",
+	EditorScroll = "editorScroll",
+	EditorShowHover = "editor.action.showHover",
+	ExecuteDocumentSymbolProvider = "vscode.executeDocumentSymbolProvider",
+	ExecuteCodeLensProvider = "vscode.executeCodeLensProvider",
+	FocusFilesExplorer = "workbench.files.action.focusFilesExplorer",
+	InstallExtension = "workbench.extensions.installExtension",
+	MoveViews = "vscode.moveViews",
+	Open = "vscode.open",
+	OpenFolder = "vscode.openFolder",
+	OpenInTerminal = "openInTerminal",
+	OpenWalkthrough = "workbench.action.openWalkthrough",
+	OpenWith = "vscode.openWith",
+	NextEditor = "workbench.action.nextEditor",
+	PreviewHtml = "vscode.previewHtml",
+	RevealLine = "revealLine",
+	RevealInExplorer = "revealInExplorer",
+	RevealInFileExplorer = "revealFileInOS",
+	SetContext = "setContext",
+	ShowExplorer = "workbench.view.explorer",
+	ShowReferences = "editor.action.showReferences",
+	ShowSCM = "workbench.view.scm",
+	UninstallExtension = "workbench.extensions.uninstallExtension",
+}
 
 // type CommandConstructor = new (container: TeWrapper) => Command;
 // const registrableCommands: CommandConstructor[] = [];
-
 
 // export const command = (): ClassDecorator =>
 // {
@@ -15,7 +79,6 @@ import { TeWrapper } from "./wrapper";
 // 		registrableCommands.push(target);
 // 	};
 // };
-
 
 export const registerCommand = (command: string, callback: (...args: any[]) => any, thisArg?: any): Disposable =>
 {
@@ -29,55 +92,26 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 	);
 };
 
-
 // export const registerCommands = (container: TeWrapper): Disposable[] =>  registrableCommands.map(c => new c(container));
 
-
-export const asCommand = <T extends unknown[]>(command: Omit<CoreCommand, "arguments"> & { arguments: [...T] }): CoreCommand => command;
-
-
-// export const executeActionCommand = <T extends ActionContext>(action: Action<T>, args: Omit<T, "type">) =>
-// 	commands.executeCommand(`${Commands.ActionPrefix}${action}`, { ...args, type: action });
-
-
-type SupportedCommands = Commands | `taskExplorer.view.${string}.focus` | `taskExplorer.view.${string}.resetViewLocation`;
-
+export const asCommand = <T extends unknown[]>(command: Omit<VsCodeCommand, "arguments"> & { arguments: [...T] }): VsCodeCommand => command;
 
 export function executeCommand<U = any>(command: SupportedCommands): Thenable<U>;
-// eslint-disable-next-line no-redeclare
 export function executeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare
 export function executeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
-// eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
 export function executeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
-{
+{   // this.wrapper.telemetry.sendEvent("command/taskexplorer", { command: command });
 	return commands.executeCommand<U>(command, ...args);
 }
 
-
-// export function executeTeCommand<U = any>(command: SupportedCommands): Thenable<U>;
-// // eslint-disable-next-line no-redeclare
-// export function executeTeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
-// // eslint-disable-next-line no-redeclare
-// export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
-// // eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
-// export function executeTeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
-// {
-// 	return commands.executeCommand<U>(`vscode-taskexplorer.${command}`, ...args);
-// }
-
-
 // export function executeVsCodeCommand<T = unknown, U = any>(command: VsCodeCommands, arg: T): Thenable<U>;
-// // eslint-disable-next-line no-redeclare
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>;
-// // eslint-disable-next-line no-redeclare, prefer-arrow/prefer-arrow-functions
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
 // {
-// 	// if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
-// 	// 	this.wrapper.telemetry.sendEvent("command/core", { command: command });
-// 	// }
-// 	return commands.executeCommand<U>(command, ...args);
+//	   if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
+// 		   this.wrapper.telemetry.sendEvent("command/vscode", { command: command });
+// 	   }
+// 	   return commands.executeCommand<U>(command, ...args);
 // }
-
 
 // export const executeEditorCommand = <T>(command: Commands, uri: Uri | undefined, args: T) => commands.executeCommand(command, uri, args);

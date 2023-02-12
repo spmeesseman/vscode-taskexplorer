@@ -2,7 +2,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Uri } from "vscode";
-import { Commands } from "../../lib/constants";
+import { TaskTree } from "../../tree/tree";
+import { Commands } from "../../lib/command";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
@@ -12,7 +13,6 @@ import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../u
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
-import { TaskTree } from "../../tree/tree";
 
 let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;

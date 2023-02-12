@@ -4,20 +4,19 @@
 // TODO - Localize a disposables[] array and make only one push to context.subscriptions
 //
 
+import { extname } from "path";
+import { log } from "../log/log";
 import * as cache from "../fileCache";
 import * as util from "../utils/utils";
-import { log } from "../log/log";
-import { extname } from "path";
 import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";
 import { storage } from "../utils/storage";
+import { Commands, executeCommand } from "../command";
 import { configuration } from "../utils/configuration";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
-import { executeCommand } from "../command";
-import { Commands } from "../constants";
 
 let currentEvent: any;
 let extContext: ExtensionContext;
