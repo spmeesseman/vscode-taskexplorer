@@ -492,14 +492,14 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         const taskTree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
-        expect(teWrapper.explorer.getParent(taskTree[0])).to.be.null; // Last Tasks
-        expect(teWrapper.explorer.getParent(taskTree[1])).to.be.null; // Last Tasks
-        expect(teWrapper.explorer.getParent(taskTree[2])).to.be.null; // Project Folder
-        expect(teWrapper.explorer.getParent(batch[0])).to.not.be.null;
-        expect(teWrapper.explorer.getParent(batch[0].taskFile)).to.not.be.null;
-        expect(await teWrapper.explorer.getChildren(taskTree[2].taskFiles[0])).to.not.be.null;
-        expect(await teWrapper.explorer.getChildren(taskTree[2].taskFiles[1])).to.not.be.null;
-        expect(teWrapper.explorer.getName()).to.be.oneOf([ "taskExplorer", "taskExplorerSideBar" ]);
+        expect(teWrapper.explorer?.getParent(taskTree[0])).to.be.null; // Last Tasks
+        expect(teWrapper.explorer?.getParent(taskTree[1])).to.be.null; // Last Tasks
+        expect(teWrapper.explorer?.getParent(taskTree[2])).to.be.null; // Project Folder
+        expect(teWrapper.explorer?.getParent(batch[0])).to.not.be.null;
+        expect(teWrapper.explorer?.getParent(batch[0].taskFile)).to.not.be.null;
+        expect(await teWrapper.explorer?.getChildren(taskTree[2].taskFiles[0])).to.not.be.null;
+        expect(await teWrapper.explorer?.getChildren(taskTree[2].taskFiles[1])).to.not.be.null;
+        expect(teWrapper.explorer?.getName()).to.be.oneOf([ "taskExplorer", "taskExplorerSideBar" ]);
         utils.endRollingCount(this);
     });
 

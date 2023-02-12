@@ -19,6 +19,7 @@ import {
 	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
 } from "../utils/utils";
 import { TeWrapper } from "../../lib/wrapper";
+import { TaskTree } from "../../tree/tree";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -412,9 +413,9 @@ suite("Util Tests", () =>
     test("Miscellaneous", async function()
     {
         if (exitRollingCount(this)) return;
-        const item = new InitScripts(teWrapper.explorer); // it won't cover since no focus the view until after a bunch of test suites
-		// item.dispose();
-       	teWrapper.explorer.isVisible();
+		// it won't cover since no focus the view until after a bunch of test suites
+        new InitScripts(teWrapper.explorer as TaskTree);
+		teWrapper.explorer?.isVisible();
         await pathUtils.getInstallPath();
         endRollingCount(this);
     });
