@@ -11,15 +11,17 @@ import { TextDecoder } from "util";
 import { TeWrapper } from "../lib/wrapper";
 import { getNonce } from "../lib/env/node/crypto";
 import { Commands, executeCommand } from "../lib/command";
-import { Disposable, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
+import { Disposable, EventEmitter, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
 } from "./common/ipc";
 
 
-export abstract class TeWebviewBase<State>
+export abstract class TeWebviewBase<State> implements Disposable
 {
+	protected readonly disposables: Disposable[] = [];
+
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
     protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
 
@@ -46,12 +48,25 @@ export abstract class TeWebviewBase<State>
     private maxSmallIntegerV8 = 2 ** 30;
     private ipcSequence = 0;
 
+	private _onContentLoaded: EventEmitter<string> = new EventEmitter<string>();
+	get onContentLoaded() {
+		return this._onContentLoaded.event;
+	}
+
 
     constructor(protected readonly wrapper: TeWrapper, title: string, protected readonly fileName: string)
     {
 		this._title = title;
 		this._originalTitle = title;
+		this._onContentLoaded = new EventEmitter<string>();
+		this.disposables.push(this._onContentLoaded);
     }
+
+
+	dispose()
+	{
+		this.disposables.forEach(d => void d.dispose());
+	}
 
 
 	get isFirstLoadComplete() {
@@ -244,6 +259,7 @@ export abstract class TeWebviewBase<State>
 			return;
 		}
 		this._view.webview.html = html;
+		setTimeout(() => this._onContentLoaded.fire(html), 1);
 	}
 
 }

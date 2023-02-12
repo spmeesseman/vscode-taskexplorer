@@ -16,12 +16,11 @@ export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes";
 
 export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> implements Disposable
 {
-	protected readonly disposables: Disposable[] = [];
 	private _disposablePanel: Disposable | undefined;
 	protected override _view: WebviewPanel | undefined;
 
 
-	constructor(container: TeWrapper,
+	constructor(wrapper: TeWrapper,
 				fileName: string,
 				title: string,
 				private readonly iconPath: string,
@@ -30,7 +29,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				private readonly trackingFeature: TrackedUsageFeatures,
 				showCommand: Commands)
 	{
-		super(container, title, fileName);
+		super(wrapper, title, fileName);
 		this.disposables.push(
 			registerCommand(showCommand, this.onShowCommand, this),
 			window.registerWebviewPanelSerializer(id, this._serializer)
@@ -38,10 +37,10 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	dispose()
+	override dispose()
 	{
-		this.disposables.forEach(d => void d.dispose());
 		this._disposablePanel?.dispose();
+		super.dispose();
 	}
 
 

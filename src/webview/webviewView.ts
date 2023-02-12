@@ -18,7 +18,6 @@ export type WebviewViewIds = "home" | "taskCount" | "taskUsage";
 
 export abstract class TeWebviewView<State, SerializedState = State> extends TeWebviewBase<State> implements WebviewViewProvider, Disposable
 {
-	protected readonly disposables: Disposable[] = [];
 	private _disposableView: Disposable | undefined;
 	protected override _view: WebviewView | undefined;
 
@@ -38,10 +37,10 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	}
 
 
-	dispose()
+	override dispose()
 	{
-		this.disposables.forEach(d => void d.dispose());
 		this._disposableView?.dispose();
+		super.dispose();
 	}
 
 
