@@ -51,8 +51,8 @@ suite("Multi-Root Workspace Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teWrapper } = await activate(this));
 
-        sortAlpha = teWrapper.configuration.get<boolean>("sortProjectFoldersAlpha");
-        await teWrapper.configuration.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
+        sortAlpha = teWrapper.config.get<boolean>("sortProjectFoldersAlpha");
+        await teWrapper.config.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
                                                                 // so make sure they're off for the verifyTaskCount() calls
         testsPath = getProjectsPath(".");
         wsf1DirName = join(testsPath, "wsf1");
@@ -101,7 +101,7 @@ suite("Multi-Root Workspace Tests", () =>
         if (!teWrapper.explorer.isVisible()) {
             await focusExplorerView();
         }
-        await teWrapper.configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+        await teWrapper.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         }

@@ -31,8 +31,9 @@ suite("Context Tests", () =>
     test("Get Context", async function()
     {
         if (exitRollingCount(this)) return;
-        getContext(ContextKeys.Enabled);
-        getContext(ContextKeys.Enabled,  true);
+        getContext<boolean>(ContextKeys.Enabled);
+        getContext<boolean>(ContextKeys.Enabled,  true);
+        getContext<string>(ContextKeys.TestsTest, "testing");
         endRollingCount(this);
     });
 

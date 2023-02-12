@@ -77,7 +77,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
-        await teWrapper.configuration.updateWs("enabledTasks.gulp", false);
+        await teWrapper.config.updateWs("enabledTasks.gulp", false);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         endRollingCount(this);
@@ -88,7 +88,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
-        await teWrapper.configuration.updateWs("enabledTasks.gulp", true);
+        await teWrapper.config.updateWs("enabledTasks.gulp", true);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

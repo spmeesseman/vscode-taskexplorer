@@ -76,6 +76,7 @@ export class TeWrapper
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 	private _onReady: EventEmitter<void> = new EventEmitter<void>();
 	private _onInitialized: EventEmitter<void> = new EventEmitter<void>();
+	// private _onWorkCompleted: EventEmitter<void> = new EventEmitter<void>();
 
 
 	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
@@ -162,7 +163,7 @@ export class TeWrapper
 	}
 
 
-	initialize = async() =>
+	init = async() =>
 	{
 		if (this._initialized) {
 			throw new Error("TeWrapper is already initialized/ready");
@@ -199,8 +200,8 @@ export class TeWrapper
 		this.registerContextMenuCommands();
 		await setContext(ContextKeys.Debugging, this.debugging);
 		await setContext(ContextKeys.Tests, this.tests);
-        await setContext(ContextKeys.Enabled, this.configuration.get<boolean>("enableSideBar") ||
-                                              this.configuration.get<boolean>("enableExplorerView"));
+        await setContext(ContextKeys.Enabled, this.config.get<boolean>("enableSideBar") ||
+                                              this.config.get<boolean>("enableExplorerView"));
 		//
 		// Signal we are ready/done
 		//
@@ -245,11 +246,11 @@ export class TeWrapper
 		}     //
 		else // See comments/notes above
 		{   //
-			const enablePersistentFileCaching = this.configuration.get<boolean>("enablePersistentFileCaching");
+			const enablePersistentFileCaching = this.config.get<boolean>("enablePersistentFileCaching");
 			enableConfigWatcher(false);
-			await this.configuration.update("enablePersistentFileCaching", true);
+			await this.config.update("enablePersistentFileCaching", true);
 			await this.filecache.rebuildCache("   ");
-			await this.configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+			await this.config.update("enablePersistentFileCaching", enablePersistentFileCaching);
 			enableConfigWatcher(true);
 		}
 
@@ -325,7 +326,7 @@ export class TeWrapper
 		return this._teApi;
 	}
 
-	get configuration(): IConfiguration {
+	get config(): IConfiguration {
 		return this._configuration;
 	}
 

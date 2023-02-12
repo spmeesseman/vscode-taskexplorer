@@ -50,7 +50,7 @@ suite("Provider Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks", {
@@ -250,8 +250,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -275,8 +275,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -300,8 +300,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
@@ -326,8 +326,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.config.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.config.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);

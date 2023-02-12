@@ -94,20 +94,25 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 
 // export const registerCommands = (container: TeWrapper): Disposable[] =>  registrableCommands.map(c => new c(container));
 
-export const asCommand = <T extends unknown[]>(command: Omit<VsCodeCommand, "arguments"> & { arguments: [...T] }): VsCodeCommand => command;
+// export const asCommand = <T extends unknown[]>(command: Omit<VsCodeCommand, "arguments"> & { arguments: [...T] }): VsCodeCommand => command;
 
 export function executeCommand<U = any>(command: SupportedCommands): Thenable<U>;
 export function executeCommand<T = unknown, U = any>(command: SupportedCommands, arg: T): Thenable<U>;
 export function executeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>;
 export function executeCommand<T extends [...unknown[]] = [], U = any>(command: SupportedCommands, ...args: T): Thenable<U>
-{   // this.wrapper.telemetry.sendEvent("command/taskexplorer", { command: command });
+{   //
+	// TODO - Telemetry
+	//
+	// this.wrapper.telemetry.sendEvent("command/taskexplorer", { command: command });
 	return commands.executeCommand<U>(command, ...args);
 }
 
 // export function executeVsCodeCommand<T = unknown, U = any>(command: VsCodeCommands, arg: T): Thenable<U>;
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>;
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
-// {
+// {   //
+//     // TODO - Telemetry
+//     //
 //	   if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
 // 		   this.wrapper.telemetry.sendEvent("command/vscode", { command: command });
 // 	   }

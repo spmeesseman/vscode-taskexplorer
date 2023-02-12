@@ -38,8 +38,8 @@ suite("Powershell Tests", () =>
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(getWsPath("."), "test2.ps1"));
         fileUri2 = Uri.file(path.join(dirName, "test2.ps1"));
-        pathToTaskProgram = teWrapper.configuration.get<string>("pathToPrograms." + testsName);
-        enableTaskType = teWrapper.configuration.get<boolean>("enabledTasks." + testsName);
+        pathToTaskProgram = teWrapper.config.get<string>("pathToPrograms." + testsName);
+        enableTaskType = teWrapper.config.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.globEvent);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         endRollingCount(this, true);

@@ -49,7 +49,7 @@ export class TaskManager implements Disposable
 
     open = async(selection: TaskItem, itemClick = false) =>
     {
-        const clickAction = this.wrapper.configuration.get<string>("taskButtons.clickAction", "Open");
+        const clickAction = this.wrapper.config.get<string>("taskButtons.clickAction", "Open");
 
         //
         // As of v1.30.0, added option to change the entry item click to execute.  In order to avoid having
@@ -470,13 +470,13 @@ export class TaskManager implements Disposable
         const exec = taskItem.isExecuting();
         if (exec)
         {
-            if (this.wrapper.configuration.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
+            if (this.wrapper.config.get<boolean>("keepTermOnStop") === true && !taskItem.taskDetached)
             {
                 const terminal = getTerminal(taskItem, "   ");
                 /* istanbul ignore else */
                 if (terminal)
                 {
-                    const ctrlChar = this.wrapper.configuration.get<string>("taskButtons.controlCharacter", "Y");
+                    const ctrlChar = this.wrapper.config.get<string>("taskButtons.controlCharacter", "Y");
                     this.log.write("   keep terminal open", 1);
                     if (taskItem.paused)
                     {

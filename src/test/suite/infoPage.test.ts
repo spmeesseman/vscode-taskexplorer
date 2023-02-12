@@ -32,8 +32,8 @@ suite("Info Report Tests", () =>
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teWrapper.explorer;
 		origSidebar = teWrapper.sidebar;
-		pkgMgr = teWrapper.configuration.getVs<string>("npm.packageManager");
-		userTasks = teWrapper.configuration.get<boolean>("specialFolders.showUserTasks");
+		pkgMgr = teWrapper.config.getVs<string>("npm.packageManager");
+		userTasks = teWrapper.config.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);
 	});
 
@@ -44,7 +44,7 @@ suite("Info Report Tests", () =>
 		teWrapper.explorer = origExplorer;
 		teWrapper.sidebar = origSidebar;
 		await closeEditors();
-		await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
+		await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
 		await executeSettingsUpdate("specialFolders.showUserTasks", userTasks);
         suiteFinished(this);
@@ -99,12 +99,12 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", "yarn");
+        await teWrapper.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-        await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
+        await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeEditors();
         endRollingCount(this);

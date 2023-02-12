@@ -26,7 +26,7 @@ suite("Workspace / VSCode Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        wsEnable = teWrapper.configuration.get<boolean>("showHiddenWsTasks");
+        wsEnable = teWrapper.config.get<boolean>("showHiddenWsTasks");
         endRollingCount(this, true);
     });
 
@@ -34,7 +34,7 @@ suite("Workspace / VSCode Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teWrapper.configuration.updateWs("showHiddenWsTasks", wsEnable);
+        await teWrapper.config.updateWs("showHiddenWsTasks", wsEnable);
         suiteFinished(this);
     });
 

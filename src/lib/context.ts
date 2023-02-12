@@ -26,7 +26,8 @@ export const enum ContextKeys
 	ParsingReport = "taskExplorer:parsingReport",
 	ReleaseNotes = "taskExplorer:releaseNotes",
 	TaskFiles = "taskExplorer:taskFiles",
-	Tests = "taskExplorer:tests"
+	Tests = "taskExplorer:tests",
+	TestsTest = "taskExplorer:testsTest"
 }
 
 

@@ -34,7 +34,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this, true)) return;
         ({ teWrapper } = await utils.activate(this));
-        clickAction = teWrapper.configuration.get<string>("taskButtons.clickAction");
+        clickAction = teWrapper.config.get<string>("taskButtons.clickAction");
         await executeSettingsUpdate("specialFolders.showLastTasks", true);
         utils.endRollingCount(this, true);
     });
@@ -382,7 +382,7 @@ suite("Task Tests", () =>
         const tree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as SpecialTaskFolder;
-        const maxLastTasks = teWrapper.configuration.get<number>("specialFolders.numLastTasks");
+        const maxLastTasks = teWrapper.config.get<number>("specialFolders.numLastTasks");
         teWrapper.configwatcher = false;
         await executeSettingsUpdate("specialFolders.numLastTasks", 6);
         try {

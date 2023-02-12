@@ -17,7 +17,6 @@ let teWrapper: TeWrapper;
 export async function activate(context: ExtensionContext)
 {
     const isTests = context.extensionMode === ExtensionMode.Test;
-
     //
     // TODO - Handle untrusted workspace
     //
@@ -30,24 +29,20 @@ export async function activate(context: ExtensionContext)
 	// 		}),
 	// 	);
 	// }
-
     //
     // Initialize configuration
     //
     registerConfiguration(context);
-
     //
     // Initialize logging
     //    0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
     //
     await log.registerLog(context, isTests ? 2 : /* istanbul ignore next */ 0);
-    log.methodStart("activation", 1, "", true);
-
+    log.methodStart("extension activation", 1, "", true);
     //
     // Initialize persistent storage
     //
     await initStorage(context);
-
     //
     // !!! Temporary after settings layout redo / rename !!!
     // !!! Remove sometime down the road (from 12/22/22) !!!
@@ -62,13 +57,14 @@ export async function activate(context: ExtensionContext)
     teWrapper = TeWrapper.create(context, storage, configuration, log);
 	oneTimeEvent(teWrapper.onInitialized)(() => { /* TODO - Show `welcome` / `version changed` page */ });
     //
-    // Wait for ready signal from application container
+    // Wait for `onInitialized` event from application container
     //
-	await teWrapper.initialize();
-
-    log.write("   activation completed successfully, initialization pending", 1);
-    log.methodDone("activation", 1);
-
+	await teWrapper.init();
+    //
+    // Activation complete. For tests return the app wrapper, otherwise return the api
+    //
+    log.write("   activation completed successfully, work pending", 1);
+    log.methodDone("extension activation", 1);
     return isTests ? teWrapper : /* istanbul ignore next */teWrapper.api;
 }
 
@@ -90,16 +86,16 @@ export async function deactivate()
     // reload is much quicker, especially in large workspaces.
     //
     /* istanbul ignore next */
-    if (!teWrapper.filecache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching"))
+    if (!teWrapper.filecache.isBusy() && !teWrapper.config.get<boolean>("enablePersistentFileCaching"))
     {
         const now = Date.now(),
-              lastWsRootPathChange = storage.get2Sync<number>("lastWsRootPathChange", 0);
+              lastWsRootPathChange = teWrapper.storage.get2Sync<number>("lastWsRootPathChange", 0);
         if (now < lastWsRootPathChange + 3000)
         {
             teWrapper.filecache.persistCache(false, true);
         }
     }
-    storage.update2Sync("lastDeactivated", Date.now());
+    teWrapper.storage.update2Sync("lastDeactivated", Date.now());
     //
     // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
     // everything here, it doesn't seem to cause any issue with Code exiting.

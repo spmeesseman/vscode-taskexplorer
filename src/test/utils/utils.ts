@@ -388,7 +388,7 @@ const isReady = (taskType?: string) =>
 
 export const logErrorsAreFine = (willFail = true) =>
 {
-    if (willFail && tc.log.enabled && teWrapper.configuration.get<boolean>("logging.enabled"))
+    if (willFail && tc.log.enabled && teWrapper.config.get<boolean>("logging.enabled"))
     {
         console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
                     `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +

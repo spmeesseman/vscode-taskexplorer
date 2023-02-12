@@ -39,7 +39,7 @@ suite("File Watcher Tests", () =>
         insideWsDir2 = join(rootPath, "tasks_test2_");
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
         outsideWsDir = utils.getProjectsPath("testA");
-        excludes = teWrapper.configuration.get<string[]>("exclude");
+        excludes = teWrapper.config.get<string[]>("exclude");
         files = {
             grunt1_0: join(insideWsDir, "Gruntfile.js"),
             grunt1_1: join(insideWsDir, "Gruntfile1.js"),

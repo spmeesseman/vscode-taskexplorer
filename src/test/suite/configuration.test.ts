@@ -26,14 +26,14 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teWrapper } = await activate(this));
-        enabledTasks = teWrapper.configuration.get<IDictionary<boolean>>("enabledTasks");
-        pathToPrograms = teWrapper.configuration.get<IDictionary<string>>("pathToPrograms");
-        shellW32 = teWrapper.configuration.getVs<string>("terminal.integrated.shell.windows");
-        shellLnx = teWrapper.configuration.getVs<string>("terminal.integrated.shell.linux");
-        shellOsx = teWrapper.configuration.getVs<string>("terminal.integrated.shell.osx");
-        globPatternsAnt = teWrapper.configuration.get<string[]>("globPatternsAnt");
-        globPatternsBash = teWrapper.configuration.get<string[]>("globPatternsBash");
-        pkgMgr = teWrapper.configuration.getVs<string>("npm.packageManager");
+        enabledTasks = teWrapper.config.get<IDictionary<boolean>>("enabledTasks");
+        pathToPrograms = teWrapper.config.get<IDictionary<string>>("pathToPrograms");
+        shellW32 = teWrapper.config.getVs<string>("terminal.integrated.shell.windows");
+        shellLnx = teWrapper.config.getVs<string>("terminal.integrated.shell.linux");
+        shellOsx = teWrapper.config.getVs<string>("terminal.integrated.shell.osx");
+        globPatternsAnt = teWrapper.config.get<string[]>("globPatternsAnt");
+        globPatternsBash = teWrapper.config.get<string[]>("globPatternsBash");
+        pkgMgr = teWrapper.config.getVs<string>("npm.packageManager");
         endRollingCount(this, true);
     });
 
@@ -51,13 +51,13 @@ suite("Configuration / Settings Tests", () =>
             }
             if (successCount >= 5 && successCount <  11)
             {
-                await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
+                await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
             }
             if(successCount >= 13)
             {
-                await teWrapper.configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
-                await teWrapper.configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
-                await teWrapper.configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+                await teWrapper.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
+                await teWrapper.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
+                await teWrapper.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
                 if(successCount >= 16) {
                     await executeSettingsUpdate("enabledTasks", enabledTasks);
                     await executeSettingsUpdate("pathToPrograms", pathToPrograms);
@@ -82,53 +82,53 @@ suite("Configuration / Settings Tests", () =>
         //
         // 3-part i.e. taskExplorer.pathToPrograms.ant
         //
-        let v = teWrapper.configuration.get<any>("pathToPrograms.ant");
+        let v = teWrapper.config.get<any>("pathToPrograms.ant");
         expect(teWrapper.utils.isString(v)).to.equal(true);
-        v = teWrapper.configuration.get<any>("pathToPrograms");
+        v = teWrapper.config.get<any>("pathToPrograms");
         expect(teWrapper.utils.isObject(v)).to.equal(true);
         let cv = v.ant;
-        await teWrapper.configuration.updateWs("pathToPrograms.ant", "/my/path/to/ant");
-        v = teWrapper.configuration.get<any>("pathToPrograms");
+        await teWrapper.config.updateWs("pathToPrograms.ant", "/my/path/to/ant");
+        v = teWrapper.config.get<any>("pathToPrograms");
         expect(teWrapper.utils.isObject(v) && v.ant === "/my/path/to/ant").to.equal(true);
-        await teWrapper.configuration.updateWs("pathToPrograms.ant", cv);
-        v = teWrapper.configuration.get<any>("pathToPrograms");
+        await teWrapper.config.updateWs("pathToPrograms.ant", cv);
+        v = teWrapper.config.get<any>("pathToPrograms");
         expect(teWrapper.utils.isObject(v) && v.ant === cv).to.equal(true);
-        cv = teWrapper.configuration.get<any>("visual.disableAnimatedIcons");
+        cv = teWrapper.config.get<any>("visual.disableAnimatedIcons");
         expect(teWrapper.utils.isBoolean(cv)).to.equal(true);
-        await teWrapper.configuration.updateWs("visual.disableAnimatedIcons", false);
-        v = teWrapper.configuration.get<any>("visual.disableAnimatedIcons");
+        await teWrapper.config.updateWs("visual.disableAnimatedIcons", false);
+        v = teWrapper.config.get<any>("visual.disableAnimatedIcons");
         expect(teWrapper.utils.isBoolean(v) && v === false).to.equal(true);
-        await teWrapper.configuration.updateWs("visual.disableAnimatedIcons", cv);
-        v = teWrapper.configuration.get<any>("visual.disableAnimatedIcons");
+        await teWrapper.config.updateWs("visual.disableAnimatedIcons", cv);
+        v = teWrapper.config.get<any>("visual.disableAnimatedIcons");
         expect(teWrapper.utils.isBoolean(v) && v === cv).to.equal(true);
         //
         // 4-part i.e. taskExplorer.specialFolders.folderState.lastTasks
         //
-        const cv2 = cv = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        const cv2 = cv = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(cv) && teWrapper.utils.isString(cv2)).to.equal(true);
-        await teWrapper.configuration.updateWs("specialFolders.folderState.lastTasks", "Collapsed");
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState.lastTasks", "Collapsed");
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === "Collapsed").to.equal(true);
-        await teWrapper.configuration.updateWs("specialFolders.folderState.lastTasks", "Expanded");
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState.lastTasks", "Expanded");
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === "Expanded").to.equal(true);
-        await teWrapper.configuration.updateWs("specialFolders.folderState.lastTasks", cv);
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState.lastTasks", cv);
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === cv).to.equal(true);
-        cv = teWrapper.configuration.get<any>("specialFolders.folderState");
+        cv = teWrapper.config.get<any>("specialFolders.folderState");
         expect(teWrapper.utils.isObject(cv)).to.equal(true);
         cv.lastTasks = "Collapsed";
-        await teWrapper.configuration.updateWs("specialFolders.folderState", cv);
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState", cv);
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === "Collapsed").to.equal(true);
         expect(teWrapper.utils.isObject(cv)).to.equal(true);
         cv.lastTasks = "Expanded";
-        await teWrapper.configuration.updateWs("specialFolders.folderState", cv);
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState", cv);
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === "Expanded").to.equal(true);
         cv.lastTasks = cv2;
-        await teWrapper.configuration.updateWs("specialFolders.folderState.lastTasks", cv2);
-        v = teWrapper.configuration.get<any>("specialFolders.folderState.lastTasks");
+        await teWrapper.config.updateWs("specialFolders.folderState.lastTasks", cv2);
+        v = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(v) && v === cv2).to.equal(true);
         //
         // Re-enable config watcher
@@ -143,7 +143,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.config.readEvent +
                   tc.waitTime.config.globEvent + tc.slowTime.config.readEvent);
-        globPatterns = teWrapper.configuration.get<string[]>("globPatternsAnt");
+        globPatterns = teWrapper.config.get<string[]>("globPatternsAnt");
         await executeSettingsUpdate("enabledTasks.ant", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/dummy.xml");
         await executeSettingsUpdate("globPatternsAnt", globPatterns, tc.waitTime.config.globEvent);
@@ -166,7 +166,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.config.globEvent + tc.slowTime.config.readEvent);
-        globPatterns = teWrapper.configuration.get<string[]>("globPatternsBash");
+        globPatterns = teWrapper.config.get<string[]>("globPatternsBash");
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
         globPatterns.push("**/extensionless/**");
         await executeSettingsUpdate("globPatternsBash", globPatterns);
@@ -189,7 +189,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event + tc.slowTime.config.readEvent);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", "yarn");
+        await teWrapper.config.updateVsWs("npm.packageManager", "yarn");
         expect(teWrapper.utils.getPackageManager() === "yarn");
         endRollingCount(this);
     });
@@ -199,7 +199,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", "npm");
+        await teWrapper.config.updateVsWs("npm.packageManager", "npm");
         expect(teWrapper.utils.getPackageManager()).to.equal("npm");
         endRollingCount(this);
     });
@@ -209,7 +209,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", "");
+        await teWrapper.config.updateVsWs("npm.packageManager", "");
         expect(teWrapper.utils.getPackageManager()).to.equal("npm");
         endRollingCount(this);
     });
@@ -219,7 +219,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", "auto");
+        await teWrapper.config.updateVsWs("npm.packageManager", "auto");
         expect(teWrapper.utils.getPackageManager()).to.equal("npm");
         endRollingCount(this);
     });
@@ -229,8 +229,8 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event);
-        await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
-        // await teWrapper.configuration.updateVs("npm.packageManager", pkgMgr); // cover global
+        await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
+        // await teWrapper.config.updateVs("npm.packageManager", pkgMgr); // cover global
         expect(teWrapper.utils.getPackageManager()).to.equal(pkgMgr === "auto" ? "npm" : pkgMgr);
         endRollingCount(this);
     });
@@ -240,7 +240,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.osx", "/usr/bin/sh");
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -250,7 +250,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.linux", "/bin/sh");
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -260,7 +260,7 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.windows", "C:\\Windows\\System32\\cmd.exe");
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -282,7 +282,7 @@ suite("Configuration / Settings Tests", () =>
             ruby: false
         });
         teWrapper.configwatcher = true;
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.osx", shellOsx);
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -295,7 +295,7 @@ suite("Configuration / Settings Tests", () =>
         teWrapper.configwatcher = false;
         await executeSettingsUpdate("enabledTasks.nsis", true);
         teWrapper.configwatcher = true;
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.linux", shellLnx);
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -309,7 +309,7 @@ suite("Configuration / Settings Tests", () =>
         teWrapper.configwatcher = false;
         await executeSettingsUpdate("enabledTasks", enabledTasks); // reset back to default enabled tasks
         teWrapper.configwatcher = true;
-        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.windows", shellW32);
+        await teWrapper.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
     });
@@ -347,16 +347,16 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event * 2 + 50);
         teWrapper.configwatcher = false;
-        const logLevel = teWrapper.configuration.get<number>("logging.level");
-        const pathToPrograms = teWrapper.configuration.get<object>("pathToPrograms");
-        const pathToAnt = teWrapper.configuration.get<object>("pathToPrograms.ant");
-        await teWrapper.configuration.update("logging.level", logLevel);
-        await teWrapper.configuration.update("pathToPrograms.ant", pathToAnt);
-        await teWrapper.configuration.update("pathToPrograms", pathToPrograms);
+        const logLevel = teWrapper.config.get<number>("logging.level");
+        const pathToPrograms = teWrapper.config.get<object>("pathToPrograms");
+        const pathToAnt = teWrapper.config.get<object>("pathToPrograms.ant");
+        await teWrapper.config.update("logging.level", logLevel);
+        await teWrapper.config.update("pathToPrograms.ant", pathToAnt);
+        await teWrapper.config.update("pathToPrograms", pathToPrograms);
         teWrapper.configwatcher = true;
-        await teWrapper.configuration.update("logging.level", logLevel !== 3 ? 3 : 2);
+        await teWrapper.config.update("logging.level", logLevel !== 3 ? 3 : 2);
         waitForTeIdle(tc.waitTime.config.event);
-        await teWrapper.configuration.update("logging.level", logLevel);
+        await teWrapper.config.update("logging.level", logLevel);
         waitForTeIdle(tc.waitTime.config.event);
         endRollingCount(this);
     });
