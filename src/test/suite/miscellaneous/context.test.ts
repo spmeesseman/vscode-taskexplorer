@@ -4,8 +4,9 @@
 /* tslint:disable */
 
 import { TeWrapper } from "../../../lib/wrapper";
-import { ContextKeys, getContext } from "../../../lib/context";
+import { ContextKeys, getContext, setContext } from "../../../lib/context";
 import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
+import { expect } from "chai";
 
 let teWrapper: TeWrapper;
 
@@ -31,9 +32,10 @@ suite("Context Tests", () =>
     test("Get Context", async function()
     {
         if (exitRollingCount(this)) return;
-        getContext<boolean>(ContextKeys.Enabled);
-        getContext<boolean>(ContextKeys.Enabled,  true);
-        getContext<string>(ContextKeys.TestsTest, "testing");
+        expect(getContext<boolean>(ContextKeys.Enabled)).to.be.a("boolean").that.is.equal(true);
+        expect(getContext<boolean>(ContextKeys.Enabled,  true)).to.be.a("boolean").that.is.equal(true);
+        expect(getContext<string>(ContextKeys.TestsTest)).to.be.a("string").that.is.equal("testing");
+        expect(getContext<string>(ContextKeys.TestsTest, "testing")).to.be.a("string").that.is.equal("testing");
         endRollingCount(this);
     });
 
@@ -41,6 +43,8 @@ suite("Context Tests", () =>
     test("Set Context", async function()
     {
         if (exitRollingCount(this)) return;
+        setContext(ContextKeys.TestsTest, "testing");
+        setContext(ContextKeys.TestsTest, undefined);
         endRollingCount(this);
     });
 

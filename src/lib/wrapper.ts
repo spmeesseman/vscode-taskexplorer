@@ -4,6 +4,7 @@ import * as fs from "./utils/fs";
 import * as fileCache from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
+import { TaskManager } from "src/tree/task";
 import { IStorage } from "../interface/IStorage";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
@@ -28,7 +29,6 @@ import { LicensePage } from "../webview/page/licensePage";
 import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
-import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
@@ -44,6 +44,7 @@ import { ParsingReportPage } from "../webview/page/parsingReportPage";
 import { registerAddToExcludesCommand } from "../commands/addToExcludes";
 import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
+import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder, env } from "vscode";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
@@ -140,21 +141,21 @@ export class TeWrapper
 		// );
 
 		context.subscriptions.push(
-			this._homeView ,
-			this._licenseManager,
+			this._usage,
+			this._homeView,
+			this._treeManager,
 			this._licensePage,
-			this._parsingReportPage,
-			this._releaseNotesPage,
 			this._taskCountView,
 			this._taskUsageView,
-			this._treeManager,
-			this._usage
+			this._licenseManager,
+			this._releaseNotesPage,
+			this._parsingReportPage
 		);
 	}
 
 
 	get onInitialized() {
-		return this._onReady.event;
+		return this._onInitialized.event;
 	}
 
 
@@ -168,7 +169,9 @@ export class TeWrapper
 		if (this._initialized) {
 			throw new Error("TeWrapper is already initialized/ready");
 		}
-		this.log.methodStart("task explorer app wrapper ready", 1);
+		this.log.methodStart("app wrapper init", 1, "", false, [
+			[ "version", this._version ], [ "previous version", this._previousVersion  ],
+		]);
 		//
 		// Register global status bar item
 		//
@@ -212,7 +215,7 @@ export class TeWrapper
 		// we do it now and not wait until the view is first visible/focused/activated.
 		//
 		queueMicrotask(() => this.run());
-		this.log.methodDone("task explorer app wrapper ready", 1);
+		this.log.methodDone("app wrapper init", 1);
 	};
 
 
@@ -221,7 +224,7 @@ export class TeWrapper
 		const now = Date.now(),
 			  lastDeactivated = await this.storage.get2<number>("lastDeactivated", 0),
 			  lastWsRootPathChange = await this.storage.get2<number>("lastWsRootPathChange", 0);
-		this.log.methodStart("task explorer app wrapper run", 1, "", true);
+		this.log.methodStart("app wrapper run", 1, "", true);
 		//
 		// Authentication
 		//
@@ -230,6 +233,12 @@ export class TeWrapper
 		// if (session) {
 		//     window.showInformationMessage(`Welcome back ${session.account.name}`);
 		// }
+		//
+		// Maybe how 'what's new'or 'welcome' page
+		//
+		if (this._version !== this._previousVersion) { /* TODO */ }
+		await this.storage.update("taskExplorer.version", this.version);
+		// utilities.oneTimeEvent(this.onReady)(() => { /* TODO */ });
 		//
 		// Build the file cache, this kicks off the whole process as refresh cmd will be issued
 		// down the line in the initialization process.
@@ -263,7 +272,7 @@ export class TeWrapper
 		//
 		// Log the environment
 		//
-		this.log.methodDone("task explorer app wrapper run", 1, "", [
+		this.log.methodDone("app wrapper run", 1, "", [
 			[ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
 			[ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
 		]);
@@ -322,7 +331,8 @@ export class TeWrapper
         this.registerTaskProvider("ruby", new RubyTaskProvider(this));
     };
 
-	get api() {
+
+	get api(): TeApi {
 		return this._teApi;
 	}
 
@@ -330,11 +340,11 @@ export class TeWrapper
 		return this._configuration;
 	}
 
-	get context() {
+	get context(): ExtensionContext {
 		return this._context;
 	}
 
-	get debugging() {
+	get debugging(): boolean {
 		return this._context.extensionMode === ExtensionMode.Development;
 	}
 
@@ -342,14 +352,13 @@ export class TeWrapper
 		enableConfigWatcher(e);
 	}
 
-	get env(): "dev" | "tests" | "production"
-    {
+	get env(): "dev" | "tests" | "production" {
 		const isDev = this._context.extensionMode === ExtensionMode.Development,
 			  isTests = this._context.extensionMode === ExtensionMode.Test;
 		return !isDev && !isTests ? /* istanbul ignore next */"production" : (isDev ? "dev" : "tests");
 	}
 
-    get explorer() {
+    get explorer(): TaskTree | undefined {
         return this.treeManager.views.taskExplorer?.tree;
     }
 
@@ -361,40 +370,40 @@ export class TeWrapper
         return this.treeManager.views.taskExplorer?.view;
     }
 
-	get filecache() {
+	get filecache(): typeof fileCache {
 		return fileCache;
 	}
 
-	get fs() {
+	get fs(): typeof fs {
 		return fs;
 	}
 
-	get id() {
+	get id(): string {
 		return this._context.extension.id;
 	}
 
-	get busy() {
+	get busy(): boolean {
 		return this._busy || !this._ready || !this._initialized || fileCache.isBusy() || this._treeManager.isBusy() ||
 			   isProcessingFsEvent() ||  isProcessingConfigChange() || this._licenseManager.isBusy();
 	}
 
-	get log() {
+	get log(): ILog {
 		return this._log;
 	}
 
-	get providers() {
+	get providers(): IDictionary<ITaskExplorerProvider> {
 		return this._providers;
 	}
 
-	get licenseManager() {
+	get licenseManager(): LicenseManager {
 		return this._licenseManager;
 	}
 
-    get sidebar() {
+    get sidebar(): TaskTree | undefined {
         return this.treeManager.views.taskExplorerSideBar?.tree;
     }
 
-    set sidebar(tree: TaskTree) {
+    set sidebar(tree: TaskTree | undefined) {
 		Object.assign(this._treeManager.views, { taskExplorerSideBar: { tree }});
     }
 
@@ -402,11 +411,11 @@ export class TeWrapper
         return this.treeManager.views.taskExplorerSideBar?.view;
     }
 
-	get treeManager() {
+	get treeManager(): TaskTreeManager {
 		return this._treeManager;
 	}
 
-	get taskManager() {
+	get taskManager(): TaskManager {
 		return this._treeManager.taskManager;
 	}
 
@@ -422,31 +431,35 @@ export class TeWrapper
 		return this._version;
 	}
 
-	get homeView() {
+	get versionchanged(): boolean {
+		return this._version !== this._previousVersion;
+	}
+
+	get homeView(): HomeView {
 		return this._homeView;
 	}
 
-	get taskCountView() {
+	get taskCountView(): TaskCountView {
 		return this._taskCountView;
 	}
 
-	get taskUsageView() {
-		return this._taskCountView;
+	get taskUsageView(): TaskUsageView {
+		return this._taskUsageView;
 	}
 
-	get licensePage() {
+	get licensePage(): LicensePage {
 		return this._licensePage;
 	}
 
-	get parsingReportPage() {
+	get parsingReportPage(): ParsingReportPage {
 		return this._parsingReportPage;
 	}
 
-	get releaseNotesPage() {
+	get releaseNotesPage(): ReleaseNotesPage {
 		return this._releaseNotesPage;
 	}
 
-	get tests() {
+	get tests(): boolean {
 		return this._tests || this._context.extensionMode === ExtensionMode.Test;
 	}
 
@@ -454,11 +467,11 @@ export class TeWrapper
 		this._tests = v;
 	}
 
-	get utils() {
+	get utils(): typeof utilities {
 		return utilities;
 	}
 
-	get wsfolder() {
+	get wsfolder(): WorkspaceFolder {
 		return (workspace.workspaceFolders as WorkspaceFolder[])[0];
 	}
 
