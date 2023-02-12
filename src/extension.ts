@@ -55,7 +55,6 @@ export async function activate(context: ExtensionContext)
     // Instantiate application container (beautiful concept from GitLens project)
     //
     teWrapper = TeWrapper.create(context, storage, configuration, log);
-	oneTimeEvent(teWrapper.onInitialized)(() => { /* TODO - Show `welcome` / `version changed` page */ });
     //
     // Wait for `onInitialized` event from application container
     //

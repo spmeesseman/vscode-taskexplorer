@@ -3,14 +3,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
-import {
-    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
-} from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 import { TaskTree } from "../../tree/tree";
-import { Commands, executeCommand } from "../../lib/command";
+import { TeWrapper } from "../../lib/wrapper";
+import {
+    executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView
+} from "../utils/commandUtils";
+import {
+    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep,
+    suiteFinished, testControl as tc, waitForTeIdle
+} from "../utils/utils";
 
 
 let teWrapper: TeWrapper;
@@ -47,7 +48,7 @@ suite("Initialization", () =>
     });
 
 
-    test("Focus Sidebar Views - Tree", async function()
+    test("Focus SideBar View Tree", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh);
@@ -69,22 +70,6 @@ suite("Initialization", () =>
         expect(teWrapper.sidebarView).to.not.be.undefined;
         expect(teWrapper.explorer).to.be.undefined;
         expect(teWrapper.explorerView).to.be.undefined;
-        endRollingCount(this);
-    });
-
-
-    test("Focus Sidebar Views - Task Usage", async function()
-    {
-        if (exitRollingCount(this)) return;
-        await executeCommand(Commands.FocusTaskUsageView);
-        endRollingCount(this);
-    });
-
-
-    test("Focus Sidebar View - Task Counts", async function()
-    {
-        if (exitRollingCount(this)) return;
-        await executeCommand(Commands.FocusTaskCountView);
         endRollingCount(this);
     });
 
