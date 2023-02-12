@@ -114,6 +114,7 @@
         "test-tree_grouping": "npm run tsc-build_test && node ./dist/test/runTest.js treeGrouping xDeactivate",
         "test-typescript": "npm run tsc-build_test && node ./dist/test/runTest.js typescript xDeactivate",
         "test-webpack": "npm run tsc-build_test && node ./dist/test/runTest.js webpack xDeactivate",
+        "test-webview": "npm run tsc-build_test && node ./dist/test/runTest.js webview xDeactivate",
         "test-workspace": "npm run tsc-build_test && node ./dist/test/runTest.js workspace xDeactivate",
         "test-util": "npm run tsc-build_test && node ./dist/test/runTest.js util xDeactivate",
         "test:dev": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run test",
