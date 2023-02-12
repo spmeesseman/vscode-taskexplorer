@@ -61,7 +61,8 @@ suite("Wrapper Tests", () =>
     {
         if (exitRollingCount(this)) return;
         try {
-            TeWrapper.create(teWrapper.context, teWrapper.storage, teWrapper.configuration, false, teWrapper.version, teWrapper.version);
+            TeWrapper.create(teWrapper.context, teWrapper.storage, teWrapper.configuration,
+                             teWrapper.log, false, teWrapper.version, teWrapper.version);
         }
         catch { /* will throw */ }
         try { await teWrapper.ready(); } catch { /* will throw */ }

@@ -368,7 +368,6 @@ suite("Util Tests", () =>
 
         log.blank();
         log.blank(1);
-		log.withColor("test", log.colors.cyan);
 		log.write(null as unknown as string);
 		log.write(undefined as unknown as string);
 		log.write("");
@@ -399,7 +398,6 @@ suite("Util Tests", () =>
 		await executeSettingsUpdate("logging.enable", false);
 		log.blank(1);
 		log.dequeue("");
-		log.withColor("test", log.colors.cyan);
 		log.write("test");
 		log.write("Test1", 1);
 		log.write("Test1", 1);
