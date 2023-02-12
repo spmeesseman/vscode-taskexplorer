@@ -3,15 +3,17 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
-import { ITaskTree, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
 import {
     activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
+import { TaskTree } from "../../tree/tree";
 
 
 let teApi: ITaskExplorerApi;
-let testsApi: ITestsApi;
+let teWrapper: TeWrapper;
 
 
 suite("Initialization", () =>
@@ -19,7 +21,7 @@ suite("Initialization", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, testsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -51,7 +53,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
+        teWrapper.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
         endRollingCount(this);
     });
 
@@ -62,12 +64,12 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
-        expect(teApi.sidebar).to.not.be.undefined;
-        expect(teApi.sidebarView).to.not.be.undefined;
-        expect(teApi.explorer).to.be.undefined;
-        expect(teApi.explorerView).to.be.undefined;
-        expect(teApi.testsApi.explorer).to.not.be.undefined;
+        teWrapper.treeManager.enableTaskTree("taskExplorer", false, "");
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.be.undefined;
+        expect(teWrapper.explorerView).to.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 
@@ -87,14 +89,14 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
-        setExplorer(teApi.explorer as ITaskTree);
+        setExplorer(teWrapper.explorer as TaskTree);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        await testsApi.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
-        expect(teApi.sidebar).to.not.be.undefined;
-        expect(teApi.sidebarView).to.not.be.undefined;
-        expect(teApi.explorer).to.be.not.undefined;
-        expect(teApi.explorerView).to.not.be.undefined;
-        expect(teApi.testsApi.explorer).to.not.be.undefined;
+        await teWrapper.treeManager.enableTaskTree("taskExplorer", true, ""); // cover edge if
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.be.not.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 
@@ -113,15 +115,15 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         // teApi.sidebar?.setEnabled(false, "");
-        testsApi.treeManager.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
+        teWrapper.treeManager.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        await testsApi.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
-        expect(teApi.sidebar).to.be.undefined;
-        expect(teApi.sidebarView).to.be.undefined;
-        expect(teApi.explorer).to.be.not.undefined;
-        expect(teApi.explorerView).to.not.be.undefined;
-        expect(teApi.testsApi.explorer).to.not.be.undefined;
+        await teWrapper.treeManager.enableTaskTree("taskExplorerSideBar", false, ""); // cover edge if
+        expect(teWrapper.sidebar).to.be.undefined;
+        expect(teWrapper.sidebarView).to.be.undefined;
+        expect(teWrapper.explorer).to.be.not.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
         endRollingCount(this);
     });
 

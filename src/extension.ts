@@ -256,8 +256,8 @@ const initialize = async(wrapper: TeWrapper) =>
 
 export function isExtensionBusy()
 {
-    return !ready || fileCache.isBusy() || teWrapper.treeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
-           isProcessingFsEvent() || isProcessingConfigChange() || teWrapper.licenseManager.isBusy();
+    return !ready || fileCache.isBusy() || teWrapper.treeManager.isBusy() || isProcessingFsEvent() ||
+           isProcessingConfigChange() || teWrapper.licenseManager.isBusy();
 }
 
 

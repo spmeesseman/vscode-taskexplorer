@@ -4,9 +4,10 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { MavenTaskProvider } from "../../providers/maven";
-import { IFilesystemApi } from "../../interface/IFilesystemApi";
+import { deleteFile, writeFile } from "../../lib/utils/fs";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
 import {
@@ -17,8 +18,8 @@ import {
 const testsName = "maven";
 const startTaskCount = 8;
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let pathToProgram: string;
 let rootPath: string;
 let fileUri: Uri;
@@ -33,13 +34,13 @@ suite("Maven Tests", () =>
         //
         // Initialize
         //
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi } = await activate(this));
         rootPath = getWsPath(".");
         fileUri = Uri.file(path.join(rootPath, "pom.xml"));
         //
         // Store / set initial settings
         //
-        pathToProgram = teApi.testsApi.config.get<string>(`pathToPrograms.${testsName}`);
+        pathToProgram = teWrapper.configuration.get<string>(`pathToPrograms.${testsName}`);
         await executeSettingsUpdate(`pathToPrograms.${testsName}`, "java\\maven\\mvn.exe");
         endRollingCount(this, true);
     });
@@ -63,7 +64,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -96,7 +97,7 @@ suite("Maven Tests", () =>
         if (exitRollingCount(this)) return;
         const provider = teApi.providers[testsName] as MavenTaskProvider;
         testInvDocPositions(provider);
-        provider.createTask("publish", "publish", teApi.testsApi.wsFolder, Uri.file(getWsPath(".")), []);
+        provider.createTask("publish", "publish", teWrapper.wsfolder, Uri.file(getWsPath(".")), []);
         endRollingCount(this);
     });
 
@@ -125,7 +126,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -146,7 +147,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
             "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -167,7 +168,7 @@ suite("Maven Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, 0);
         endRollingCount(this);

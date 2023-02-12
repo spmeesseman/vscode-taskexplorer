@@ -4,21 +4,23 @@
 import * as path from "path";
 import { expect } from "chai";
 import * as treeUtils from "./treeUtils";
-import { figures } from "../../lib/figures";
-import { Globs } from "../../lib/constants";
 import { testControl } from "../control";
+import { TaskTree } from "../../tree/tree";
+import { figures } from "../../lib/figures";
 import { deactivate } from "../../extension";
 import { startInput, stopInput } from "./input";
 import { TeWrapper } from "../../lib/wrapper";
 import { hasExplorerFocused } from "./commandUtils";
+import { Globs, Strings } from "../../lib/constants";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import initSettings, { cleanupSettings } from "./initSettings";
 import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
-import { ITaskTree, ITaskExplorerApi, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
+import { TaskItem } from "../../tree/item";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
@@ -27,7 +29,7 @@ export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
-export let teExplorer: ITaskTree;
+export let teExplorer: TaskTree;
 
 let activated = false;
 let caughtControlC = false;
@@ -143,17 +145,18 @@ export const activate = async (instance?: Mocha.Context) =>
         // Ensure extension initialized successfully
         //
         expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
-        expect(teApi.explorer).to.not.be.empty;
+        teWrapper = TeWrapper.instance;
+        expect(teWrapper.explorer).to.not.be.empty;
         teWrapper = TeWrapper.instance;
         //
         // Set a valid license key to run in 'licensed mode' at startup
         //
-        await teApi.testsApi.storage.updateSecret("license_key", "1234-5678-9098-7654321");
+        await teWrapper.storage.updateSecret("license_key", "1234-5678-9098-7654321");
         //
         // _api pre-test suite will reset after disable/enable
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
-        setExplorer(teApi.explorer as ITaskTree);
+        setExplorer(teWrapper.explorer as TaskTree);
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
@@ -162,7 +165,7 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
         //
-        teApi.log.setWriteToConsole(tc.log.console, tc.log.level);
+        teWrapper.log.setWriteToConsole(tc.log.console, tc.log.level);
         //
         // Catch CTRL+C and set hasRollingCountError if caught
         //
@@ -178,12 +181,7 @@ export const activate = async (instance?: Mocha.Context) =>
     return {
         teApi,
         teWrapper,
-        extension: ext as Extension<any>,
-        testsApi: teApi.testsApi,
-        fsApi: teApi.testsApi.fs,
-        configApi: teApi.testsApi.config,
-        explorer: teApi.testsApi.explorer,
-        utils: teApi.testsApi.utilities
+        extension: ext as Extension<any>
     };
 };
 
@@ -200,7 +198,7 @@ export const cleanup = async () =>
     {
         console.log(`    ${figures.color.info}`);
         console.log(`    ${figures.color.info} ${figures.withColor("Log File Location:", figures.colors.grey)}`);
-        console.log(`    ${figures.color.info} ${figures.withColor("   " + teApi.log.getLogFileName(), figures.colors.grey)}`);
+        console.log(`    ${figures.color.info} ${figures.withColor("   " + teWrapper.log.getLogFileName(), figures.colors.grey)}`);
         console.log(`    ${figures.color.info}`);
     }
 
@@ -274,7 +272,7 @@ export const closeEditors = () => commands.executeCommand("openEditors.closeAll"
 
 export const createwebviewForRevive = (viewTitle: string, viewType: string) =>
 {
-    const resourceDir = Uri.joinPath(teApi.testsApi.extensionContext.extensionUri, "res");
+    const resourceDir = Uri.joinPath(teWrapper.context.extensionUri, "res");
     const panel = window.createWebviewPanel(
         `taskExplorer.${viewType}`,
         viewTitle,
@@ -340,8 +338,8 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
 };
 
 
-export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
-    taskItem.id.replace(Globs.LAST_TASKS_LABEL + ":", "").replace(Globs.FAV_TASKS_LABEL + ":", "").replace(Globs.USER_TASKS_LABEL + ":", "");
+export const getSpecialTaskItemId = (taskItem: TaskItem) =>
+    taskItem.id.replace(Strings.LAST_TASKS_LABEL + ":", "").replace(Strings.FAV_TASKS_LABEL + ":", "").replace(Strings.USER_TASKS_LABEL + ":", "");
 
 
 export const getTeApi = () => teApi;
@@ -368,8 +366,8 @@ const isReady = (taskType?: string) =>
     let err: string | undefined;
     if (!teApi)                                 err = `    ${figures.color.error} ${figures.withColor("TeApi null", figures.colors.grey)}`;
     else {
-        if (!teApi.explorer)                    err = `    ${figures.color.error} ${figures.withColor("TeApi Explorer provider == null", figures.colors.grey)}`;
-        else if (!teApi.sidebar)                err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider == null", figures.colors.grey)}`;
+        if (!teWrapper.explorer)                err = `    ${figures.color.error} ${figures.withColor("TeApi Explorer provider == null", figures.colors.grey)}`;
+        // /else if (!teApi.sidebar)            err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider == null", figures.colors.grey)}`;
         else if (!teApi.providers)              err = `    ${figures.color.error} ${figures.withColor("Providers null", figures.colors.grey)}`;
     }
     if (!err && taskType) {
@@ -390,7 +388,7 @@ const isReady = (taskType?: string) =>
 
 export const logErrorsAreFine = (willFail = true) =>
 {
-    if (willFail && tc.log.enabled && teApi.testsApi.config.get<boolean>("logging.enabled"))
+    if (willFail && tc.log.enabled && teWrapper.configuration.get<boolean>("logging.enabled"))
     {
         console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
                     `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
@@ -415,7 +413,7 @@ export const overrideNextShowInputBox = (value: any) => overridesShowInputBox.pu
 export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push(value);
 
 
-export const setExplorer = (explorer: ITaskTree) => teExplorer = explorer;
+export const setExplorer = (explorer: TaskTree) => teExplorer = explorer;
 
 
 export const setFailed = (ctrlc = true) =>
@@ -429,10 +427,10 @@ export const setFailed = (ctrlc = true) =>
 export const setLicensed = async (valid: boolean) =>
 {
     const licMgr = teWrapper.licenseManager;
-    teApi.setTests(!valid);
+    teWrapper.tests = !valid;
     await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
     await licMgr.checkLicense();
-    teApi.setTests(true);
+    teWrapper.tests = true;
 };
 
 
@@ -465,16 +463,16 @@ export const suiteFinished = (instance: Mocha.Context) =>
         });
     }
     else {
-        teApi.log.warn("Suite Finished: Instance is undefined!");
+        teWrapper.log.warn("Suite Finished: Instance is undefined!");
     }
 };
 
 
 export const tagLog = (test: string, suite: string) =>
 {
-    teApi.log.write("******************************************************************************************");
-    teApi.log.write(" SUITE: " + suite.toUpperCase() + "  -  TEST : " + test);
-    teApi.log.write("******************************************************************************************");
+    teWrapper.log.write("******************************************************************************************");
+    teWrapper.log.write(" SUITE: " + suite.toUpperCase() + "  -  TEST : " + test);
+    teWrapper.log.write("******************************************************************************************");
 };
 
 
@@ -565,12 +563,12 @@ export const waitForTeIdle = async (minWait = 1, maxWait = 15000) =>
     const _wait = async (iterationsIdle: number) =>
     {
         let iteration = 0;
-        while (((iteration < iterationsIdle && waited < minWait /* && !gotNotIdle */) || teApi.isBusy()) && waited < maxWait)
+        while (((iteration < iterationsIdle && waited < minWait /* && !gotNotIdle */) || teWrapper.busy) && waited < maxWait)
         {
             await sleep(tc.waitForTeIdle.sleep);
             waited += tc.waitForTeIdle.sleep;
             ++iteration;
-            if (teApi.isBusy()) {
+            if (teWrapper.busy) {
                 iteration = 0;
             }
         }

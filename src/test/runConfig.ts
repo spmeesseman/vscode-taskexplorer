@@ -29,8 +29,10 @@ export default async() =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
           testArgs = JSON.parse(process.env.testArgs || "[]"),
-          testsRoot = path.resolve(__dirname, ".."),
-          nycRoot = path.resolve(__dirname, "..", "..", "..");
+          // testsRoot = path.resolve(__dirname, ".."),  // <- WP    // Webpack is fn'g garbage.  Same paths. but somehow
+          // nycRoot = path.resolve(__dirname, "..", "..", ".."),    // fucked up to were everything is mapped one level down.
+          testsRoot = path.resolve(__dirname),           // <- TS    // So fng sick of Webpack.  Sick of spending 17 hours for
+          nycRoot = path.resolve(__dirname, "..", ".."); // <- TS    // every little thing that needs to be done w/ it.  Fng garbage.
 
     // Setup coverage pre-test, including post-test hook to report
     const nyc = new NYC({

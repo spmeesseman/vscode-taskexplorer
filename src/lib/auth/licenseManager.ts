@@ -12,12 +12,11 @@ import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { LicensePage } from "../../webview/page/licensePage";
 import { executeCommand, registerCommand } from "../command";
-import { ILicenseManager } from "../../interface/ILicenseManager";
 import { AuthenticationProviderAuthenticationSessionsChangeEvent, Disposable, env, EventEmitter, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 import { TeAuthenticationProvider } from "./authProvider";
 
 
-export class LicenseManager implements ILicenseManager, Disposable
+export class LicenseManager implements Disposable
 {
 	private disposables: Disposable[] = [];
 	private busy = false;

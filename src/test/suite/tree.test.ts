@@ -3,25 +3,27 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
+import { expect } from "chai";
 import * as utils from "../utils/utils";
-import { Globs } from "../../lib/constants";
+import { TaskTree } from "../../tree/tree";
+import { Strings } from "../../lib/constants";
 import { TaskItem } from "../../tree/item";
+import { TeWrapper } from "../../lib/wrapper";
 import { TaskFolder } from "../../tree/folder";
 import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
 import { SpecialTaskFolder } from "../../tree/specialFolder";
+import { IDictionary, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
-import { IDictionary, ITaskTree, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { expect } from "chai";
 
+let teWrapper: TeWrapper;
 const tc = utils.testControl;
 let teApi: ITaskExplorerApi;
-let explorer: ITaskTree;
-let testsApi: ITestsApi;
-let ant: ITaskItem[];
-let bash: ITaskItem[];
-let batch: ITaskItem[];
-let python: ITaskItem[];
+let explorer: TaskTree;
+let ant: TaskItem[];
+let bash: TaskItem[];
+let batch: TaskItem[];
+let python: TaskItem[];
 let cstItem1: TaskItem | undefined;
 let cstItem2: TaskItem | undefined;
 let cstItem3: TaskItem | undefined;
@@ -36,7 +38,7 @@ suite("Tree Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ teApi, testsApi, explorer } = await utils.activate(this));
+        ({ teApi, teWrapper } = await utils.activate(this));
         utils.endRollingCount(this, true);
     });
 
@@ -63,7 +65,7 @@ suite("Tree Tests", () =>
         bash = await utils.treeUtils.getTreeTasks("bash", 1);
         batch = await utils.treeUtils.getTreeTasks("batch", 2);
         python = await utils.treeUtils.getTreeTasks("python", 2);
-        await teApi.testsApi.storage.update(Globs.FAV_TASKS_STORE, [
+        await teWrapper.storage.update(Strings.FAV_TASKS_STORE, [
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])
         ]);
@@ -93,7 +95,7 @@ suite("Tree Tests", () =>
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event * 2) + (tc.slowTime.getTreeTasks * 2));
         ant = await utils.treeUtils.getTreeTasks("ant", 3);
         batch = await utils.treeUtils.getTreeTasks("batch", 2);
-        await teApi.testsApi.storage.update(Globs.LAST_TASKS_STORE, [
+        await teWrapper.storage.update(Strings.LAST_TASKS_STORE, [
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])
         ]);
@@ -137,13 +139,14 @@ suite("Tree Tests", () =>
 
     test("Add Custom Label 1", async function()
     {
+console.log("AAA");
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem1 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
@@ -165,11 +168,11 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem2 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
@@ -191,11 +194,11 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === bash[0].id);
@@ -217,11 +220,11 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[0].id);
@@ -243,11 +246,11 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[1].id);
@@ -269,11 +272,11 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        const taskTree = testsApi.treeManager.getTaskTree();
+        const taskTree = teWrapper.treeManager.getTaskTree();
         if (taskTree)
         {
-            const sFolder= taskTree[0].label === Globs.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === Globs.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
+                            (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
             if (sFolder)
             {
                 cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
@@ -492,14 +495,14 @@ suite("Tree Tests", () =>
     test("Reveal API", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        const taskTree = testsApi.treeManager.getTaskTree() as ITaskFolder[];
-        expect(await explorer.getParent!(taskTree[0])).to.be.null; // Last Tasks
-        expect(await explorer.getParent!(taskTree[1])).to.be.null; // Last Tasks
-        expect(await explorer.getParent!(taskTree[2])).to.be.null; // Project Folder
-        expect(await explorer.getParent!(batch[0])).to.not.be.null;
-        expect(await explorer.getParent!(batch[0].taskFile)).to.not.be.null;
-        expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[0])).to.not.be.null;
-        expect(await explorer.getChildren((taskTree[2] as TaskFolder).taskFiles[1])).to.not.be.null;
+        const taskTree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
+        expect(explorer.getParent(taskTree[0])).to.be.null; // Last Tasks
+        expect(explorer.getParent(taskTree[1])).to.be.null; // Last Tasks
+        expect(explorer.getParent(taskTree[2])).to.be.null; // Project Folder
+        expect(explorer.getParent(batch[0])).to.not.be.null;
+        expect(explorer.getParent(batch[0].taskFile)).to.not.be.null;
+        expect(await teWrapper.explorer.getChildren(taskTree[2]).taskFiles[0]).to.not.be.null;
+        expect(await teWrapper.explorer.getChildren(taskTree[2]).taskFiles[1]).to.not.be.null;
         expect(explorer.getName()).to.be.oneOf([ "taskExplorer", "taskExplorerSideBar" ]);
         utils.endRollingCount(this);
     });
@@ -510,7 +513,7 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.event * 2) + tc.slowTime.commands.refreshNoChanges);
         await executeSettingsUpdate("specialFolders.folderState.project1", "Collapsed");
-        await testsApi.treeManager.refresh(undefined, undefined, "");
+        await teWrapper.treeManager.refresh(undefined, undefined, "");
         await executeSettingsUpdate("specialFolders.folderState.project1", "Expanded");
         utils.endRollingCount(this);
     });
@@ -542,25 +545,25 @@ suite("Tree Tests", () =>
         map["richard face"] = new TaskFolder("richard face");
         map.bob = new TaskFolder("bob");
         map.scott = new TaskFolder("maurice");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
         map.chris = new TaskFolder("chris");
         map.maurice = new TaskFolder("maurice");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map.peter = new TaskFolder("peter");
         map.larry = new TaskFolder("larry");
         map.mike = new TaskFolder("maurice");
         sortFolders(map);
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
         map.OMG = new TaskFolder("if i was");
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
         map["change folder"] = new TaskFolder("what");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
         map["extremely tired"] = new TaskFolder("tired1");
         map.tired = new TaskFolder("tired2");
         map["dozing off"] = new TaskFolder("doze");
@@ -568,8 +571,8 @@ suite("Tree Tests", () =>
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
@@ -577,28 +580,14 @@ suite("Tree Tests", () =>
         map["extremely tired"] = new TaskFolder("tired1");
         map.tired = new TaskFolder("tired2");
         map["dozing off"] = new TaskFolder("doze");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
         sortFolders(map);
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
-        map["Andrew was here"] = new TaskFolder("tasks4");
-        map["maya and sierra"] = new TaskFolder("tasks5");
-        map["front DOOR"] = new TaskFolder("Christmas");
-        map["change folder"] = new TaskFolder("what");
-        map["extremely tired"] = new TaskFolder("tired1");
-        map.tired = new TaskFolder("tired2");
-        map["dozing off"] = new TaskFolder("doze");
-        sortFolders(map);
-        map = {};
-        map.Zoo = new TaskFolder("onetwothree");
-        map.OMG = new TaskFolder("if i was");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
@@ -610,9 +599,9 @@ suite("Tree Tests", () =>
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
@@ -624,9 +613,9 @@ suite("Tree Tests", () =>
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
@@ -638,9 +627,9 @@ suite("Tree Tests", () =>
         map = {};
         map.Zoo = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
         map["Andrew was here"] = new TaskFolder("tasks4");
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("Christmas");
@@ -650,14 +639,28 @@ suite("Tree Tests", () =>
         map["dozing off"] = new TaskFolder("doze");
         sortFolders(map);
         map = {};
-        map[Globs.LAST_TASKS_LABEL] = new TaskFolder(Globs.LAST_TASKS_LABEL);
+        map.Zoo = new TaskFolder("onetwothree");
+        map.OMG = new TaskFolder("if i was");
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
+        map["Andrew was here"] = new TaskFolder("tasks4");
+        map["maya and sierra"] = new TaskFolder("tasks5");
+        map["front DOOR"] = new TaskFolder("Christmas");
+        map["change folder"] = new TaskFolder("what");
+        map["extremely tired"] = new TaskFolder("tired1");
+        map.tired = new TaskFolder("tired2");
+        map["dozing off"] = new TaskFolder("doze");
+        sortFolders(map);
+        map = {};
+        map[Strings.LAST_TASKS_LABEL] = new TaskFolder(Strings.LAST_TASKS_LABEL);
         map[""] = new TaskFolder("onetwothree");
         map.OMG = new TaskFolder("if i was");
         map["Andrew was here"] = new TaskFolder("");
-        map[Globs.FAV_TASKS_LABEL] = new TaskFolder(Globs.FAV_TASKS_LABEL);
+        map[Strings.FAV_TASKS_LABEL] = new TaskFolder(Strings.FAV_TASKS_LABEL);
         map["maya and sierra"] = new TaskFolder("tasks5");
         map["front DOOR"] = new TaskFolder("");
-        map[Globs.USER_TASKS_LABEL] = new TaskFolder(Globs.USER_TASKS_LABEL);
+        map[Strings.USER_TASKS_LABEL] = new TaskFolder(Strings.USER_TASKS_LABEL);
         map[""] = new TaskFolder("what");
         map["extremely tired"] = new TaskFolder("tired1");
         map.tired = new TaskFolder("tired2");

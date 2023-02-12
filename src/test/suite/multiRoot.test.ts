@@ -16,23 +16,24 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { Task, Uri, workspace, WorkspaceFolder } from "vscode";
 import { enableConfigWatcher } from "../../lib/watcher/configWatcher";
 import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { onWsFoldersChange } from "../../lib/watcher/fileWatcher";
+import { TaskItem } from "../../tree/item";
 
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
 
 let fakeWsfStartIdx = 1;
-let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
-let testsApi: ITestsApi;
+let teWrapper: TeWrapper;
 let sortAlpha: boolean;
 let sortAlphaReset: boolean;
 let testsPath: string;
@@ -48,20 +49,20 @@ suite("Multi-Root Workspace Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi, testsApi } = await activate(this));
+        ({ teWrapper } = await activate(this));
 
-        sortAlpha = teApi.testsApi.config.get<boolean>("sortProjectFoldersAlpha");
-        await teApi.testsApi.config.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
+        sortAlpha = teWrapper.configuration.get<boolean>("sortProjectFoldersAlpha");
+        await teWrapper.configuration.updateVs("grunt.autoDetect", false); // we ignore internally provided grunt tasks when building the tree
                                                                 // so make sure they're off for the verifyTaskCount() calls
         testsPath = getProjectsPath(".");
         wsf1DirName = join(testsPath, "wsf1");
-        await fsApi.createDir(wsf1DirName);
+        await teWrapper.fs.createDir(wsf1DirName);
         wsf2DirName = join(testsPath, "wsf2");
-        await fsApi.createDir(wsf2DirName);
+        await teWrapper.fs.createDir(wsf2DirName);
         wsf3DirName = join(testsPath, "wsf3");
-        await fsApi.createDir(wsf3DirName);
+        await teWrapper.fs.createDir(wsf3DirName);
         wsf4DirName = join(testsPath, "wsf4");
-        await fsApi.createDir(wsf4DirName);
+        await teWrapper.fs.createDir(wsf4DirName);
 
         wsf.push((workspace.workspaceFolders as WorkspaceFolder[])[0]);
         if (tc.isMultiRootWorkspace) {
@@ -97,20 +98,20 @@ suite("Multi-Root Workspace Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        if (!testsApi.explorer.isVisible()) {
+        if (!teWrapper.explorer.isVisible()) {
             await focusExplorerView();
         }
-        await teApi.testsApi.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+        await teWrapper.configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
         }
         if (!sortAlphaReset){
             await executeSettingsUpdate("sortProjectFoldersAlpha", sortAlpha);
         }
-        await fsApi.deleteDir(wsf1DirName);
-        await fsApi.deleteDir(wsf2DirName);
-        await fsApi.deleteDir(wsf3DirName);
-        await fsApi.deleteDir(wsf4DirName);
+        await teWrapper.fs.deleteDir(wsf1DirName);
+        await teWrapper.fs.deleteDir(wsf2DirName);
+        await teWrapper.fs.deleteDir(wsf3DirName);
+        await teWrapper.fs.deleteDir(wsf4DirName);
         suiteFinished(this);
     });
 
@@ -125,7 +126,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.standard);
-        await teApi.testsApi.fileCache.addWsFolders(undefined);
+        await teWrapper.filecache.addWsFolders(undefined);
         await waitForTeIdle(tc.waitTime.command);
         endRollingCount(this);
     });
@@ -137,7 +138,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.addEmpty + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx] ],
                 removed: []
             });
@@ -157,7 +158,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.addEmpty * 2);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ],
                 removed: []
             });
@@ -176,7 +177,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.addEmpty);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx + 3] ],
                 removed: []
             });
@@ -196,7 +197,7 @@ suite("Multi-Root Workspace Tests", () =>
         enableConfigWatcher(false);
         await executeSettingsUpdate("sortProjectFoldersAlpha", true);
         enableConfigWatcher(true);
-        await testsApi.onWsFoldersChange({
+        await onWsFoldersChange({
             added: [],
             removed: []
         });
@@ -204,7 +205,7 @@ suite("Multi-Root Workspace Tests", () =>
         enableConfigWatcher(false);
         await executeSettingsUpdate("sortProjectFoldersAlpha", false);
         enableConfigWatcher(true);
-        await testsApi.onWsFoldersChange({
+        await onWsFoldersChange({
             added: [],
             removed: []
         });
@@ -223,7 +224,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.removeEmpty);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
             });
@@ -242,7 +243,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.removeEmpty * 2);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2] ]
             });
@@ -261,7 +262,7 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.removeEmpty + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 3] ]
             });
@@ -279,7 +280,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.wsFolder.add + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             join(wsf1DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default2", ["jshint:myproject2"]);\n' +
@@ -292,7 +293,7 @@ suite("Multi-Root Workspace Tests", () =>
             {
                 return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
             };
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx] ],
                 removed: []
             });
@@ -312,22 +313,22 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.wsFolder.add * 3) + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             join(wsf2DirName, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default3", ["jshint:myproject3"]);\n' +
             '    grunt.registerTask("upload3", ["s3"]);\n' +
             "};\n"
         );
-        await fsApi.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf3DirName, "Gruntfile.JS"));
-        await fsApi.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf4DirName, "GRUNTFILE.js"));
+        await teWrapper.fs.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf3DirName, "Gruntfile.JS"));
+        await teWrapper.fs.copyFile(join(wsf2DirName, "Gruntfile.js"), join(wsf4DirName, "GRUNTFILE.js"));
         if (!tc.isMultiRootWorkspace)
         {
             workspace.getWorkspaceFolder = (uri: Uri) =>
             {
                 return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx + 1];
             };
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx + 1], wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ],
                 removed: []
             });
@@ -349,8 +350,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.remove + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.treeManager.getTaskMap(),
-                  tasks = testsApi.treeManager.getTasks();
+            const taskMap = teWrapper.treeManager.getTaskMap(),
+                  tasks = teWrapper.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -360,9 +361,9 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId1 = {
                 id: "fakeTaskId1",
                 resourceUri: wsf[fakeWsfStartIdx].uri
-            } as unknown as ITaskItem;
+            } as unknown as TaskItem;
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
             });
@@ -395,8 +396,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow(tc.slowTime.wsFolder.remove + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push task and task item, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.treeManager.getTaskMap(),
-                  tasks = testsApi.treeManager.getTasks();
+            const taskMap = teWrapper.treeManager.getTaskMap(),
+                  tasks = teWrapper.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -406,8 +407,8 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId2 = {
                 id: "fakeTaskId2",
                 resourceUri: wsf[fakeWsfStartIdx + 1].uri
-            } as unknown as ITaskItem;
-            await testsApi.onWsFoldersChange({
+            } as unknown as TaskItem;
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1] ]
             });
@@ -429,8 +430,8 @@ suite("Multi-Root Workspace Tests", () =>
         this.slow((tc.slowTime.wsFolder.remove * 2) + tc.slowTime.taskCount.verify);
         if (!tc.isMultiRootWorkspace)
         {   // Push tasks and task items, vscode knows they're fake and won't return them in fetchTasks()
-            const taskMap = testsApi.treeManager.getTaskMap(),
-                  tasks = testsApi.treeManager.getTasks();
+            const taskMap = teWrapper.treeManager.getTaskMap(),
+                  tasks = teWrapper.treeManager.getTasks();
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -440,7 +441,7 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId3 = {
                 id: "fakeTaskId3",
                 resourceUri: wsf[fakeWsfStartIdx + 2].uri
-            } as unknown as ITaskItem;
+            } as unknown as TaskItem;
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -450,8 +451,8 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId4 = {
                 id: "fakeTaskId4",
                 resourceUri: wsf[fakeWsfStartIdx + 3].uri
-            } as unknown as ITaskItem;
-            await testsApi.onWsFoldersChange({
+            } as unknown as TaskItem;
+            await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ]
             });
@@ -479,7 +480,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.wsFolder.add + tc.slowTime.taskCount.verify + tc.slowTime.cache.rebuildCancel + 200);
-        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         if (!tc.isMultiRootWorkspace)
         {
@@ -487,7 +488,7 @@ suite("Multi-Root Workspace Tests", () =>
             {
                 return wsf[uri.fsPath.includes("test-fixture") ? 0 : fakeWsfStartIdx];
             };
-            await testsApi.onWsFoldersChange({
+            await onWsFoldersChange({
                 added: [ wsf[fakeWsfStartIdx] ],
                 removed: []
             });
@@ -507,12 +508,12 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.wsFolder.remove + tc.slowTime.taskCount.verify + tc.slowTime.cache.rebuildCancel + 200);
-        teApi.testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await sleep(100);
         if (!tc.isMultiRootWorkspace)
         {
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
-            await testsApi.onWsFoldersChange({ // event will wait for previous fil cache build
+            await onWsFoldersChange({ // event will wait for previous fil cache build
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx] ]
             });

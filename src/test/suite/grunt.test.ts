@@ -6,10 +6,11 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import fsUtils from "../utils/fsUtils";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { GruntTaskProvider } from "../../providers/grunt";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
@@ -19,7 +20,7 @@ const testsName = "grunt";
 const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: GruntTaskProvider;
 let fileUri: Uri;
 
@@ -30,7 +31,7 @@ suite("Grunt Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as GruntTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "gruntfile.js"));
         endRollingCount(this, true);
@@ -56,7 +57,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "grunt", "GRUNTFILE.JS"));
+        const docText = await teWrapper.fs.readFileAsync(path.join(getWsPath("."), "grunt", "GRUNTFILE.JS"));
         expect(provider.getDocumentPosition("grp-test-svr-build1", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("run_tests", docText)).to.be.equal(0);
         endRollingCount(this);

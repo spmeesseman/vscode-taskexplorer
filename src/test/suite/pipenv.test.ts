@@ -9,17 +9,18 @@ import { expect } from "chai";
 import { startupFocus } from "../utils/suiteUtils";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "pipenv";
 const startTaskCount = 3;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: GradleTaskProvider;
 let dirName: string;
 let fileUri: Uri;
@@ -31,7 +32,7 @@ suite("Pipenv Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "Pipfile"));
@@ -43,7 +44,7 @@ suite("Pipenv Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -67,7 +68,7 @@ suite("Pipenv Tests", () =>
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "Pipfile"));
+        const docText = await teWrapper.fs.readFileAsync(path.join(getWsPath("."), "Pipfile"));
         expect(provider.getDocumentPosition("convert-ui", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("build-exe", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("test44", docText)).to.be.equal(0);

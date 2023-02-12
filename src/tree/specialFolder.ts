@@ -2,11 +2,12 @@
 import { TaskItem } from "./item";
 import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
-import { Globs, Strings } from "../lib/constants";
+import { IDictionary } from "../interface";
 import { sortTasks } from "../lib/sortTasks";
 import { storage } from "../lib/utils/storage";
+import { TaskTreeManager } from "./treeManager";
+import { Globs, Strings } from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
-import { IDictionary, ITaskTreeManager } from "../interface";
 import { isString, removeFromArray } from "../lib/utils/utils";
 import {
     commands, ConfigurationChangeEvent, Disposable, InputBoxOptions, ThemeIcon, TreeItem,
@@ -22,7 +23,7 @@ import {
 export class SpecialTaskFolder extends TaskFolder implements Disposable
 {
 
-    public treeManager: ITaskTreeManager;
+    public treeManager: TaskTreeManager;
     public disposables: Disposable[];
     private storeName: string;
     private isFavorites: boolean;
@@ -32,7 +33,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
     private settingNameEnabled: string;
 
 
-    constructor(treeManager: ITaskTreeManager, label: string, state: TreeItemCollapsibleState)
+    constructor(treeManager: TaskTreeManager, label: string, state: TreeItemCollapsibleState)
     {
         super(label, state);
         this.treeManager = treeManager;

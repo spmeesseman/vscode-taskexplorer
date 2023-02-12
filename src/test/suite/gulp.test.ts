@@ -4,10 +4,11 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { GulpTaskProvider } from "../../providers/gulp";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
@@ -16,8 +17,8 @@ import {
 const testsName = "gulp";
 const startTaskCount = 17;
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let provider: GulpTaskProvider;
 let fileUri: Uri;
 let file2Uri: Uri;
@@ -29,7 +30,7 @@ suite("Gulp Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as GulpTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "gulpfile.js"));
         file2Uri = Uri.file(path.join(getWsPath("."), "gulpfile.mjs"));
@@ -42,8 +43,8 @@ suite("Gulp Tests", () =>
         if (exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate("useGulp", false, tc.waitTime.config.event);
         await updateInternalProviderAutoDetect("gulp", "off"); // turned on in tests initSettings()
-        await fsApi.deleteFile(fileUri.fsPath);
-        await fsApi.deleteFile(file2Uri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(file2Uri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent + tc.waitTime.config.disableEvent);
         suiteFinished(this);
     });
@@ -76,7 +77,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.disableEvent + tc.slowTime.taskCount.verify);
-        await teApi.testsApi.config.updateWs("enabledTasks.gulp", false);
+        await teWrapper.configuration.updateWs("enabledTasks.gulp", false);
         await waitForTeIdle(tc.waitTime.config.disableEvent);
         await verifyTaskCount(testsName, 0);
         endRollingCount(this);
@@ -87,7 +88,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + tc.slowTime.taskCount.verify);
-        await teApi.testsApi.config.updateWs("enabledTasks.gulp", true);
+        await teWrapper.configuration.updateWs("enabledTasks.gulp", true);
         await waitForTeIdle(tc.waitTime.config.enableEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -98,7 +99,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -120,7 +121,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -146,7 +147,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "var gulp = require('gulp');\n" +
             "gulp.task('hello3', (done) => {\n" +
@@ -164,7 +165,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -175,7 +176,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             file2Uri.fsPath,
             "import pkg from 'gulp';\n" +
             "const { task, series } = pkg;\n" +
@@ -207,7 +208,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(file2Uri.fsPath);
+        await teWrapper.fs.deleteFile(file2Uri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

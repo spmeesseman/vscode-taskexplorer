@@ -58,6 +58,7 @@
         "uild",
         "vsix",
         "vslauncher",
-        "webpackte"
+        "webpackte",
+        "wsfolder"
     ]
 }

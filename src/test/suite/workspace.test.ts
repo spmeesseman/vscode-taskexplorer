@@ -2,6 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
@@ -14,6 +15,7 @@ const testsName = "Workspace";
 const startTaskCount = 10; // 10 + 3 'User' Tasks, but getTaskCountByTree() will not return the User tasks
 
 let teApi: ITaskExplorerApi;
+let teWrapper: TeWrapper;
 let wsEnable: boolean;
 
 
@@ -23,8 +25,8 @@ suite("Workspace / VSCode Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi } = await activate(this));
-        wsEnable = teApi.testsApi.config.get<boolean>("showHiddenWsTasks");
+        ({ teApi, teWrapper } = await activate(this));
+        wsEnable = teWrapper.configuration.get<boolean>("showHiddenWsTasks");
         endRollingCount(this, true);
     });
 
@@ -32,7 +34,7 @@ suite("Workspace / VSCode Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teApi.testsApi.config.updateWs("showHiddenWsTasks", wsEnable);
+        await teWrapper.configuration.updateWs("showHiddenWsTasks", wsEnable);
         suiteFinished(this);
     });
 

@@ -3,6 +3,7 @@
 import { log } from "../lib/log/log";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
+import { TaskManager } from "./task";
 import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
 import { Strings } from "../lib/constants";
@@ -19,15 +20,14 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
-import { IDictionary, ITaskTreeView, ITaskTreeManager, TasksChangeEvent } from "../interface";
+import { IDictionary, ITaskTreeView, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
     window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
-import { TaskManager } from "./task";
 
 
-export class TaskTreeManager implements ITaskTreeManager, Disposable
+export class TaskTreeManager implements Disposable
 {
 
     private tasks: Task[];
@@ -391,7 +391,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
     {
         Object.values(this._views).filter(v => !!v && v.tree).forEach((v) =>
         {
-            (v as ITaskTreeView).tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
+            ((v as ITaskTreeView).tree as TaskTree).fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
         });
         this._onDidTasksChange.fire({ taskCount: this.tasks.length });
     };

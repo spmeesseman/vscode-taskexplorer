@@ -8,7 +8,7 @@ import { basename, extname, sep } from "path";
 import { Commands, Globs, Strings } from "../constants";
 import { configuration } from "./configuration";
 import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
-import { ILicenseManager } from "../../interface/ILicenseManager";
+import { LicenseManager } from "../auth/licenseManager";
 
 
 export const getCombinedGlobPattern = (defaultPattern: string, globs: string[]) =>
@@ -269,7 +269,7 @@ export const removeFromArray = (arr: any[], item: any) =>
 
 let maxTasksMessageShown = false;
 const maxTaskTypeMessageShown: any = {};
-export const showMaxTasksReachedMessage = (licMgr: ILicenseManager, taskType?: string, force?: boolean) =>
+export const showMaxTasksReachedMessage = (licMgr: LicenseManager, taskType?: string, force?: boolean) =>
 {
     if (force || ((!maxTasksMessageShown && !taskType) || (taskType && !maxTaskTypeMessageShown[taskType] && Object.keys(maxTaskTypeMessageShown).length < 3)))
     {

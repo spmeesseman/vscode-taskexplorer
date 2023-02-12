@@ -1,19 +1,24 @@
 
-import * as utils from "../lib/utils/utils";
-import * as sortTasks from "../lib/sortTasks";
 import { log } from "../lib/log/log";
 import { join } from "path";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
 import { Strings } from "../lib/constants";
+import { IDictionary } from "../interface";
+import * as utils from "../lib/utils/utils";
 import { NoScripts } from "../lib/noScripts";
+import * as sortTasks from "../lib/sortTasks";
+import { TaskTreeManager } from "./treeManager";
 import { SpecialTaskFolder } from "./specialFolder";
 import { statusBarItem } from "../lib/statusBarItem";
 import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
 import { Disposable, Task, TreeItemCollapsibleState } from "vscode";
-import { IDictionary, ITaskTreeManager, TaskMap } from "../interface";
+
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type TaskMap = { [id: string]: TaskItem | undefined };
 
 
 export class TaskTreeBuilder implements Disposable
@@ -22,13 +27,13 @@ export class TaskTreeBuilder implements Disposable
     private static taskMap: TaskMap = {};
     private static taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
 
-    private treeManager: ITaskTreeManager;
+    private treeManager: TaskTreeManager;
     private taskMap: TaskMap;
     private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
-    constructor(treeManager: ITaskTreeManager, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
+    constructor(treeManager: TaskTreeManager, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
     {
         this.treeManager = treeManager;
         this.specialFolders = specialFolders;

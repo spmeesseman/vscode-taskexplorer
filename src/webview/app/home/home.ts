@@ -2,10 +2,10 @@
 import "../common/css/vscode.css";
 import "./home.css";
 import "./home.scss";
+import { Disposable } from "vscode";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
-import { Disposable } from "vscode";
 
 
 export class HomeWebviewApp extends TeWebviewApp<State>

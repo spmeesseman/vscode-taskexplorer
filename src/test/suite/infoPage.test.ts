@@ -7,18 +7,19 @@ import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ParsingReportPage } from "../../webview/page/parsingReportPage";
-import { ITaskTree, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
+import { TaskTree } from "../../tree/tree";
 
 let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
-let origExplorer: ITaskTree | undefined;
-let origSidebar: ITaskTree | undefined;
+let origExplorer: TaskTree | undefined;
+let origSidebar: TaskTree | undefined;
 let pkgMgr: string;
 
 
@@ -29,10 +30,10 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teWrapper, teApi } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
-		origExplorer = teApi.explorer;
-		origSidebar = teApi.sidebar;
-		pkgMgr = teApi.testsApi.config.getVs<string>("npm.packageManager");
-		userTasks = teApi.testsApi.config.get<boolean>("specialFolders.showUserTasks");
+		origExplorer = teWrapper.explorer;
+		origSidebar = teWrapper.sidebar;
+		pkgMgr = teWrapper.configuration.getVs<string>("npm.packageManager");
+		userTasks = teWrapper.configuration.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);
 	});
 
@@ -40,10 +41,10 @@ suite("Info Report Tests", () =>
 	suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-		teApi.explorer = origExplorer;
-		teApi.sidebar = origSidebar;
+		teWrapper.explorer = origExplorer;
+		teWrapper.sidebar = origSidebar;
 		await closeEditors();
-		await teApi.testsApi.config.updateVsWs("npm.packageManager", pkgMgr);
+		await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
 		await executeSettingsUpdate("specialFolders.showUserTasks", userTasks);
         suiteFinished(this);
@@ -98,12 +99,12 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
-        await teApi.testsApi.config.updateVsWs("npm.packageManager", "yarn");
+        await teWrapper.configuration.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-        await teApi.testsApi.config.updateVsWs("npm.packageManager", pkgMgr);
+        await teWrapper.configuration.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeEditors();
         endRollingCount(this);
@@ -127,15 +128,15 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 150);
-		const oExplorer = teApi.explorer;
-		const oSidebar = teApi.sidebar;
-		teApi.explorer = undefined;
-		teApi.sidebar = undefined;
+		const oExplorer = teWrapper.explorer;
+		const oSidebar = teWrapper.sidebar;
+		teWrapper.explorer = undefined;
+		teWrapper.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-		teApi.explorer = oExplorer;
-		teApi.sidebar = oSidebar;
+		teWrapper.explorer = oExplorer;
+		teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -145,15 +146,15 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 150);
-		const oExplorer = teApi.explorer;
-		const oSidebar = teApi.sidebar;
-		teApi.explorer = undefined;
-		teApi.sidebar = oExplorer;
+		const oExplorer = teWrapper.explorer;
+		const oSidebar = teWrapper.sidebar;
+		teWrapper.explorer = undefined;
+		teWrapper.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-		teApi.explorer = oExplorer;
-		teApi.sidebar = oSidebar;
+		teWrapper.explorer = oExplorer;
+		teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -163,16 +164,16 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-		const oExplorer = teApi.explorer;
-		const oSidebar = teApi.sidebar;
-		teApi.explorer = undefined;
-		teApi.sidebar = undefined;
+		const oExplorer = teWrapper.explorer;
+		const oSidebar = teWrapper.sidebar;
+		teWrapper.explorer = undefined;
+		teWrapper.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
-		teApi.explorer = oExplorer;
-		teApi.sidebar = oSidebar;
+		teWrapper.explorer = oExplorer;
+		teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -182,16 +183,16 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-		const oExplorer = teApi.explorer;
-		const oSidebar = teApi.sidebar;
-		teApi.explorer = undefined;
-		teApi.sidebar = oExplorer;
+		const oExplorer = teWrapper.explorer;
+		const oSidebar = teWrapper.sidebar;
+		teWrapper.explorer = undefined;
+		teWrapper.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
-		teApi.explorer = oExplorer;
-		teApi.sidebar = oSidebar;
+		teWrapper.explorer = oExplorer;
+		teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -201,11 +202,14 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 200);
-		const panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
+		let panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
-		teApi.testsApi.isBusy = true;
-		setTimeout(() => { teApi.testsApi.isBusy = false; }, 50);
+		teWrapper.parsingReportPage.dispose();
+		panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
+		await sleep(50);
+		// teWrapper.busy = true;
+		setTimeout(() => { /* teWrapper.busy = false; */ }, 50);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
 		await closeEditors();

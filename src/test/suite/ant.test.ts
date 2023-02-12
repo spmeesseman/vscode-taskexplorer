@@ -3,9 +3,9 @@
 /* tslint:disable */
 
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { AntTaskProvider } from "../../providers/ant";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi } from "../../interface/IFilesystemApi";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
@@ -17,8 +17,8 @@ const testsName = "ant";
 const startTaskCount = 3;
 const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) + tc.slowTime.tasks.antParser;
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let provider: AntTaskProvider;
 let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;
@@ -33,13 +33,12 @@ suite("Ant Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi } = await activate(this));
-        fsApi = teApi.testsApi.fs;
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as AntTaskProvider;
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);
-        buildFileXml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
+        buildFileXml = await teWrapper.fs.readFileAsync(buildXmlFileUri.fsPath);
         endRollingCount(this, true);
     });
 
@@ -48,7 +47,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         if (!buildFileXmlRestored) {
-            await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+            await teWrapper.fs.writeFile(buildXmlFileUri.fsPath, buildFileXml);
         }
         await executeSettingsUpdate("useAnt", false);
         suiteFinished(this);
@@ -77,7 +76,7 @@ suite("Ant Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const xml = await fsApi.readFileAsync(buildXmlFileUri.fsPath);
+        const xml = await teWrapper.fs.readFileAsync(buildXmlFileUri.fsPath);
         testInvDocPositions(provider);
         provider.getDocumentPosition("test_isnt_there", xml);
         let index = provider.getDocumentPosition("test-build", xml);
@@ -176,7 +175,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir=".">\n' +
@@ -194,7 +193,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +
@@ -214,7 +213,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +
@@ -231,7 +230,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             "<some_node>\n" +
@@ -248,7 +247,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(slowTimeforAntRunTasks + tc.slowTime.fs.modifyEventAnt);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             buildXmlFileUri.fsPath,
             '<?xml version="1.0"?>\n' +
             '<project basedir="." default="test2">\n' +
@@ -269,7 +268,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEventAnt + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(buildXmlFileUri.fsPath, buildFileXml);
+        await teWrapper.fs.writeFile(buildXmlFileUri.fsPath, buildFileXml);
         buildFileXmlRestored = true;
         await waitForTeIdle(tc.waitTime.fs.modifyEvent);
         await verifyTaskCount("ant", startTaskCount);

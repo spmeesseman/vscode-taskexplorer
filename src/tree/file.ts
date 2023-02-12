@@ -1,14 +1,15 @@
 
 import * as path from "path";
-import * as util from "../lib/utils/utils";
 import { log } from "../lib/log/log";
 import { TaskFolder }  from "./folder";
+import * as util from "../lib/utils/utils";
+import { ITaskDefinition } from "../interface";
 import { pathExistsSync } from "../lib/utils/fs";
 import { properCase } from "../lib/utils/commonUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
 import { getInstallPathSync, getUserDataPath } from "../lib/utils/pathUtils";
-import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface";
+import { TaskItem } from "./item";
 
 
 /**
@@ -22,7 +23,7 @@ import { ITaskFile, ITaskFolder, ITaskItem, ITaskDefinition } from "../interface
  * The last TaskFile in a grouping will contain items of type TaskItem.  If not grouped,
  * the TaskFile node for each task type within each TaskFolder will contain items of type TaskItem.
  */
-export class TaskFile extends TreeItem implements ITaskFile
+export class TaskFile extends TreeItem implements TaskFile
 {
     public path: string;
     /**
@@ -38,7 +39,7 @@ export class TaskFile extends TreeItem implements ITaskFile
      * Child TaskItem or TaskFile nodes in the tree.  A TaskFile can own another TaskFile
      * if "Grouping" is turned on in settings.
      */
-    public treeNodes: (ITaskItem|ITaskFile)[] = [];
+    public treeNodes: (TaskItem|TaskFile)[] = [];
     /**
      * @property fileName
      *
@@ -228,7 +229,7 @@ export class TaskFile extends TreeItem implements ITaskFile
      *
      * @param treeNode The node/item to add to this TaskFile node.
      */
-    public addTreeNode(treeNode: (ITaskFile | ITaskItem | undefined))
+    public addTreeNode(treeNode: (TaskFile | TaskItem | undefined))
     {
         /* istanbul ignore else */
         if (treeNode) {
@@ -238,7 +239,7 @@ export class TaskFile extends TreeItem implements ITaskFile
     }
 
 
-    static getGroupedId = (folder: ITaskFolder, file: ITaskFile, label: string, treeLevel: number) =>
+    static getGroupedId = (folder: TaskFolder, file: TaskFile, label: string, treeLevel: number) =>
     {
         const groupSeparator = util.getGroupSeparator();
         const labelSplit = label.split(groupSeparator);
@@ -339,7 +340,7 @@ export class TaskFile extends TreeItem implements ITaskFile
      * @returns File name
      */
     // Note:  Making this function private bombs the types
-    public getFileNameFromSource(source: string, folder: ITaskFolder, taskDef: ITaskDefinition, incRelPathForCode?: boolean)
+    public getFileNameFromSource(source: string, folder: TaskFolder, taskDef: ITaskDefinition, incRelPathForCode?: boolean)
     {
         //
         // Ant tasks or any tasks provided by this extension will have a "fileName" definition
@@ -382,7 +383,7 @@ export class TaskFile extends TreeItem implements ITaskFile
      * @param treeNode The node/item to add to this TaskFile node.
      * @param index The index at which to insert into the array
      */
-    public insertTreeNode(treeItem: (ITaskFile | ITaskItem), index: number)
+    public insertTreeNode(treeItem: (TaskFile | TaskItem), index: number)
     {
         this.treeNodes.splice(index, 0, treeItem);
     }
@@ -393,7 +394,7 @@ export class TaskFile extends TreeItem implements ITaskFile
      *
      * @param treeNode The node/item to remove from this TaskFile node.
      */
-    public removeTreeNode(treeItem: (ITaskFile | ITaskItem))
+    public removeTreeNode(treeItem: (TaskFile | TaskItem))
     {
         const idx = this.treeNodes.findIndex(tn => tn.id === treeItem.id);
         /* istanbul ignore else */

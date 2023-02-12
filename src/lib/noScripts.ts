@@ -1,6 +1,6 @@
 
 import * as nls from "vscode-nls";
-import { ITaskTree } from "../interface";
+import { TaskTree } from "src/tree/tree";
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
 
 const localize = nls.loadMessageBundle();
@@ -55,7 +55,7 @@ export class NoScripts extends TreeItem
 
 export class InitScripts extends TreeItem
 {
-    constructor(tree: ITaskTree)
+    constructor(tree: TaskTree)
     {
         super(initScriptsLabel + "...");
         this.contextValue =  "initscripts";
@@ -75,7 +75,7 @@ export class InitScripts extends TreeItem
 
 export class LoadScripts extends TreeItem
 {
-    constructor(tree: ITaskTree)
+    constructor(tree: TaskTree)
     {
         super(loadScriptsLabel + "...");
         this.contextValue =  "loadscripts";

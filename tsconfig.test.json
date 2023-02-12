@@ -1,5 +1,6 @@
 {
     "extends": "./tsconfig.base.json",
+    // "ts-node": {"require": ["tsconfig-paths/register"]},
     "compilerOptions": {
         "paths": {
 			"@env/*": [ "src/lib/env/node/*" ]
@@ -13,7 +14,6 @@
         "script",
         "types",
         "res",
-        "dist",
         ".nyc_output",
         "coverage",
         "src/webview/app/**/*",

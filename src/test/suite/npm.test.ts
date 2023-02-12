@@ -8,11 +8,11 @@ import { TaskExecution } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { getPackageManager } from "../../lib/utils/utils";
 import { executeTeCommand2 } from "../utils/commandUtils";
-import { IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "npm";
+let teWrapper: TeWrapper;
 const tc = utils.testControl;
-let fsApi: IFilesystemApi;
 let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 let packageJsonPath: string | undefined;
 let npmTaskItems: TaskItem[];
@@ -24,7 +24,7 @@ suite("NPM Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ fsApi } = await utils.activate(this));
+        ({ teWrapper } = await utils.activate(this));
         startTaskCount = tc.isMultiRootWorkspace ? 15 : 0;
         utils.endRollingCount(this, true);
     });
@@ -36,10 +36,10 @@ suite("NPM Tests", () =>
         if (packageJsonPath)
         {
             const packageLockJsonPath = packageJsonPath.replace(".", "-lock.");
-            await fsApi.deleteFile(packageJsonPath);
-            if (await fsApi.pathExists(packageLockJsonPath)) {
+            await teWrapper.fs.deleteFile(packageJsonPath);
+            if (await teWrapper.fs.pathExists(packageLockJsonPath)) {
                 try {
-                    await fsApi.deleteFile(packageLockJsonPath);
+                    await teWrapper.fs.deleteFile(packageLockJsonPath);
                 }
                 catch (error) {
                     console.log(error);
@@ -66,7 +66,7 @@ suite("NPM Tests", () =>
         // Create NPM package.json
         //
         packageJsonPath = utils.getWsPath("package.json");
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             packageJsonPath,
             "{\r\n" +
             '    "name": "vscode-taskexplorer",\r\n' +

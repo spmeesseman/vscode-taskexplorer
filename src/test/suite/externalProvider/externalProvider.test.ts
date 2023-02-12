@@ -5,20 +5,21 @@
 import { join } from "path";
 import fsUtils from "../../utils/fsUtils";
 import { refresh } from "../../utils/treeUtils";
+import { TeWrapper } from "../../../lib/wrapper";
 import { Commands } from "../../../lib/constants";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";
 import { ExternalTaskProvider3 } from "./externalProvider3";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let dispose: Disposable;
 let dispose2: Disposable;
 let dispose3: Disposable;
@@ -35,7 +36,7 @@ suite("External Provider Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ fsApi, teApi } = await activate(this));
+        ({ teWrapper, teApi } = await activate(this));
         insideWsDir = getWsPath("tasks_test_");
         outsideWsDir = getProjectsPath("testA");
         taskProvider = new ExternalTaskProvider1();
@@ -201,7 +202,7 @@ suite("External Provider Tests", () =>
         this.slow((testControl.slowTime.fs.createFolderEvent * 2) + testControl.slowTime.fs.createEvent + (testControl.slowTime.taskCount.verify * 2));
         await fsUtils.createDir(outsideWsDir);
         await fsUtils.createFile(join(outsideWsDir, "Somefile.js"), "a = {\na: b\n};\n");
-        await fsApi.copyDir(outsideWsDir, insideWsDir, /Somefile\.js/, true); // copy folder
+        await teWrapper.fs.copyDir(outsideWsDir, insideWsDir, /Somefile\.js/, true); // copy folder
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
         endRollingCount(this);
     });

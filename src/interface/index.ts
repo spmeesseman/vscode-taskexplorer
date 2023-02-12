@@ -1,22 +1,15 @@
 
 export { IEvent } from "./IEvent";
 export { IRecord } from "./IRecord";
-export { ITaskFile } from "./ITaskFile";
-export { ITaskItem } from "./ITaskItem";
-export { ITaskTree } from "./ITaskTree";
-export { ITestsApi } from "./ITestsApi";
-export { IFileCache } from "./IFileCache";
 export { ITaskStats } from "./ITaskStats";
-export { TaskMap } from "./types/TaskMap";
 export { ICacheItem } from "./ICacheItem";
 export { IDictionary } from "./IDictionary";
-export { ITaskFolder } from "./ITaskFolder";
 export { ITaskTreeView } from "./ITaskTreeView";
 export { ILogQueueItem } from "./ILogQueueItem";
-export { IFilesystemApi } from "./IFilesystemApi";
 export { ITaskDefinition } from "./ITaskDefinition";
 export { ITaskExplorerApi } from "./ITaskExplorerApi";
+export { TasksChangeEvent } from "./TaskChangeEvent";
 export { IExternalProvider } from "./IExternalProvider";
+export { TeSessionChangeEvent } from "./IAuthentication";
 export { IStorage, StorageChangeEvent } from "./IStorage";
-export { ITaskTreeManager, TasksChangeEvent } from "./ITaskTreeManager";
 export { ILog, LogColor, ILogColors, LogColors, LogStyle, colors, withColor } from "./ILog";

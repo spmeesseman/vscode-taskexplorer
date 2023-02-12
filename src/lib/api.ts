@@ -1,137 +1,36 @@
 
 import { log } from "./log/log";
-import * as fs from "./utils/fs";
-import * as util from "./utils/utils";
-import * as fileCache from "./fileCache";
-import { TaskTree } from "../tree/tree";
 import { TeWrapper } from "./wrapper";
-import { storage } from "./utils/storage";
 import { executeCommand, registerCommand } from "./command";
-import { isExtensionBusy } from "../extension";
-import { workspace, WorkspaceFolder } from "vscode";
 import { ContextKeys, setContext } from "./context";
-import { configuration } from "./utils/configuration";
-import { onWsFoldersChange } from "./watcher/fileWatcher";
-import { enableConfigWatcher } from "./watcher/configWatcher";
-import { IExternalProvider, ITaskExplorerApi, ITaskTree, ITaskTreeView, ITestsApi } from "../interface";
+import { IExternalProvider, ITaskExplorerApi, ITaskTreeView } from "../interface";
 import { Commands } from "./constants";
 
 
 export class TeApi implements ITaskExplorerApi
 {
     private _tests: boolean;
-	private _testsApi: ITestsApi;
-	readonly container: TeWrapper;
 
 
-    constructor(container: TeWrapper)
+    constructor(private readonly _wrapper: TeWrapper)
     {
-        this.container = container;
-        this._tests = container.tests;
-
+        this._tests = this._wrapper.tests;
         /* istanbul ignore else */
-        if (this._tests)
-        {
-            this._testsApi = {
-                fs,
-                config: configuration,
-                fileCache,
-                isBusy: false,
-                storage,
-                enableConfigWatcher,
-                onWsFoldersChange,
-                utilities: util,
-                licenseManager: this.container.licenseManager,
-                treeManager: this.container.treeManager,
-                extensionContext: this.container.context,
-                wsFolder: (workspace.workspaceFolders as WorkspaceFolder[])[0],
-                get explorer()
-                {
-                    return (this.treeManager.views.taskExplorer?.tree || this.treeManager.views.taskExplorerSideBar?.tree) as TaskTree;
-                }
-            };
+        if (this._tests) {
             void setContext(ContextKeys.Tests, true);
-            this.setTests(true); // lol, damn istanbul.  cover the initial empty fn
-            this.setTests = (isTests) => { this._tests = isTests; };
-            this.isBusy = () => isExtensionBusy() || this._testsApi.isBusy;
         }
-        else {
-            this._testsApi = {} as unknown as ITestsApi;
-        }
-
-        container.context.subscriptions.push(registerCommand("vscode-taskexplorer.getApi", () => this, this));
+        this._wrapper.context.subscriptions.push(registerCommand("vscode-taskexplorer.getApi", () => this, this));
     }
 
 
-    get explorer()
-    {
-        return this.container.treeManager.views.taskExplorer?.tree;
+    get providers() {
+        return this._wrapper.providers;
     }
 
 
-    set explorer(tree)
-    {
-        (this.container.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as ITaskTree;
+    get wrapper()  {
+        return this._tests ? this._wrapper : undefined;
     }
-
-
-    get explorerView()
-    {
-        return this.container.treeManager.views.taskExplorer?.view;
-    }
-
-
-    get log()
-    {
-        return log;
-    }
-
-
-    get providers()
-    {
-        return this.container.providers;
-    }
-
-
-    get sidebar()
-    {
-        return this.container.treeManager.views.taskExplorerSideBar?.tree;
-    }
-
-
-    set sidebar(tree)
-    {
-        if (this.container.treeManager.views.taskExplorerSideBar) {
-            this.container.treeManager.views.taskExplorerSideBar.tree = tree as ITaskTree;
-        }
-    }
-
-
-    get sidebarView()
-    {
-        return this.container.treeManager.views.taskExplorerSideBar?.view;
-    }
-
-
-    get testsApi()
-    {
-        return this._testsApi;
-    }
-
-
-    isBusy = () => isExtensionBusy();
-
-
-    isLicensed = () => this.container.licenseManager.isLicensed();
-
-
-    isTests = () => this._tests;
-
-
-    setTests = (isTests: boolean) =>
-    {
-        this._tests = isTests;
-    };
 
 
     refreshExternalProvider = async(providerName: string) =>

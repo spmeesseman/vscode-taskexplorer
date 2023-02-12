@@ -4,11 +4,12 @@
 
 import { join } from "path";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { MakeTaskProvider } from "../../providers/make";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
@@ -17,8 +18,8 @@ import {
 const testsName = "make";
 const startTaskCount = 8;
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let provider: MakeTaskProvider;
 let dirName: string;
 let fileUri: Uri;
@@ -30,7 +31,7 @@ suite("Makefile Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as MakeTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(join(dirName, "makefile"));
@@ -55,7 +56,7 @@ suite("Makefile Tests", () =>
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const makefileContent = teApi.testsApi.fs.readFileSync(getWsPath("make\\makefile"));
+        const makefileContent = teWrapper.fs.readFileSync(getWsPath("make\\makefile"));
         let index = provider.getDocumentPosition("rule1", makefileContent);
         expect(index).to.equal(273, `rule1 task position should be 273 (actual ${index}`);
         index = provider.getDocumentPosition("rule2", makefileContent);
@@ -79,7 +80,7 @@ suite("Makefile Tests", () =>
         const rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0],
               filePath = getWsPath(join(testsName, "makefile")),
               fileUri = Uri.file(filePath);
-        const pathToMake = teApi.testsApi.config.get<string>("pathToPrograms." + testsName, "nmake");
+        const pathToMake = teWrapper.configuration.get<string>("pathToPrograms." + testsName, "nmake");
         try {
             await executeSettingsUpdate("pathToPrograms." + testsName, "nmake");
             provider.createTask("test", "test", rootWorkspace, fileUri, []);
@@ -129,9 +130,9 @@ suite("Makefile Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "copy_dependencies                         :\n" +
             "   copy /y ..\\dep\\*.acm $(OUTPUT_DIRECTORY)\\bin\n" +
@@ -166,10 +167,10 @@ suite("Makefile Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.waitTime.fs.deleteFolderEvent + tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         endRollingCount(this);
     });
@@ -179,9 +180,9 @@ suite("Makefile Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "copy_dependencies                         :\n" +
             "   copy /y ..\\dep\\*.acm $(OUTPUT_DIRECTORY)\\bin\n" +
@@ -216,7 +217,7 @@ suite("Makefile Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

@@ -7,7 +7,8 @@
  */
 
 import { TextDecoder } from "util";
-import { getNonce } from "@env/crypto";
+import { getNonce } from "../lib/env/node/crypto";
+// import { getNonce } from "@env/crypto";
 import { Commands } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import { executeCommand } from "../lib/command";

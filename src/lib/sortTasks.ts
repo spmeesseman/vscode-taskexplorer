@@ -5,7 +5,7 @@ import { TreeItemLabel } from "vscode";
 import { TaskItem } from "../tree/item";
 import { TaskFile } from "../tree/file";
 import { TaskFolder } from "../tree/folder";
-import { IDictionary, ITaskFile, ITaskItem } from "../interface";
+import { IDictionary } from "../interface";
 import { configuration } from "./utils/configuration";
 
 
@@ -49,10 +49,10 @@ export const sortTaskFolder = (folder: TaskFolder, logPad: string, logLevel: num
 };
 
 
-export const sortTasks = (items: (ITaskFile | ITaskItem)[] | undefined, logPad: string, logLevel: number) =>
+export const sortTasks = (items: (TaskFile | TaskItem)[] | undefined, logPad: string, logLevel: number) =>
 {
     log.methodStart("sort tasks", logLevel, logPad);
-    items?.sort((a: ITaskFile | ITaskItem, b: ITaskFile | ITaskItem) =>
+    items?.sort((a: TaskFile | TaskItem, b: TaskFile | TaskItem) =>
     {               // TaskFiles are kept at the top, like a folder in Windows
         let s = -1; // Explorer (b instanceof TaskItem && a instanceof TaskFile)
         const labelA = (a.label as string | TreeItemLabel).toString(),

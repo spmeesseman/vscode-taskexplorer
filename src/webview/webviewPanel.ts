@@ -98,6 +98,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 			if (args.length === 2 && isObject(args[0]) && args[0].webview)
 			{
 				this._view = args[0] as WebviewPanel;
+				// State = args[1],.... still don't know wtf to do with 'State'.
 				args.splice(0, 2);
 			}
 			else

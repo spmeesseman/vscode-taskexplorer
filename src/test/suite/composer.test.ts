@@ -6,18 +6,19 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { ComposerTaskProvider } from "../../providers/composer";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "composer";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let dirName: string;
 let fileUri: Uri;
 
@@ -28,7 +29,7 @@ suite("Composer Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "composer.json"));
         endRollingCount(this, true);
@@ -38,7 +39,7 @@ suite("Composer Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -76,7 +77,7 @@ suite("Composer Tests", () =>
         const provider = teApi.providers[testsName] as ComposerTaskProvider;
         // provider.readTasks();
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(path.join(getWsPath("."), "composer.json"));
+        const docText = await teWrapper.fs.readFileAsync(path.join(getWsPath("."), "composer.json"));
         expect(provider.getDocumentPosition("doc", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("doc2", docText)).to.be.equal(1787); // pos of scripts block
         endRollingCount(this);
@@ -107,7 +108,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -118,7 +119,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -141,7 +142,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -165,7 +166,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -187,7 +188,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "include": ["**/*"],\n' +
@@ -203,7 +204,7 @@ suite("Composer Tests", () =>
     test("Invalid JSON", async function()
     {
         if (exitRollingCount(this)) return;
-        let resetLogging = teApi.log.isLoggingEnabled();
+        let resetLogging = teWrapper.log.isLoggingEnabled();
         if (resetLogging) { // turn scary error logging off
             this.slow(tc.slowTime.fs.modifyEvent + (tc.slowTime.config.event * 2) + tc.slowTime.taskCount.verify);
             executeSettingsUpdate("logging.enable", false);
@@ -212,7 +213,7 @@ suite("Composer Tests", () =>
         else {
             this.slow(tc.slowTime.fs.modifyEvent);
         }
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "{\n" +
             '  "scripts":\n' +
@@ -237,7 +238,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -248,7 +249,7 @@ suite("Composer Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

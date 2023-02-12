@@ -5,10 +5,11 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { RubyTaskProvider } from "../../providers/ruby";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     verifyTaskCount, waitForTeIdle
@@ -18,7 +19,7 @@ const testsName = "ruby";
 const startTaskCount = 1;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: RubyTaskProvider;
 let fileUri: Uri;
 
@@ -29,7 +30,7 @@ suite("Ruby Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as RubyTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "ruby_script.rb"));
         endRollingCount(this, true);
@@ -38,7 +39,7 @@ suite("Ruby Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });
 
@@ -99,7 +100,7 @@ suite("Ruby Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/ruby\n\n");
+        await teWrapper.fs.writeFile(fileUri.fsPath, "#!/usr/local/bin/ruby\n\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
@@ -110,7 +111,7 @@ suite("Ruby Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

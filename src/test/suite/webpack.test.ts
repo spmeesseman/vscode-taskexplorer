@@ -5,10 +5,11 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { WebpackTaskProvider } from "../../providers/webpack";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
@@ -21,7 +22,7 @@ const fileUri = Uri.file(path.join(dirName, "webpack.config.js"));
 const fileUri2 = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: WebpackTaskProvider;
 
 
@@ -31,10 +32,10 @@ suite("Webpack Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         startTaskCount = tc.isMultiRootWorkspace ? 15 : 0;
         provider = teApi.providers[testsName] as WebpackTaskProvider;
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         endRollingCount(this, true);
     });
 
@@ -42,8 +43,8 @@ suite("Webpack Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteFile(fileUri2.fsPath);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteFile(fileUri2.fsPath);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -96,7 +97,7 @@ suite("Webpack Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri2.fsPath,
+        await teWrapper.fs.writeFile(fileUri2.fsPath,
 `
 module.exports = (env) =>
 {
@@ -118,7 +119,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath,
+        await teWrapper.fs.writeFile(fileUri.fsPath,
 `
 module.exports = (env) =>
 {
@@ -140,7 +141,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(fileUri.fsPath);
+        const docText = await teWrapper.fs.readFileAsync(fileUri.fsPath);
         expect(provider.getDocumentPosition("stage", docText)).to.be.equal(0);
         endRollingCount(this);
     });
@@ -150,7 +151,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await verifyTaskCount(testsName, startTaskCount + 15);
         endRollingCount(this);
@@ -161,7 +162,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri2.fsPath);
+        await teWrapper.fs.deleteFile(fileUri2.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -172,7 +173,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath,
+        await teWrapper.fs.writeFile(fileUri.fsPath,
 `
 module.exports = (env) =>
 {
@@ -194,7 +195,7 @@ module.exports = (env) =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

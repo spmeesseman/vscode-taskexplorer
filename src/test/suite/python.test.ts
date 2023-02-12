@@ -8,17 +8,18 @@ import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { PythonTaskProvider } from "../../providers/python";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, logErrorsAreFine, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "python";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
@@ -35,15 +36,15 @@ suite("Python Tests", () =>
         //
         // Initialize
         //
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "test2.py"));
         //
         // Store / set initial settings
         //
-        pathToTaskProgram = teApi.testsApi.config.get<string>("pathToPrograms." + testsName);
-        enableTaskType = teApi.testsApi.config.get<boolean>("enabledTasks." + testsName);
+        pathToTaskProgram = teWrapper.configuration.get<string>("pathToPrograms." + testsName);
+        enableTaskType = teWrapper.configuration.get<boolean>("enabledTasks." + testsName);
         await executeSettingsUpdate("pathToPrograms." + testsName, testsName + "/" + testsName + ".exe", tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks." + testsName, true, tc.waitTime.config.enableEvent);
         endRollingCount(this, true);
@@ -55,7 +56,7 @@ suite("Python Tests", () =>
         if (exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate("pathToPrograms." + testsName, pathToTaskProgram, tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks." + testsName, enableTaskType, tc.waitTime.config.enableEvent);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -119,7 +120,7 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -130,7 +131,7 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
+        await teWrapper.fs.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
@@ -141,7 +142,7 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -152,7 +153,7 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
+        await teWrapper.fs.writeFile(fileUri.fsPath, "#!/usr/local/bin/python\n\n");
         await waitForTeIdle(tc.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1, 1);
         endRollingCount(this);
@@ -163,8 +164,8 @@ suite("Python Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + (tc.waitTime.fs.deleteEvent * 2) + tc.slowTime.taskCount.verify);
-        // await fsApi.deleteFile(fileUri.fsPath);
-        await fsApi.deleteDir(dirName);
+        // await teWrapper.fs.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent * 2);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

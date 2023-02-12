@@ -1,13 +1,12 @@
 
-import { log } from "../lib/log/log";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
+import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
-import { IEvent, ITaskTree } from "../interface";
+import { IEvent } from "../interface";
 import { TaskTreeManager } from "./treeManager";
-import { InitScripts, LoadScripts, NoScripts } from "../lib/noScripts";
-import { Event, EventEmitter, Task, TreeItem, Uri, commands, Disposable } from "vscode";
-import { timeout } from "../lib/utils/utils";
+import { InitScripts, LoadScripts } from "../lib/noScripts";
+import { Event, EventEmitter, Task, TreeItem, Disposable } from "vscode";
 
 
 /**
@@ -34,7 +33,7 @@ import { timeout } from "../lib/utils/utils";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTree implements ITaskTree, Disposable
+export class TaskTree implements Disposable
 {
     private static loadStage = 0;
     private defaultGetChildrenLogLevel = 1;

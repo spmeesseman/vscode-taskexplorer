@@ -6,20 +6,21 @@ import { join } from "path";
 import { Uri } from "vscode";
 import { AppPublisherTaskProvider } from "../../providers/appPublisher";
 import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, suiteFinished, testControl as tc, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
+import { deleteFile, writeFile } from "../../lib/utils/fs";
 
 const testsName = "apppublisher";
 const startTaskCount = 21;
 const rootPath = getWsPath(".");
 const fileUri = Uri.file(join(rootPath, ".publishrc.json"));
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
-
 
 suite("App-Publisher Tests", () =>
 {
@@ -29,7 +30,7 @@ suite("App-Publisher Tests", () =>
         // Initialize
         //
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -37,7 +38,7 @@ suite("App-Publisher Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteFile(fileUri.fsPath);
+        await deleteFile(fileUri.fsPath);
         suiteFinished(this);
     });
 
@@ -78,7 +79,7 @@ suite("App-Publisher Tests", () =>
         provider.getDocumentPosition(undefined, undefined);
         provider.getDocumentPosition("test", undefined);
         provider.getDocumentPosition(undefined, "test");
-        provider.createTask("publish", "publish", teApi.testsApi.wsFolder, Uri.file(getWsPath(".")), []);
+        provider.createTask("publish", "publish", teWrapper.wsfolder, Uri.file(getWsPath(".")), []);
         endRollingCount(this);
     });
 
@@ -87,7 +88,7 @@ suite("App-Publisher Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -129,7 +130,7 @@ suite("App-Publisher Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0"\n' +
@@ -156,7 +157,7 @@ suite("App-Publisher Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.commands.refresh + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await writeFile(
             fileUri.fsPath,
             "{\n" +
             '    "version": "1.0.0",\n' +
@@ -183,7 +184,7 @@ suite("App-Publisher Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

@@ -6,10 +6,11 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { env } from "process";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { JenkinsTaskProvider } from "../../providers/jenkins";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
@@ -17,8 +18,8 @@ import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, 
 const testsName = "jenkins";
 let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let provider: JenkinsTaskProvider;
 let fileUri: Uri;
 let setEnvJenkinsToken = false;
@@ -29,7 +30,7 @@ suite("Jenkins Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         startTaskCount = tc.isMultiRootWorkspace ? 1 : 0;
         provider = teApi.providers[testsName] as JenkinsTaskProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "Jenkinsfile"));
@@ -37,9 +38,9 @@ suite("Jenkins Tests", () =>
             env.JENKINS_API_TOKEN = "FAKE_TOKEN";
             setEnvJenkinsToken = true;
         }
-        teApi.testsApi.enableConfigWatcher(false);
+        teWrapper.configwatcher = false;
         await executeSettingsUpdate("pathToPrograms.jenkins", "https://jenkins.pjats.com");
-        teApi.testsApi.enableConfigWatcher(true);
+        teWrapper.configwatcher = true;
         endRollingCount(this, true);
     });
 
@@ -50,10 +51,10 @@ suite("Jenkins Tests", () =>
         if (setEnvJenkinsToken) {
             delete env.JENKINS_API_TOKEN;
         }
-        await fsApi.deleteFile(fileUri.fsPath);
-        teApi.testsApi.enableConfigWatcher(false);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
+        teWrapper.configwatcher = false;
         await executeSettingsUpdate("pathToPrograms.jenkins", "");
-        teApi.testsApi.enableConfigWatcher(true);
+        teWrapper.configwatcher = true;
         suiteFinished(this);
     });
 
@@ -106,7 +107,7 @@ suite("Jenkins Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath,
+        await teWrapper.fs.writeFile(fileUri.fsPath,
 `
 pipeline {
     agent any
@@ -129,7 +130,7 @@ pipeline {
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(fileUri.fsPath);
+        const docText = await teWrapper.fs.readFileAsync(fileUri.fsPath);
         expect(provider.getDocumentPosition("stage", docText)).to.be.equal(0);
         endRollingCount(this);
     });
@@ -139,7 +140,7 @@ pipeline {
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -150,7 +151,7 @@ pipeline {
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath,
+        await teWrapper.fs.writeFile(fileUri.fsPath,
 `
 pipeline {
     agent any
@@ -200,7 +201,7 @@ pipeline {
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

@@ -4,10 +4,11 @@
 
 import { join } from "path";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { BashTaskProvider } from "../../providers/bash";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl, treeUtils, verifyTaskCount, logErrorsAreFine, suiteFinished,
     exitRollingCount, waitForTeIdle, endRollingCount, needsTreeBuild
@@ -18,8 +19,8 @@ const startTaskCount = 1;
 const dirName = getWsPath("tasks_test_");
 const fileUri = Uri.file(join(dirName, "test_provider.sh"));
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 let wsFolder: WorkspaceFolder;
 
 
@@ -29,7 +30,7 @@ suite("Bash Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         wsFolder = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         endRollingCount(this, true);
     });
@@ -38,7 +39,7 @@ suite("Bash Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -105,9 +106,9 @@ suite("Bash Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
-        await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
+        await teWrapper.fs.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
@@ -118,7 +119,7 @@ suite("Bash Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -129,7 +130,7 @@ suite("Bash Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUri.fsPath, "echo test 123\n\n");
+        await teWrapper.fs.writeFile(fileUri.fsPath, "echo test 123\n\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent);
         await verifyTaskCount(testsName, startTaskCount + 1);
         endRollingCount(this);
@@ -140,7 +141,7 @@ suite("Bash Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

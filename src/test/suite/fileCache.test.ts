@@ -2,10 +2,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
-import { ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
+import { TeWrapper } from "../../lib/wrapper";
 
-let testsApi: ITestsApi;
+let teWrapper: TeWrapper;
 const tc = utils.testControl;
 
 
@@ -14,10 +14,10 @@ suite("File Cache Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ testsApi } = await utils.activate(this));
-        await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        ({ teWrapper } = await utils.activate(this));
+        await teWrapper.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         utils.endRollingCount(this, true);
     });
 
@@ -26,9 +26,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this, false, true)) return;
         await executeSettingsUpdate("enablePersistentFileCaching", false);
-        await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        await teWrapper.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
         utils.suiteFinished(this);
     });
 
@@ -64,7 +64,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuild + tc.slowTime.min);
-        await testsApi.fileCache.rebuildCache("", true);
+        await teWrapper.filecache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -82,10 +82,10 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuild + (tc.slowTime.config.event * 3) + (tc.slowTime.taskCount.verify * 6));
-        await testsApi.storage.update2("fileCacheTaskFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFilesMap", undefined);
-        await testsApi.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
-        await testsApi.fileCache.rebuildCache("", true);
+        await teWrapper.storage.update2("fileCacheTaskFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFilesMap", undefined);
+        await teWrapper.storage.update2("fileCacheProjectFileToFileCountMap", undefined);
+        await teWrapper.filecache.rebuildCache("", true);
         await utils.sleep(tc.waitTime.min);
         await checkTaskCounts();
         utils.endRollingCount(this);
@@ -106,7 +106,7 @@ suite("File Cache Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuild + tc.slowTime.commands.fast);
         // await treeUtils.refresh(this);
-        await testsApi.fileCache.rebuildCache("", true);
+        await teWrapper.filecache.rebuildCache("", true);
         await utils.waitForTeIdle(tc.waitTime.commandFast);
         utils.endRollingCount(this);
     });
@@ -124,7 +124,7 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + tc.waitTime.min);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -134,8 +134,8 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + tc.waitTime.min);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
-        await testsApi.fileCache.cancelBuildCache();
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -145,9 +145,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 80);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(40);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -157,9 +157,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 150);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(75);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -169,9 +169,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 200);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(100);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -181,9 +181,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 500);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(250);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -193,9 +193,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 1000);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(500);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -205,9 +205,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 1500);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(750);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -217,9 +217,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.rebuildCancel + 2000);
-        testsApi.fileCache.rebuildCache(""); // Don't 'await'
+        teWrapper.filecache.rebuildCache(""); // Don't 'await'
         await utils.sleep(1000);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -229,8 +229,8 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel);
-        testsApi.fileCache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
-        await testsApi.fileCache.cancelBuildCache();
+        teWrapper.filecache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -240,9 +240,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 20);
-        testsApi.fileCache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("gulp", undefined, true, ""); // Don't 'await'
         await utils.sleep(10);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -252,9 +252,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 40);
-        testsApi.fileCache.buildTaskTypeCache("python", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("python", undefined, true, ""); // Don't 'await'
         await utils.sleep(20);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -264,9 +264,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 100);
-        testsApi.fileCache.buildTaskTypeCache("batch", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("batch", undefined, true, ""); // Don't 'await'
         await utils.sleep(50);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -276,9 +276,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 150);
-        testsApi.fileCache.buildTaskTypeCache("bash", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("bash", undefined, true, ""); // Don't 'await'
         await utils.sleep(75);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -288,9 +288,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 300);
-        testsApi.fileCache.buildTaskTypeCache("ant", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("ant", undefined, true, ""); // Don't 'await'
         await utils.sleep(150);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -300,9 +300,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 500);
-        testsApi.fileCache.buildTaskTypeCache("npm", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("npm", undefined, true, ""); // Don't 'await'
         await utils.sleep(250);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });
@@ -312,9 +312,9 @@ suite("File Cache Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.cache.buildCancel + 1000);
-        testsApi.fileCache.buildTaskTypeCache("grunt", undefined, true, ""); // Don't 'await'
+        teWrapper.filecache.buildTaskTypeCache("grunt", undefined, true, ""); // Don't 'await'
         await utils.sleep(500);
-        await testsApi.fileCache.cancelBuildCache();
+        await teWrapper.filecache.cancelBuildCache();
         await utils.sleep(tc.waitTime.min);
         utils.endRollingCount(this);
     });

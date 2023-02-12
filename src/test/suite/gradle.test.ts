@@ -5,10 +5,11 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupBuildTree } from "../utils/suiteUtils";
 import { GradleTaskProvider } from "../../providers/gradle";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
@@ -18,7 +19,7 @@ const testsName = "gradle";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: GradleTaskProvider;
 let dirName: string;
 let fileUri: Uri;
@@ -30,7 +31,7 @@ suite("Gradle Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as GradleTaskProvider;
         dirName = getWsPath(".");
         fileUri = Uri.file(path.join(dirName, "test2.gradle"));
@@ -64,7 +65,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this)) return;
         testInvDocPositions(provider);
-        const docText = await fsApi.readFileAsync(path.join(dirName, "test.gradle"));
+        const docText = await teWrapper.fs.readFileAsync(path.join(dirName, "test.gradle"));
         expect(provider.getDocumentPosition("fatJar", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("emptyTask", docText)).to.be.greaterThan(0);
         expect(provider.getDocumentPosition("fatJar2", docText)).to.be.equal(0);
@@ -105,7 +106,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "\ntask fatJar10(type: Jar) {\n" +
             "    manifest {}\n" +
@@ -122,7 +123,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.modifyEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "\ntask fatJar10(type: Jar) {\n" +
             "    manifest {}\n" +
@@ -143,7 +144,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             fileUri.fsPath,
             "\ntask fatJar10(type: Jar) {\n" +
             "    manifest {}\n" +
@@ -160,7 +161,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteEvent + tc.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUri.fsPath);
+        await teWrapper.fs.deleteFile(fileUri.fsPath);
         await waitForTeIdle(tc.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);

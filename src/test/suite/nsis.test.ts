@@ -4,20 +4,17 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { NsisTaskProvider } from "../../providers/nsis";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-    activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished,
-    testControl, treeUtils
-} from "../utils/utils";
-import { focusExplorerView } from "../utils/commandUtils";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl } from "../utils/utils";
 
 const testsName = "nsis";
 const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
+let teWrapper: TeWrapper;
 let provider: NsisTaskProvider;
 let dirName: string;
 let fileUri: Uri;
@@ -29,7 +26,7 @@ suite("Nullsoft NSIS Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         provider = teApi.providers[testsName] as NsisTaskProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.nsi"));
@@ -97,10 +94,10 @@ suite("Nullsoft NSIS Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.createEvent + testControl.waitTime.min);
-        // if (!(await fsApi.pathExists(dirName))) {
-        //     await fsApi.createDir(dirName);
+        // if (!(await teWrapper.fs.pathExists(dirName))) {
+        //     await teWrapper.fs.createDir(dirName);
         // }
-        // await fsApi.writeFile(
+        // await teWrapper.fs.writeFile(
         //     fileUri.fsPath,
         //     "module.exports = function(nsis) {\n" +
         //     '    nsis.registerTask(\n"default2", ["jshint:myproject"]);\n' +
@@ -118,8 +115,8 @@ suite("Nullsoft NSIS Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify + testControl.waitTime.fs.deleteEvent + testControl.waitTime.min);
-        // await fsApi.deleteFile(fileUri.fsPath);
-        // await fsApi.deleteDir(dirName);
+        // await teWrapper.fs.deleteFile(fileUri.fsPath);
+        // await teWrapper.fs.deleteDir(dirName);
         // await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         // await verifyTaskCount(testsName, startTaskCount);
         // await waitForTeIdle(testControl.waitTime.min);

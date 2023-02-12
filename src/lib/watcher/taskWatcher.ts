@@ -5,24 +5,23 @@ import { log } from "../log/log";
 import { TaskItem } from "../../tree/item";
 import { configuration } from "../utils/configuration";
 import { SpecialTaskFolder } from "../../tree/specialFolder";
-import { IDictionary, ITaskTreeManager } from "../../interface";
+import { IDictionary } from "../../interface";
 import {
     Disposable, WorkspaceFolder, tasks, TaskStartEvent, StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";
+import { TaskTreeManager } from "src/tree/treeManager";
 
 
 export class TaskWatcher implements Disposable
 {
 
     private statusBarSpace: StatusBarItem;
-    private treeManager: ITaskTreeManager;
+    private treeManager: TaskTreeManager;
     private disposables: Disposable[];
-    private babysitterCt = 0;
-    private babysitterTimers: IDictionary<NodeJS.Timeout> = {};
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
-    constructor(treeManager: ITaskTreeManager, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
+    constructor(treeManager: TaskTreeManager, specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder })
     {
         this.treeManager = treeManager;
         this.specialFolders = specialFolders;

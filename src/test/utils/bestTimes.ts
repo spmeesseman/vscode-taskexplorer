@@ -1,8 +1,8 @@
 
 
-import { teApi } from "./utils";
 import { figures } from "../../lib/figures";
 import { testControl as tc } from "../control";
+import { storage } from "../../lib/utils/storage";
 import { properCase } from "../../lib/utils/commonUtils";
 import { lowerCaseFirstChar } from "../../lib/utils/utils";
 
@@ -13,9 +13,9 @@ const timeSep = "---------------------------------------------------------------
 const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
 {
     const _clr = async () => {
-        await teApi.testsApi.storage.update2(storageKey, undefined);
-        await teApi.testsApi.storage.update2(storageKey + "Fmt", undefined);
-        await teApi.testsApi.storage.update2(storageKey + "NumTests", undefined);
+        await storage.update2(storageKey, undefined);
+        await storage.update2(storageKey + "Fmt", undefined);
+        await storage.update2(storageKey + "NumTests", undefined);
     };
     if (tct.clearBestTime || tct.clearAllBestTimes)
     {
@@ -23,7 +23,7 @@ const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
     }
     else if (tct.clearBestTimesOnTestCountChange)
     {
-        const prevNumTests = await teApi.testsApi.storage.get2<number>(storageKey + "NumTests", 0);
+        const prevNumTests = await storage.get2<number>(storageKey + "NumTests", 0);
         if (prevNumTests < numTests) {
             await _clr();
         }
@@ -59,7 +59,7 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 {
     let msg: string;
     let wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
-    const prevBestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
+    const prevBestTimeElapsedFmt = await storage.get2<string>(storageKey + "Fmt", ""),
           prevMsg = ` The previous fastest time recorded for a ${wsTypeMsg} workspace was ${prevBestTimeElapsedFmt}`,
           preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
     wsTypeMsg = tc.isMultiRootWorkspace ? "Multi-Root" : "Single-Root";
@@ -97,7 +97,7 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
 
     await clearProcessTimeStorage(storageKey, numTests);
 
-    let bestTimeElapsed = await teApi.testsApi.storage.get2<number>(storageKey, 0);
+    let bestTimeElapsed = await storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
         bestTimeElapsed = timeElapsed + 1;
     }
@@ -110,7 +110,7 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
     }
     else {
         const wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
-        const bestTimeElapsedFmt = await teApi.testsApi.storage.get2<string>(storageKey + "Fmt", ""),
+        const bestTimeElapsedFmt = await storage.get2<string>(storageKey + "Fmt", ""),
               msg1 = `The time elapsed was ${timeElapsedFmt}`,
               msg2 = `The fastest time recorded for a ${wsTypeMsg} workspace is ${bestTimeElapsedFmt}`;
         console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
@@ -197,8 +197,8 @@ export const processTimes = async (timeStarted: number, hadRollingCountError: bo
 
 const saveProcessTimeToStorage = async (key: string, timeElapsed: number, timeElapseFmt: string, numTests: number) =>
 {
-    await teApi.testsApi.storage.update2(key, timeElapsed);
-    await teApi.testsApi.storage.update2(key + "Fmt", timeElapseFmt);
-    await teApi.testsApi.storage.update2(key + "NumTests", numTests);
+    await storage.update2(key, timeElapsed);
+    await storage.update2(key + "Fmt", timeElapseFmt);
+    await storage.update2(key + "NumTests", numTests);
 };
 

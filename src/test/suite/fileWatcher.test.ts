@@ -2,12 +2,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as utils from "../utils/utils";
-import fsUtils from "../utils/fsUtils";
 import { join } from "path";
+import fsUtils from "../utils/fsUtils";
+import * as utils from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IDictionary, IFilesystemApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { IConfiguration } from "@spmeesseman/vscode-taskexplorer-types/lib/IConfiguration";
+import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -16,8 +16,7 @@ const startTaskCountGrunt = 7;
 const startTaskCountGulp = 17;
 const startTaskCountWs = 13; // 10 + 3 User Tasks
 let startTaskCountNpm = 2;  // set in suiteSetup() as it will change depending on single or multi root ws
-let fsApi: IFilesystemApi;
-let configApi: IConfiguration;
+let teWrapper: TeWrapper;
 let insideWsDir: string;
 let insideWsDir2: string;
 let insideWsDirIgn: string;
@@ -33,14 +32,14 @@ suite("File Watcher Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        ({ fsApi, configApi } = await utils.activate(this));
+        ({ teWrapper } = await utils.activate(this));
         startTaskCountNpm = tc.isMultiRootWorkspace ? 17 : 2;
         rootPath = utils.getWsPath(".");
         insideWsDir = join(rootPath, "tasks_test_");
         insideWsDir2 = join(rootPath, "tasks_test2_");
         insideWsDirIgn = join(rootPath, "fwTestIgnore");
         outsideWsDir = utils.getProjectsPath("testA");
-        excludes = configApi.get<string[]>("exclude");
+        excludes = teWrapper.configuration.get<string[]>("exclude");
         files = {
             grunt1_0: join(insideWsDir, "Gruntfile.js"),
             grunt1_1: join(insideWsDir, "Gruntfile1.js"),
@@ -106,8 +105,8 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent * 2);
-        await fsApi.createDir(insideWsDir);
-        await fsApi.createDir(insideWsDir2);
+        await teWrapper.fs.createDir(insideWsDir);
+        await teWrapper.fs.createDir(insideWsDir2);
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         utils.endRollingCount(this);
     });
@@ -245,11 +244,11 @@ suite("File Watcher Tests", () =>
             '    grunt.registerTask("upload13", ["s3"]);\n' +
             "};\n"
         );
-        await fsApi.copyDir(outsideWsDir, insideWsDir, /Gruntfile\.js/, true); // copy folder
+        await teWrapper.fs.copyDir(outsideWsDir, insideWsDir, /Gruntfile\.js/, true); // copy folder
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
-        await fsApi.copyDir(outsideWsDir, insideWsDir); // copies files only within outsideWsDir
-        await fsApi.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
+        await teWrapper.fs.copyDir(outsideWsDir, insideWsDir); // copies files only within outsideWsDir
+        await teWrapper.fs.copyDir(outsideWsDir, insideWsDir, /Gulpfile/); // cover filter yielding 0 files
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
         utils.endRollingCount(this);
@@ -271,7 +270,7 @@ suite("File Watcher Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent + tc.slowTime.taskCount.verify + (tc.slowTime.licenseMgr.setLicenseCmd * 2));
         utils.setLicensed(false);
-        await fsApi.copyDir(outsideWsDir, insideWsDir, undefined, true); // copy folder
+        await teWrapper.fs.copyDir(outsideWsDir, insideWsDir, undefined, true); // copy folder
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         utils.setLicensed(true);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 4);
@@ -304,7 +303,7 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("gruntIgn_2", 1, "");
         await writeGulpFile("gulp1_0", 1, "");
         await writeGulpFile("gulp2_0", 125, " ");
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             join(insideWsDir2, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
@@ -315,7 +314,7 @@ suite("File Watcher Tests", () =>
         writeGruntFile("grunt2_0", 1, "");
         await writeGulpFile("gulp2_0", 50, "");
         await writeGruntFile("grunt2_0", 1, " ");
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             join(insideWsDir2, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
@@ -324,21 +323,21 @@ suite("File Watcher Tests", () =>
         );
         await utils.sleep(50);
         await writeGulpFile("gulp2_0", 1, " ");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 1, "  ");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 125, "");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 1, "");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 1, "");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 125, "");
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await writeGruntFile("grunt2_0", 1, "");
         await writeGruntFile("grunt2_1", 1, "");
         await writeGulpFile("gulp2_1", 1, "");
-        await fsApi.deleteFile(files.grunt2_0);
+        await teWrapper.fs.deleteFile(files.grunt2_0);
         await writeGruntFile("grunt2_1", 50, "");
         await writeGruntFile("gruntIgn_0", 1, "  ");
         await writeGruntFile("grunt1_5", 1, "");
@@ -346,8 +345,8 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("grunt1_5", 50, "");
         await writeGruntFile("grunt2_6", 1, "");
         await writeGruntFile("grunt2_7", 50, "");
-        await fsApi.deleteFile(files.grunt2_6);
-        await fsApi.deleteFile(files.grunt2_7);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_7);
         await writeGruntFile("grunt2_6", 1, "");
         await writeGruntFile("grunt2_7", 125, "");
         await writeGruntFile("grunt2_0", 1, "  ");
@@ -355,32 +354,32 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("gruntIgn_0", 1, "");
         await writeGruntFile("grunt1_0", 125, "");
         await writeGruntFile("grunt1_0", 125, " ");
-        await fsApi.deleteFile(files.grunt1_3);
+        await teWrapper.fs.deleteFile(files.grunt1_3);
         await writeGruntFile("grunt1_0", 50, " ");
-        await fsApi.deleteFile(files.grunt1_3);
+        await teWrapper.fs.deleteFile(files.grunt1_3);
         await writeGruntFile("grunt1_0", 125, " ");
-        await fsApi.deleteFile(files.grunt1_3);
+        await teWrapper.fs.deleteFile(files.grunt1_3);
         await writeGruntFile("grunt1_0", 25, " ");
-        await fsApi.deleteFile(files.grunt1_3);
+        await teWrapper.fs.deleteFile(files.grunt1_3);
         await writeGruntFile("grunt1_0", 25, " ");
-        await fsApi.deleteFile(files.grunt1_3);
+        await teWrapper.fs.deleteFile(files.grunt1_3);
         await utils.sleep(500);
-        await fsApi.deleteFile(files.gulp1_0);
-        await fsApi.deleteFile(files.gulp2_1);
+        await teWrapper.fs.deleteFile(files.gulp1_0);
+        await teWrapper.fs.deleteFile(files.gulp2_1);
         await utils.sleep(25);
-        await fsApi.deleteFile(files.gulp2_0);
-        await fsApi.deleteFile(files.grunt2_0);
+        await teWrapper.fs.deleteFile(files.gulp2_0);
+        await teWrapper.fs.deleteFile(files.grunt2_0);
         await writeGruntFile("grunt2_0", 1, "");
-        await fsApi.deleteFile(files.grunt2_0);
-        await fsApi.deleteFile(files.grunt2_1);
-        await fsApi.deleteFile(files.grunt2_2);
-        await fsApi.deleteFile(files.grunt2_3);
+        await teWrapper.fs.deleteFile(files.grunt2_0);
+        await teWrapper.fs.deleteFile(files.grunt2_1);
+        await teWrapper.fs.deleteFile(files.grunt2_2);
+        await teWrapper.fs.deleteFile(files.grunt2_3);
         await utils.sleep(25);
-        await fsApi.deleteFile(files.grunt2_4);
-        await fsApi.deleteFile(files.grunt2_5);
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_4);
+        await teWrapper.fs.deleteFile(files.grunt2_5);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await utils.sleep(25);
-        await fsApi.deleteFile(files.grunt2_7);
+        await teWrapper.fs.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2); // 2 less than previous test, blanked /_test_files/Gruntfile.js
         utils.endRollingCount(this);
@@ -410,7 +409,7 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("grunt2_5", 1, "");
         await writeGruntFile("grunt2_6", 125, "");
         await writeGruntFile("grunt2_7", 1, "");
-        await fsApi.writeFile(
+        await teWrapper.fs.writeFile(
             join(insideWsDir2, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"d45", ["jshint:m2"]);\n' +
@@ -439,19 +438,19 @@ suite("File Watcher Tests", () =>
         await writeGruntFile("grunt2_1", 1, "");
         await writeGruntFile("grunt2_1", 125, " ");
         await writeGruntFile("grunt2_1", 1, "");
-        await fsApi.deleteFile(files.grunt2_0);
+        await teWrapper.fs.deleteFile(files.grunt2_0);
         await utils.sleep(25);
-        await fsApi.deleteFile(files.gulp2_0);
+        await teWrapper.fs.deleteFile(files.gulp2_0);
         await utils.sleep(25);
-        await fsApi.deleteFile(files.grunt2_1);
+        await teWrapper.fs.deleteFile(files.grunt2_1);
         await utils.sleep(500);
-        await fsApi.deleteFile(files.grunt2_2);
-        await fsApi.deleteFile(files.grunt2_3);
+        await teWrapper.fs.deleteFile(files.grunt2_2);
+        await teWrapper.fs.deleteFile(files.grunt2_3);
         await utils.sleep(50);
-        await fsApi.deleteFile(files.grunt2_5);
-        await fsApi.deleteFile(files.grunt2_6);
+        await teWrapper.fs.deleteFile(files.grunt2_5);
+        await teWrapper.fs.deleteFile(files.grunt2_6);
         await utils.sleep(50);
-        await fsApi.deleteFile(files.grunt2_7);
+        await teWrapper.fs.deleteFile(files.grunt2_7);
         await utils.waitForTeIdle(tc.waitTime.fs.createEvent * 2);
         await utils.verifyTaskCount("grunt", startTaskCountGrunt + 2);
         utils.endRollingCount(this);
@@ -462,10 +461,10 @@ suite("File Watcher Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.deleteFolderEvent + (tc.slowTime.taskCount.verify * 6));
-        await fsApi.deleteDir(outsideWsDir);
-        await fsApi.deleteDir(insideWsDir);
-        await fsApi.deleteDir(insideWsDir2);
-        await fsApi.deleteDir(insideWsDirIgn);
+        await teWrapper.fs.deleteDir(outsideWsDir);
+        await teWrapper.fs.deleteDir(insideWsDir);
+        await teWrapper.fs.deleteDir(insideWsDir2);
+        await teWrapper.fs.deleteDir(insideWsDirIgn);
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
         await checkTaskCounts(this);
         utils.endRollingCount(this);
@@ -488,13 +487,13 @@ const checkTaskCounts = async (instance: Mocha.Context) =>
 
 const writeGruntFile = async(file: string, msSleep: number, content: string) =>
 {
-    await fsApi.writeFile(files[file], content);
+    await teWrapper.fs.writeFile(files[file], content);
     await utils.sleep(msSleep);
 };
 
 
 const writeGulpFile = async(file: string, msSleep: number, content: string) =>
 {
-    await fsApi.writeFile(files[file], content);
+    await teWrapper.fs.writeFile(files[file], content);
     await utils.sleep(msSleep);
 };

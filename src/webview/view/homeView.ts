@@ -2,11 +2,10 @@
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/context";
-import { TasksChangeEvent } from "../../interface";
+import { TasksChangeEvent, TeSessionChangeEvent } from "../../interface";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
-import { TeSessionChangeEvent } from "../../interface/ILicenseManager";
 import { removeLicenseButtons } from "../common/removeLicenseButtons";
 import { IpcMessage, onIpc } from "../common/ipc";
 

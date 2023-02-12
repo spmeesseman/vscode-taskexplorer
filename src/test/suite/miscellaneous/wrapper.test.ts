@@ -13,7 +13,7 @@ let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 
 
-suite("Container Tests", () =>
+suite("Wrapper Tests", () =>
 {
 
     suiteSetup(async function()
@@ -72,13 +72,13 @@ suite("Container Tests", () =>
     test("Access API Getter Properties", async function()
     {
         if (exitRollingCount(this)) return;
-        expect(teApi.explorer).to.not.be.undefined;
-        expect(teApi.explorerView).to.not.be.undefined;
-        expect(teApi.sidebar).to.be.undefined;
-        expect(teApi.sidebarView).to.be.undefined;
-        expect(teApi.isLicensed()).to.be.oneOf([ true, false ]);
-        expect(teApi.isBusy()).to.be.oneOf([ true, false ]);
-        expect(teApi.isTests()).to.be.equal(true);
+        expect(teWrapper.explorer).to.not.be.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.sidebar).to.be.undefined;
+        expect(teWrapper.sidebarView).to.be.undefined;
+        expect(teWrapper.licenseManager.isLicensed()).to.be.oneOf([ true, false ]);
+        expect(teWrapper.busy).to.be.oneOf([ true, false ]);
+        expect(teWrapper.tests).to.be.equal(true);
         endRollingCount(this);
     });
 

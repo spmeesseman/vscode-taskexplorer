@@ -1,7 +1,10 @@
 
 import { log } from "./log/log";
+import * as fs from "./utils/fs";
 import * as fileCache from "./fileCache";
-import { IDictionary, ILog } from "../interface";
+import { TaskTree } from "src/tree/tree";
+import * as utilities from "./utils/utils";
+import { isExtensionBusy } from "src/extension";
 import { IStorage } from "../interface/IStorage";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
@@ -32,10 +35,10 @@ import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
 import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
-import { ILicenseManager } from "../interface/ILicenseManager";
 import { TeAuthenticationProvider } from "./auth/authProvider";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
-import { registerConfigWatcher } from "./watcher/configWatcher";
+import { enableConfigWatcher, registerConfigWatcher } from "./watcher/configWatcher";
+import { IDictionary, ILog, ITaskTreeView } from "../interface";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
@@ -43,8 +46,8 @@ import { ParsingReportPage } from "../webview/page/parsingReportPage";
 import { registerAddToExcludesCommand } from "../commands/addToExcludes";
 import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
-import { ExtensionContext, EventEmitter, ExtensionMode, tasks } from "vscode";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
+import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder } from "vscode";
 
 
 export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
@@ -53,10 +56,12 @@ export class TeWrapper
 {
 	static #instance: TeWrapper | undefined;
 
-	private _licenseManager: ILicenseManager;
+	private _licenseManager: LicenseManager;
 	private _treeManager: TaskTreeManager;
 
 	private _ready = false;
+	private _busy = false;
+	private _tests = false;
 	private readonly _version: string;
 	private readonly _prerelease;
 	private readonly _context: ExtensionContext;
@@ -79,9 +84,7 @@ export class TeWrapper
 	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
     {
 		if (TeWrapper.#instance) throw new Error("TeWrapper is already initialized");
-
 		TeWrapper.#instance = new TeWrapper(context, storage, configuration, prerelease, version, previousVersion);
-console.log("instance_create1: " + !!TeWrapper.#instance);
 		return TeWrapper.#instance;
 	}
 
@@ -228,6 +231,10 @@ console.log("instance_create1: " + !!TeWrapper.#instance);
 		return this._context.extensionMode === ExtensionMode.Development;
 	}
 
+	set configwatcher(e: boolean) {
+		enableConfigWatcher(e);
+	}
+
 	get env(): "dev" | "tests" | "production"
     {
 		const isDev = this._context.extensionMode === ExtensionMode.Development,
@@ -235,8 +242,34 @@ console.log("instance_create1: " + !!TeWrapper.#instance);
 		return !isDev && !isTests ? "production" : (isTests ? "tests" : "dev");
 	}
 
+    get explorer()
+    {
+        return this.treeManager.views.taskExplorer?.tree;
+    }
+
+    set explorer(tree)
+    {
+        (this.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as TaskTree;
+    }
+
+    get explorerView() {
+        return this.treeManager.views.taskExplorer?.view;
+    }
+
+	get filecache() {
+		return fileCache;
+	}
+
+	get fs() {
+		return fs;
+	}
+
 	get id() {
 		return this._context.extension.id;
+	}
+
+	get busy() {
+		return isExtensionBusy() || this._busy;
 	}
 
 	get log() {
@@ -259,9 +292,20 @@ console.log("instance_create1: " + !!TeWrapper.#instance);
 		return this._licenseManager;
 	}
 
-	get tests() {
-		return this._context.extensionMode === ExtensionMode.Test;
-	}
+
+    get sidebar() {
+        return this.treeManager.views.taskExplorerSideBar?.tree;
+    }
+
+    set sidebar(tree) {
+        if (this.treeManager.views.taskExplorerSideBar) {
+            this.treeManager.views.taskExplorerSideBar.tree = tree as TaskTree;
+        }
+    }
+
+    get sidebarView() {
+        return this.treeManager.views.taskExplorerSideBar?.view;
+    }
 
 	get treeManager() {
 		return this._treeManager;
@@ -305,6 +349,22 @@ console.log("instance_create1: " + !!TeWrapper.#instance);
 
 	get releaseNotesPage() {
 		return this._releaseNotesPage;
+	}
+
+	get tests() {
+		return this._tests || this._context.extensionMode === ExtensionMode.Test;
+	}
+
+	set tests(v) {
+		this._tests = v;
+	}
+
+	get utils() {
+		return utilities;
+	}
+
+	get wsfolder() {
+		return (workspace.workspaceFolders as WorkspaceFolder[])[0];
 	}
 
 	// await window.withProgress(

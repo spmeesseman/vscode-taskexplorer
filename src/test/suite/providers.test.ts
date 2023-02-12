@@ -8,8 +8,10 @@ import { tasks } from "vscode";
 import { TaskItem } from "../../tree/item";
 import { TaskFile } from "../../tree/file";
 import { refresh } from "../utils/treeUtils";
+import { TeWrapper } from "../../lib/wrapper";
+import { TaskMap } from "../../tree/treeBuilder";
 import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
-import { ITaskExplorerApi, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
@@ -19,8 +21,8 @@ import {
 const tempFiles: string[] = [];
 
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
-let taskFile: ITaskFile | undefined;
+let teWrapper: TeWrapper;
+let taskFile: TaskFile | undefined;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;
@@ -35,7 +37,7 @@ suite("Provider Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
@@ -48,7 +50,7 @@ suite("Provider Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await teApi.testsApi.config.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
+        await teWrapper.configuration.updateVsWs("terminal.integrated.shell.windows", tc.defaultWindowsShell);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         await executeSettingsUpdate("logging.enable", tc.log.enabled, tc.waitTime.config.event);
         await executeSettingsUpdate("enabledTasks", {
@@ -68,16 +70,16 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fs.createFolderEvent * 3);
-        if (!await fsApi.pathExists(dirName)) {
-            await fsApi.createDir(dirName);
+        if (!await teWrapper.fs.pathExists(dirName)) {
+            await teWrapper.fs.createDir(dirName);
             await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
-        if (!await fsApi.pathExists(dirNameL2)) {
-            await fsApi.createDir(dirNameL2);
+        if (!await teWrapper.fs.pathExists(dirNameL2)) {
+            await teWrapper.fs.createDir(dirNameL2);
             await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
-        if (!await fsApi.pathExists(dirNameIgn)) {
-            await fsApi.createDir(dirNameIgn);
+        if (!await teWrapper.fs.pathExists(dirNameIgn)) {
+            await teWrapper.fs.createDir(dirNameIgn);
             await waitForTeIdle(tc.waitTime.fs.createFolderEvent);
         }
         endRollingCount(this);
@@ -248,8 +250,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -273,8 +275,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 6) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
@@ -298,8 +300,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 4) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showLastTasks", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.folderState.favorites", "Collapsed");
@@ -324,8 +326,8 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.eventFast * 2) + (tc.slowTime.config.showHideSpecialFolder * 5) + (tc.slowTime.config.readEvent * 2));
-        const showFavorites = teApi.testsApi.config.get<boolean>("specialFolders.showFavorites");
-        const showLastTasks = teApi.testsApi.config.get<boolean>("specialFolders.showLastTasks");
+        const showFavorites = teWrapper.configuration.get<boolean>("specialFolders.showFavorites");
+        const showLastTasks = teWrapper.configuration.get<boolean>("specialFolders.showLastTasks");
         await executeSettingsUpdate("specialFolders.showFavorites", false, tc.waitTime.config.showHideSpecialFolder);
         try {
             await executeSettingsUpdate("specialFolders.showFavorites", true, tc.waitTime.config.showHideSpecialFolder);
@@ -349,7 +351,7 @@ suite("Provider Tests", () =>
         if (exitRollingCount(this)) return;
         let numOpened = 0,
             numFilesOpened = 0;
-        const taskMap = teApi.testsApi.treeManager.getTaskMap(),
+        const taskMap = teWrapper.treeManager.getTaskMap(),
               filesOpened: string[] = [];
         for (const t of Object.keys(taskMap))
         {
@@ -369,7 +371,7 @@ suite("Provider Tests", () =>
     test("Verify Task Counts", async function()
     {
         if (exitRollingCount(this)) return;
-        taskMap = teApi.testsApi.treeManager.getTaskMap();
+        taskMap = teWrapper.treeManager.getTaskMap();
         let taskCount = treeUtils.findIdInTaskMap(":ant", taskMap);
         expect(taskCount).to.be.equal(7, `Unexpected Ant task count (Found ${taskCount} of 7)`);
         taskCount = treeUtils.findIdInTaskMap(":apppublisher:", taskMap);
@@ -529,7 +531,7 @@ async function deleteTempFilesAndDirectories()
         while ((file = tempFiles.shift()))
         {
             try {
-                await fsApi.deleteFile(file);
+                await teWrapper.fs.deleteFile(file);
             }
             catch (error) {
                 console.log(error);
@@ -537,11 +539,11 @@ async function deleteTempFilesAndDirectories()
         }
     }
     try {
-        await fsApi.deleteDir(dirNameL2);
+        await teWrapper.fs.deleteDir(dirNameL2);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-        await fsApi.deleteDir(dirNameIgn);
+        await teWrapper.fs.deleteDir(dirNameIgn);
         await waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
     }
     catch (error) {
@@ -565,7 +567,7 @@ async function setupAnt()
     tempFiles.push(file4);
     tempFiles.push(file5);
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test2">\n' +
@@ -575,7 +577,7 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file3,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test1">\n' +
@@ -584,9 +586,9 @@ async function setupAnt()
         "</project>\n"
     );
 
-    await fsApi.writeFile(file4, '<?xml version="1.0"?>\n');
+    await teWrapper.fs.writeFile(file4, '<?xml version="1.0"?>\n');
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file5,
         '<?xml version="1.0"?>\n' +
         '<project basedir="." default="test2">\n' +
@@ -609,7 +611,7 @@ async function setupGradle()
     tempFiles.push(file2);
     tempFiles.push(file3);
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         "task fatJar2(type: Jar) {\n" +
         "    manifest {\n" +
@@ -623,7 +625,7 @@ async function setupGradle()
         "}\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file3,
         "task fatJar3(type: Jar) {\n" +
         "    manifest {\n" +
@@ -648,7 +650,7 @@ async function setupTsc()
     const file2 = join(dirName, "tsconfig.json");
     tempFiles.push(file2);
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file,
         "{\n" +
         '    "compilerOptions":\n' +
@@ -668,7 +670,7 @@ async function setupTsc()
         "}\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         "{\n" +
         '    "compilerOptions":\n' +
@@ -709,7 +711,7 @@ async function setupGulp()
     tempFiles.push(file5);
 
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         "const { series } = require('gulp');\n" +
         "function clean(cb) {\n" +
@@ -725,7 +727,7 @@ async function setupGulp()
         "exports.default = series(clean, build);\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file3,
         "var gulp = require('gulp');\n" +
         "gulp.task('hello3', (done) => {\n" +
@@ -738,7 +740,7 @@ async function setupGulp()
         "});\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file4,
         "import pkg from 'gulp';\n" +
         "const { task, series } = pkg;\n" +
@@ -761,7 +763,7 @@ async function setupGulp()
         "export const default123 = series(clean2, build2);\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file5,
         "var gulp = require('gulp');\n" +
         "gulp.task('group2-test2-build-ui-one', (done) => {\n" +
@@ -800,13 +802,13 @@ async function setupMakefile()
     const file3 = join(dirNameIgn, "Makefile");
     tempFiles.push(file3);
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         "# all tasks comment\n" +
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file3,
         "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
     );
@@ -825,8 +827,8 @@ async function setupBatch()
     const file3 = join(dirNameIgn, "test3.bat");
     tempFiles.push(file3);
 
-    await fsApi.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
-    await fsApi.writeFile(file3, "@echo testing batch file 3\r\n");
+    await teWrapper.fs.writeFile(file2, "@echo testing batch file 2\r\nsleep /t 5\r\n");
+    await teWrapper.fs.writeFile(file3, "@echo testing batch file 3\r\n");
     await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
 
@@ -842,9 +844,9 @@ async function setupBash()
     const file3 = join(dirNameIgn, "test3.sh");
     tempFiles.push(file3);
 
-    await fsApi.writeFile(file, "echo testing bash file\n");
-    await fsApi.writeFile(file2, "echo testing bash file 2\n");
-    await fsApi.writeFile(file3, "echo testing bash file 3\n");
+    await teWrapper.fs.writeFile(file, "echo testing bash file\n");
+    await teWrapper.fs.writeFile(file2, "echo testing bash file 2\n");
+    await teWrapper.fs.writeFile(file3, "echo testing bash file 3\n");
 
     await waitForTeIdle(tc.waitTime.fs.createEvent);
 }
@@ -863,7 +865,7 @@ async function setupGrunt()
     const file4 = join(dirNameL2, "GRUNTFILE.JS");
     tempFiles.push(file4);
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file2,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask(\n"default2", ["jshint:myproject"]);\n' +
@@ -871,7 +873,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file3,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask(\n"default3", ["jshint:myproject"]);\n' +
@@ -879,7 +881,7 @@ async function setupGrunt()
         "};\n"
     );
 
-    await fsApi.writeFile(
+    await teWrapper.fs.writeFile(
         file4,
         "module.exports = function(grunt) {\n" +
         '    grunt.registerTask("grp-test-svr-build1", ["s1"]);\n' +
@@ -910,9 +912,9 @@ async function createAntFile()
         const file = join(dirName, "build.xml");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 '<?xml version="1.0"?>\n' +
                 '<project basedir="." default="test1">\n' +
@@ -935,9 +937,9 @@ async function createAppPublisherFile()
         const file = join(rootPath, ".publishrc.json");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "{\n" +
                 '    "version": "1.0.0",\n' +
@@ -962,9 +964,9 @@ async function createMavenPomFile()
         const file = join(rootPath, "pom.xml");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n" +
                 "    <modelVersion>4.0.0</modelVersion>\n" +
@@ -982,9 +984,9 @@ async function createBatchFile()
     {
         const file = join(rootPath, "test.bat");
         tempFiles.push(file);
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(file, "@echo testing batch file\r\n");
+            await teWrapper.fs.writeFile(file, "@echo testing batch file\r\n");
             await waitForTeIdle(tc.waitTime.fs.createEvent);
         }
     }
@@ -998,9 +1000,9 @@ async function createGradleFile()
         const file = join(dirName, "build.gradle");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "task fatJar(type: Jar) {\n" +
                 "    manifest {\n" +
@@ -1026,9 +1028,9 @@ async function createGruntFile()
         const file = join(rootPath, "GRUNTFILE.js");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "module.exports = function(grunt) {\n" +
                 "    grunt.registerTask(\n'default', ['jshint:myproject']);\n" +
@@ -1048,9 +1050,9 @@ async function createGulpFile()
         const file = join(rootPath, "gulpfile.js");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "var gulp = require('gulp');\n" +
                 "gulp.task(\n'hello', (done) => {\n" +
@@ -1074,9 +1076,9 @@ async function createMakeFile()
         const file = join(rootPath, "Makefile");
         tempFiles.push(file);
 
-        if (!await fsApi.pathExists(file))
+        if (!await teWrapper.fs.pathExists(file))
         {
-            await fsApi.writeFile(
+            await teWrapper.fs.writeFile(
                 file,
                 "all   : temp.exe\r\n" + "    @echo Building app\r\n" + "clean: t1\r\n" + "    rmdir /q /s ../build\r\n"
             );

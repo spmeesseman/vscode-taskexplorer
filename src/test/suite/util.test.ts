@@ -13,18 +13,18 @@ import { expect } from "chai";
 import { InitScripts } from "../../lib/noScripts";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { camelCase, properCase } from "../../lib/utils/commonUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
 	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
 let rootUri: Uri;
-let teApi: ITaskExplorerApi;
+let teWrapper: TeWrapper;
 
 
 suite("Util Tests", () =>
@@ -33,7 +33,7 @@ suite("Util Tests", () =>
 	suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi } = await activate(this));
+        ({ teWrapper } = await activate(this));
 		rootUri = (workspace.workspaceFolders as WorkspaceFolder[])[0].uri;
         await executeSettingsUpdate("logging.enable", true);
         await executeSettingsUpdate("logging.enableOutputWindow", true);
@@ -414,9 +414,9 @@ suite("Util Tests", () =>
     test("Miscellaneous", async function()
     {
         if (exitRollingCount(this)) return;
-        const item = new InitScripts(teApi.testsApi.explorer); // it won't cover since no focus the view until after a bunch of test suites
+        const item = new InitScripts(teWrapper.explorer); // it won't cover since no focus the view until after a bunch of test suites
 		// item.dispose();
-        teApi.testsApi.explorer.isVisible();
+       	teWrapper.explorer.isVisible();
         await pathUtils.getInstallPath();
         endRollingCount(this);
     });
@@ -699,30 +699,30 @@ suite("Util Tests", () =>
     test("Storage", async function()
     {
         if (exitRollingCount(this)) return;
-        if (teApi.testsApi.storage)
+        if (teWrapper.storage)
         {
-            await teApi.testsApi.storage.update("TEST_KEY", "This is a test");
-            expect(teApi.testsApi.storage.get<string>("TEST_KEY")).to.be.equal("This is a test");
-            expect(teApi.testsApi.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await teApi.testsApi.storage.update("TEST_KEY", "");
-            expect(teApi.testsApi.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await teApi.testsApi.storage.update("TEST_KEY", undefined);
-			expect(teApi.testsApi.storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
-			expect(teApi.testsApi.storage.get<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
-			expect(teApi.testsApi.storage.get<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
+            await teWrapper.storage.update("TEST_KEY", "This is a test");
+            expect(teWrapper.storage.get<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(teWrapper.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teWrapper.storage.update("TEST_KEY", "");
+            expect(teWrapper.storage.get<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teWrapper.storage.update("TEST_KEY", undefined);
+			expect(teWrapper.storage.get<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+			expect(teWrapper.storage.get<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
+			expect(teWrapper.storage.get<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
 
-            await teApi.testsApi.storage.update2("TEST_KEY", "This is a test");
-            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY")).to.be.equal("This is a test");
-            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY", "some other value")).to.be.equal("This is a test");
-            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await teApi.testsApi.storage.update2("TEST_KEY", "");
-            expect(await teApi.testsApi.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
-            await teApi.testsApi.storage.update2("TEST_KEY", undefined);
-			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
-			expect(await teApi.testsApi.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
-			expect(await teApi.testsApi.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
+            await teWrapper.storage.update2("TEST_KEY", "This is a test");
+            expect(await teWrapper.storage.get2<string>("TEST_KEY")).to.be.equal("This is a test");
+            expect(await teWrapper.storage.get2<string>("TEST_KEY", "some other value")).to.be.equal("This is a test");
+            expect(await teWrapper.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teWrapper.storage.update2("TEST_KEY", "");
+            expect(await teWrapper.storage.get2<string>("TEST_KEY_DOESNT_EXIST", "defValue")).to.be.equal("defValue");
+            await teWrapper.storage.update2("TEST_KEY", undefined);
+			expect(await teWrapper.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
+			expect(await teWrapper.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
+			expect(await teWrapper.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
 
-			log.write("STORAGE KEYS: " + teApi.testsApi.storage.keys().join(", "));
+			log.write("STORAGE KEYS: " + teWrapper.storage.keys().join(", "));
         }
         endRollingCount(this);
     });

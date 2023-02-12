@@ -7,11 +7,12 @@ import { Uri } from "vscode";
 import { expect } from "chai";
 import { BatchTaskProvider } from "../../providers/batch";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IFilesystemApi, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl, treeUtils, verifyTaskCount, suiteFinished, exitRollingCount,
     waitForTeIdle, endRollingCount, needsTreeBuild
 } from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "batch";
 const startTaskCount = 2;
@@ -19,8 +20,8 @@ const dirName = getWsPath("tasks_test_");
 const fileUriBat = Uri.file(join(dirName, "test_provider_bat.bat"));
 const fileUriCmd = Uri.file(join(dirName, "test_provider-cmd.cmd"));
 
+let teWrapper: TeWrapper;
 let teApi: ITaskExplorerApi;
-let fsApi: IFilesystemApi;
 
 
 suite("Batch Tests", () =>
@@ -29,7 +30,7 @@ suite("Batch Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, fsApi } = await activate(this));
+        ({ teApi, teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -37,7 +38,7 @@ suite("Batch Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         suiteFinished(this);
     });
 
@@ -103,10 +104,10 @@ suite("Batch Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createFolderEvent + testControl.slowTime.fs.createFolderEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.createDir(dirName);
+        await teWrapper.fs.createDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.createFolderEvent);
-        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
-        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
+        await teWrapper.fs.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
+        await teWrapper.fs.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent + 50);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
@@ -117,8 +118,8 @@ suite("Batch Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.deleteFile(fileUriBat.fsPath);
-        await fsApi.deleteFile(fileUriCmd.fsPath);
+        await teWrapper.fs.deleteFile(fileUriBat.fsPath);
+        await teWrapper.fs.deleteFile(fileUriCmd.fsPath);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
@@ -129,8 +130,8 @@ suite("Batch Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.createEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
-        await fsApi.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
+        await teWrapper.fs.writeFile(fileUriBat.fsPath, "echo test 123\r\n\r\n");
+        await teWrapper.fs.writeFile(fileUriCmd.fsPath, "echo test 123\r\n");
         await waitForTeIdle(testControl.waitTime.fs.createEvent + 50);
         await verifyTaskCount(testsName, startTaskCount + 2);
         endRollingCount(this);
@@ -141,7 +142,7 @@ suite("Batch Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteFolderEvent + testControl.slowTime.taskCount.verify);
-        await fsApi.deleteDir(dirName);
+        await teWrapper.fs.deleteDir(dirName);
         await waitForTeIdle(testControl.waitTime.fs.deleteEvent);
         await verifyTaskCount(testsName, startTaskCount);
         endRollingCount(this);
