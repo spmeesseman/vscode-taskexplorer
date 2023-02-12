@@ -34,7 +34,7 @@ suite("Context Tests", () =>
         if (exitRollingCount(this)) return;
         expect(getContext<boolean>(ContextKeys.Enabled)).to.be.a("boolean").that.is.equal(true);
         expect(getContext<boolean>(ContextKeys.Enabled,  true)).to.be.a("boolean").that.is.equal(true);
-        expect(getContext<string>(ContextKeys.TestsTest)).to.be.a("string").that.is.equal("testing");
+        expect(getContext<string>(ContextKeys.TestsTest)).to.be.undefined;
         expect(getContext<string>(ContextKeys.TestsTest, "testing")).to.be.a("string").that.is.equal("testing");
         endRollingCount(this);
     });
@@ -43,8 +43,9 @@ suite("Context Tests", () =>
     test("Set Context", async function()
     {
         if (exitRollingCount(this)) return;
-        setContext(ContextKeys.TestsTest, "testing");
-        setContext(ContextKeys.TestsTest, undefined);
+        await setContext(ContextKeys.TestsTest, "testing");
+        expect(getContext<string>(ContextKeys.TestsTest)).to.be.a("string").that.is.equal("testing");
+        await setContext(ContextKeys.TestsTest, undefined);
         endRollingCount(this);
     });
 

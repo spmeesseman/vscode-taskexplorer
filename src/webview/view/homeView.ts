@@ -62,6 +62,7 @@ function main() {
 export class HomeView extends TeWebviewView<State>
 {
 	static viewTitle = "Home";
+	static viewDescription = "Home";
 	static viewId: WebviewViewIds = "home"; // Must match view id in package.json
 
 
@@ -70,8 +71,9 @@ export class HomeView extends TeWebviewView<State>
 		super(
 			wrapper,
 			HomeView.viewTitle,
+			HomeView.viewDescription,
 			"home.html",
-			`taskExplorer.views.${HomeView.viewId}`,
+			`taskExplorer.view.${HomeView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			`${HomeView.viewId}View`
 		);

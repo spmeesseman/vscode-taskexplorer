@@ -18,6 +18,7 @@ export type WebviewViewIds = "home" | "taskCount" | "taskUsage";
 
 export abstract class TeWebviewView<State, SerializedState = State> extends TeWebviewBase<State> implements WebviewViewProvider, Disposable
 {
+	private _description: string | undefined;
 	private _disposableView: Disposable | undefined;
 	protected override _view: WebviewView | undefined;
 
@@ -25,15 +26,15 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	constructor(
 		wrapper: TeWrapper,
 		title: string,
+		description: string,
 		fileName: string,
-		public readonly id: `taskExplorer.views.${WebviewViewIds}`,
+		public readonly id: `taskExplorer.view.${WebviewViewIds}`,
 		private readonly contextKeyPrefix: `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}`,
 		private readonly trackingFeature: TrackedUsageFeatures)
 	{
 		super(wrapper, title, fileName);
-		this.disposables.push(
-			window.registerWebviewViewProvider(id, this)
-		);
+		this.description = description;
+		this.disposables.push(window.registerWebviewViewProvider(id, this));
 	}
 
 
@@ -46,12 +47,13 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	get description(): string | undefined
 	{
-		return this._view?.description;
+		return this._description;
 	}
 
 
 	set description(description: string | undefined)
 	{
+		this._description = description;
 		if (!this._view) return;
 		this._view.description = description;
 	}
@@ -91,6 +93,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		};
 
 		webviewView.title = this.title;
+		webviewView.description = this._description;
 
 		this._disposableView = Disposable.from(
 			this._view.onDidDispose(this.onViewDisposed, this),

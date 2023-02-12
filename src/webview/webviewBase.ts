@@ -166,7 +166,7 @@ export abstract class TeWebviewBase<State> implements Disposable
     };
 
 
-	protected notify<T extends IpcNotificationType<any>>(type: T, params: IpcMessageParams<T>, completionId?: string)
+	notify<T extends IpcNotificationType<any>>(type: T, params: IpcMessageParams<T>, completionId?: string)
 	{
 		return this.postMessage(
 		{

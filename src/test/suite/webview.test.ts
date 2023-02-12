@@ -2,7 +2,10 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
+import { expect } from "chai";
 import { TeWrapper } from "../../lib/wrapper";
+import { startupFocus } from "../utils/suiteUtils";
+import { EchoCommandType } from "../../webview/common/ipc";
 import { Commands, executeCommand } from "../../lib/command";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
@@ -31,10 +34,16 @@ suite("Webview Tests", () =>
     });
 
 
+	test("Focus Explorer View", async function()
+	{
+        await startupFocus(this);
+	});
+
+
     test("Enable and Focus SideBar", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.refresh);
+        this.slow(tc.slowTime.commands.refreshNoChanges);
         teWrapper.treeManager.enableTaskTree("taskExplorerSideBar", true, "");
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
@@ -45,16 +54,29 @@ suite("Webview Tests", () =>
     test("Home View", async function()
     {
         if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
         let loaded = false,
             loadTime = 0;
-        const d = teWrapper.homeView.onContentLoaded(() => { loaded = true; });
+        const d = teWrapper.homeView.onContentLoaded(() => { loaded = true; }); // cover onContentLoaded
         await teWrapper.homeView.show();
-        while (!loaded && loadTime < 51) { sleep(50); loadTime += 25; }
+        while (!loaded && loadTime < 21) { await sleep(10); loadTime += 10; }
         d.dispose();
         await executeCommand(Commands.FocusHomeView);
-        await executeCommand(Commands.DisableTaskType, "bash", tc.waitTime.config.enableEvent);
-        await sleep(10);
-        await executeCommand(Commands.EnableTaskType, "bash", tc.waitTime.config.enableEvent);
+        await sleep(5);
+        await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
+        await sleep(5);
+        await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
+        expect(teWrapper.homeView.description).to.not.be.undefined;
+        await focusExplorerView();
+        await sleep(5);
+        await executeCommand(Commands.FocusHomeView);
+        await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowParsingReportPage });
+        await sleep(5);
+        await closeEditors();
+        await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(5);
+        teWrapper.homeView
+        await closeEditors();
         endRollingCount(this);
     });
 
@@ -62,7 +84,13 @@ suite("Webview Tests", () =>
     test("Task Usage View", async function()
     {
         if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
+        await executeCommand(Commands.FocusTaskUsageView);
+        await sleep(1);
+        await focusExplorerView();
+        await sleep(5);
         await teWrapper.taskUsageView.show();
+        await sleep(5);
         endRollingCount(this);
     });
 
@@ -70,14 +98,23 @@ suite("Webview Tests", () =>
     test("Task Count View", async function()
     {
         if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
         await teWrapper.taskCountView.show();
+        await sleep(1);
+        await focusExplorerView();
+        await sleep(5);
+        await executeCommand(Commands.FocusTaskCountView);
+        await sleep(5);
         endRollingCount(this);
     });
 
 
     test("Tree View", async function()
     {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
         await focusExplorerView();
+        endRollingCount(this);
     });
 
 

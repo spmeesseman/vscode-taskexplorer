@@ -29,14 +29,18 @@ export const enum Commands
 	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
     Run = "vscode-taskexplorer.run",
     RunWithArgs = "vscode-taskexplorer.runWithArgs",
-	ShowHomeView = "vscode-taskexplorer.showHomeView",
     RunLastTask = "vscode-taskexplorer.runLastTask",
-	ShowLicensePage = "vscode-taskexplorer.showLicensePage",
-	ShowParsingReportPage = "vscode-taskexplorer.showParsingReportPage",
-	ShowReleaseNotesPage = "vscode-taskexplorer.showReleaseNotesPage",
-	ShowTaskCountView = "vscode-taskexplorer.showTaskCountView",
-	ShowTaskStatsView = "vscode-taskexplorer.showTaskStatsView",
-	ShowWelcomePage = "vscode-taskexplorer.showWelcomePage"
+	RefreshHomeView = "vscode-taskexplorer.home.refresh",
+	RefreshLicensePage = "vscode-taskexplorer.licensePage.refresh",
+	RefreshParsingReportPage = "vscode-taskexplorer.parsingReport.refresh",
+	RefreshReleaseNotesPage = "vscode-taskexplorer.releaseNotes.refresh",
+	RefreshTaskCountView = "vscode-taskexplorer.taskCount.refresh",
+	RefreshTaskUsageView = "vscode-taskexplorer.taskUsage.refresh",
+	RefreshWelcomePage = "vscode-taskexplorer.welcome.refresh",
+	ShowLicensePage = "vscode-taskexplorer.view.licensePage.show",
+	ShowParsingReportPage = "vscode-taskexplorer.view.parsingReport.show",
+	ShowReleaseNotesPage = "vscode-taskexplorer.view.releaseNotes.show",
+	ShowWelcomePage = "vscode-taskexplorer.view.welcome.show"
 }
 
 export const enum VsCodeCommands

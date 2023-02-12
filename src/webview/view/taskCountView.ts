@@ -11,6 +11,7 @@ import { createTaskCountTable } from "../common/taskCountTable";
 export class TaskCountView extends TeWebviewView<State>
 {
 	static viewTitle = "Task Count";
+	static viewDescription = "Task Count Details";
 	static viewId: WebviewViewIds = "taskCount"; // Must match view id in package.jso
 
 
@@ -19,8 +20,9 @@ export class TaskCountView extends TeWebviewView<State>
 		super(
 			wrapper,
 			TaskCountView.viewTitle,
+			TaskCountView.viewDescription,
 			"task-count.html",
-			`taskExplorer.views.${TaskCountView.viewId}`,
+			`taskExplorer.view.${TaskCountView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			`${TaskCountView.viewId}View`
 		);

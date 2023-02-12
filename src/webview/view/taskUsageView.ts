@@ -10,6 +10,7 @@ import { TeWebviewView, WebviewViewIds } from "../webviewView";
 export class TaskUsageView extends TeWebviewView<State>
 {
 	static viewTitle = "Task Usage";
+	static viewDescription = "Task Usage Details";
 	static viewId: WebviewViewIds = "taskUsage"; // Must match view id in package.jso
 
 
@@ -18,8 +19,9 @@ export class TaskUsageView extends TeWebviewView<State>
 		super(
 			wrapper,
 			TaskUsageView.viewTitle,
+			TaskUsageView.viewDescription,
 			"task-usage.html",
-			`taskExplorer.views.${TaskUsageView.viewId}`,
+			`taskExplorer.view.${TaskUsageView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			`${TaskUsageView.viewId}View`
 		);
