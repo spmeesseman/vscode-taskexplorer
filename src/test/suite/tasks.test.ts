@@ -62,13 +62,13 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.getTreeTasks * 4);
-        bash = await utils.treeUtils.getTreeTasks("bash", 1);
+        bash = await utils.treeUtils.getTreeTasks(teWrapper, "bash", 1);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
-        batch = await utils.treeUtils.getTreeTasks("batch", 2);
+        batch = await utils.treeUtils.getTreeTasks(teWrapper, "batch", 2);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
-        ant = await utils.treeUtils.getTreeTasks("ant", 3);
+        ant = await utils.treeUtils.getTreeTasks(teWrapper, "ant", 3);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
-        python = await utils.treeUtils.getTreeTasks("python", 2);
+        python = await utils.treeUtils.getTreeTasks(teWrapper, "python", 2);
         await utils.waitForTeIdle(tc.waitTime.getTreeTasks);
         utils.endRollingCount(this);
     });

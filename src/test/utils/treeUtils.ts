@@ -1,10 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import { expect } from "chai";
+import { TaskItem } from "../../tree/item";
+import { TeWrapper } from "../../lib/wrapper";
+import { TaskMap } from "../../tree/treeBuilder";
 import { isObjectEmpty } from "../../lib/utils/utils";
-import { ITaskItem, TaskMap } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand } from "./commandUtils";
-import { figures, getTeApi, sleep, testControl as tc, verifyTaskCount, waitForTeIdle } from "./utils";
+import { figures, getTeApi, sleep, testControl as tc, waitForTeIdle } from "./utils";
 
 let didRefresh = false;
 let didSetGroupLevel = false;
@@ -16,19 +18,18 @@ export const hasRefreshed = () => didRefresh;
 export const findIdInTaskMap = (id: string, tMap: TaskMap) => Object.values(tMap).filter((t) => t && t.id?.includes(id) && !t.isUser).length;
 
 
-export const getTreeTasks = async(taskType: string, expectedCount: number) =>
+export const getTreeTasks = async(teWrapper: TeWrapper, taskType: string, expectedCount: number) =>
 {
-    const teApi = getTeApi(),
-          taskItems: ITaskItem[] = [];
+    const taskItems: TaskItem[] = [];
 
     const _getTaskMap = async(retries: number) =>
     {
-        let taskMap = teApi.testsApi.treeManager.getTaskMap();
+        let taskMap = teWrapper.treeManager.getTaskMap();
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             await waitForTeIdle(150, 1600);
-            taskMap = teApi.testsApi.treeManager.getTaskMap();
+            taskMap = teWrapper.treeManager.getTaskMap();
         }
 
         if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
@@ -39,7 +40,7 @@ export const getTreeTasks = async(taskType: string, expectedCount: number) =>
             if (retries % 10 === 0)
             {
                 await refresh();
-                taskMap = teApi.testsApi.treeManager.getTaskMap();
+                taskMap = teWrapper.treeManager.getTaskMap();
             }
             if (!taskMap || isObjectEmpty(taskMap))
             {
@@ -108,14 +109,14 @@ export const refresh = async(instance?: any) =>
 
 
 
-export const verifyTaskCountByTree = async(taskType: string, expectedCount: number, retries = 2) =>
+export const verifyTaskCountByTree = async(teWrapper: TeWrapper, taskType: string, expectedCount: number, retries = 2) =>
 {
-    let taskMap = getTeApi().testsApi.treeManager.getTaskMap();
+    let taskMap = teWrapper.treeManager.getTaskMap();
     const _getCount = async() =>
     {
         if (!taskMap || isObjectEmpty(taskMap)) {
             await refresh();
-            taskMap = getTeApi().testsApi.treeManager.getTaskMap();
+            taskMap = teWrapper.treeManager.getTaskMap();
         }
         return findIdInTaskMap(`:${taskType}:`, taskMap);
     };

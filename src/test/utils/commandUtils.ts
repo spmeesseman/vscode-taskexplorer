@@ -1,12 +1,13 @@
 import { commands } from "vscode";
-import { waitForTeIdle, testControl as tc, teApi, teExplorer, sleep } from "./utils";
+import { configuration } from "../../lib/utils/configuration";
+import { waitForTeIdle, testControl as tc, teExplorer } from "./utils";
 
 let explorerHasFocused = false;
 
 
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
-    const rc = await teApi.testsApi.config.updateWs(key, value);
+    const rc = await configuration.updateWs(key, value);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;

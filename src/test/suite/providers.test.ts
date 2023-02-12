@@ -403,7 +403,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.config.excludeTasksEvent);
-        const grunt = await treeUtils.getTreeTasks("grunt", 13) as TaskItem[],
+        const grunt = await treeUtils.getTreeTasks(teWrapper, "grunt", 13),
               taskItems = (await tasks.fetchTasks({ type: "grunt" })).filter(t => !!t.definition.uri),
               gruntCt = taskItems.length,
               taskItem = grunt.find(t => t.taskSource === "grunt" && !t.taskFile.path.startsWith("grunt") && t.task.name === "default" && t.taskFile.fileName === "GRUNTFILE.js");
@@ -418,7 +418,7 @@ suite("Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.fetchTasksCommand + tc.slowTime.taskCount.verify + tc.slowTime.commands.exclude);
-        const batch = await treeUtils.getTreeTasks("batch", 4) as TaskItem[],
+        const batch = await treeUtils.getTreeTasks(teWrapper, "batch", 4),
               taskItems = await tasks.fetchTasks({ type: "batch" }),
               scriptCt = taskItems.length,
               taskItem = batch.find(t => t.taskSource === "batch" && t.taskFile.fileName.toLowerCase().includes("test2.bat"));

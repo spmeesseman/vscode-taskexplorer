@@ -61,10 +61,10 @@ suite("Tree Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event * 2) +
                   (tc.slowTime.getTreeTasks * 4) + tc.slowTime.storageUpdate);
-        ant = await utils.treeUtils.getTreeTasks("ant", 3);
-        bash = await utils.treeUtils.getTreeTasks("bash", 1);
-        batch = await utils.treeUtils.getTreeTasks("batch", 2);
-        python = await utils.treeUtils.getTreeTasks("python", 2);
+        ant = await utils.treeUtils.getTreeTasks(teWrapper, "ant", 3);
+        bash = await utils.treeUtils.getTreeTasks(teWrapper, "bash", 1);
+        batch = await utils.treeUtils.getTreeTasks(teWrapper, "batch", 2);
+        python = await utils.treeUtils.getTreeTasks(teWrapper, "python", 2);
         await teWrapper.storage.update(Strings.FAV_TASKS_STORE, [
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])
@@ -93,8 +93,8 @@ suite("Tree Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.showHideSpecialFolder * 2) + (tc.waitTime.config.event * 2) + (tc.slowTime.getTreeTasks * 2));
-        ant = await utils.treeUtils.getTreeTasks("ant", 3);
-        batch = await utils.treeUtils.getTreeTasks("batch", 2);
+        ant = await utils.treeUtils.getTreeTasks(teWrapper, "ant", 3);
+        batch = await utils.treeUtils.getTreeTasks(teWrapper, "batch", 2);
         await teWrapper.storage.update(Strings.LAST_TASKS_STORE, [
             utils.getSpecialTaskItemId(batch[0]), utils.getSpecialTaskItemId(batch[1]), utils.getSpecialTaskItemId(ant[0]),
             utils.getSpecialTaskItemId(bash[0]), utils.getSpecialTaskItemId(python[0]), utils.getSpecialTaskItemId(python[1])

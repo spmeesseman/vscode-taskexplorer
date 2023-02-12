@@ -8,10 +8,12 @@ import { join } from "path";
 import { ITestControl } from "../control";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
+import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "tsc";
 const startTaskCount = 0;
 let testControl: ITestControl;
+let teWrapper: TeWrapper;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;
@@ -24,7 +26,7 @@ suite("Typescript Tests", () =>
     suiteSetup(async function()
     {
         if (utils.exitRollingCount(this, true)) return;
-        await utils.activate(this);
+        ({ teWrapper } = await utils.activate(this));
         testControl = utils.testControl;
         rootPath = utils.getWsPath(".");
         dirName = join(rootPath, "tasks_test_ts_");
@@ -55,7 +57,7 @@ suite("Typescript Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.taskCount.verifyByTree);
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount);
         utils.endRollingCount(this);
     });
 
@@ -84,7 +86,7 @@ suite("Typescript Tests", () =>
             "}\n",
             testControl.waitTime.fs.createEventTsc
         );
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 2);
         utils.endRollingCount(this);
     });
 
@@ -96,7 +98,7 @@ suite("Typescript Tests", () =>
         //
         // Typescript 'open' just opens the document, doesnt find the task position
         //
-        const tscItems = await utils.treeUtils.getTreeTasks("tsc", startTaskCount + 2);
+        const tscItems = await utils.treeUtils.getTreeTasks(teWrapper, "tsc", startTaskCount + 2);
         await executeTeCommand2("open", [ tscItems[0] ]);
         await utils.closeEditors();
         await executeTeCommand2("open", [ tscItems[1] ]);
@@ -129,7 +131,7 @@ suite("Typescript Tests", () =>
             "}\n",
             testControl.waitTime.fs.createEventTsc
         );
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });
 
@@ -139,7 +141,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, false, testControl.waitTime.config.enableEvent);
-        await utils.treeUtils.verifyTaskCountByTree(testsName, 0);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, 0);
         utils.endRollingCount(this);
     });
 
@@ -149,7 +151,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.config.enableEvent + testControl.slowTime.taskCount.verifyByTree);
         await executeSettingsUpdate(`enabledTasks.${testsName}`, true, testControl.waitTime.config.enableEvent);
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });
 
@@ -196,7 +198,7 @@ suite("Typescript Tests", () =>
         // but are actually invalid.  TSC engine will report the old task count as well, so it
         // doesn't event matter if we had the file modify event watcher on or not.
         //
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 4);
         // if (resetLogging) { // turn scary error logging off
         //     executeSettingsUpdate("logging.enable", true);
         // }
@@ -228,7 +230,7 @@ suite("Typescript Tests", () =>
             "}\n",
             testControl.waitTime.fs.modifyEventTsc
         );
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 4);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 4);
         utils.endRollingCount(this);
     });
 
@@ -238,7 +240,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEventTsc + testControl.slowTime.taskCount.verifyByTree);
         await fsUtils.deleteFile(fileUri.fsPath, testControl.waitTime.fs.deleteEventTsc);
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount + 2);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount + 2);
         utils.endRollingCount(this);
     });
 
@@ -248,7 +250,7 @@ suite("Typescript Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(testControl.slowTime.fs.deleteEventTsc + testControl.slowTime.taskCount.verifyByTree);
         await fsUtils.deleteFile(fileUri2.fsPath, testControl.waitTime.fs.deleteEventTsc);
-        await utils.treeUtils.verifyTaskCountByTree(testsName, startTaskCount);
+        await utils.treeUtils.verifyTaskCountByTree(teWrapper, testsName, startTaskCount);
         utils.endRollingCount(this);
     });
 
