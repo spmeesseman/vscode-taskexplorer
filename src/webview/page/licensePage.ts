@@ -34,7 +34,7 @@ export class LicensePage extends TeWebviewPanel<State>
 		const newKey = args[0] as string | undefined;
 		html = await createTaskCountTable(this.wrapper, undefined, html);
 		html = removeViewLicenseButton(html);
-		let infoContent = this.getExtraContent(newKey);
+		let infoContent = await this.getExtraContent(newKey);
 		html = html.replace("<!-- addtlContentTop -->", infoContent);
 		infoContent = this.getExtraContent2();
 		html = html.replace("<!-- addtlContent -->", infoContent);
@@ -42,9 +42,10 @@ export class LicensePage extends TeWebviewPanel<State>
 	};
 
 
-	private getExtraContent = (newKey?: string) =>
+	private getExtraContent = async (newKey?: string) =>
 	{
 		const licMgr = this.wrapper.licenseManager;
+		const key = await licMgr.getLicenseKey();
 		const details = !newKey ?
 	(!licMgr.isLicensed() ? `
 	<table class="margin-top-15">
@@ -67,7 +68,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	` : `
 	<table class="margin-top-15">
 		<tr><td class="content-subsection-header">
-			License Key: &nbsp;${newKey}
+			License Key: &nbsp;${key}
 		</td></tr>
 		<tr><td>
 			Thank you for your support!
@@ -82,7 +83,7 @@ export class LicensePage extends TeWebviewPanel<State>
 	`) : `
 	<table class="margin-top-15">
 		<tr><td class="content-subsection-header">
-			30-Day License Key: &nbsp;${licMgr.getLicenseKey()}
+			30-Day License Key: &nbsp;${key}
 		</td></tr>
 		<tr><td>
 			This license key is valid for30 days from the time it was issued.  Please show your support for
