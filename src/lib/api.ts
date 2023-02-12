@@ -26,11 +26,6 @@ export class TeApi implements ITaskExplorerApi
     }
 
 
-    get wrapper()  {
-        return this._tests ? this._wrapper : undefined;
-    }
-
-
     refreshExternalProvider = async(providerName: string) =>
     {
         if (this.providers[providerName])

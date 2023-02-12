@@ -15,7 +15,6 @@ import { MakeTaskProvider } from "../providers/make";
 import { RubyTaskProvider } from "../providers/ruby";
 import { NsisTaskProvider } from "../providers/nsis";
 import { PerlTaskProvider } from "../providers/perl";
-import { configuration } from "./utils/configuration";
 import { UsageWatcher } from "./watcher/usageWatcher";
 import { TaskTreeManager } from "../tree/treeManager";
 import { LicenseManager } from "./auth/licenseManager";
@@ -51,19 +50,14 @@ import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, Worksp
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
 
 
-export const isContainer = (container: any): container is TeWrapper => container instanceof TeWrapper;
-
 export class TeWrapper
 {
-	static #instance: TeWrapper | undefined;
-
 	private _ready = false;
 	private _tests = false;
 	private readonly _busy = false;
 	private readonly _teApi: TeApi;
 	private readonly _log: ILog;
 	private readonly _homeView: HomeView;
-	private readonly _prerelease;
 	private readonly _version: string;
 	private readonly _licensePage: LicensePage;
 	private readonly _storage: IStorage;
@@ -82,18 +76,15 @@ export class TeWrapper
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
-	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  prerelease: boolean, version: string, previousVersion: string | undefined)
+	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog, version: string, previousVersion: string | undefined)
     {
-		if (TeWrapper.#instance) throw new Error("TeWrapper is already initialized");
-		TeWrapper.#instance = new TeWrapper(context, storage, configuration, log, prerelease, version, previousVersion);
-		return TeWrapper.#instance;
+		return new TeWrapper(context, storage, configuration, log, version, previousVersion);
 	}
 
 
-	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  prerelease: boolean, version: string, previousVersion: string | undefined)
+	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  version: string, previousVersion: string | undefined)
     {
 		this._context = context;
-		this._prerelease = prerelease;
 		this._version = version;
 		this._previousVersion = previousVersion;
         this._storage = storage;
@@ -156,22 +147,6 @@ export class TeWrapper
 			this._usage
 		);
 	}
-
-
-	static get instance(): TeWrapper {
-		return TeWrapper.#instance ?? TeWrapper.#proxy;
-	}
-
-
-	static #proxy = new Proxy<TeWrapper>({} as TeWrapper,
-    {
-		get: (_target, prop) =>
-        {
-			if (TeWrapper.#instance) return (TeWrapper.#instance as any)[prop];
-			if (prop === "config") return configuration;
-			throw new Error("TeWrapper is not initialized");
-		},
-	});
 
 
 	get onReady() {
@@ -322,14 +297,6 @@ export class TeWrapper
 
 	get log() {
 		return this._log;
-	}
-
-	get prerelease(){
-		return this._prerelease;
-	}
-
-	get prereleaseOrDebugging() {
-		return this._prerelease || this.debugging;
 	}
 
 	get providers() {

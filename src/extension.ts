@@ -18,9 +18,8 @@ let teWrapper: TeWrapper;
 
 export async function activate(context: ExtensionContext)
 {
+    const isTests = context.extensionMode === ExtensionMode.Test;
     const version: string = context.extension.packageJSON.version;
-	const insiders = context.extension.id === "spmeesseman-vscode-taskexplorer-insiders";
-	const prerelease = false; // insiders || satisfies(version, "> 2023.0.0");
 
     //
     // TODO - Handle untrusted workspace
@@ -44,7 +43,7 @@ export async function activate(context: ExtensionContext)
     // Initialize logging
     //    0=off | 1=on w/red&yellow | 2=on w/ no red/yellow
     //
-    await log.registerLog(context, context.extensionMode === ExtensionMode.Test ? 2 : /* istanbul ignore next */ 0);
+    await log.registerLog(context, isTests ? 2 : /* istanbul ignore next */ 0);
     log.methodStart("activation", 1, "", true);
 
     //
@@ -65,7 +64,7 @@ export async function activate(context: ExtensionContext)
     // Instantiate application container (beautiful concept from GitLens project)
     //
 	const storedVersion = storage.get<string>("taskExplorer.version");
-    teWrapper = TeWrapper.create(context, storage, configuration, log, prerelease, version, storedVersion);
+    teWrapper = TeWrapper.create(context, storage, configuration, log, version, storedVersion);
 	oneTimeEvent(teWrapper.onReady)(() =>
     {
 		// void showWelcome(teWrapper, version, storedVersion, "   ");
@@ -82,7 +81,7 @@ export async function activate(context: ExtensionContext)
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
 
-    return teWrapper.api;
+    return isTests ? teWrapper : /* istanbul ignore next */teWrapper.api;
 }
 
 

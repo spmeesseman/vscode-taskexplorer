@@ -42,8 +42,8 @@ suite("Wrapper Tests", () =>
         if (exitRollingCount(this)) return;
         expect(teWrapper.env).to.equal("tests");
         expect(teWrapper.id).to.be.a("string");
-        expect(teWrapper.prerelease).to.equal(false);
-        expect(teWrapper.prereleaseOrDebugging).to.equal(false);
+        expect(teWrapper.taskManager).to.not.be.undefined;
+        expect(teWrapper.taskUsageView).to.not.be.undefined;
         expect(teWrapper.tests).to.equal(true);
         expect(teWrapper.storage).to.not.be.undefined;
         expect(teWrapper.licensePage).to.not.be.undefined;
@@ -60,11 +60,6 @@ suite("Wrapper Tests", () =>
     test("Re-Access Initialization Properties (Throws)", async function()
     {
         if (exitRollingCount(this)) return;
-        try {
-            TeWrapper.create(teWrapper.context, teWrapper.storage, teWrapper.configuration,
-                             teWrapper.log, false, teWrapper.version, teWrapper.version);
-        }
-        catch { /* will throw */ }
         try { await teWrapper.ready(); } catch { /* will throw */ }
         endRollingCount(this);
     });

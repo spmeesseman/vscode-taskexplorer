@@ -139,12 +139,13 @@ export const activate = async (instance?: Mocha.Context) =>
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
         console.log(`    ${figures.color.info} ${figures.withColor("Activating extension", figures.colors.grey)}`);
-        teApi = await (ext as any).activate();
+        teWrapper = await (ext as any).activate();
         console.log(`    ${figures.color.info} ${figures.withColor("Extension successfully activated", figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully
         //
-        teWrapper = TeWrapper.instance;
+        teApi = teWrapper.api;
+        expect(teApi).to.not.be.empty;
         expect(teWrapper.explorer).to.not.be.empty;
         expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
         //
