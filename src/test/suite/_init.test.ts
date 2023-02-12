@@ -76,7 +76,7 @@ suite("Initialization", () =>
     test("Focus Sidebar Views - Task Usage", async function()
     {
         if (exitRollingCount(this)) return;
-        await executeCommand("taskExplorer.view.taskUsage.focus");
+        await executeCommand(Commands.FocusTaskUsageView);
         endRollingCount(this);
     });
 
@@ -84,7 +84,7 @@ suite("Initialization", () =>
     test("Focus Sidebar View - Task Counts", async function()
     {
         if (exitRollingCount(this)) return;
-        await executeCommand("taskExplorer.view.taskCount.focus");
+        await executeCommand(Commands.FocusTaskCountView);
         endRollingCount(this);
     });
 

@@ -356,7 +356,7 @@ export class LicenseManager implements Disposable
 	async setTasks(tasks: Task[], logPad = "   ")
 	{
 		let displayPopup = !this.licensed;
-		const storedVersion = storage.get<string>("version"),
+		const storedVersion = storage.get<string>("taskExplorer.version"),
 			  lastNag = storage.get<string>("lastLicenseNag"),
 			  versionChange = this.wrapper.version !== storedVersion;
 
@@ -384,9 +384,12 @@ export class LicenseManager implements Disposable
 
 		if (versionChange)
 		{
-			this.panel = await this.wrapper.licensePage.show();
-			await storage.update("version", this.wrapper.version);
-			await storage.update("lastLicenseNag", Date.now().toString());
+			setTimeout(async () =>
+			{
+				this.panel = await this.wrapper.licensePage.show();
+				await storage.update("version", this.wrapper.version);
+				await storage.update("lastLicenseNag", Date.now().toString());
+			}, 1);
 		}
 		else if (displayPopup)
 		{

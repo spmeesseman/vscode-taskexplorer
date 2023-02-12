@@ -124,9 +124,9 @@ const logLogFileLocation = () =>
         /* istanbul ignore else */
         if (logControl.isTests)
         {
-            console.log(`    ${figures.color.info} ${withColor("*************************************************************************************", colors.grey)}`);
-            console.log(`    ${figures.color.info} ${withColor(" Log File: " + logControl.fileName, colors.grey)}`);
-            console.log(`    ${figures.color.info} ${withColor("*************************************************************************************", colors.grey)}`);
+            console.log(`    ${figures.color.info} ${figures.withColor("*************************************************************************************", colors.grey)}`);
+            console.log(`    ${figures.color.info} ${figures.withColor(" Log File: " + logControl.fileName, colors.grey)}`);
+            console.log(`    ${figures.color.info} ${figures.withColor("*************************************************************************************", colors.grey)}`);
         }
     }
 };

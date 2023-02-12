@@ -1,22 +1,18 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { log } from "./lib/log/log";
-import { TeApi } from "./lib/api";
 import { TeWrapper } from "./lib/wrapper";
-import * as fileCache from "./lib/fileCache";
-import { ITaskExplorerApi } from "./interface";
 import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
 import { ExtensionContext, env, ExtensionMode } from "vscode";
+import { enableConfigWatcher } from "./lib/watcher/configWatcher";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
-import { enableConfigWatcher, isProcessingConfigChange } from "./lib/watcher/configWatcher";
-import { disposeFileWatchers, registerFileWatchers, isProcessingFsEvent } from "./lib/watcher/fileWatcher";
+import { disposeFileWatchers, registerFileWatchers } from "./lib/watcher/fileWatcher";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 
 // import "tsconfig-paths/register";
 
 let ready = false;
-let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 
 
@@ -66,32 +62,16 @@ export async function activate(context: ExtensionContext)
     //
 
     //
-    // Figure out previous version
-    //
-	let previousVersion: string | undefined;
-	const syncedVersion = storage.get<string>(prerelease && !insiders ? "synced:preVersion" : "synced:version"),
-          localVersion = storage.get<string>(prerelease && !insiders ? "preVersion" : "version");
-	if (!localVersion || !syncedVersion) {
-		previousVersion = syncedVersion ?? localVersion;
-	}
-    else if (syncedVersion === localVersion) {
-		previousVersion = syncedVersion;
-	}
-    else {
-		previousVersion = localVersion;
-	}
-
-    //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    teWrapper = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
+	const storedVersion = storage.get<string>("taskExplorer.version");
+    teWrapper = TeWrapper.create(context, storage, configuration, log, prerelease, version, storedVersion);
 	oneTimeEvent(teWrapper.onReady)(() =>
     {
-		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
-		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
-		if (!syncedVersion || (version === syncedVersion)) {
-			void storage.update(prerelease && !insiders ? "synced:preVersion" : "synced:version", version);
-		}
+		// void showWelcome(teWrapper, version, storedVersion, "   ");
+        // await doWorkSon(teWrapper);
+       // doWorkSon(teWrapper);
+        setTimeout(doWorkSon, 1, teWrapper);
 	});
 
     //
@@ -99,50 +79,10 @@ export async function activate(context: ExtensionContext)
     //
 	await teWrapper.ready();
 
-    //
-    // Instantiate the extension API
-    //
-	teApi = new TeApi(teWrapper);
-
-    //
-    // TODO - Telemetry
-    //
-	// teWrapper.telemetry.setGlobalAttributes({
-	// 	debugging: container.debugging,
-	// 	insiders: insiders,
-	// 	prerelease: prerelease,
-	// 	install: previousVersion == null,
-	// 	upgrade: previousVersion != null && version !== previousVersion,
-	// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
-	// });
-
-    //
-    // TODO - Telemetry
-    //
-	// const startTime = sw.startTime;
-	// const endTime = hrtime();
-	// const elapsed = sw.elapsed();
-    // container.telemetry.sendEvent(
-	// 	"activate",
-	// 	{
-	// 		"activation.elapsed": elapsed,
-	// 		"activation.mode": mode?.name,
-	// 		...flatCfg,
-	// 	},
-	// 	startTime,
-	// 	endTime,
-	// );
-
-    //
-    // Use a delayed initialization so we can display an 'Initializing...' message
-    // in the tree on startup.  Really no good way to do that w/o this.
-    //
-    setTimeout(initialize, 25, teWrapper);
-
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
 
-    return teApi;
+    return teWrapper.api;
 }
 
 
@@ -163,13 +103,13 @@ export async function deactivate()
     // reload is much quicker, especially in large workspaces.
     //
     /* istanbul ignore next */
-    if (!fileCache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching"))
+    if (!teWrapper.filecache.isBusy() && !configuration.get<boolean>("enablePersistentFileCaching"))
     {
         const now = Date.now(),
               lastWsRootPathChange = storage.get2Sync<number>("lastWsRootPathChange", 0);
         if (now < lastWsRootPathChange + 3000)
         {
-            fileCache.persistCache(false, true);
+            teWrapper.filecache.persistCache(false, true);
         }
     }
     storage.update2Sync("lastDeactivated", Date.now());
@@ -184,36 +124,23 @@ export async function deactivate()
 }
 
 
-const initialize = async(wrapper: TeWrapper) =>
+const doWorkSon = async(wrapper: TeWrapper) =>
 {
     const now = Date.now(),
           lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
           lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
-    log.methodStart("initialization", 1, "", true);
+    log.methodStart("do init work son", 1, "", true);
     //
     // Authentication
     //
-    // const session = await authentication.getSession("auth0", [], { createIfNone: false });
-    // if (session) {
-    //     window.showInformationMessage(`Welcome back ${session.account.label}`);
-    // }
-    //
-    // Check license
-    //
     await wrapper.licenseManager.checkLicense("   ");
-    //
-    // Register file type watchers
-    // This "used" to also start the file scan to build the file task file cache. It now
-    // does not on startup.  We use rebuildCache() below, so as to initiate one scan as
-    // opposed to one scan per task type, like it did previously.  Note that if task types
-    // are enabled or disabled in settings after startup, then the individual calls to
-    // registerFileWatcher() will perform the scan for that task type.
-    //
-    await registerFileWatchers(wrapper.context, "   ");
+    // const session = await licenseManager.getSession("TeAuth", [], { create: true });
+    // if (session) {
+    //     window.showInformationMessage(`Welcome back ${session.account.name}`);
+    // }
     //
     // Build the file cache, this kicks off the whole process as refresh cmd will be issued
     // down the line in the initialization process.
-    //
     // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
     // To make the tree reload pain as light as possible, we now always persist the file cache
     // regardless if the user settings has activated it or not when the extension deactivates
@@ -223,19 +150,20 @@ const initialize = async(wrapper: TeWrapper) =>
     /* istanbul ignore else */
     if (wrapper.tests || /* istanbul ignore next */!rootFolderChanged)
     {
-        await fileCache.rebuildCache("   ");
+        await wrapper.filecache.rebuildCache("   ");
     }     //
     else // See comments/notes above
     {   //
         const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
         enableConfigWatcher(false);
         await configuration.update("enablePersistentFileCaching", true);
-        await fileCache.rebuildCache("   ");
-        await configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+        await wrapper.filecache.rebuildCache("   ");
+        await wrapper.configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
         enableConfigWatcher(true);
     }
-    await storage.update2("lastDeactivated", 0);
-    await storage.update2("lastWsRootPathChange", 0);
+
+    await wrapper.storage.update2("lastDeactivated", 0);
+    await wrapper.storage.update2("lastWsRootPathChange", 0);
     //
     // Start the first tree build/load
     //
@@ -243,12 +171,12 @@ const initialize = async(wrapper: TeWrapper) =>
     //
     // Log the environment
     //
-    log.methodDone("initialization", 1, "", [
+    log.methodDone("do init work son", 1, "", [
         [ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
         [ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
     ]);
     //
-    // Signal that first task load has completed
+    // Signal that the startup work has completed
     //
     setTimeout(() => { ready = true; }, 1);
 };

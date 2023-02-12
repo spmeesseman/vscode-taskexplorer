@@ -2,7 +2,7 @@
 import { Disposable, DOM } from "./common/dom";
 import {
 	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
-	WebviewFocusChangedCommandType, WebviewReadyCommandType
+	WebviewFocusChangedCommandType, WebviewReadyCommandType, ExecuteCommandType, onIpc, EchoCommandType
 } from "../common/ipc";
 
 interface VsCodeApi {
@@ -51,6 +51,7 @@ export abstract class TeWebviewApp<State = undefined>
 			if (this.onMessageReceived) {
 				disposables.push(DOM.on(window, "message", this.onMessageReceived.bind(this)));
 			}
+			disposables.push(DOM.on(window, "message", this._onMessageReceived.bind(this)));
 			this.sendCommand(WebviewReadyCommandType, undefined);
 			this.onInitialized?.();
 		});
@@ -130,6 +131,29 @@ export abstract class TeWebviewApp<State = undefined>
 			this.ipcSequence++;
 		}
 		return `webview:${this.ipcSequence}`;
+	};
+
+
+	private _onMessageReceived(e: MessageEvent)
+    {
+		const msg = e.data as IpcMessage;
+        this.log(`[BASE]${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
+        switch (msg.method)
+        {
+			case EchoCommandType.method:        // Standard echo service for testing web->host commands
+                onIpc(EchoCommandType, msg, params =>
+				{
+					if (params.args) {
+						this.sendCommand(ExecuteCommandType, params);
+					}
+					else {
+						this.sendCommand(ExecuteCommandType, params);
+					}
+				});
+                break;
+			default:
+                break;
+		}
 	};
 
 

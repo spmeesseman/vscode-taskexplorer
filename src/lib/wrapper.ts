@@ -1,5 +1,5 @@
 
-import { log } from "./log/log";
+import { TeApi } from "./api";
 import * as fs from "./utils/fs";
 import { isReady } from "../extension";
 import * as fileCache from "./fileCache";
@@ -30,7 +30,7 @@ import { LicensePage } from "../webview/page/licensePage";
 import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
-import { isProcessingFsEvent } from "./watcher/fileWatcher";
+import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
@@ -58,22 +58,23 @@ export class TeWrapper
 	static #instance: TeWrapper | undefined;
 
 	private _ready = false;
-	private _busy = false;
 	private _tests = false;
-	private readonly _prerelease;
+	private readonly _busy = false;
+	private readonly _teApi: TeApi;
 	private readonly _log: ILog;
-	private _homeView: HomeView;
+	private readonly _homeView: HomeView;
+	private readonly _prerelease;
 	private readonly _version: string;
-	private _licensePage: LicensePage;
+	private readonly _licensePage: LicensePage;
 	private readonly _storage: IStorage;
 	private readonly _usage: UsageWatcher;
-	private _taskCountView: TaskCountView;
-	private _treeManager: TaskTreeManager;
-	private _taskUsageView: TaskUsageView;
-	private _licenseManager: LicenseManager;
+	private readonly _taskCountView: TaskCountView;
+	private readonly _treeManager: TaskTreeManager;
+	private readonly _taskUsageView: TaskUsageView;
+	private readonly _licenseManager: LicenseManager;
 	private readonly _context: ExtensionContext;
-	private _releaseNotesPage: ReleaseNotesPage;
-	private _parsingReportPage: ParsingReportPage;
+	private readonly _releaseNotesPage: ReleaseNotesPage;
+	private readonly _parsingReportPage: ParsingReportPage;
 	private readonly _configuration: IConfiguration;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _previousVersion: string | undefined;
@@ -81,15 +82,15 @@ export class TeWrapper
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
 
 
-	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
+	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  prerelease: boolean, version: string, previousVersion: string | undefined)
     {
 		if (TeWrapper.#instance) throw new Error("TeWrapper is already initialized");
-		TeWrapper.#instance = new TeWrapper(context, storage, configuration, prerelease, version, previousVersion);
+		TeWrapper.#instance = new TeWrapper(context, storage, configuration, log, prerelease, version, previousVersion);
 		return TeWrapper.#instance;
 	}
 
 
-	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, prerelease: boolean, version: string, previousVersion: string | undefined)
+	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  prerelease: boolean, version: string, previousVersion: string | undefined)
     {
 		this._context = context;
 		this._prerelease = prerelease;
@@ -112,6 +113,37 @@ export class TeWrapper
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
 
+		this._teApi = new TeApi(this);
+
+		//
+		// TODO - Telemetry
+		//
+		// teWrapper.telemetry.setGlobalAttributes({
+		// 	debugging: container.debugging,
+		// 	insiders: insiders,
+		// 	prerelease: prerelease,
+		// 	install: previousVersion == null,
+		// 	upgrade: previousVersion != null && version !== previousVersion,
+		// 	upgradedFrom: previousVersion != null && version !== previousVersion ? previousVersion : undefined,
+		// });
+
+		//
+		// TODO - Telemetry
+		//
+		// const startTime = sw.startTime;
+		// const endTime = hrtime();
+		// const elapsed = sw.elapsed();
+		// container.telemetry.sendEvent(
+		// 	"activate",
+		// 	{
+		// 		"activation.elapsed": elapsed,
+		// 		"activation.mode": mode?.name,
+		// 		...flatCfg,
+		// 	},
+		// 	startTime,
+		// 	endTime,
+		// );
+
 		context.subscriptions.push(
 			this._homeView ,
 			this._licenseManager,
@@ -125,9 +157,11 @@ export class TeWrapper
 		);
 	}
 
+
 	static get instance(): TeWrapper {
 		return TeWrapper.#instance ?? TeWrapper.#proxy;
 	}
+
 
 	static #proxy = new Proxy<TeWrapper>({} as TeWrapper,
     {
@@ -139,20 +173,34 @@ export class TeWrapper
 		},
 	});
 
+
 	get onReady() {
 		return this._onReady.event;
 	}
 
+
 	ready = async() =>
 	{
 		if (this._ready) {
-			throw new Error("TeWrapper is already ready");
+			throw new Error("TeWrapper is already initialized/ready");
 		}
-		await fileCache.registerFileCache(this);
-		registerConfigWatcher(this);
 		this.registerTaskProviders();
 		this.registerContextMenuCommands();
+		registerConfigWatcher(this);
 		registerStatusBarItem(this._context);
+		await fileCache.registerFileCache(this);
+		//
+		// Register file type watchers
+		// This "used" to also start the file scan to build the file task file cache. It now
+		// does not on startup.  We use rebuildCache() below, so as to initiate one scan as
+		// opposed to one scan per task type, like it did previously.  Note that if task types
+		// are enabled or disabled in settings after startup, then the individual calls to
+		// registerFileWatcher() will perform the scan for that task type.
+		//
+		await registerFileWatchers(this._context, "   ");
+		//
+		// Context
+		//
 		if (this.debugging) {
 			await setContext(ContextKeys.Debugging, true);
 		}
@@ -165,6 +213,7 @@ export class TeWrapper
 		queueMicrotask(() => this._onReady.fire());
 	};
 
+
 	private registerContextMenuCommands = () =>
 	{
 		registerDonateCommand(this._context);
@@ -174,11 +223,13 @@ export class TeWrapper
 		registerRemoveFromExcludesCommand(this._context);
 	};
 
+
     private registerTaskProvider = (providerName: string, provider: TaskExplorerProvider) =>
     {
         this.context.subscriptions.push(tasks.registerTaskProvider(providerName, provider));
         this._providers[providerName] = provider;
     };
+
 
 	private registerTaskProviders = () =>
     {   //
@@ -210,6 +261,10 @@ export class TeWrapper
         this.registerTaskProvider("python", new PythonTaskProvider(this));
         this.registerTaskProvider("ruby", new RubyTaskProvider(this));
     };
+
+	get api() {
+		return this._teApi;
+	}
 
 	get configuration(): IConfiguration {
 		return this._configuration;

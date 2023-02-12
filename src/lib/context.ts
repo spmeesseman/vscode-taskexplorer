@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { VsCodeCommands } from "./command";
+import { IDictionary } from "src/interface";
 import { commands, EventEmitter } from "vscode";
 import type { WebviewIds } from "../webview/webviewPanel";
 import type { WebviewViewIds } from "../webview/webviewView";
 
-const contextStorage = new Map<string, unknown>();
+const contextStorage: IDictionary<unknown> = {};
 const _onDidChangeContext = new EventEmitter<AllContextKeys>();
 export const onDidChangeContext = _onDidChangeContext.event;
 
@@ -48,12 +49,12 @@ type AllContextKeys =
 	| `${ContextKeys.KeyPrefix}${string}`;
 
 
-export const getContext = <T>(key: AllContextKeys, defaultValue?: T) => contextStorage.get(key) as T | undefined || defaultValue;
+export const getContext = <T>(key: AllContextKeys, defaultValue?: T) => contextStorage[key] as T | undefined || defaultValue;
 
 
 export  const setContext = async(key: AllContextKeys, value: unknown): Promise<void> =>
 {
-	contextStorage.set(key, value);
+	contextStorage[key] = value;
 	void (await commands.executeCommand(VsCodeCommands.SetContext, key, value));
 	_onDidChangeContext.fire(key);
 };

@@ -40,11 +40,9 @@ export class HomeWebviewApp extends TeWebviewApp<State>
 
 	protected override onMessageReceived(e: MessageEvent)
     {
-		const msg = e.data as IpcMessage;
+		const msg = e.data; // as IpcMessage;
         this.log(`${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
-
-		const message = e.data; // JSON data from tests
-        switch (message.command)
+        switch (msg.command)
         {
             case "enterLicense":
                 this.enterLicense();

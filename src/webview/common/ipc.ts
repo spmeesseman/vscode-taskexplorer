@@ -43,27 +43,33 @@ export const onIpc = <T extends IpcMessageType<any>>(type: T, msg: IpcMessage, f
 export const WebviewReadyCommandType = new IpcCommandType("webview/ready");
 
 
-export interface WebviewFocusChangedParams {
+export interface WebviewFocusChangedParams
+{
 	focused: boolean;
 	inputFocused: boolean;
 }
 export const WebviewFocusChangedCommandType = new IpcCommandType<WebviewFocusChangedParams>("webview/focus");
 
 
-export interface ExecuteCommandParams {
+export interface ExecuteCommandParams
+{
 	command: string;
 	args?: [];
 }
 export const ExecuteCommandType = new IpcCommandType<ExecuteCommandParams>("command/execute");
+export const EchoCommandType = new IpcCommandType<ExecuteCommandParams>("command/echo");
 
-export interface DidChangeExtensionEnabledParams {
+export interface DidChangeExtensionEnabledParams
+{
 	extensionEnabled: boolean;
 }
 export const DidChangeExtensionEnabledType = new IpcNotificationType<DidChangeExtensionEnabledParams>(
 	"extensionEnabled/didChange",
 );
 
-export interface DidChangeConfigurationParams {
+
+export interface DidChangeConfigurationParams
+{
 	plusEnabled: boolean;
 }
 export const DidChangeConfigurationType = new IpcNotificationType<DidChangeConfigurationParams>(
