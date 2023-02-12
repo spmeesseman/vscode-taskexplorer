@@ -2,6 +2,7 @@
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
 import { IDictionary } from "../interface";
+import { TeWrapper } from "src/lib/wrapper";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { TaskExplorerProvider } from "./provider";
@@ -23,7 +24,7 @@ export class ComposerTaskProvider extends TaskExplorerProvider implements TaskEx
     };
 
 
-    constructor() { super("composer"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "composer"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

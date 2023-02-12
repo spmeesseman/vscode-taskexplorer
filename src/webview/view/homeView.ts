@@ -6,7 +6,7 @@ import { TasksChangeEvent } from "../../interface";
 import { StorageChangeEvent } from "../../interface/IStorage";
 import { ConfigurationChangeEvent, Disposable } from "vscode";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
-import { TeSessionChangeEvent } from "src/interface/ILicenseManager";
+import { TeSessionChangeEvent } from "../../interface/ILicenseManager";
 import { removeLicenseButtons } from "../common/removeLicenseButtons";
 import { IpcMessage, onIpc } from "../common/ipc";
 
@@ -131,7 +131,7 @@ export class HomeView extends TeWebviewView<State>
 		html = html.replace("#{taskCounts.length}",  taskCount.toString())
 				   .replace("#{taskCounts.today}", taskStats.todayCount.toString())
 				   .replace("#{license.status}", "<span class=\"codicon codicon-lock\">UNLICENSED</span>");
-		return removeLicenseButtons(html);
+		return removeLicenseButtons(this.wrapper, html);
 	};
 
 

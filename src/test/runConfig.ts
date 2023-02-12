@@ -24,12 +24,13 @@ import "source-map-support/register";
 //     return new Promise(resolve => setTimeout(resolve, ms));
 // };
 
+
 export default async() =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
           testArgs = JSON.parse(process.env.testArgs || "[]"),
-          testsRoot = __dirname,
-          nycRoot = path.resolve(__dirname, "..", "..");
+          testsRoot = path.resolve(__dirname, ".."),
+          nycRoot = path.resolve(__dirname, "..", "..", "..");
 
     // Setup coverage pre-test, including post-test hook to report
     const nyc = new NYC({

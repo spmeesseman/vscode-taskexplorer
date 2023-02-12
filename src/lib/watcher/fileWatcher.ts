@@ -11,12 +11,13 @@ import { extname } from "path";
 import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";
 import { storage } from "../utils/storage";
-import { refreshTree } from "../refreshTree";
 import { configuration } from "../utils/configuration";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
+import { executeCommand } from "../command";
+import { Commands } from "../constants";
 
 let currentEvent: any;
 let extContext: ExtensionContext;
@@ -321,10 +322,10 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
         if (!configuration.get<boolean>("sortProjectFoldersAlpha"))
         {   //
             // Refresh tree only, leave file cache and provider invalidation alone.  Setting
-            // the 2nd param in refreshTree() to `false` accomplishes just that.
+            // the 2nd param in refresh cmd to `false` accomplishes just that.
             //
             log.write("   refresh tree order", 1);
-            await refreshTree(false, undefined, "   ");
+            await executeCommand(Commands.Refresh, false, undefined, "   ");
         }
         else {
             log.write("   nothing to do", 1);
@@ -464,7 +465,7 @@ const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
     {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
         const numFilesFound = await cache.addFolder(uri, logPad + "   ");
         if (numFilesFound > 0) {
-            await refreshTree(undefined, uri, logPad + "   ");
+            await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
         }
         log.methodDone("[event] directory 'create'", 1, logPad);
     }
@@ -479,7 +480,7 @@ const _procDirDeleteEvent = async(uri: Uri, logPad: string) =>
     {   log.methodStart("[event] directory 'delete'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
         const numFilesRemoved = cache.removeFolderFromCache(uri, logPad + "   ");
         if (numFilesRemoved > 0) {
-            await refreshTree(undefined, uri, logPad + "   ");
+            await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
         }
         log.methodDone("[event] directory 'delete'", 1, logPad);
     }
@@ -492,7 +493,7 @@ const _procFileChangeEvent = async(taskType: string, uri: Uri, logPad: string) =
 {
     try
     {   log.methodStart("[event] file 'change'", 1, logPad, true, [[ "file", uri.fsPath ]]);
-        await refreshTree(taskType, uri, logPad + "   ");
+        await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
         log.methodDone("[event] file 'change'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file change' event error", e ]); }
@@ -505,7 +506,7 @@ const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad: string) =
     try
     {   log.methodStart("[event] file 'create'", 1, logPad, true, [[ "file", uri.fsPath ]]);
         cache.addFileToCache(taskType, uri, logPad + "   ");
-        await refreshTree(taskType, uri, logPad + "   ");
+        await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
         log.methodDone("[event] file 'create'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file create' event error", e ]); }
@@ -518,7 +519,7 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad: string) =
     try
     {   log.methodStart("[event] file 'delete'", 1, logPad, true, [[ "file", uri.fsPath ]]);
         cache.removeFileFromCache(taskType, uri, logPad + "   ");
-        await refreshTree(taskType, uri, logPad + "   ");
+        await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
         log.methodDone("[event] file 'delete'", 1, logPad);
     }
     catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file delete' event error", e ]); }
@@ -538,7 +539,7 @@ const _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: s
         if (numFilesFound > 0 || numFilesRemoved > 0)
         {
             const all =  [ ...e.added, ...e.removed ];
-            await refreshTree(undefined, all.length === 1 ? all[0].uri : undefined, logPad + "   ");
+            await executeCommand(Commands.Refresh, undefined, all.length === 1 ? all[0].uri : undefined, logPad + "   ");
         }
         log.methodDone("workspace folder 'add/remove'", 1, logPad, [
             [ "# of files found", numFilesFound ], [ "# of files removed", numFilesRemoved ]

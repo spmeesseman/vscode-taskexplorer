@@ -1,7 +1,7 @@
 
 
-import figures from "../../lib/figures";
 import { teApi } from "./utils";
+import { figures } from "../../lib/figures";
 import { testControl as tc } from "../control";
 import { properCase } from "../../lib/utils/commonUtils";
 import { lowerCaseFirstChar } from "../../lib/utils/utils";

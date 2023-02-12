@@ -2,6 +2,8 @@
 import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { execSync } from "child_process";
+import { IDictionary } from "../interface";
+import { TeWrapper } from "src/lib/wrapper";
 import { parseStringPromise } from "xml2js";
 import { basename, dirname, join } from "path";
 import { TaskExplorerProvider } from "./provider";
@@ -11,7 +13,6 @@ import { getCombinedGlobPattern } from "../lib/utils/utils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { pathExistsSync, readFileAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, window, workspace, ShellExecutionOptions } from "vscode";
-import { IDictionary } from "../interface";
 
 interface StringMap { [s: string]: string }
 
@@ -28,7 +29,7 @@ export class AntTaskProvider extends TaskExplorerProvider implements TaskExplore
         win32: "ant.bat"
     };
 
-    constructor() { super("ant"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "ant"); }
 
 
     public createTask(target: string, cmdName: string, folder: WorkspaceFolder, uri: Uri, xArgs?: string[]): Task

@@ -16,7 +16,7 @@ import { isString, isTaskTypeEnabled, isWorkspaceFolder } from "./utils/utils";
 const JSON5 = require("json5/dist/index.js");
 
 
-export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", logQueueId?: string) =>
+export const isTaskIncluded = (wrapper: TeWrapper, task: Task, relativePath: string, logPad = "", logQueueId?: string) =>
 {
     const isScopeWsFolder = isWorkspaceFolder(task.scope);
 
@@ -39,7 +39,7 @@ export const isTaskIncluded = (task: Task, relativePath: string, logPad = "", lo
     //
     // External tasks registered via Task Explorer API
     //
-    const providers = TeWrapper.instance.providers;
+    const providers = wrapper.providers;
     if (providers[task.source] && providers[task.source].isExternal) {
         return !!task.definition && !!task.name && !!task.execution;
     }

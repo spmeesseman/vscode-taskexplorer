@@ -40,7 +40,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 		html = html.replace("#{changelog}", changeLogHtml)
 				   .replace("#{subtitle}", this.getNewInThisReleaseShortDsc())
 				   .replace("#{releasenotes}", this.getNewReleaseNotes(version, changeLogMd));
-		html = removeLicenseButtons(html);
+		html = removeLicenseButtons(this.wrapper, html);
 		return html;
 	};
 

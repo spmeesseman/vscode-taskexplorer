@@ -1,6 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
 import { readJsonAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
@@ -12,7 +13,7 @@ import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOp
 export class AppPublisherTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("apppublisher"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "apppublisher"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined

@@ -71,7 +71,7 @@ export class TaskManager implements Disposable
         if (await pathExists(uri.fsPath))
         {
             const document: TextDocument = await workspace.openTextDocument(uri);
-            const offset = findDocumentPosition(document, selection);
+            const offset = findDocumentPosition(this.wrapper, document, selection);
             const position = document.positionAt(offset);
             await window.showTextDocument(document, { selection: new Selection(position, position) });
         }
@@ -213,7 +213,7 @@ export class TaskManager implements Disposable
                 //
                 const def = newTask.definition,
                     folder = taskItem.getFolder(),
-                    p = TeWrapper.instance.providers[def.type];
+                    p = this.wrapper.providers[def.type];
                 /* istanbul ignore else */
                 if (folder && p)
                 {
@@ -350,7 +350,7 @@ export class TaskManager implements Disposable
                         folder = taskItem.getFolder();
                     // if (folder)
                     // {
-                        newTask = (new ScriptTaskProvider()).createTask(
+                        newTask = (new ScriptTaskProvider(this.wrapper)).createTask(
                             def.script, undefined, folder as WorkspaceFolder, def.uri, _args.trim().split(" "), logPad + "   "
                         ) as Task;
                         newTask.definition.taskItemId = def.taskItemId;

@@ -2,18 +2,18 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import TaskItem from "../../tree/item";
-import TaskFile from "../../tree/file";
 import { join } from "path";
 import { expect } from "chai";
-import { workspace, tasks, WorkspaceFolder } from "vscode";
+import { tasks } from "vscode";
+import { TaskItem } from "../../tree/item";
+import { TaskFile } from "../../tree/file";
+import { refresh } from "../utils/treeUtils";
+import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import { ITaskExplorerApi, TaskMap, IFilesystemApi, ITaskFile } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { refresh } from "../utils/treeUtils";
 
 
 const tempFiles: string[] = [];

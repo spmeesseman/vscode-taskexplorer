@@ -1,8 +1,9 @@
 
+import { promisify } from "util";
 import { log } from "../lib/log/log";
 import { exec } from "child_process";
 import { basename, dirname } from "path";
-import { promisify } from "util";
+import { TeWrapper } from "src/lib/wrapper";
 import { timeout } from "../lib/utils/utils";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
@@ -15,7 +16,7 @@ import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from
 export class GulpTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("gulp"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "gulp"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

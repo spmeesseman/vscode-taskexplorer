@@ -32,6 +32,7 @@ export let teExplorer: ITaskTree;
 let activated = false;
 let caughtControlC = false;
 let hasRollingCountError = false;
+let teWrapper: TeWrapper;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
@@ -143,6 +144,7 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
         expect(teApi.explorer).to.not.be.empty;
+        teWrapper = TeWrapper.instance;
         //
         // Set a valid license key to run in 'licensed mode' at startup
         //
@@ -175,7 +177,7 @@ export const activate = async (instance?: Mocha.Context) =>
     }
     return {
         teApi,
-        teWrapper: TeWrapper.instance,
+        teWrapper,
         extension: ext as Extension<any>,
         testsApi: teApi.testsApi,
         fsApi: teApi.testsApi.fs,
@@ -367,7 +369,7 @@ const isReady = (taskType?: string) =>
     if (!teApi)                                 err = `    ${figures.color.error} ${figures.withColor("TeApi null", figures.colors.grey)}`;
     else {
         if (!teApi.explorer)                    err = `    ${figures.color.error} ${figures.withColor("TeApi Explorer provider == null", figures.colors.grey)}`;
-        else if (!teApi.sidebar)                 err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider != null", figures.colors.grey)}`;
+        else if (!teApi.sidebar)                err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider == null", figures.colors.grey)}`;
         else if (!teApi.providers)              err = `    ${figures.color.error} ${figures.withColor("Providers null", figures.colors.grey)}`;
     }
     if (!err && taskType) {
@@ -426,7 +428,7 @@ export const setFailed = (ctrlc = true) =>
 
 export const setLicensed = async (valid: boolean) =>
 {
-    const licMgr = TeWrapper.instance.licenseManager;
+    const licMgr = teWrapper.licenseManager;
     teApi.setTests(!valid);
     await licMgr.setLicenseKey(valid ? "1234-5678-9098-7654321" : undefined);
     await licMgr.checkLicense();

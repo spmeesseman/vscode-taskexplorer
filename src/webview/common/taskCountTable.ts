@@ -1,8 +1,7 @@
 
-import { TextDecoder } from "util";
+import { Task, workspace } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
 import { IDictionary } from "../../interface";
-import { Task, Uri, workspace } from "vscode";
 import { getTaskFiles } from "../../lib/fileCache";
 import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
 import { removeLicenseButtons } from "./removeLicenseButtons";
@@ -15,7 +14,7 @@ export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, 
           taskCounts: IDictionary<number> = {};
 
     let fileCount = 0;
-    const treeMgr = TeWrapper.instance.treeManager;
+    const treeMgr = wrapper.treeManager;
     // let tableTemplate = (await workspace.fs.readFile(tableTemplateFile)).toString();
     const tasks = treeMgr.getTasks() // Filter out 'User' tasks for project/folder reports
                          .filter((t: Task) => !project || (isWorkspaceFolder(t.scope) &&
@@ -47,7 +46,7 @@ export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, 
 
     if (html)
     {
-        html = removeLicenseButtons(html);
+        html = removeLicenseButtons(wrapper, html);
         html = html.replace(/\#\{taskCounts\.table\}/g, tableTemplate);
         html = html.replace(/\#\{taskCounts\.length\}/g, tasks.length.toString())
                     .replace(/\#\{taskTypes\.length\}/g, Object.keys(taskCounts).length.toString())

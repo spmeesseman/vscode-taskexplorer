@@ -3,7 +3,6 @@
 import { log } from "../log/log";
 import { TeWrapper } from "../wrapper";
 import { persistCache } from "../fileCache";
-import { refreshTree } from "../refreshTree";
 import { IDictionary } from "../../interface";
 import { pushIfNotExists } from "../utils/utils";
 import { registerFileWatcher } from "./fileWatcher";
@@ -11,7 +10,10 @@ import { setContext, ContextKeys } from "../context";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
+import { executeCommand } from "../command";
+import { Commands } from "../constants";
 
+let _wrapper: TeWrapper;
 let watcherEnabled = true;
 let processingConfigEvent = false;
 const enabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks", {});
@@ -252,7 +254,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enableExplorerView");
         log.write("   the 'enableExplorerView' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        TeWrapper.instance.treeManager.enableTaskTree("taskExplorer", newValue, "   ");
+        _wrapper.treeManager.enableTaskTree("taskExplorer", newValue, "   ");
         await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
                                               configuration.get<boolean>("enableSideBar"));
     }
@@ -261,7 +263,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enableSideBar");
         log.write("   the 'enableSideBar' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        TeWrapper.instance.treeManager.enableTaskTree("taskExplorerSideBar", newValue, "   ");
+        _wrapper.treeManager.enableTaskTree("taskExplorerSideBar", newValue, "   ");
         await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
                                               configuration.get<boolean>("enableSideBar"));
     }
@@ -283,16 +285,16 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     try
     {   if (refresh || refreshTaskTypes.length > 3)
         {
-            await refreshTree(undefined, undefined, "   ");
+            await executeCommand(Commands.Refresh, undefined, undefined, "   ");
         }
         else if (refreshTaskTypes.length > 0)
         {
             for (const t of refreshTaskTypes) {
-                await refreshTree(t, undefined, "   ");
+                await executeCommand(Commands.Refresh, t, undefined, "   ");
             }
         }
         else if (refresh2) {
-            await refreshTree(false, undefined, "   ");
+            await executeCommand(Commands.Refresh, false, undefined, "   ");
         }
         else {
             log.write("   Current changes require no processing", 1);
@@ -308,8 +310,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
 }
 
 
-export const registerConfigWatcher = (context: ExtensionContext) =>
+export const registerConfigWatcher = (wrapper: TeWrapper) =>
 {
-    const d = workspace.onDidChangeConfiguration(async e => { await processConfigChanges(context, e); });
-    context.subscriptions.push(d);
+    _wrapper = wrapper;
+    const d = workspace.onDidChangeConfiguration(async e => { await processConfigChanges(wrapper.context, e); });
+    wrapper.context.subscriptions.push(d);
 };

@@ -1,4 +1,5 @@
 
+import { TeWrapper } from "src/lib/wrapper";
 import { Globs } from "../lib/constants";
 import { configuration } from "../lib/utils/configuration";
 import { getCombinedGlobPattern } from "../lib/utils/utils";
@@ -7,7 +8,7 @@ import { ScriptTaskProvider } from "./script";
 
 export class BashTaskProvider extends ScriptTaskProvider implements TaskExplorerProvider
 {
-    constructor() { super("bash"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "bash"); }
 
     public override getGlobPattern()
     {

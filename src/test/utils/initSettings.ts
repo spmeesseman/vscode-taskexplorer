@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import figures from "../../lib/figures";
+import { figures } from "../../lib/figures";
 import { testControl as tc } from "../control";
 import { isObject } from "../../lib/utils/utils";
 import { ConfigurationTarget, workspace } from "vscode";

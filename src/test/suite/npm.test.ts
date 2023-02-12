@@ -3,7 +3,7 @@
 /* tslint:disable */
 
 import * as utils from "../utils/utils";
-import TaskItem from "../../tree/item";
+import { TaskItem } from "../../tree/item";
 import { TaskExecution } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { getPackageManager } from "../../lib/utils/utils";
@@ -139,9 +139,9 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmInstallCommand);
-        const exec = await executeTeCommand2(
+        const exec = await executeTeCommand2<TaskExecution | undefined>(
             "runInstall", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
-        ) as TaskExecution | undefined;
+        );
         await utils.waitForTaskExecution(exec);
         utils.endRollingCount(this);
     });
@@ -151,9 +151,9 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
-        const exec = await executeTeCommand2(
+        const exec = await executeTeCommand2<TaskExecution | undefined>(
             "runUpdate", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
-        ) as TaskExecution | undefined;
+        );
         await utils.waitForTaskExecution(exec);
         utils.endRollingCount(this);
     });
@@ -164,9 +164,9 @@ suite("NPM Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommandPkg);
         utils.overrideNextShowInputBox("@spmeesseman/app-publisher");
-        const exec = await executeTeCommand2(
+        const exec = await executeTeCommand2<TaskExecution | undefined>(
             "runUpdatePackage", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
-        ) as TaskExecution | undefined;
+        );
         await utils.waitForTaskExecution(exec);
         utils.endRollingCount(this);
     });
@@ -176,9 +176,9 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
-        const exec = await executeTeCommand2(
+        const exec = await executeTeCommand2<TaskExecution | undefined>(
             "runAudit", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
-        ) as TaskExecution | undefined;
+        );
         await utils.waitForTaskExecution(exec);
         utils.endRollingCount(this);
     });
@@ -188,9 +188,9 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.tasks.npmCommand);
-        const exec = await executeTeCommand2(
+        const exec = await executeTeCommand2<TaskExecution | undefined>(
             "runAuditFix", [ npmTaskItems[0].taskFile ], tc.waitTime.npmCommandMin, tc.waitTime.npmCommandMin
-        ) as TaskExecution | undefined;
+        );
         await utils.waitForTaskExecution(exec);
         utils.endRollingCount(this);
     });

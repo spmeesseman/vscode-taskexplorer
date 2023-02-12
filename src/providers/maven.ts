@@ -1,5 +1,7 @@
 
 import { log } from "../lib/log/log";
+import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
@@ -7,13 +9,12 @@ import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
-import { basename, dirname } from "path";
 
 
 export class MavenTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("maven"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "maven"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task | undefined

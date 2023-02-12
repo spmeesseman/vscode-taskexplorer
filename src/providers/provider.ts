@@ -19,7 +19,6 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
     abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
     abstract readUriTasks(uri: Uri, logPad: string): Promise<Task[]>;
 
-
     public cachedTasks: Task[] | undefined;
     public providerName = "***";
     public readonly isExternal = false;
@@ -28,7 +27,8 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
     protected logQueueId: string | undefined;
 
 
-    constructor(name: string) {
+    constructor(protected readonly wrapper: TeWrapper, name: string) {
+        this.wrapper = wrapper;
         this.providerName = name;
     }
 
@@ -69,7 +69,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
         log.methodStart(`provide ${this.providerName} tasks`, 1, TaskExplorerProvider.logPad, true, [[ "call count", ++this.callCount ]], this.logQueueId);
         if (!this.cachedTasks)
         {
-            const licMgr = TeWrapper.instance.licenseManager;
+            const licMgr = this.wrapper.licenseManager;
             this.cachedTasks = await this.readTasks(TaskExplorerProvider.logPad + "   ");
             if (licMgr && !licMgr.isLicensed())
             {
@@ -106,7 +106,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
                 if (!isExcluded(fObj.uri.path) && !visitedFiles.includes(fObj.uri.fsPath) && pathExistsSync(fObj.uri.fsPath))
                 {
                     visitedFiles.push(fObj.uri.fsPath);
-                    const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
+                    const tasks = (await this.readUriTasks(fObj.uri, logPad + "   ")).filter(t => isTaskIncluded(this.wrapper, t, t.definition.path));
                     log.write(`   processed ${this.providerName} file`, 2, logPad, this.logQueueId);
                     log.value("      file", fObj.uri.fsPath, 2, logPad, this.logQueueId);
                     log.value("      targets in file", tasks.length, 2, logPad, this.logQueueId);
@@ -161,7 +161,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
             //
             if (pathExists && !isDirectory(uri.fsPath) && !configuration.get<string[]>("exclude", []).includes(uri.path))
             {
-                const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(t, t.definition.path));
+                const tasks = (await this.readUriTasks(uri, logPad + "   ")).filter(t => isTaskIncluded(this.wrapper, t, t.definition.path));
                 cachedTasks.push(...tasks);
             }
 
@@ -193,7 +193,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
                  // (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* istanbul ignore next */isDirectory(uri.fsPath)) ||
                  (cstDef.uri.fsPath.startsWith(uri.fsPath) && /* istanbul ignore next */!extname(uri.fsPath) /* ouch */) ||
                  //
-                 !isTaskIncluded(item, cstDef.uri.path)));
+                 !isTaskIncluded(this.wrapper, item, cstDef.uri.path)));
     }
 
 }

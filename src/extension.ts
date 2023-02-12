@@ -17,6 +17,7 @@ import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } f
 
 let ready = false;
 let teApi: ITaskExplorerApi;
+let teWrapper: TeWrapper;
 
 
 export async function activate(context: ExtensionContext)
@@ -83,8 +84,8 @@ export async function activate(context: ExtensionContext)
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    const wrapper = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
-	oneTimeEvent(wrapper.onReady)(() =>
+    teWrapper = TeWrapper.create(context, storage, configuration, prerelease, version, previousVersion);
+	oneTimeEvent(teWrapper.onReady)(() =>
     {
 		// void showWelcomeOrWhatsNew(container, version, previousVersion, "   ");
 		void storage.update(prerelease && !insiders ? "preVersion" : "version", version);
@@ -96,12 +97,12 @@ export async function activate(context: ExtensionContext)
     //
     // Wait for ready signal from application container
     //
-	await wrapper.ready();
+	await teWrapper.ready();
 
     //
     // Instantiate the extension API
     //
-	teApi = new TeApi(wrapper);
+	teApi = new TeApi(teWrapper);
 
     //
     // TODO - Telemetry
@@ -136,7 +137,7 @@ export async function activate(context: ExtensionContext)
     // Use a delayed initialization so we can display an 'Initializing...' message
     // in the tree on startup.  Really no good way to do that w/o this.
     //
-    setTimeout(initialize, 25, wrapper);
+    setTimeout(initialize, 25, teWrapper);
 
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
@@ -176,10 +177,10 @@ export async function deactivate()
     // VSCode will/would dispose() items in subscriptions but it won't be covered.  So dispose
     // everything here, it doesn't seem to cause any issue with Code exiting.
     //
-    TeWrapper.instance.context.subscriptions.forEach((s) => {
+    teWrapper.context.subscriptions.forEach((s) => {
         s.dispose();
     });
-    TeWrapper.instance.context.subscriptions.splice(0);
+    teWrapper.context.subscriptions.splice(0);
 }
 
 
@@ -210,7 +211,7 @@ const initialize = async(wrapper: TeWrapper) =>
     //
     await registerFileWatchers(wrapper.context, "   ");
     //
-    // Build the file cache, this kicks off the whole process as refreshTree() will be called
+    // Build the file cache, this kicks off the whole process as refresh cmd will be issued
     // down the line in the initialization process.
     //
     // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
@@ -255,8 +256,8 @@ const initialize = async(wrapper: TeWrapper) =>
 
 export function isExtensionBusy()
 {
-    return !ready || fileCache.isBusy() || TeWrapper.instance.treeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
-           isProcessingFsEvent() || isProcessingConfigChange() || TeWrapper.instance.licenseManager.isBusy();
+    return !ready || fileCache.isBusy() || teWrapper.treeManager.isBusy() || teApi.explorer?.isBusy() || teApi.sidebar?.isBusy() ||
+           isProcessingFsEvent() || isProcessingConfigChange() || teWrapper.licenseManager.isBusy();
 }
 
 

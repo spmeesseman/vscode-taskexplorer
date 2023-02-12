@@ -3,11 +3,10 @@ import { log } from "../lib/log/log";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
-import { refreshTree } from "../lib/refreshTree";
-import { registerCommand } from "../lib/command";
 import { Commands, Globs } from "../lib/constants";
 import { ExtensionContext, Uri, window } from "vscode";
 import { removeFromExcludes } from "../lib/addToExcludes";
+import { executeCommand, registerCommand } from "../lib/command";
 
 const localize = loadMessageBundle();
 
@@ -22,7 +21,7 @@ const removeUriFromExcludes = async(uri: Uri) =>
         {
             const taskType = globKey.replace("GLOB_", "").toLowerCase();
             await removeFromExcludes([ uri.path ], "exclude", true, "   ");
-            await refreshTree(taskType, uri, "   ");
+            await executeCommand(Commands.Refresh, taskType, uri, "   ");
         }
         else{
             const msg = "This file does not appear to be associated to any known task type";

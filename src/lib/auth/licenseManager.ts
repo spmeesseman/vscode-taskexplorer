@@ -8,7 +8,6 @@ import { IncomingMessage } from "http";
 import { Commands } from "../constants";
 import { storage } from "../utils/storage";
 import { log, logControl } from "../log/log";
-import { refreshTree } from "../refreshTree";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { LicensePage } from "../../webview/page/licensePage";
@@ -119,7 +118,7 @@ export class LicenseManager implements ILicenseManager, Disposable
 					{
 						window.showInformationMessage("License key validated, thank you for your support!");
 						if (this.maxTasksReached) {
-							await refreshTree(true, false, "   ");
+							await executeCommand(Commands.Refresh);
 						}
 					}
 				}

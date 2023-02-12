@@ -80,7 +80,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             this._taskManager,
             this.specialFolders.favorites,
             this.specialFolders.lastTasks,
-            commands.registerCommand("vscode-taskexplorer.refresh", () => this.refresh(true, false, ""), this),
+            commands.registerCommand("vscode-taskexplorer.refresh", (taskType?: boolean, uri?: Uri, logPad = "") => this.refresh(taskType, uri, logPad), this),
             commands.registerCommand("vscode-taskexplorer.addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
             commands.registerCommand("vscode-taskexplorer.run",  async (item: TaskItem) => this.taskManager.run(item), this),
             commands.registerCommand("vscode-taskexplorer.runNoTerm",  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
@@ -199,7 +199,7 @@ export class TaskTreeManager implements ITaskTreeManager, Disposable
             // Only internally provided tasks will be present in the this.tasks cache at this point, as extension
             // provided tasks will have been skipped/ignored in the provideTasks() processing.
             //
-            if (!isTaskIncluded(item, getTaskRelativePath(item), logPad + "   "))
+            if (!isTaskIncluded(this.wrapper, item, getTaskRelativePath(item), logPad + "   "))
             {
                 ++ctRmv;
                 tasksCache.splice(object.length - 1 - index, 1);

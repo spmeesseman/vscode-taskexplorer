@@ -6,8 +6,7 @@ import * as fileCache from "./fileCache";
 import { TaskTree } from "../tree/tree";
 import { TeWrapper } from "./wrapper";
 import { storage } from "./utils/storage";
-import { registerCommand } from "./command";
-import { refreshTree } from "./refreshTree";
+import { executeCommand, registerCommand } from "./command";
 import { isExtensionBusy } from "../extension";
 import { workspace, WorkspaceFolder } from "vscode";
 import { ContextKeys, setContext } from "./context";
@@ -15,6 +14,7 @@ import { configuration } from "./utils/configuration";
 import { onWsFoldersChange } from "./watcher/fileWatcher";
 import { enableConfigWatcher } from "./watcher/configWatcher";
 import { IExternalProvider, ITaskExplorerApi, ITaskTree, ITaskTreeView, ITestsApi } from "../interface";
+import { Commands } from "./constants";
 
 
 export class TeApi implements ITaskExplorerApi
@@ -138,7 +138,7 @@ export class TeApi implements ITaskExplorerApi
     {
         if (this.providers[providerName])
         {
-            await refreshTree(providerName, undefined, "");
+            await executeCommand(Commands.Refresh, providerName);
         }
     };
 
@@ -146,14 +146,14 @@ export class TeApi implements ITaskExplorerApi
     register = async(providerName: string, provider: IExternalProvider, logPad: string) =>
     {
         this.providers[providerName] = provider;
-        await refreshTree(providerName, undefined, logPad);
+        await executeCommand(Commands.Refresh, providerName, undefined, logPad);
     };
 
 
     unregister = async(providerName: string, logPad: string) =>
     {
         delete this.providers[providerName];
-        await refreshTree(providerName, undefined, logPad);
+        await executeCommand(Commands.Refresh, providerName, undefined, logPad);
     };
 
 }

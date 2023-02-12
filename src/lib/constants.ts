@@ -51,6 +51,7 @@ export const enum Commands
 	GetApi = "vscode-taskexplorer.getApi",
 	GetLicense = "vscode-taskexplorer.getLicense",
     Open = "vscode-taskexplorer.open",
+	Refresh = "vscode-taskexplorer.refresh",
 	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
     Run = "vscode-taskexplorer.run",
     RunWithArgs = "vscode-taskexplorer.runWithArgs",

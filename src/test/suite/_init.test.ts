@@ -3,7 +3,6 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
-import { refreshTree } from "../../lib/refreshTree";
 import { ITaskTree, ITaskExplorerApi, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
 import {
@@ -52,7 +51,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
-        await testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
+        testsApi.treeManager.enableTaskTree("taskExplorerSideBar", true, ""); // cover edge if
         endRollingCount(this);
     });
 
@@ -63,7 +62,7 @@ suite("Initialization", () =>
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        await testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
+        testsApi.treeManager.enableTaskTree("taskExplorer", false, "");
         expect(teApi.sidebar).to.not.be.undefined;
         expect(teApi.sidebarView).to.not.be.undefined;
         expect(teApi.explorer).to.be.undefined;
@@ -77,7 +76,7 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh);
-        await refreshTree(undefined, undefined, "");
+        await executeTeCommand2("refresh", [ undefined, undefined, "" ]);
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);
     });
@@ -104,7 +103,7 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refreshNoChanges * 2);
-        await refreshTree(undefined, undefined, "");
+        await executeTeCommand2("refresh", [ undefined, undefined, "" ]);
         endRollingCount(this);
     });
 

@@ -81,6 +81,7 @@ export class TeWrapper
 		if (TeWrapper.#instance) throw new Error("TeWrapper is already initialized");
 
 		TeWrapper.#instance = new TeWrapper(context, storage, configuration, prerelease, version, previousVersion);
+console.log("instance_create1: " + !!TeWrapper.#instance);
 		return TeWrapper.#instance;
 	}
 
@@ -131,7 +132,7 @@ export class TeWrapper
     {
 		get: (_target, prop) =>
         {
-			if (!TeWrapper.#instance) return (TeWrapper.#instance as any)[prop];
+			if (TeWrapper.#instance) return (TeWrapper.#instance as any)[prop];
 			if (prop === "config") return configuration;
 			throw new Error("TeWrapper is not initialized");
 		},
@@ -148,8 +149,8 @@ export class TeWrapper
 		if (this._ready) {
 			throw new Error("TeWrapper is already ready");
 		}
-		await fileCache.registerFileCache(this._context);
-		registerConfigWatcher(this._context);
+		await fileCache.registerFileCache(this);
+		registerConfigWatcher(this);
 		this.registerTaskProviders();
 		this.registerContextMenuCommands();
 		registerStatusBarItem(this._context);
@@ -193,25 +194,25 @@ export class TeWrapper
         // TODO: VSCODE API now implements "resolveTask" in addition to "provideTask".  Need to implement
         //     https://code.visualstudio.com/api/extension-guides/task-provider
         //
-        this.registerTaskProvider("ant", new AntTaskProvider());                    // Apache Ant Build Automation Tool
-        this.registerTaskProvider("apppublisher", new AppPublisherTaskProvider());  // App Publisher (work related)
-        this.registerTaskProvider("composer", new ComposerTaskProvider());          // PHP / composer.json
-        this.registerTaskProvider("gradle", new GradleTaskProvider());              // Gradle multi-Language Automation Tool
-        this.registerTaskProvider("grunt", new GruntTaskProvider());                // Gulp JavaScript Toolkit
-        this.registerTaskProvider("gulp", new GulpTaskProvider());                  // Grunt JavaScript Task Runner
-        this.registerTaskProvider("jenkins", new JenkinsTaskProvider());            // Jenkinsfile validation task
-        this.registerTaskProvider("make", new MakeTaskProvider());                  // C/C++ Makefile
-        this.registerTaskProvider("maven", new MavenTaskProvider());                // Apache Maven Toolset
-        this.registerTaskProvider("pipenv", new PipenvTaskProvider());              // Pipfile for Python pipenv package manager
-        this.registerTaskProvider("webpack", new WebpackTaskProvider());
+        this.registerTaskProvider("ant", new AntTaskProvider(this));                    // Apache Ant Build Automation Tool
+        this.registerTaskProvider("apppublisher", new AppPublisherTaskProvider(this));  // App Publisher (work related)
+        this.registerTaskProvider("composer", new ComposerTaskProvider(this));          // PHP / composer.json
+        this.registerTaskProvider("gradle", new GradleTaskProvider(this));              // Gradle multi-Language Automation Tool
+        this.registerTaskProvider("grunt", new GruntTaskProvider(this));                // Gulp JavaScript Toolkit
+        this.registerTaskProvider("gulp", new GulpTaskProvider(this));                  // Grunt JavaScript Task Runner
+        this.registerTaskProvider("jenkins", new JenkinsTaskProvider(this));            // Jenkinsfile validation task
+        this.registerTaskProvider("make", new MakeTaskProvider(this));                  // C/C++ Makefile
+        this.registerTaskProvider("maven", new MavenTaskProvider(this));                // Apache Maven Toolset
+        this.registerTaskProvider("pipenv", new PipenvTaskProvider(this));              // Pipfile for Python pipenv package manager
+        this.registerTaskProvider("webpack", new WebpackTaskProvider(this));
         // Script type tasks
-        this.registerTaskProvider("bash", new BashTaskProvider());
-        this.registerTaskProvider("batch", new BatchTaskProvider());
-        this.registerTaskProvider("nsis", new NsisTaskProvider());
-        this.registerTaskProvider("perl", new PerlTaskProvider());
-        this.registerTaskProvider("powershell", new PowershellTaskProvider());
-        this.registerTaskProvider("python", new PythonTaskProvider());
-        this.registerTaskProvider("ruby", new RubyTaskProvider());
+        this.registerTaskProvider("bash", new BashTaskProvider(this));
+        this.registerTaskProvider("batch", new BatchTaskProvider(this));
+        this.registerTaskProvider("nsis", new NsisTaskProvider(this));
+        this.registerTaskProvider("perl", new PerlTaskProvider(this));
+        this.registerTaskProvider("powershell", new PowershellTaskProvider(this));
+        this.registerTaskProvider("python", new PythonTaskProvider(this));
+        this.registerTaskProvider("ruby", new RubyTaskProvider(this));
     };
 
 

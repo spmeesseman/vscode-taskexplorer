@@ -2,12 +2,11 @@
 import { log } from "../lib/log/log";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
-import { refreshTree } from "../lib/refreshTree";
 import { testPattern } from "../lib/utils/utils";
-import { registerCommand } from "../lib/command";
+import { Globs, Commands } from "../lib/constants";
 import { addToExcludes } from "../lib/addToExcludes";
 import { ExtensionContext, Uri, window } from "vscode";
-import { Globs, Commands } from "../lib/constants";
+import { executeCommand, registerCommand } from "../lib/command";
 
 const localize = loadMessageBundle();
 
@@ -22,7 +21,7 @@ const addUriToExcludes = async(uri: Uri) =>
         {
             const taskType = globKey.replace("GLOB_", "").toLowerCase();
             await addToExcludes([ uri.path ], "exclude", true, "   ");
-            await refreshTree(taskType, uri, "   ");
+            await executeCommand(Commands.Refresh, taskType, uri, "   ");
         }
         else{
             const msg = "This file does not appear to be associated to any known task type";

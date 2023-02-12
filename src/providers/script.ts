@@ -1,12 +1,13 @@
 
 import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
-import { basename, dirname, sep, extname, join } from "path";
+import { TeWrapper } from "src/lib/wrapper";
+import { readFileSync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
+import { basename, dirname, sep, extname, join } from "path";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
-import { readFileSync } from "../lib/utils/fs";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 
@@ -25,7 +26,7 @@ import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOp
 export class ScriptTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor(name = "script") { super(name); }
+    constructor(wrapper: TeWrapper, name = "script") { super(wrapper, name); }
 
 
     private scriptTable: any = {

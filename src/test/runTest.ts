@@ -4,8 +4,7 @@ import * as path from "path";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
 import { testControl } from "./control";
-import { copyFile, deleteDir, readFileAsync, writeFile } from "../lib/utils/fs";
-import { getWsPath } from "./utils/sharedUtils";
+import { copyFile, createDir, deleteDir, pathExistsSync, readFileAsync, writeFile } from "../lib/utils/fs";
 import { getTaskTypeRealName, getTaskTypes } from "../lib/utils/taskTypeUtils";
 
 const VSCODE_TEST_VERSION = "1.63.0";
@@ -14,6 +13,8 @@ interface IDictionary<TValue>
 {
     [id: string]: TValue;
 }
+
+const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "..", "..", "test-fixture", "project1", p));
 
 const main = async(args: string[]) =>
 {
@@ -96,6 +97,9 @@ const main = async(args: string[]) =>
         //
         // Copy a "User Tasks" file
         //
+        if (!pathExistsSync(path.join(vscodeTestUserDataPath, "User"))) {
+            await createDir(path.join(vscodeTestUserDataPath, "User"));
+        }
         await copyFile(path.join(testWorkspaceMultiRoot, "user-tasks.json"), path.join(vscodeTestUserDataPath, "User", "tasks.json"));
 
         //

@@ -46,7 +46,7 @@ const findJsonDocumentPosition = (documentText: string, taskItem: TaskItem): num
 };
 
 
-export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem): number =>
+export const findDocumentPosition = (wrapper: TeWrapper, document: TextDocument, taskItem: TaskItem): number =>
 {
     let scriptOffset = 0;
     const documentText = document.getText();
@@ -64,7 +64,7 @@ export const findDocumentPosition = (document: TextDocument, taskItem: TaskItem)
     else if (!isWatchTask(taskItem.taskSource))
     {
         log.write("   find custom provider position", 2);
-        const provider = TeWrapper.instance.providers[def.type];
+        const provider = wrapper.providers[def.type];
         scriptOffset = provider?.getDocumentPosition(taskItem.task.name, documentText) || -1;
     }
 

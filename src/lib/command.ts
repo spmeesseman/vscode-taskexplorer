@@ -22,7 +22,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 	return commands.registerCommand(
 		command,
 		function (this: any, ...args) {
-			// TeWrapper.instance.telemetry.sendEvent("command", { command: command });
+			// this.wrapper.telemetry.sendEvent("command", { command: command });
 			return callback.call(this, ...args);
 		},
 		thisArg
@@ -74,7 +74,7 @@ export function executeCommand<T extends [...unknown[]] = [], U = any>(command: 
 // export function executeVsCodeCommand<T extends [...unknown[]] = [], U = any>(command: VsCodeCommands, ...args: T): Thenable<U>
 // {
 // 	// if (command !== VsCodeCommands.ExecuteDocumentSymbolProvider) {
-// 	// 	TeWrapper.instance.telemetry.sendEvent("command/core", { command: command });
+// 	// 	this.wrapper.telemetry.sendEvent("command/core", { command: command });
 // 	// }
 // 	return commands.executeCommand<U>(command, ...args);
 // }

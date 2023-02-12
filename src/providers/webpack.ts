@@ -1,6 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
@@ -11,7 +12,7 @@ import { configuration } from "../lib/utils/configuration";
 export class WebpackTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("webpack"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "webpack"); }
 
 
     public createTask(target: string, cmd: "webpack" |"cross-env", folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task

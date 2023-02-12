@@ -1,13 +1,14 @@
 
-import * as bombadil from "@sgarciac/bombadil";
 import { log } from "../lib/log/log";
+import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
+import * as bombadil from "@sgarciac/bombadil";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { configuration } from "../lib/utils/configuration";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
-import { basename, dirname } from "path";
 
 
 /**
@@ -16,7 +17,7 @@ import { basename, dirname } from "path";
 export class PipenvTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("pipenv"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "pipenv"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

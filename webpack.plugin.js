@@ -39,7 +39,7 @@ const wpPlugin =
 		// "AfterDonePlugin" MUST BE LAST IN THE PLUGINS ARRAY!!
 		/** @type {WebpackPluginInstance | undefined} */
 		let plugin;
-		if (env.target !== "webview" && wpConfig.mode === "production")
+		if (env.build !== "webview" && wpConfig.mode === "production")
 		{
 			plugin =
 			{   /** @param {import("webpack").Compiler} compiler Compiler */
@@ -71,7 +71,7 @@ const wpPlugin =
 		*/
 		bundle: (env, wpConfig) =>
 		{
-			/** @type {BundleAnalyzerPlugin | undefined} */
+			/** @type {BundleAnalyzerPlugin | any  | undefined} */
 			let plugin;
 			if (env.analyze === true)
 			{
@@ -150,7 +150,7 @@ const wpPlugin =
 		let plugin;
 		if (env.clean === true)
 		{
-			if (env.target === "webview")
+			if (env.build === "webview")
 			{
 				const basePath = path.posix.join(__dirname.replace(/\\/g, "/"), "res");
 				plugin = new CleanWebpackPlugin(
@@ -199,7 +199,7 @@ const wpPlugin =
 	{
 		/** @type {CopyPlugin | undefined} */
 		let plugin;
-		if (env.target === "webview")
+		if (env.build === "webview")
 		{
 			const /** @type {CopyPlugin.Pattern[]} */patterns = [],
 				  psx__dirname = __dirname.replace(/\\/g, "/"),
@@ -350,7 +350,7 @@ const wpPlugin =
 	{
 		/** @type {InlineChunkHtmlPlugin | undefined} */
 		let plugin;
-		if (env.target === "webview")
+		if (env.build === "webview")
 		{
 			plugin = new InlineChunkHtmlPlugin(HtmlPlugin, wpConfig.mode === "production" ? ["\\.css$"] : []);
 		}
@@ -370,7 +370,7 @@ const wpPlugin =
 	{
 		/** @type {ImageMinimizerPlugin | undefined} */
 		let plugin;
-		if (env.target === "webview" && wpConfig.mode !== "production")
+		if (env.build === "webview" && wpConfig.mode !== "production")
 		{
 			// plugin = new ImageMinimizerPlugin({
 			// 	deleteOriginalAssets: true,
@@ -393,7 +393,7 @@ const wpPlugin =
 	{
 		/** @type {webpack.optimize.LimitChunkCountPlugin | undefined} */
 		let plugin;
-		if (env.target === "extension_web")
+		if (env.build === "extension_web")
 		{
 			plugin = new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 });
 		}
@@ -413,7 +413,7 @@ const wpPlugin =
 	{
 		/** @type {ForkTsCheckerPlugin | undefined} */
 		let plugin;
-		if (env.target === "webview")
+		if (env.build === "webview")
 		{
 			plugin = new ForkTsCheckerPlugin(
 			{
@@ -477,7 +477,7 @@ const wpPlugin =
 	{
 		/** @type {HtmlPlugin[]} */
 		const plugins = [];
-		if (env.target === "webview")
+		if (env.build === "webview")
 		{
 			apps.forEach(k => plugins.push(wpPlugin.html(k, env, wpConfig)));
 		}

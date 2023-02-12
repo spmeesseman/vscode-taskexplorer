@@ -2,11 +2,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as utils from "../utils/utils";
 import { join } from "path";
 import { expect } from "chai";
 import { Task } from "vscode";
-import { TeWrapper } from "../../lib/container";
+import * as utils from "../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { LicensePage } from "../../webview/page/licensePage";

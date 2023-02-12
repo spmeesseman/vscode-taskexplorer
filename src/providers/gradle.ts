@@ -1,6 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
@@ -21,7 +22,7 @@ export class GradleTaskProvider extends TaskExplorerProvider implements TaskExpl
         win32: "gradlew.bat"
     };
 
-    constructor() { super("gradle"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "gradle"); }
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task

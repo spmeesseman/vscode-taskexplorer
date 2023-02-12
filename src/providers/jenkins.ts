@@ -1,6 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
+import { TeWrapper } from "src/lib/wrapper";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
@@ -12,7 +13,7 @@ import { env } from "process";
 export class JenkinsTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider
 {
 
-    constructor() { super("jenkins"); }
+    constructor(wrapper: TeWrapper) { super(wrapper, "jenkins"); }
 
 
     public createTask(pathToJenkins: string, pathToCurl: string, folder: WorkspaceFolder, uri: Uri, xArgs: string[]): Task

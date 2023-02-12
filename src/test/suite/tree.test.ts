@@ -5,11 +5,11 @@
 
 import * as utils from "../utils/utils";
 import { Globs } from "../../lib/constants";
-import TaskItem from "../../tree/item";
-import TaskFolder from "../../tree/folder";
-import SpecialTaskFolder from "../../tree/specialFolder";
+import { TaskItem } from "../../tree/item";
+import { TaskFolder } from "../../tree/folder";
 import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
+import { SpecialTaskFolder } from "../../tree/specialFolder";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import { IDictionary, ITaskTree, ITaskExplorerApi, ITaskFolder, ITaskItem, ITestsApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { expect } from "chai";
