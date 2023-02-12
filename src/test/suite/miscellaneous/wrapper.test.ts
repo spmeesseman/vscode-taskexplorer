@@ -60,7 +60,7 @@ suite("Wrapper Tests", () =>
     test("Re-Access Initialization Properties (Throws)", async function()
     {
         if (exitRollingCount(this)) return;
-        try { await teWrapper.ready(); } catch { /* will throw */ }
+        try { await teWrapper.initialize(); } catch { /* will throw */ }
         endRollingCount(this);
     });
 

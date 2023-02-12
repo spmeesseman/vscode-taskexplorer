@@ -1,7 +1,6 @@
 
 import { TeApi } from "./api";
 import * as fs from "./utils/fs";
-import { isReady } from "../extension";
 import * as fileCache from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
@@ -46,7 +45,7 @@ import { registerAddToExcludesCommand } from "../commands/addToExcludes";
 import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
-import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder } from "vscode";
+import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder, env } from "vscode";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
 
 
@@ -54,43 +53,47 @@ export class TeWrapper
 {
 	private _ready = false;
 	private _tests = false;
-	private readonly _busy = false;
-	private readonly _teApi: TeApi;
+	private _busy = false;
+	private _initialized = false;
+
 	private readonly _log: ILog;
-	private readonly _homeView: HomeView;
+	private readonly _teApi: TeApi;
 	private readonly _version: string;
-	private readonly _licensePage: LicensePage;
 	private readonly _storage: IStorage;
+	private readonly _homeView: HomeView;
 	private readonly _usage: UsageWatcher;
-	private readonly _taskCountView: TaskCountView;
+	private readonly _licensePage: LicensePage;
+	private readonly _context: ExtensionContext;
 	private readonly _treeManager: TaskTreeManager;
 	private readonly _taskUsageView: TaskUsageView;
-	private readonly _licenseManager: LicenseManager;
-	private readonly _context: ExtensionContext;
-	private readonly _releaseNotesPage: ReleaseNotesPage;
-	private readonly _parsingReportPage: ParsingReportPage;
+	private readonly _taskCountView: TaskCountView;
 	private readonly _configuration: IConfiguration;
 	// private readonly _telemetry: TelemetryService;
+	private readonly _licenseManager: LicenseManager;
+	private readonly _releaseNotesPage: ReleaseNotesPage;
 	private readonly _previousVersion: string | undefined;
-	private _onReady: EventEmitter<void> = new EventEmitter<void>();
+	private readonly _parsingReportPage: ParsingReportPage;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
+	private _onReady: EventEmitter<void> = new EventEmitter<void>();
+	private _onInitialized: EventEmitter<void> = new EventEmitter<void>();
 
 
-	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog, version: string, previousVersion: string | undefined)
+	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
     {
-		return new TeWrapper(context, storage, configuration, log, version, previousVersion);
+		return new TeWrapper(context, storage, configuration, log);
 	}
 
 
-	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog,  version: string, previousVersion: string | undefined)
+	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
     {
 		this._context = context;
-		this._version = version;
-		this._previousVersion = previousVersion;
         this._storage = storage;
         this._configuration = configuration;
 		this._log = log;
 		this._providers = {};
+
+		this._version = this._context.extension.packageJSON.version;
+		this._previousVersion = this._storage.get<string>("taskExplorer.version");
 
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
@@ -149,20 +152,37 @@ export class TeWrapper
 	}
 
 
+	get onInitialized() {
+		return this._onReady.event;
+	}
+
+
 	get onReady() {
 		return this._onReady.event;
 	}
 
 
-	ready = async() =>
+	initialize = async() =>
 	{
-		if (this._ready) {
+		if (this._initialized) {
 			throw new Error("TeWrapper is already initialized/ready");
 		}
-		this.registerTaskProviders();
-		this.registerContextMenuCommands();
-		registerConfigWatcher(this);
+		this.log.methodStart("task explorer app wrapper ready", 1);
+		//
+		// Register global status bar item
+		//
 		registerStatusBarItem(this._context);
+		//
+		// Register all task provider services, i.e. ant, batch, bash, python, etc...
+		//
+		this.registerTaskProviders();
+		//
+		// Register the configuration/settings watcher
+		//
+		registerConfigWatcher(this);
+		//
+		// Register file cache manager
+		//
 		await fileCache.registerFileCache(this);
 		//
 		// Register file type watchers
@@ -176,16 +196,80 @@ export class TeWrapper
 		//
 		// Context
 		//
-		if (this.debugging) {
-			await setContext(ContextKeys.Debugging, true);
+		this.registerContextMenuCommands();
+		await setContext(ContextKeys.Debugging, this.debugging);
+		await setContext(ContextKeys.Tests, this.tests);
+        await setContext(ContextKeys.Enabled, this.configuration.get<boolean>("enableSideBar") ||
+                                              this.configuration.get<boolean>("enableExplorerView"));
+		//
+		// Signal we are ready/done
+		//
+		queueMicrotask(() => { this._initialized = true; this._onInitialized.fire(); });
+		//
+		// Start the whole work process, i.e. read task files and build the task tree, etc.
+		// Large workspaces can take a bit of time if persistent caching isn't enabled, so
+		// we do it now and not wait until the view is first visible/focused/activated.
+		//
+		queueMicrotask(() => this.run());
+		this.log.methodDone("task explorer app wrapper ready", 1);
+	};
+
+
+	private run = async() =>
+	{
+		const now = Date.now(),
+			  lastDeactivated = await this.storage.get2<number>("lastDeactivated", 0),
+			  lastWsRootPathChange = await this.storage.get2<number>("lastWsRootPathChange", 0);
+		this.log.methodStart("task explorer app wrapper run", 1, "", true);
+		//
+		// Authentication
+		//
+		await this.licenseManager.checkLicense("   ");
+		// const session = await licenseManager.getSession("TeAuth", [], { create: true });
+		// if (session) {
+		//     window.showInformationMessage(`Welcome back ${session.account.name}`);
+		// }
+		//
+		// Build the file cache, this kicks off the whole process as refresh cmd will be issued
+		// down the line in the initialization process.
+		// On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
+		// To make the tree reload pain as light as possible, we now always persist the file cache
+		// regardless if the user settings has activated it or not when the extension deactivates
+		// in this scenario. So check this case and proceed as necessary.
+		//
+		const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
+		/* istanbul ignore else */
+		if (this.tests || /* istanbul ignore next */!rootFolderChanged)
+		{
+			await this.filecache.rebuildCache("   ");
+		}     //
+		else // See comments/notes above
+		{   //
+			const enablePersistentFileCaching = this.configuration.get<boolean>("enablePersistentFileCaching");
+			enableConfigWatcher(false);
+			await this.configuration.update("enablePersistentFileCaching", true);
+			await this.filecache.rebuildCache("   ");
+			await this.configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
+			enableConfigWatcher(true);
 		}
-		else if (this.tests) {
-			await setContext(ContextKeys.Tests, true);
-		}
-        await setContext(ContextKeys.Enabled, this.configuration.get<boolean>("enableExplorerView") ||
-                                              this.configuration.get<boolean>("enableSideBar"));
-		this._ready = true;
-		queueMicrotask(() => this._onReady.fire());
+
+		await this.storage.update2("lastDeactivated", 0);
+		await this.storage.update2("lastWsRootPathChange", 0);
+		//
+		// Start the first tree build/load
+		//
+		await this.treeManager.loadTasks("   ");
+		//
+		// Log the environment
+		//
+		this.log.methodDone("task explorer app wrapper run", 1, "", [
+			[ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
+			[ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
+		]);
+		//
+		// Signal that the startup work has completed
+		//
+		queueMicrotask(() => { this._ready = true; this._onReady.fire(); });
 	};
 
 
@@ -261,17 +345,15 @@ export class TeWrapper
     {
 		const isDev = this._context.extensionMode === ExtensionMode.Development,
 			  isTests = this._context.extensionMode === ExtensionMode.Test;
-		return !isDev && !isTests ? "production" : (isTests ? "tests" : "dev");
+		return !isDev && !isTests ? /* istanbul ignore next */"production" : (isDev ? "dev" : "tests");
 	}
 
-    get explorer()
-    {
+    get explorer() {
         return this.treeManager.views.taskExplorer?.tree;
     }
 
-    set explorer(tree)
-    {
-        (this.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as TaskTree;
+    set explorer(tree) {
+		Object.assign(this._treeManager.views, { taskExplorer: { tree }});
     }
 
     get explorerView() {
@@ -291,8 +373,8 @@ export class TeWrapper
 	}
 
 	get busy() {
-		return this._busy || !this.ready || fileCache.isBusy() || this.treeManager.isBusy() || isProcessingFsEvent() ||
-			   isProcessingConfigChange() || this.licenseManager.isBusy() || !isReady();
+		return this._busy || !this._ready || !this._initialized || fileCache.isBusy() || this._treeManager.isBusy() ||
+			   isProcessingFsEvent() ||  isProcessingConfigChange() || this._licenseManager.isBusy();
 	}
 
 	get log() {
@@ -311,10 +393,8 @@ export class TeWrapper
         return this.treeManager.views.taskExplorerSideBar?.tree;
     }
 
-    set sidebar(tree) {
-        if (this.treeManager.views.taskExplorerSideBar) {
-            this.treeManager.views.taskExplorerSideBar.tree = tree as TaskTree;
-        }
+    set sidebar(tree: TaskTree) {
+		Object.assign(this._treeManager.views, { taskExplorerSideBar: { tree }});
     }
 
     get sidebarView() {

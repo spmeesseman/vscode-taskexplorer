@@ -4,22 +4,19 @@ import { log } from "./lib/log/log";
 import { TeWrapper } from "./lib/wrapper";
 import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
-import { ExtensionContext, env, ExtensionMode } from "vscode";
-import { enableConfigWatcher } from "./lib/watcher/configWatcher";
+import { ExtensionContext, ExtensionMode } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
-import { disposeFileWatchers, registerFileWatchers } from "./lib/watcher/fileWatcher";
+import { disposeFileWatchers } from "./lib/watcher/fileWatcher";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 
 // import "tsconfig-paths/register";
 
-let ready = false;
 let teWrapper: TeWrapper;
 
 
 export async function activate(context: ExtensionContext)
 {
     const isTests = context.extensionMode === ExtensionMode.Test;
-    const version: string = context.extension.packageJSON.version;
 
     //
     // TODO - Handle untrusted workspace
@@ -59,24 +56,15 @@ export async function activate(context: ExtensionContext)
     //
     // !!! End temporary !!!
     //
-
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-	const storedVersion = storage.get<string>("taskExplorer.version");
-    teWrapper = TeWrapper.create(context, storage, configuration, log, version, storedVersion);
-	oneTimeEvent(teWrapper.onReady)(() =>
-    {
-		// void showWelcome(teWrapper, version, storedVersion, "   ");
-        // await doWorkSon(teWrapper);
-       // doWorkSon(teWrapper);
-        setTimeout(doWorkSon, 1, teWrapper);
-	});
-
+    teWrapper = TeWrapper.create(context, storage, configuration, log);
+	oneTimeEvent(teWrapper.onInitialized)(() => { /* TODO - Show `welcome` / `version changed` page */ });
     //
     // Wait for ready signal from application container
     //
-	await teWrapper.ready();
+	await teWrapper.initialize();
 
     log.write("   activation completed successfully, initialization pending", 1);
     log.methodDone("activation", 1);
@@ -121,67 +109,6 @@ export async function deactivate()
     });
     teWrapper.context.subscriptions.splice(0);
 }
-
-
-const doWorkSon = async(wrapper: TeWrapper) =>
-{
-    const now = Date.now(),
-          lastDeactivated = await storage.get2<number>("lastDeactivated", 0),
-          lastWsRootPathChange = await storage.get2<number>("lastWsRootPathChange", 0);
-    log.methodStart("do init work son", 1, "", true);
-    //
-    // Authentication
-    //
-    await wrapper.licenseManager.checkLicense("   ");
-    // const session = await licenseManager.getSession("TeAuth", [], { create: true });
-    // if (session) {
-    //     window.showInformationMessage(`Welcome back ${session.account.name}`);
-    // }
-    //
-    // Build the file cache, this kicks off the whole process as refresh cmd will be issued
-    // down the line in the initialization process.
-    // On a workspace folder move that changes the 1st folder, VSCode restarts the extension.
-    // To make the tree reload pain as light as possible, we now always persist the file cache
-    // regardless if the user settings has activated it or not when the extension deactivates
-    // in this scenario. So check this case and proceed as necessary.
-    //
-    const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
-    /* istanbul ignore else */
-    if (wrapper.tests || /* istanbul ignore next */!rootFolderChanged)
-    {
-        await wrapper.filecache.rebuildCache("   ");
-    }     //
-    else // See comments/notes above
-    {   //
-        const enablePersistentFileCaching = configuration.get<boolean>("enablePersistentFileCaching");
-        enableConfigWatcher(false);
-        await configuration.update("enablePersistentFileCaching", true);
-        await wrapper.filecache.rebuildCache("   ");
-        await wrapper.configuration.update("enablePersistentFileCaching", enablePersistentFileCaching);
-        enableConfigWatcher(true);
-    }
-
-    await wrapper.storage.update2("lastDeactivated", 0);
-    await wrapper.storage.update2("lastWsRootPathChange", 0);
-    //
-    // Start the first tree build/load
-    //
-    await wrapper.treeManager.loadTasks("   ");
-    //
-    // Log the environment
-    //
-    log.methodDone("do init work son", 1, "", [
-        [ "machine id", env.machineId ], [ "session id", env.sessionId ], [ "app name", env.appName ],
-        [ "remote name", env.remoteName ], [ "is new ap install", env.isNewAppInstall ]
-    ]);
-    //
-    // Signal that the startup work has completed
-    //
-    setTimeout(() => { ready = true; }, 1);
-};
-
-
-export const isReady = () => ready;
 
 
 /* istanbul ignore next */
