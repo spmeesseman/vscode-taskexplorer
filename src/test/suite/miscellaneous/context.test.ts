@@ -10,7 +10,7 @@ import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../.
 let teWrapper: TeWrapper;
 
 
-suite("Wrapper Tests", () =>
+suite("Context Tests", () =>
 {
 
     suiteSetup(async function()
