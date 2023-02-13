@@ -97,10 +97,20 @@ button:hover {
     /* background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000); */
 }
 
+.homeview-license-mode-label {
+    text-align: left;
+    padding-right: 6px;
+}
+
 .homeview-license-status-label {
     text-align: left;
-    background: var(--vscode-background);
-    padding-right: 6px;
+    line-height: 12px;
+}
+
+.homeview-license-status-icon {
+    line-height: 12px !important;
+    padding: 0px;
+    margin-top: -3px;
 }
 
 .homeview-license-status-container {

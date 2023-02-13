@@ -2,10 +2,11 @@
 import "../common/css/vscode.css";
 import "./home.css";
 import "./home.scss";
+import "../common/scss/codicons.scss";
 import { Disposable } from "vscode";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
-import { ExecuteCommandType, IpcMessage } from "../../common/ipc";
+import { ExecuteCommandType } from "../../common/ipc";
 
 
 export class HomeWebviewApp extends TeWebviewApp<State>
@@ -40,7 +41,7 @@ export class HomeWebviewApp extends TeWebviewApp<State>
 
 	protected override onMessageReceived(e: MessageEvent)
     {
-		const msg = e.data; // as IpcMessage;
+		const msg = e.data;
         this.log(`${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
         switch (msg.command)
         {
