@@ -5,7 +5,7 @@
 import { expect } from "chai";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { EchoCommandType } from "../../webview/common/ipc";
+import { EchoCommandRequestType } from "../../webview/common/ipc";
 import { Commands, executeCommand } from "../../lib/command";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
@@ -68,9 +68,9 @@ suite("Webview Tests", () =>
         expect(teWrapper.homeView.description).to.not.be.undefined;
         await focusExplorerView();
         await executeCommand(Commands.FocusHomeView);
-        await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowParsingReportPage });
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage });
         await closeEditors();
-        await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowReleaseNotesPage });
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
         await executeCommand(Commands.RefreshHomeView);
         await closeEditors();
         endRollingCount(this);

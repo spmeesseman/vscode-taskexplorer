@@ -2,7 +2,7 @@
 import { Disposable, DOM } from "./common/dom";
 import {
 	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
-	WebviewFocusChangedCommandType, WebviewReadyCommandType, ExecuteCommandType, onIpc, EchoCommandType
+	WebviewFocusChangedCommandType, WebviewReadyCommandType, ExecuteCommandType, onIpc, EchoCommandRequestType, ExecuteCommandParams, LogWriteCommandType
 } from "../common/ipc";
 
 interface VsCodeApi {
@@ -115,7 +115,11 @@ export abstract class TeWebviewApp<State = undefined>
 	}
 
 
-	protected log = (message: string, ...optionalParams: any[]) => console.log(message, ...optionalParams);
+	protected log = (message: string, ...optionalParams: any[]) =>
+	{
+		this.sendCommand(LogWriteCommandType, { message, value: undefined });
+		console.log(message, ...optionalParams);
+	};
 
 
 	protected getState = () => this._vscode.getState() as State;
@@ -139,16 +143,8 @@ export abstract class TeWebviewApp<State = undefined>
         this.log(`[BASE]${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
         switch (msg.method)
         {
-			case EchoCommandType.method:        // Standard echo service for testing web->host commands
-                onIpc(EchoCommandType, msg, params =>
-				{
-					// if (params.args) {
-					// 	this.sendCommand(ExecuteCommandType, params);
-					// }
-					// else {
-					this.sendCommand(ExecuteCommandType, params);
-					// }
-				});
+			case EchoCommandRequestType.method:    // Standard echo service for testing web->host commands
+                onIpc(EchoCommandRequestType, msg, params => this.sendCommand(ExecuteCommandType, params));
                 break;
 			default:
                 break;
@@ -159,7 +155,7 @@ export abstract class TeWebviewApp<State = undefined>
 	private postMessage = (e: IpcMessage) => this._vscode.postMessage(e);
 
 
-	protected sendCommand<TCommand extends IpcCommandType<any>>(command: TCommand, params: IpcMessageParams<TCommand>)
+	protected sendCommand<TCmd extends IpcCommandType<any>>(command: TCmd, params: IpcMessageParams<TCmd>)
 	{
 		const id = this.nextIpcId();
 		this.log(`${this.appName}.sendCommand(${id}): name=${command.method}`);

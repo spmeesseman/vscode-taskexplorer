@@ -21,12 +21,14 @@ export type IpcMessageParams<T> = T extends IpcMessageType<infer P> ? P : never;
 
 
 /**
+ * @class IpcCommandType
  * Commands are sent from the webview to the extension
  */
 export class IpcCommandType<Params = void> extends IpcMessageType<Params> {}
 
 
 /**
+ * @class IpcNotificationType
  * Notifications are sent from the extension to the webview
  */
 export class IpcNotificationType<Params = void> extends IpcMessageType<Params> {}
@@ -57,21 +59,28 @@ export interface ExecuteCommandParams
 	args?: [];
 }
 export const ExecuteCommandType = new IpcCommandType<ExecuteCommandParams>("command/execute");
-export const EchoCommandType = new IpcCommandType<ExecuteCommandParams>("command/echo");
+
+
+export interface LogWriteCommandTypeParams
+{
+	message: string;
+	value?: any;
+}
+export const LogWriteCommandType = new IpcCommandType<LogWriteCommandTypeParams>("command/log");
+
 
 export interface DidChangeExtensionEnabledParams
 {
 	extensionEnabled: boolean;
 }
-export const DidChangeExtensionEnabledType = new IpcNotificationType<DidChangeExtensionEnabledParams>(
-	"extensionEnabled/didChange",
-);
+export const DidChangeExtensionEnabledType = new IpcNotificationType<DidChangeExtensionEnabledParams>("extensionEnabled/didChange");
 
 
 export interface DidChangeConfigurationParams
 {
 	plusEnabled: boolean;
 }
-export const DidChangeConfigurationType = new IpcNotificationType<DidChangeConfigurationParams>(
-	"configuration/didChange",
-);
+export const DidChangeConfigurationType = new IpcNotificationType<DidChangeConfigurationParams>("configuration/didChange");
+
+
+export const EchoCommandRequestType = new IpcNotificationType<ExecuteCommandParams>("command/echo");

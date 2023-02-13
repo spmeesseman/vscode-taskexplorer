@@ -13,7 +13,7 @@ import { getNonce } from "../lib/env/node/crypto";
 import { Commands, executeCommand } from "../lib/command";
 import { Disposable, EventEmitter, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
-	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc,
+	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc, LogWriteCommandType,
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
 } from "./common/ipc";
 
@@ -113,7 +113,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 		]);
 
 		let html = content;
-		html = await this._onHtmlPreview(content, ...args);
+		html = await this.onHtmlPreviewCore(content, ...args);
 
 		const repl = (h: string) =>
 		{
@@ -149,7 +149,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 		html = repl(html);
 
 		this._isFirstLoadComplete = true;
-		return this._onHtmlFinalize(html, ...args);
+		return this.onHtmlFinalizeCore(html, ...args);
 	}
 
 
@@ -184,10 +184,10 @@ export abstract class TeWebviewBase<State> implements Disposable
 	protected onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => html;
 
 
-	protected _onHtmlPreview = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
+	private onHtmlPreviewCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
 
 
-	protected _onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
+	private onHtmlFinalizeCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
 
 
 	protected onMessageReceivedCore(e: IpcMessage)
@@ -197,18 +197,11 @@ export abstract class TeWebviewBase<State> implements Disposable
 		switch (e.method)
 		{
 			case WebviewReadyCommandType.method:
-				onIpc(WebviewReadyCommandType, e, () =>
-				{
-					this._isReady = true;
-					this.onReady?.();
-				});
+				onIpc(WebviewReadyCommandType, e, () => { this._isReady = true; this.onReady?.(); });
 				break;
 
 			case WebviewFocusChangedCommandType.method:
-				onIpc(WebviewFocusChangedCommandType, e, params =>
-				{
-					this.onViewFocusChanged(params);
-				});
+				onIpc(WebviewFocusChangedCommandType, e, params => this.onViewFocusChanged(params));
 				break;
 
 			case ExecuteCommandType.method:
@@ -217,10 +210,12 @@ export abstract class TeWebviewBase<State> implements Disposable
 					if (params.args) {
 						void executeCommand(params.command as Commands, ...params.args);
 					}
-					else {
-						void executeCommand(params.command as Commands);
-					}
+					else { void executeCommand(params.command as Commands); }
 				});
+				break;
+
+			case LogWriteCommandType.method:
+				onIpc(LogWriteCommandType, e, params => this.wrapper.log.write("[WEBVIEW]: " + params.message, 1));
 				break;
 
 			default:
