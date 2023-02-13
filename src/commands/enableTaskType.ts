@@ -3,7 +3,7 @@ import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
-import { ExtensionContext, Uri, window } from "vscode";
+import { Disposable, Uri, window } from "vscode";
 import { configuration } from "../lib/utils/configuration";
 import { Commands, registerCommand } from "../lib/command";
 
@@ -28,9 +28,9 @@ const enableTaskType = async(uri: Uri) =>
 };
 
 
-export const registerEnableTaskTypeCommand = (context: ExtensionContext) =>
+export const registerEnableTaskTypeCommand = (disposables: Disposable[]) =>
 {
-	context.subscriptions.push(
+	disposables.push(
         registerCommand(Commands.EnableTaskType, async (uri: Uri) => { await enableTaskType(uri); })
     );
 };

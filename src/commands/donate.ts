@@ -1,6 +1,6 @@
 
 import { log } from "../lib/log/log";
-import { ExtensionContext, window } from "vscode";
+import { Disposable, window } from "vscode";
 import { Commands, registerCommand } from "../lib/command";
 
 
@@ -12,9 +12,9 @@ const donate = async() =>
 };
 
 
-export const registerDonateCommand = (context: ExtensionContext) =>
+export const registerDonateCommand = (disposables: Disposable[]) =>
 {
-	context.subscriptions.push(
+	disposables.push(
         registerCommand(Commands.Donate, async () => { await donate(); })
     );
 };

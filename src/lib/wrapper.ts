@@ -289,11 +289,11 @@ export class TeWrapper
 
 	private registerContextMenuCommands = () =>
 	{
-		registerDonateCommand(this._context);
-		registerAddToExcludesCommand(this._context);
-		registerDisableTaskTypeCommand(this._context);
-		registerEnableTaskTypeCommand(this._context);
-		registerRemoveFromExcludesCommand(this._context);
+		registerDonateCommand(this._context.subscriptions);
+		registerAddToExcludesCommand(this._context.subscriptions);
+		registerDisableTaskTypeCommand(this._context.subscriptions);
+		registerEnableTaskTypeCommand(this._context.subscriptions);
+		registerRemoveFromExcludesCommand(this._context.subscriptions);
 	};
 
 

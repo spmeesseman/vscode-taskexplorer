@@ -117,7 +117,7 @@ export abstract class TeWebviewApp<State = undefined>
 
 	protected log = (message: string, ...optionalParams: any[]) =>
 	{
-		this.sendCommand(LogWriteCommandType, { message, value: undefined });
+		// this.sendCommand(LogWriteCommandType, { message, value: undefined });
 		console.log(message, ...optionalParams);
 	};
 

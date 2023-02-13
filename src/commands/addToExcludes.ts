@@ -4,8 +4,8 @@ import { Globs } from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
+import { Disposable, Uri, window } from "vscode";
 import { addToExcludes } from "../lib/addToExcludes";
-import { ExtensionContext, Uri, window } from "vscode";
 import { Commands, executeCommand, registerCommand } from "../lib/command";
 
 const localize = loadMessageBundle();
@@ -36,9 +36,9 @@ const addUriToExcludes = async(uri: Uri) =>
 };
 
 
-export const registerAddToExcludesCommand = (context: ExtensionContext) =>
+export const registerAddToExcludesCommand = (disposables: Disposable[]) =>
 {
-	context.subscriptions.push(
+	disposables.push(
         registerCommand(Commands.AddToExcludesMenu, async (uri: Uri) => { await addUriToExcludes(uri); })
     );
 };

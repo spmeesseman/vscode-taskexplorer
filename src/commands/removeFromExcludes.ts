@@ -4,7 +4,7 @@ import { Globs } from "../lib/constants";
 import { isDirectory } from "../lib/utils/fs";
 import { loadMessageBundle } from "vscode-nls";
 import { testPattern } from "../lib/utils/utils";
-import { ExtensionContext, Uri, window } from "vscode";
+import { Disposable, Uri, window } from "vscode";
 import { removeFromExcludes } from "../lib/addToExcludes";
 import { Commands, executeCommand, registerCommand } from "../lib/command";
 
@@ -36,9 +36,9 @@ const removeUriFromExcludes = async(uri: Uri) =>
 };
 
 
-export const registerRemoveFromExcludesCommand = (context: ExtensionContext) =>
+export const registerRemoveFromExcludesCommand = (disposables: Disposable[]) =>
 {
-	context.subscriptions.push(
+	disposables.push(
         registerCommand(Commands.RemovefromExcludes, async (uri: Uri) => { await removeUriFromExcludes(uri); })
     );
 };

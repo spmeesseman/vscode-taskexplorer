@@ -214,7 +214,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	protected override _onHtmlPreview = async(html: string, ...args: unknown[]) =>
+	protected override onHtmlPreviewCore = async(html: string, ...args: unknown[]) =>
 	{
 		return this.onHtmlPreview(html.replace(/\#\{title\}/g,
 `<table><tr>

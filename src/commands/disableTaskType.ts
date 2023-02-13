@@ -1,7 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
-import { ExtensionContext, Uri } from "vscode";
+import { Disposable, Uri } from "vscode";
 import { testPattern } from "../lib/utils/utils";
 import { configuration } from "../lib/utils/configuration";
 import { Commands, registerCommand } from "../lib/command";
@@ -17,9 +17,9 @@ const disableTaskType = async(uri: Uri) =>
 };
 
 
-export const registerDisableTaskTypeCommand = (context: ExtensionContext) =>
+export const registerDisableTaskTypeCommand = (disposables: Disposable[]) =>
 {
-	context.subscriptions.push(
+	disposables.push(
         registerCommand(Commands.DisableTaskType, async (uri: Uri) => { await disableTaskType(uri); })
     );
 };

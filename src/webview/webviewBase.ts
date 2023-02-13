@@ -184,10 +184,10 @@ export abstract class TeWebviewBase<State> implements Disposable
 	protected onHtmlFinalize = async(html: string, ...args: unknown[]): Promise<string> => html;
 
 
-	private onHtmlPreviewCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
+	protected onHtmlPreviewCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlPreview(html, ...args);
 
 
-	private onHtmlFinalizeCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
+	protected onHtmlFinalizeCore = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
 
 
 	protected onMessageReceivedCore(e: IpcMessage)
