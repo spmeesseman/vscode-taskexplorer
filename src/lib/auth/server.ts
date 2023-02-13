@@ -48,6 +48,9 @@ export class TeServer implements Disposable
 	};
 
 
+	serverToken = () => this.idToken;
+
+
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
 		/* istanbul ignore if */
@@ -103,7 +106,8 @@ export class TeServer implements Disposable
 		this.wrapper.log.methodDone(fn + " license", 1, logPad);
 	};
 
-    request = (options: any, logPad: string) =>
+
+    request = (endpoint: string, params: any, logPad: string) =>
 	{
 		this.busy = true;
 
@@ -113,16 +117,20 @@ export class TeServer implements Disposable
 			this.wrapper.log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
 			this.log("starting https get 30-day license request to license server", logPad + "   ");
 
-			const req = request(this.getDefaultServerOptions("/token"), (res) =>
+			const req = request(this.getDefaultServerOptions(endpoint), (res) =>
 			{
 				res.on("data", (chunk) => { rspData += chunk; });
 				res.on("end", async() =>
 				{
-                    const jso = JSON.parse(rspData);
+                    let jso = { success: false, message: "" };
+                    try {console.log(rspData);
+                        jso = JSON.parse(rspData);
+                    }
+                    catch {}
                     this.logServerResponse(res, jso, rspData, logPad);
 					resolve({
+                        data: jso,
                         status: res.statusCode,
-                        jso,
                         success: res.statusCode === 200 && jso.success && jso.message === "Success"
                     });
 				});
@@ -136,7 +144,7 @@ export class TeServer implements Disposable
 				resolve(undefined);
 			});
 
-			req.write(JSON.stringify(options), () =>
+			req.write(JSON.stringify(params), () =>
             {
 				this.log("   output stream written, ending request and waiting for response...", logPad);
 				req.end();

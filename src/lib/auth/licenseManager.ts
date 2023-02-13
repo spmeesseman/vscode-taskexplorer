@@ -1,16 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { TeWrapper } from "../wrapper";
-import { storage } from "../utils/storage";
-import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";
-import { LicensePage } from "../../webview/page/licensePage";
 import { executeCommand, registerCommand, Commands } from "../command";
-import {
-	AuthenticationProviderAuthenticationSessionsChangeEvent, Disposable, env, EventEmitter,
-	InputBoxOptions, Task, WebviewPanel, window
-} from "vscode";
+import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";
+import { Disposable, env, EventEmitter, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
 
 export class LicenseManager implements Disposable
@@ -22,11 +16,10 @@ export class LicenseManager implements Disposable
 	private numTasks = 0;
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
+	private maxTasksReached = false;
+	private _auth: TeAuthenticationProvider;
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
-	private maxTasksReached = false;
-	private panel: LicensePage | undefined;
-	private _auth: TeAuthenticationProvider;
     private _onSessionChange = new EventEmitter<TeAuthenticationSessionChangeEvent>();
 
 
@@ -64,10 +57,8 @@ export class LicenseManager implements Disposable
 		this.disposables.forEach((d) => {
             d.dispose();
         });
-	    this.panel?.hide();
 		this.numTasks = 0;
 		this.licensed = false;
-		this.panel = undefined;
 	}
 
 
@@ -78,7 +69,7 @@ export class LicenseManager implements Disposable
 
 	private displayPopup = async (message: string) =>
 	{
-		await storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
+		await this.wrapper.storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
 		window.showInformationMessage(message, "Enter License Key", "Info", "Not Now")
 		.then(async (action) =>
 		{
@@ -133,7 +124,7 @@ export class LicenseManager implements Disposable
 	};
 
 
-	getLicenseKey = async() => storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
+	getLicenseKey = async() => this.wrapper.storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>
@@ -145,10 +136,10 @@ export class LicenseManager implements Disposable
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);
 
 
+	serverToken = () => this.wrapper.server.serverToken;
+
+
 	getVersion = () => this.wrapper.version;
-
-
-	getWebviewPanel = () => this.panel?.view as WebviewPanel | undefined;
 
 
 	isBusy = () => this.busy;
@@ -157,8 +148,7 @@ export class LicenseManager implements Disposable
 	isLicensed = () => this.licensed;
 
 
-
-	private onSessionChanged = (e: AuthenticationProviderAuthenticationSessionsChangeEvent) =>
+	private onSessionChanged = (e: TeAuthenticationSessionChangeEvent) =>
 	{
 		this._onSessionChange.fire(e);
 	};
@@ -177,7 +167,8 @@ export class LicenseManager implements Disposable
 			return;
 		}
 
-		const jso = await this.wrapper.server.request({
+		const rsp = await this.wrapper.server.request("/token",
+		{
 			ttl: 30,
 			appid: env.machineId,
 			appname: "vscode-taskexplorer",
@@ -185,14 +176,14 @@ export class LicenseManager implements Disposable
 			json: true,
 			license: true,
 			tests: this.wrapper.tests
-		}, logPad);
+		},
+		logPad);
 
-		await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
-		if (jso.success === true && isObject(jso.token))
+		if (rsp.success === true && rsp.data && this.wrapper.utils.isObject(rsp.data.token))
 		{
-			token = jso.token.token;
-			await storage.updateSecret("license_key_30day", token);
-			await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
+			token = rsp.data.token.token;
+			await this.setLicenseKeyFromRsp(rsp.success, rsp.data, logPad);
+			await this.wrapper.storage.updateSecret("license_key_30day", token);
 		}
 
 		this.busy = false;
@@ -201,14 +192,14 @@ export class LicenseManager implements Disposable
 	};
 
 
-	setLicenseKey = async (licenseKey: string | undefined) => storage.updateSecret("license_key", licenseKey);
+	setLicenseKey = async (licenseKey: string | undefined) => this.wrapper.storage.updateSecret("license_key", licenseKey);
 
 
 	private setLicenseKeyFromRsp = async(licensed: boolean, jso: any, logPad: string) =>
 	{
 		if (licensed && jso.token)
 		{
-			if (isString(jso.token))
+			if (this.wrapper.utils.isString(jso.token))
 			{
 				this.wrapper.log.write("license key", 1, logPad, jso.token);
 				await this.setLicenseKey(jso.token);
@@ -234,7 +225,7 @@ export class LicenseManager implements Disposable
 	async setTasks(tasks: Task[], logPad = "   ")
 	{
 		let displayPopup = !this.licensed;
-		const lastNag = storage.get<string>("taskExplorer.lastLicenseNag");
+		const lastNag = this.wrapper.storage.get<string>("taskExplorer.lastLicenseNag");
 
 		if (this.numTasks === tasks.length) {
 			return;
@@ -262,8 +253,8 @@ export class LicenseManager implements Disposable
 		{
 			setTimeout(async () =>
 			{
-				this.panel = await this.wrapper.licensePage.show();
-				await storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
+				await this.wrapper.licensePage.show();
+				await this.wrapper.storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
 			}, 1);
 		}
 		else if (displayPopup)
@@ -289,18 +280,20 @@ export class LicenseManager implements Disposable
 		this.busy = true;
 		let licensed = false;
 
-		const jso = await this.wrapper.server.request({
+		const rsp = await this.wrapper.server.request(this._auth.apiEndpoint,
+		{
 			licensekey: licenseKey,
 			appid: env.machineId,
 			appname: "vscode-taskexplorer-prod",
 			ip: "*"
-		}, logPad);
+		},
+		logPad);
 
-		if (jso.success === true)
+		if (rsp.success === true)
 		{
-			licensed = jso.success;
-			jso.token = licenseKey;
-			await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
+			licensed = rsp.success;
+			rsp.token = licenseKey;
+			await this.setLicenseKeyFromRsp(rsp.success, rsp, logPad);
 		}
 
 		this.busy = false;

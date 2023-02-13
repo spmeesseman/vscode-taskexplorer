@@ -195,7 +195,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + 1100 + tc.slowTime.storageUpdate);
 		utils.overrideNextShowInputBox("1234-5678-9098-0000000");
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "enterLicense" });
+		await teWrapper.licensePage.view?.webview.postMessage({ command: "enterLicense" });
 		await utils.sleep(500);
 		await utils.closeEditors();
         utils.endRollingCount(this);

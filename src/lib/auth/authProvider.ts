@@ -17,7 +17,6 @@ export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
 const CLIENT_ID = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 const TEAUTH_DOMAIN = "app1.spmeesseman.com";
-const authApiEndpoint = "/api/license/validate/v1";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
 
@@ -36,6 +35,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     private _disposable: Disposable;
     private _pendingStates: string[] = [];
     private _uriHandler = new UriEventHandler();
+    private _authApiEndpoint = "/api/license/validate/v1";
     private _codeExchangePromises: IDictionary<{ promise: Promise<string>; cancel: EventEmitter<void> }> = {};
     private _onSessionChange = new EventEmitter<TeAuthenticationSessionChangeEvent>();
 
@@ -46,6 +46,10 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             authentication.registerAuthenticationProvider(AUTH_TYPE, AUTH_NAME, this, { supportsMultipleAccounts: false }),
             window.registerUriHandler(this._uriHandler)
         );
+    }
+
+    get apiEndpoint() {
+        return this._authApiEndpoint;
     }
 
 
