@@ -142,12 +142,12 @@ export abstract class TeWebviewApp<State = undefined>
 			case EchoCommandType.method:        // Standard echo service for testing web->host commands
                 onIpc(EchoCommandType, msg, params =>
 				{
-					if (params.args) {
-						this.sendCommand(ExecuteCommandType, params);
-					}
-					else {
-						this.sendCommand(ExecuteCommandType, params);
-					}
+					// if (params.args) {
+					// 	this.sendCommand(ExecuteCommandType, params);
+					// }
+					// else {
+					this.sendCommand(ExecuteCommandType, params);
+					// }
 				});
                 break;
 			default:

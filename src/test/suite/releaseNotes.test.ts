@@ -9,6 +9,7 @@ import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
+import { Commands } from "../../lib/command";
 
 let teApi: ITaskExplorerApi;
 let extension: Extension<any>;
@@ -44,7 +45,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + 200);
-		webviewPanel = await executeTeCommand<TeWebviewPanel<any>>("showReleaseNotesPage", testControl.waitTime.viewReport);
+		webviewPanel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowReleaseNotesPage, testControl.waitTime.viewReport);
 		await sleep(100);
         endRollingCount(this);
 	});
@@ -58,7 +59,7 @@ suite("Release Notes Page Tests", () =>
 		const version = extension.packageJSON.version;
 		extension.packageJSON.version = "17.4444.0";
 		try {
-			webviewPanel = await executeTeCommand<TeWebviewPanel<any>>("showReleaseNotesPage", testControl.waitTime.viewReport);
+			webviewPanel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowReleaseNotesPage, testControl.waitTime.viewReport);
 			await sleep(100);
 		}
 		catch (e) { throw e; }

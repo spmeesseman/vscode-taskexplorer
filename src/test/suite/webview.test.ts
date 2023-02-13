@@ -62,20 +62,16 @@ suite("Webview Tests", () =>
         while (!loaded && loadTime < 21) { await sleep(10); loadTime += 10; }
         d.dispose();
         await executeCommand(Commands.FocusHomeView);
-        await sleep(5);
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
         await sleep(5);
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
         expect(teWrapper.homeView.description).to.not.be.undefined;
         await focusExplorerView();
-        await sleep(5);
         await executeCommand(Commands.FocusHomeView);
         await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowParsingReportPage });
-        await sleep(5);
         await closeEditors();
         await teWrapper.homeView.notify(EchoCommandType, { command: Commands.ShowReleaseNotesPage });
-        await sleep(5);
-        teWrapper.homeView
+        await executeCommand(Commands.RefreshHomeView);
         await closeEditors();
         endRollingCount(this);
     });
@@ -86,11 +82,8 @@ suite("Webview Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
         await executeCommand(Commands.FocusTaskUsageView);
-        await sleep(1);
         await focusExplorerView();
-        await sleep(5);
         await teWrapper.taskUsageView.show();
-        await sleep(5);
         endRollingCount(this);
     });
 
@@ -100,11 +93,8 @@ suite("Webview Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
         await teWrapper.taskCountView.show();
-        await sleep(1);
         await focusExplorerView();
-        await sleep(5);
         await executeCommand(Commands.FocusTaskCountView);
-        await sleep(5);
         endRollingCount(this);
     });
 

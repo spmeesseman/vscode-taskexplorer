@@ -1,15 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { request } from "https";
-// import fetch from "@env/fetch";
-import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
-import { IncomingMessage } from "http";
 import { storage } from "../utils/storage";
-import { log, logControl } from "../log/log";
 import { isObject, isString } from "../utils/utils";
 import { isScriptType } from "../utils/taskTypeUtils";
-import { TeAuthenticationProvider } from "./authProvider";
+import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";
 import { LicensePage } from "../../webview/page/licensePage";
 import { executeCommand, registerCommand, Commands } from "../command";
 import {
@@ -23,9 +18,7 @@ export class LicenseManager implements Disposable
 	private disposables: Disposable[] = [];
 	private busy = false;
 	private wrapper: TeWrapper;
-	private host = "license.spmeesseman.com";
 	private licensed = false;
-	private logRequestStepsTests = false;
 	private numTasks = 0;
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
@@ -33,11 +26,8 @@ export class LicenseManager implements Disposable
 	private maxFreeTasksForScriptType = 50;
 	private maxTasksReached = false;
 	private panel: LicensePage | undefined;
-	private port = 443;
 	private _auth: TeAuthenticationProvider;
-	private authApiEndpoint = "/api/license/validate/v1";
-    private _onSessionChange = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
-	private token = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
+    private _onSessionChange = new EventEmitter<TeAuthenticationSessionChangeEvent>();
 
 
 	constructor(wrapper: TeWrapper)
@@ -56,7 +46,7 @@ export class LicenseManager implements Disposable
 	async checkLicense(logPad = "   ")
 	{
 		const storedLicenseKey = await this.getLicenseKey();
-		log.methodStart("license manager check license", 1, logPad, false, [
+		this.wrapper.log.methodStart("license manager check license", 1, logPad, false, [
 			[ "license key", storedLicenseKey ?? "n/a" ], [ "machine id", env.machineId ]
 		]);
 		if (storedLicenseKey) {
@@ -65,7 +55,7 @@ export class LicenseManager implements Disposable
 		else {
 			this.licensed = false;
 		}
-		log.methodDone("license manager check license", 1, logPad, [[ "is licensed", this.licensed ]]);
+		this.wrapper.log.methodDone("license manager check license", 1, logPad, [[ "is licensed", this.licensed ]]);
 	}
 
 
@@ -106,7 +96,7 @@ export class LicenseManager implements Disposable
 
 	async enterLicenseKey()
 	{
-		log.methodStart("enter license key", 1);
+		this.wrapper.log.methodStart("enter license key", 1);
 		const opts: InputBoxOptions = { prompt: "Enter license key" };
 		try {
 			const input = await window.showInputBox(opts);
@@ -129,33 +119,16 @@ export class LicenseManager implements Disposable
 			}
 		}
 		catch (e) {}
-		log.methodDone("enter license key", 1);
+		this.wrapper.log.methodDone("enter license key", 1);
 	}
-
-
-	private getDefaultServerOptions = (apiEndpoint: string) =>
-	{
-		return {
-			hostname: this.host,
-			port: this.port,
-			path: apiEndpoint,
-			method: "POST",
-			timeout: this.host !== "localhost" ? 4000 : /* istanbul ignore next*/1250,
-			headers: {
-				"token": this.token,
-				// eslint-disable-next-line @typescript-eslint/naming-convention
-				"Content-Type": "application/json"
-			}
-		};
-	};
 
 
 	async getLicense()
 	{
-		log.methodStart("get 30-day license command", 1, "", true);
+		this.wrapper.log.methodStart("get 30-day license command", 1, "", true);
 		const newKey = await this.requestLicense("   ");
 		const panel = await this.wrapper.licensePage.show(undefined, newKey);
-		log.methodDone("get 30-day license command", 1);
+		this.wrapper.log.methodDone("get 30-day license command", 1);
 		return { panel: panel.view, newKey };
 	};
 
@@ -172,9 +145,6 @@ export class LicenseManager implements Disposable
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);
 
 
-	getToken = () => this.token;
-
-
 	getVersion = () => this.wrapper.version;
 
 
@@ -187,47 +157,6 @@ export class LicenseManager implements Disposable
 	isLicensed = () => this.licensed;
 
 
-	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
-	{
-		/* istanbul ignore if */
-		if (this.wrapper.tests && !logControl.writeToConsole && this.logRequestStepsTests)
-		{
-			if (!value && value !== false) {
-				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
-			}
-			else {
-				const valuePad = 18, diff = valuePad - msg.length;
-				for (let i = 0; i < diff; i++) {
-					msg += " ";
-				}
-				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg + " : " + value, figures.colors.grey)}`);
-			}
-		}
-		/* istanbul ignore else */
-		if (isString(msg))
-		{
-			if (!value) {
-				log.write(msg, 1, logPad);
-			}
-			else {
-				log.value(msg, value, 1, logPad);
-			}
-		}
-		else {
-			log.error(msg);
-		}
-	};
-
-
-	private logServerResponse = (res: IncomingMessage, jso: any, rspData: string, logPad: string) =>
-	{
-		this.log("   response received", logPad);
-		this.log("      status code", logPad, res.statusCode);
-		this.log("      length", logPad, rspData.length);
-		this.log("      success", logPad, jso.success);
-		this.log("      message", logPad, jso.message);
-	};
-
 
 	private onSessionChanged = (e: AuthenticationProviderAuthenticationSessionsChangeEvent) =>
 	{
@@ -235,91 +164,40 @@ export class LicenseManager implements Disposable
 	};
 
 
-	/* istanbul ignore next*/
-	private onServerError = (e: any, logPad: string, fn: string, rspData?: string) =>
+	requestLicense = async(logPad: string) =>
 	{
-		this.log(e, "", undefined, figures.color.errorTests);
-		if (rspData) {
-			this.log(rspData, "", undefined, figures.color.errorTests);
-		}
-		this.log("   the license server is down, offline, or there is a connection issue", logPad, undefined, figures.color.errorTests);
-		this.log("   licensed mode will be automatically enabled", logPad, undefined, figures.color.errorTests);
-		this.log("request to license server completed w/ a failure", logPad + "   ", undefined, figures.color.errorTests);
-		log.methodDone(fn + " license", 1, logPad);
-	};
-
-
-	requestLicense = (logPad: string) =>
-	{
+		let token: string | undefined;
 		this.busy = true;
 
-		return new Promise<string | undefined>(async(resolve) =>
+		this.wrapper.log.methodStart("request license", 1, logPad);
+
+		if (await this.wrapper.storage.getSecret("license_key_30day") !== undefined)
+		{   // this.log("   a 30-day license has already been allocated to this machine", logPad);
+			this.busy = false;
+			return;
+		}
+
+		const jso = await this.wrapper.server.request({
+			ttl: 30,
+			appid: env.machineId,
+			appname: "vscode-taskexplorer",
+			ip: "*",
+			json: true,
+			license: true,
+			tests: this.wrapper.tests
+		}, logPad);
+
+		await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
+		if (jso.success === true && isObject(jso.token))
 		{
-			log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
+			token = jso.token.token;
+			await storage.updateSecret("license_key_30day", token);
+			await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
+		}
 
-			if (await storage.getSecret("license_key_30day") !== undefined)
-			{
-				this.log("   a 30-day license has already been allocated to this machine", logPad);
-				log.methodDone("validate license", 1, logPad);
-				setTimeout(() => resolve(undefined), 1);
-				this.busy = false;
-				return;
-			}
-
-			let rspData = "";
-			this.log("starting https get 30-day license request to license server", logPad + "   ");
-
-			const req = request(this.getDefaultServerOptions("/token"), (res) =>
-			{
-				res.on("data", (chunk) => { rspData += chunk; });
-				res.on("end", async() =>
-				{
-					let token: string | undefined;
-					try
-					{
-						const jso = JSON.parse(rspData),
-							  licensed = res.statusCode === 200 && jso.success && jso.message === "Success" && isObject(jso.token);
-						this.logServerResponse(res, jso, rspData, logPad);
-						await this.setLicenseKeyFromRsp(licensed, jso, logPad);
-						token = jso.token.token;
-						await storage.updateSecret("license_key_30day", token);
-						log.methodDone("request license", 1, logPad, [[ "30-day license key", token ]]);
-					}
-					catch (e)
-					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
-						/* istanbul ignore next*/
-						this.onServerError(e, "request", logPad, rspData);
-					}
-					finally {
-						this.busy = false;
-						resolve(token);
-					}
-				});
-			});
-
-			/* istanbul ignore next*/
-			req.on("error", (e) =>
-			{   // Not going to fail unless i birth a bug
-				this.onServerError(e, "request", logPad);
-				this.busy = false;
-				resolve(undefined);
-			});
-
-			req.write(JSON.stringify(
-			{
-				ttl: 30,
-				appid: env.machineId,
-				appname: "vscode-taskexplorer",
-				ip: "*",
-				json: true,
-				license: true,
-				tests: this.wrapper.tests
-			}),
-			() => {
-				this.log("   output stream written, ending request and waiting for response...", logPad);
-				req.end();
-			});
-		});
+		this.busy = false;
+		this.wrapper.log.methodDone("request license", 1, logPad, [[ "30-day key", token ]]);
+		return token;
 	};
 
 
@@ -332,21 +210,21 @@ export class LicenseManager implements Disposable
 		{
 			if (isString(jso.token))
 			{
-				this.log("      license key", logPad, jso.token);
+				this.wrapper.log.write("license key", 1, logPad, jso.token);
 				await this.setLicenseKey(jso.token);
 			}
 			else {
-				this.log("      license key", logPad, jso.token.token);
-				this.log("      issued", logPad, jso.token.issuedFmt);
-				this.log("      expires", logPad, jso.token.expiresFmt || jso.expiresFmt);
+				this.wrapper.log.write("license key", 1, logPad, jso.token.token);
+				this.wrapper.log.write("   issued", 1, logPad, jso.token.issuedFmt);
+				this.wrapper.log.write("   expires", 1, logPad, jso.token.expiresFmt || jso.expiresFmt);
 				await this.setLicenseKey(jso.token.token);
 			}
-			this.log("   license key saved to secure storage", logPad);
+			this.wrapper.log.write("license key saved to secure storage", 1, logPad);
 		}
 		else {
-			this.log("   license key will not be saved", logPad);
+			this.wrapper.log.write("license key will not be saved", 1, logPad);
 		}
-		this.log("request to license server completed", logPad + "   ");
+		this.wrapper.log.write("request to license server completed", 1, logPad);
 	};
 
 
@@ -363,7 +241,7 @@ export class LicenseManager implements Disposable
 		}
 		this.numTasks = tasks.length;
 
-		log.methodStart("license manager set tasks", 1, logPad, false, [
+		this.wrapper.log.methodStart("license manager set tasks", 1, logPad, false, [
 			[ "is licensed", this.licensed ], [ "is version change", this.wrapper.versionchanged ],
 			[ "# of tasks", this.numTasks ], [ "last nag", lastNag ]
 		]);
@@ -393,7 +271,7 @@ export class LicenseManager implements Disposable
 			this.displayPopup("Purchase a license to unlock unlimited parsed tasks.");
 		}
 
-		log.methodDone("license manager set tasks", 1, logPad);
+		this.wrapper.log.methodDone("license manager set tasks", 1, logPad);
 	}
 
 
@@ -403,106 +281,31 @@ export class LicenseManager implements Disposable
 		this.maxFreeTaskFiles = data.maxFreeTaskFiles;
 		this.maxFreeTasksForTaskType = data.maxFreeTasksForTaskType;
 		this.maxFreeTasksForScriptType = data.maxFreeTasksForScriptType;
-		this.logRequestStepsTests = !!data.logRequestSteps || this.logRequestStepsTests;
 	};
 
 
-	private validateLicense = (licenseKey: string, logPad: string) =>
+	private validateLicense = async(licenseKey: string, logPad: string) =>
 	{
 		this.busy = true;
+		let licensed = false;
 
-		return new Promise<boolean>((resolve) =>
+		const jso = await this.wrapper.server.request({
+			licensekey: licenseKey,
+			appid: env.machineId,
+			appname: "vscode-taskexplorer-prod",
+			ip: "*"
+		}, logPad);
+
+		if (jso.success === true)
 		{
-			log.methodStart("validate license", 1, logPad, false, [[ "license key", licenseKey ], [ "host", this.host ], [ "port", this.port ]]);
+			licensed = jso.success;
+			jso.token = licenseKey;
+			await this.setLicenseKeyFromRsp(jso.success, jso, logPad);
+		}
 
-			let rspData = "";
-			this.log("starting https validate request to license server", logPad);
-
-			const req = request(this.getDefaultServerOptions(this.authApiEndpoint), (res) =>
-			{
-				res.on("data", (chunk) => { rspData += chunk; });
-				res.on("end", async() =>
-				{
-					let licensed = true;
-					try
-					{   const jso = JSON.parse(rspData);
-						licensed = res.statusCode === 200 && jso.success && jso.message === "Success";
-						this.logServerResponse(res, jso, rspData, logPad);
-						jso.token = licenseKey;
-						await this.setLicenseKeyFromRsp(licensed, jso, logPad);
-						log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
-					}
-					catch (e)
-					{   // Fails if IIS/Apache server is running but the reverse proxied app server is not, maybe
-						/* istanbul ignore next*/
-						this.onServerError(e, "validate", logPad, rspData);
-					}
-					finally {
-						this.busy = false;
-						resolve(licensed);
-					}
-				});
-			});
-
-			/* istanbul ignore next*/
-			req.on("error", (e) =>
-			{   // Not going to fail unless i birth a bug
-				this.onServerError(e, "validate", logPad);
-				this.busy = false;
-				resolve(true);
-			});
-
-			req.write(JSON.stringify(
-			{
-				licensekey: licenseKey,
-				appid: env.machineId,
-				appname: "vscode-taskexplorer-prod",
-				ip: "*"
-			}),
-			() => {
-				this.log("   output stream written, ending request and waiting for response...", logPad);
-				req.end();
-			});
-		});
+		this.busy = false;
+		this.wrapper.log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
+		return licensed;
 	};
-
-	// private validateLicenseFetch = async(licenseKey: string, logPad: string) =>
-	// {
-	// 	const res = await fetch(Uri.joinPath(this.host, this.authApiEndpoint).toString(),
-	// 	{
-	// 		method: "POST",
-	// 		agent: getProxyAgent(),
-	// 		headers: {
-	// 			// "Authorization": `Bearer ${codeSession.token}`,
-	// 			"Authorization": `Bearer ${this.token}`,
-	// 			"User-Agent": "VSCode-TaskExplorer",
-	// 			"Content-Type": "application/json",
-	// 		},
-	// 		body: JSON.stringify(
-	// 		{
-	// 			licensekey: licenseKey,
-	// 			appid: env.machineId,
-	// 			appname: "vscode-taskexplorer-prod",
-	// 			ip: "*"
-	// 		}),
-	// 	});
-
-	// 	let licensed = true;
-	// 	try
-	// 	{   const jso = JSON.parse(res.body);
-	// 		licensed = res.ok && jso.success && jso.message === "Success";
-	// 		this.logServerResponse(res, jso, res.data, logPad);
-	// 		jso.token = licenseKey;
-	// 		await this.setLicenseKeyFromRsp(licensed, jso, logPad);
-	// 	}
-	// 	catch (e) {
-	// 		/* istanbul ignore next*/
-	// 		this.onServerError(e, "validate", logPad, res.data);
-	// 	}
-	// 	finally {
-	// 		this.busy = false;
-	// 	}
-	// 	log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);
-	// };
 
 }

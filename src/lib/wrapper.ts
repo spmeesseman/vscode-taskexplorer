@@ -48,6 +48,7 @@ import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder, env } from "vscode";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
+import { TeServer } from "./auth/server";
 
 
 export class TeWrapper
@@ -60,6 +61,7 @@ export class TeWrapper
 	private readonly _log: ILog;
 	private readonly _teApi: TeApi;
 	private readonly _version: string;
+	private readonly _server: TeServer;
 	private readonly _storage: IStorage;
 	private readonly _homeView: HomeView;
 	private readonly _usage: UsageWatcher;
@@ -105,6 +107,7 @@ export class TeWrapper
 		this._taskCountView = new TaskCountView(this);
 		this._taskUsageView = new TaskUsageView(this);
 
+		this._server = new TeServer(this);
 		this._licensePage = new LicensePage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
@@ -142,6 +145,7 @@ export class TeWrapper
 
 		context.subscriptions.push(
 			this._usage,
+			this._server,
 			this._homeView,
 			this._treeManager,
 			this._licensePage,
@@ -336,8 +340,17 @@ export class TeWrapper
 		return this._teApi;
 	}
 
+	get busy(): boolean {
+		return this._busy || !this._ready || !this._initialized || fileCache.isBusy() || this._treeManager.isBusy() ||
+			   isProcessingFsEvent() || isProcessingConfigChange() || this._licenseManager.isBusy();
+	}
+
 	get config(): IConfiguration {
 		return this._configuration;
+	}
+
+	set configwatcher(e: boolean) {
+		enableConfigWatcher(e);
 	}
 
 	get context(): ExtensionContext {
@@ -346,10 +359,6 @@ export class TeWrapper
 
 	get debugging(): boolean {
 		return this._context.extensionMode === ExtensionMode.Development;
-	}
-
-	set configwatcher(e: boolean) {
-		enableConfigWatcher(e);
 	}
 
 	get env(): "dev" | "tests" | "production" {
@@ -363,7 +372,7 @@ export class TeWrapper
     }
 
     set explorer(tree) {
-		Object.assign(this._treeManager.views, { taskExplorer: { tree }});
+		(this.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as TaskTree;
     }
 
     get explorerView() {
@@ -378,13 +387,12 @@ export class TeWrapper
 		return fs;
 	}
 
-	get id(): string {
-		return this._context.extension.id;
+	get homeView(): HomeView {
+		return this._homeView;
 	}
 
-	get busy(): boolean {
-		return this._busy || !this._ready || !this._initialized || fileCache.isBusy() || this._treeManager.isBusy() ||
-			   isProcessingFsEvent() ||  isProcessingConfigChange() || this._licenseManager.isBusy();
+	get id(): string {
+		return this._context.extension.id;
 	}
 
 	get log(): ILog {
@@ -399,54 +407,6 @@ export class TeWrapper
 		return this._licenseManager;
 	}
 
-    get sidebar(): TaskTree | undefined {
-        return this.treeManager.views.taskExplorerSideBar?.tree;
-    }
-
-    set sidebar(tree: TaskTree | undefined) {
-		Object.assign(this._treeManager.views, { taskExplorerSideBar: { tree }});
-    }
-
-    get sidebarView() {
-        return this.treeManager.views.taskExplorerSideBar?.view;
-    }
-
-	get treeManager(): TaskTreeManager {
-		return this._treeManager;
-	}
-
-	get taskManager(): TaskManager {
-		return this._treeManager.taskManager;
-	}
-
-	get storage(): IStorage {
-		return this._storage;
-	}
-
-	get usage(): UsageWatcher {
-		return this._usage;
-	}
-
-	get version(): string {
-		return this._version;
-	}
-
-	get versionchanged(): boolean {
-		return this._version !== this._previousVersion;
-	}
-
-	get homeView(): HomeView {
-		return this._homeView;
-	}
-
-	get taskCountView(): TaskCountView {
-		return this._taskCountView;
-	}
-
-	get taskUsageView(): TaskUsageView {
-		return this._taskUsageView;
-	}
-
 	get licensePage(): LicensePage {
 		return this._licensePage;
 	}
@@ -459,6 +419,38 @@ export class TeWrapper
 		return this._releaseNotesPage;
 	}
 
+	get server(): TeServer {
+		return this._server;
+	}
+
+    get sidebar(): TaskTree | undefined {
+        return this.treeManager.views.taskExplorerSideBar?.tree;
+    }
+
+    set sidebar(tree: TaskTree | undefined) {
+		(this.treeManager.views.taskExplorerSideBar as ITaskTreeView).tree = tree as TaskTree;
+    }
+
+    get sidebarView() {
+        return this.treeManager.views.taskExplorerSideBar?.view;
+    }
+
+	get storage(): IStorage {
+		return this._storage;
+	}
+
+	get taskManager(): TaskManager {
+		return this._treeManager.taskManager;
+	}
+
+	get taskCountView(): TaskCountView {
+		return this._taskCountView;
+	}
+
+	get taskUsageView(): TaskUsageView {
+		return this._taskUsageView;
+	}
+
 	get tests(): boolean {
 		return this._tests || this._context.extensionMode === ExtensionMode.Test;
 	}
@@ -467,9 +459,29 @@ export class TeWrapper
 		this._tests = v;
 	}
 
+	get treeManager(): TaskTreeManager {
+		return this._treeManager;
+	}
+
+	get usage(): UsageWatcher {
+		return this._usage;
+	}
+
 	get utils(): typeof utilities {
 		return utilities;
 	}
+
+	get version(): string {
+		return this._version;
+	}
+
+	get versionchanged(): boolean {
+		return this._version !== this._previousVersion;
+	}
+
+    get views() {
+        return this.treeManager.views;
+    }
 
 	get wsfolder(): WorkspaceFolder {
 		return (workspace.workspaceFolders as WorkspaceFolder[])[0];

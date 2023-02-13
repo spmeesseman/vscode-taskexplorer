@@ -30,17 +30,17 @@ export const enum Commands
     Run = "vscode-taskexplorer.run",
     RunWithArgs = "vscode-taskexplorer.runWithArgs",
     RunLastTask = "vscode-taskexplorer.runLastTask",
-	RefreshHomeView = "vscode-taskexplorer.home.refresh",
-	RefreshLicensePage = "vscode-taskexplorer.licensePage.refresh",
-	RefreshParsingReportPage = "vscode-taskexplorer.parsingReport.refresh",
-	RefreshReleaseNotesPage = "vscode-taskexplorer.releaseNotes.refresh",
-	RefreshTaskCountView = "vscode-taskexplorer.taskCount.refresh",
-	RefreshTaskUsageView = "vscode-taskexplorer.taskUsage.refresh",
-	RefreshWelcomePage = "vscode-taskexplorer.welcome.refresh",
-	ShowLicensePage = "vscode-taskexplorer.view.licensePage.show",
-	ShowParsingReportPage = "vscode-taskexplorer.view.parsingReport.show",
-	ShowReleaseNotesPage = "vscode-taskexplorer.view.releaseNotes.show",
-	ShowWelcomePage = "vscode-taskexplorer.view.welcome.show"
+	RefreshHomeView = "taskExplorer.view.home.refresh",
+	RefreshLicensePage = "taskExplorer.view.licensePage.refresh",
+	RefreshParsingReportPage = "taskExplorer.view.parsingReport.refresh",
+	RefreshReleaseNotesPage = "taskExplorer.view.releaseNotes.refresh",
+	RefreshTaskCountView = "taskExplorer.view.taskCount.refresh",
+	RefreshTaskUsageView = "taskExplorer.view.taskUsage.refresh",
+	RefreshWelcomePage = "taskExplorer.view.welcome.refresh",
+	ShowLicensePage = "taskExplorer.view.licensePage.show",
+	ShowParsingReportPage = "taskExplorer.view.parsingReport.show",
+	ShowReleaseNotesPage = "taskExplorer.view.releaseNotes.show",
+	ShowWelcomePage = "taskExplorer.view.welcome.show"
 }
 
 export const enum VsCodeCommands

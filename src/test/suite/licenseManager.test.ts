@@ -47,7 +47,6 @@ suite("License Manager Tests", () =>
 		//
         ({ teApi, teWrapper } = await utils.activate(this));
 		oLicenseKey = await teWrapper.storage.getSecret("license_key");
-		oVersion = teWrapper.storage.get<string>("taskExplorer.version");
 		await teWrapper.storage.updateSecret("license_key_30day", undefined);
 		licMgr = teWrapper.licenseManager;
 		licMgr.setTestData({
@@ -69,9 +68,6 @@ suite("License Manager Tests", () =>
 		await teWrapper.storage.updateSecret("license_key_30day", undefined);
 		if (oLicenseKey) {
 			await teWrapper.storage.updateSecret("license_key", oLicenseKey);
-		}
-		if (oVersion) {
-			await teWrapper.storage.update("taskExplorer.version", oVersion);
 		}
 		licMgr?.setTestData({
 			maxFreeTasks: licMgrMaxFreeTasks,
@@ -183,11 +179,12 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.pageWithDetail + 1100 + (tc.slowTime.storageUpdate * 2) + tc.slowTime.licenseMgr.setLicenseCmd);
 		await utils.setLicensed(false);
-		await teWrapper.storage.delete("taskExplorer.version");
-		await teWrapper.storage.delete("taskExplorer.lastLicenseNag");
+		await teWrapper.licensePage.show();
+		await utils.sleep(50);
+		await teWrapper.licensePage.view?.webview.postMessage({ command: "getLicense" });
 		await setTasks();
 		await utils.sleep(50);
-		await licMgr.getWebviewPanel()?.webview.postMessage({ command: "showParsingReport" });
+		await teWrapper.licensePage.view?.webview.postMessage({ command: "showParsingReport" });
 		await utils.sleep(500);
         utils.endRollingCount(this);
 	});
@@ -275,7 +272,6 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.checkLicense + 800);
-		await teWrapper.storage.delete("taskExplorer.version");
 		await licMgr.checkLicense();
 		await setTasks();
 		await utils.sleep(400);
@@ -322,7 +318,6 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
 		await licMgr.setLicenseKey(oLicenseKey);
-		await teWrapper.storage.update("taskExplorer.version", version);
         utils.endRollingCount(this);
 	});
 
@@ -407,7 +402,6 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.checkLicense + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd);
-		await teWrapper.storage.delete("taskExplorer.version");
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await setTasks();
@@ -442,10 +436,9 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.get30DayLicense +
 				  tc.slowTime.storageSecretRead + tc.slowTime.closeEditors + 1100);
-		await teWrapper.storage.delete("taskExplorer.version");
-		await setTasks();
+		await teWrapper.licensePage.show();
 		await utils.sleep(50);
-		const result = await licMgr.getWebviewPanel()?.webview.postMessage({ command: "getLicense" });
+		const result = await teWrapper.licensePage.view?.webview.postMessage({ command: "getLicense" });
 		await utils.sleep(500);
 		expect(result).to.be.equal(true);
 		await utils.waitForTeIdle(tc.waitTime.licenseMgr.get30DayLicense);

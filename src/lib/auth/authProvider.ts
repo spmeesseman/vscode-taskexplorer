@@ -1,21 +1,23 @@
 
 
-import fetch from "node-fetch";
+// import fetch from "node-fetch";
 import { v4 as uuid } from "uuid";
 import { URLSearchParams } from "url";
-import { storage } from "../utils/storage";
+import { TeWrapper } from "../wrapper";
 import { IDictionary } from "../../interface";
 import { PromiseAdapter, promiseFromEvent } from "../utils/promiseUtils";
 import {
     authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession,
-    Disposable, env, EventEmitter, ExtensionContext, ProgressLocation, Uri, UriHandler, window
+    Disposable, env, EventEmitter, ProgressLocation, Uri, UriHandler, window
 } from "vscode";
-import { TeWrapper } from "../wrapper";
+
+export type TeAuthenticationSessionChangeEvent = AuthenticationProviderAuthenticationSessionsChangeEvent;
 
 export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
 const CLIENT_ID = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 const TEAUTH_DOMAIN = "app1.spmeesseman.com";
+const authApiEndpoint = "/api/license/validate/v1";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
 
@@ -27,6 +29,7 @@ class UriEventHandler extends EventEmitter<Uri> implements UriHandler
     }
 }
 
+
 export class TeAuthenticationProvider implements AuthenticationProvider, Disposable
 {
 
@@ -34,7 +37,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     private _pendingStates: string[] = [];
     private _uriHandler = new UriEventHandler();
     private _codeExchangePromises: IDictionary<{ promise: Promise<string>; cancel: EventEmitter<void> }> = {};
-    private _onSessionChange = new EventEmitter<AuthenticationProviderAuthenticationSessionsChangeEvent>();
+    private _onSessionChange = new EventEmitter<TeAuthenticationSessionChangeEvent>();
 
 
     constructor(private readonly wrapper: TeWrapper)
@@ -64,7 +67,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     /* istanbul ignore next */
     public async getSessions(scopes?: string[]): Promise<readonly AuthenticationSession[]>
     {
-        const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
+        const allSessions = await this.wrapper.storage.getSecret(SESSIONS_SECRET_KEY);
 
         if (allSessions)
         {
@@ -114,7 +117,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
     /* istanbul ignore next */
     public async removeSession(sessionId: string): Promise<void>
     {
-        const allSessions = await storage.getSecret(SESSIONS_SECRET_KEY);
+        const allSessions = await this.wrapper.storage.getSecret(SESSIONS_SECRET_KEY);
         if (allSessions)
         {
             const sessions = JSON.parse(allSessions) as AuthenticationSession[];
@@ -122,7 +125,7 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
             const session = sessions[sessionIdx];
             sessions.splice(sessionIdx, 1);
 
-            await storage.updateSecret(SESSIONS_SECRET_KEY, JSON.stringify(sessions));
+            await this.wrapper.storage.updateSecret(SESSIONS_SECRET_KEY, JSON.stringify(sessions));
 
             if (session)
             {
@@ -232,14 +235,15 @@ export class TeAuthenticationProvider implements AuthenticationProvider, Disposa
         };
 
     /* istanbul ignore next */
-    private async getUserInfo(token: string): Promise<{ name: string; email: string }>
+    private async getUserInfo(_token: string): Promise<{ name: string; email: string }>
     {
-        const response = await fetch(`https://${TEAUTH_DOMAIN}/userinfo`, {
-            headers: {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                Authorization: `Bearer ${token}`
-            }
-        });
-        return response.json() as Promise<{ name: string; email: string }>;
+        // const response = await fetch(`https://${TEAUTH_DOMAIN}/userinfo`, {
+        //     headers: {
+        //         // eslint-disable-next-line @typescript-eslint/naming-convention
+        //         Authorization: `Bearer ${token}`
+        //     }
+        // });
+        // return response.json() as Promise<{ name: string; email: string }>;
+        return { name: "Test", email: "test@spmeesseman.com" };
     }
 }

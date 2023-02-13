@@ -11,7 +11,7 @@ import { expect } from "chai";
 let teWrapper: TeWrapper;
 
 
-suite("Context Tests", () =>
+suite("Misc Tests - Context", () =>
 {
 
     suiteSetup(async function()

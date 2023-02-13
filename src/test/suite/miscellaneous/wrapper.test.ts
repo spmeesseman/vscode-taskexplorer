@@ -13,7 +13,7 @@ let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 
 
-suite("Wrapper Tests", () =>
+suite("Misc Tests - Wrapper", () =>
 {
 
     suiteSetup(async function()

@@ -8,7 +8,7 @@ import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ParsingReportPage } from "../../webview/page/parsingReportPage";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskTreeView } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
@@ -18,6 +18,7 @@ let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
+let sidebarWasEmpty = false;
 let origExplorer: TaskTree | undefined;
 let origSidebar: TaskTree | undefined;
 let pkgMgr: string;
@@ -32,6 +33,10 @@ suite("Info Report Tests", () =>
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teWrapper.explorer;
 		origSidebar = teWrapper.sidebar;
+		if (!teWrapper.views.taskExplorerSideBar) {
+			sidebarWasEmpty = true;
+			teWrapper.views.taskExplorerSideBar = {} as ITaskTreeView;
+		}
 		pkgMgr = teWrapper.config.getVs<string>("npm.packageManager");
 		userTasks = teWrapper.config.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);
@@ -43,6 +48,9 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this, false, true)) return;
 		teWrapper.explorer = origExplorer;
 		teWrapper.sidebar = origSidebar;
+		if (sidebarWasEmpty) {
+			delete teWrapper.views.taskExplorerSideBar;
+		}
 		await closeEditors();
 		await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
@@ -115,7 +123,7 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    const panel = await executeTeCommand<TeWebviewPanel<any>>("showParsingReportPage", testControl.waitTime.viewReport);
+	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowLicensePage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();

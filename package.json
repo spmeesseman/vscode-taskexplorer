@@ -116,6 +116,7 @@
         "test-webpack": "npm run tsc-build_test && node ./dist/test/runTest.js webpack xDeactivate",
         "test-webview": "npm run tsc-build_test && node ./dist/test/runTest.js webview xDeactivate",
         "test-workspace": "npm run tsc-build_test && node ./dist/test/runTest.js workspace xDeactivate",
+        "test-wrapper": "npm run tsc-build_test && node ./dist/test/runTest.js wrapper xDeactivate",
         "test-util": "npm run tsc-build_test && node ./dist/test/runTest.js util xDeactivate",
         "test:dev": "rimraf c:\\code\\data\\user-data\\cacheddata && npm run test",
         "test:after": "npm run test-coverage-full_off",

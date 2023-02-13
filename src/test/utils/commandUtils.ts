@@ -27,7 +27,7 @@ export const executeTeCommand2Async = (command: string, args: any[], minWait?: n
 
 export const executeTeCommand = async <T>(command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    command = !command.startsWith("vscode-taskexplorer.") ? `vscode-taskexplorer.${command}` : command;
+    command = !command.startsWith("vscode-taskexplorer.") && !command.startsWith("taskExplorer.") ? `vscode-taskexplorer.${command}` : command;
     const rc = await commands.executeCommand(command, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
