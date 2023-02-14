@@ -72,6 +72,7 @@ suite("Webview Tests", () =>
         await closeEditors();
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
         await executeCommand(Commands.RefreshHomeView);
+        await executeCommand(Commands.Donate);
         await closeEditors();
         endRollingCount(this);
     });

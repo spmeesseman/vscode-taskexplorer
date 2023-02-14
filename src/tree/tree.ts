@@ -6,7 +6,7 @@ import { TaskFolder } from "./folder";
 import { IEvent } from "../interface";
 import { TaskTreeManager } from "./treeManager";
 import { InitScripts, LoadScripts } from "../lib/noScripts";
-import { Event, EventEmitter, Task, TreeItem, Disposable } from "vscode";
+import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } from "vscode";
 
 
 /**
@@ -33,7 +33,7 @@ import { Event, EventEmitter, Task, TreeItem, Disposable } from "vscode";
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTree implements Disposable
+export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
 {
     private static loadStage = 0;
     private defaultGetChildrenLogLevel = 1;

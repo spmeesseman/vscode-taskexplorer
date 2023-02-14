@@ -21,7 +21,7 @@ export class TaskUsageView extends TeWebviewView<State>
 			TaskUsageView.viewTitle,
 			TaskUsageView.viewDescription,
 			"task-usage.html",
-			`taskExplorer.view.${TaskUsageView.viewId}`,
+			`taskexplorer.view.${TaskUsageView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			`${TaskUsageView.viewId}View`
 		);

@@ -24,7 +24,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				fileName: string,
 				title: string,
 				private readonly iconPath: string,
-				public readonly id: `taskExplorer.${WebviewIds}`,
+				public readonly id: `taskexplorer.${WebviewIds}`,
 				private readonly contextKeyPrefix: `${ContextKeys.WebviewPrefix}${WebviewIds}`,
 				private readonly trackingFeature: TrackedUsageFeatures,
 				showCommand: Commands)

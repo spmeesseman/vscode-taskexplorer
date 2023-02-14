@@ -187,10 +187,10 @@ const main = async(args: string[]) =>
                 {
                     await writeFile(projectSettingsFile, JSON.stringify(
                     {
-                        "taskExplorer.exclude": [
+                        "taskexplorer.exclude": [
                             "**/tasks_test_ignore_/**",
                         ],
-                        "taskExplorer.globPatternsAnt": [
+                        "taskexplorer.globPatternsAnt": [
                             "**/hello.xml"
                         ]
                     }, null, 4));
@@ -198,10 +198,10 @@ const main = async(args: string[]) =>
                 else
                 {
                     mwsConfig.settings = {
-                        "taskExplorer.exclude": [
+                        "taskexplorer.exclude": [
                             "**/tasks_test_ignore_/**",
                         ],
-                        "taskExplorer.globPatternsAnt": [
+                        "taskexplorer.globPatternsAnt": [
                             "**/hello.xml"
                         ]
                     };
@@ -227,16 +227,16 @@ const createDefaultSettings = async() =>
     const packageJson = JSON.parse(await readFileAsync(getWsPath("../../package.json")));
     const enabledTasks: IDictionary<boolean> = {};
     getTaskTypes().map(t => getTaskTypeRealName(t)).forEach(t => {
-        enabledTasks[t] = packageJson.contributes.configuration.properties["taskExplorer.enabledTasks"].default[t];
+        enabledTasks[t] = packageJson.contributes.configuration.properties["taskexplorer.enabledTasks"].default[t];
     });
 
     return {
         "terminal.integrated.shell.windows": undefined,
-        "taskExplorer.enableExplorerView": true,
-        "taskExplorer.enableSideBar": true,
-        "taskExplorer.enablePersistentFileCaching": false,
-        "taskExplorer.enabledTasks": enabledTasks,
-        "taskExplorer.pathToPrograms":
+        "taskexplorer.enableExplorerView": true,
+        "taskexplorer.enableSideBar": true,
+        "taskexplorer.enablePersistentFileCaching": false,
+        "taskexplorer.enabledTasks": enabledTasks,
+        "taskexplorer.pathToPrograms":
         {
             ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"),
             ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"),
@@ -254,38 +254,38 @@ const createDefaultSettings = async() =>
             python: "c:\\Code\\python\\python.exe",
             ruby: "ruby"
         },
-        "taskExplorer.logging.enable": false,
-        "taskExplorer.logging.level": 1,
-        "taskExplorer.logging.enableFile": false,
-        "taskExplorer.logging.enableFileSymbols": false,
-        "taskExplorer.logging.enableOutputWindow": false,
-        "taskExplorer.specialFolders.numLastTasks": 10,
-        "taskExplorer.specialFolders.showFavorites": true,
-        "taskExplorer.specialFolders.showLastTasks": true,
-        "taskExplorer.specialFolders.showUserTasks": true,
-        "taskExplorer.specialFolders.folderState": {
+        "taskexplorer.logging.enable": false,
+        "taskexplorer.logging.level": 1,
+        "taskexplorer.logging.enableFile": false,
+        "taskexplorer.logging.enableFileSymbols": false,
+        "taskexplorer.logging.enableOutputWindow": false,
+        "taskexplorer.specialFolders.numLastTasks": 10,
+        "taskexplorer.specialFolders.showFavorites": true,
+        "taskexplorer.specialFolders.showLastTasks": true,
+        "taskexplorer.specialFolders.showUserTasks": true,
+        "taskexplorer.specialFolders.folderState": {
             favorites: "Expanded",
             lastTasks: "Expanded",
             userTasks: "Expanded"
         },
-        "taskExplorer.taskButtons.clickAction": "Open",
-        "taskExplorer.taskButtons.showFavoritesButton": true,
-        "taskExplorer.taskButtons.showExecuteWithArgumentsButton": false,
-        "taskExplorer.taskButtons.showExecuteWithNoTerminalButton": false,
-        "taskExplorer.visual.disableAnimatedIcons": true,
-        "taskExplorer.visual.enableAnsiconForAnt": false,
-        "taskExplorer.groupMaxLevel": 1,
-        "taskExplorer.groupSeparator": "-",
-        "taskExplorer.groupWithSeparator": true,
-        "taskExplorer.groupStripTaskLabel": true,
-        "taskExplorer.exclude": [],
-        "taskExplorer.includeAnt": [], // Deprecated, use `globPatternsAnt`
-        "taskExplorer.globPatternsAnt": [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ],
-        "taskExplorer.keepTermOnStop": false,
-        "taskExplorer.showHiddenWsTasks": true,
-        "taskExplorer.showRunningTask": true,
-        "taskExplorer.useGulp": false,
-        "taskExplorer.useAnt": false,
+        "taskexplorer.taskButtons.clickAction": "Open",
+        "taskexplorer.taskButtons.showFavoritesButton": true,
+        "taskexplorer.taskButtons.showExecuteWithArgumentsButton": false,
+        "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": false,
+        "taskexplorer.visual.disableAnimatedIcons": true,
+        "taskexplorer.visual.enableAnsiconForAnt": false,
+        "taskexplorer.groupMaxLevel": 1,
+        "taskexplorer.groupSeparator": "-",
+        "taskexplorer.groupWithSeparator": true,
+        "taskexplorer.groupStripTaskLabel": true,
+        "taskexplorer.exclude": [],
+        "taskexplorer.includeAnt": [], // Deprecated, use `globPatternsAnt`
+        "taskexplorer.globPatternsAnt": [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ],
+        "taskexplorer.keepTermOnStop": false,
+        "taskexplorer.showHiddenWsTasks": true,
+        "taskexplorer.showRunningTask": true,
+        "taskexplorer.useGulp": false,
+        "taskexplorer.useAnt": false,
     };
 };
 

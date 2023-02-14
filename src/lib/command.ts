@@ -6,41 +6,42 @@ import {
 	Command as VsCodeCommand, Disposable, Uri, commands, Command
 } from "vscode";
 
-type SupportedCommands = Commands | `taskExplorer.view.${string}.focus` | `taskExplorer.view.${string}.resetViewLocation`;
+type SupportedCommands = Commands | `taskexplorer.view.${string}.focus` | `taskexplorer.view.${string}.resetViewLocation`;
 
 
 export const enum Commands
 {
-	AddToExcludesMenu = "vscode-taskexplorer.addToExcludesEx",
-	ClearTaskStats = "vscode-taskexplorer.clearTaskStats",
-	Donate = "vscode-taskexplorer.donate",
-	DisableTaskType = "vscode-taskexplorer.disableTaskType",
-	EnableTaskType = "vscode-taskexplorer.enableTaskType",
-	EnterLicense = "vscode-taskexplorer.enterLicense",
-	FocusExplorerView  = "taskExplorerSideBar.focus",
-	FocusSidebarView  = "taskExplorer.focus",
-	FocusHomeView  = "taskExplorer.view.home.focus",
-	FocusTaskCountView  = "taskExplorer.view.taskCount.focus",
-	FocusTaskUsageView  = "taskExplorer.view.taskUsage.focus",
-	GetApi = "vscode-taskexplorer.getApi",
-	GetLicense = "vscode-taskexplorer.getLicense",
-    Open = "vscode-taskexplorer.open",
-	Refresh = "vscode-taskexplorer.refresh",
-	RemovefromExcludes = "vscode-taskexplorer.removeFromExcludes",
-    Run = "vscode-taskexplorer.run",
-    RunWithArgs = "vscode-taskexplorer.runWithArgs",
-    RunLastTask = "vscode-taskexplorer.runLastTask",
-	RefreshHomeView = "taskExplorer.view.home.refresh",
-	RefreshLicensePage = "taskExplorer.view.licensePage.refresh",
-	RefreshParsingReportPage = "taskExplorer.view.parsingReport.refresh",
-	RefreshReleaseNotesPage = "taskExplorer.view.releaseNotes.refresh",
-	RefreshTaskCountView = "taskExplorer.view.taskCount.refresh",
-	RefreshTaskUsageView = "taskExplorer.view.taskUsage.refresh",
-	RefreshWelcomePage = "taskExplorer.view.welcome.refresh",
-	ShowLicensePage = "taskExplorer.view.licensePage.show",
-	ShowParsingReportPage = "taskExplorer.view.parsingReport.show",
-	ShowReleaseNotesPage = "taskExplorer.view.releaseNotes.show",
-	ShowWelcomePage = "taskExplorer.view.welcome.show"
+	AddToExcludesMenu = "taskexplorer.addToExcludesEx",
+	ClearTaskStats = "taskexplorer.clearTaskStats",
+	Donate = "taskexplorer.donate",
+	DisableTaskType = "taskexplorer.disableTaskType",
+	EnableTaskType = "taskexplorer.enableTaskType",
+	EnterLicense = "taskexplorer.enterLicense",
+	FocusExplorerTreeView  = "taskexplorer.view.taskTreeExplorer.focus",
+	FocusSidebarTreeView  = "taskexplorer.view.taskTreeSideBar.focus",
+	FocusSidebarView  = "taskExplorerSideBar.focus",
+	FocusHomeView  = "taskexplorer.view.home.focus",
+	FocusTaskCountView  = "taskexplorer.view.taskCount.focus",
+	FocusTaskUsageView  = "taskexplorer.view.taskUsage.focus",
+	GetApi = "taskexplorer.getApi",
+	GetLicense = "taskexplorer.getLicense",
+    Open = "taskexplorer.open",
+	Refresh = "taskexplorer.refresh",
+	RemovefromExcludes = "taskexplorer.removeFromExcludes",
+    Run = "taskexplorer.run",
+    RunWithArgs = "taskexplorer.runWithArgs",
+    RunLastTask = "taskexplorer.runLastTask",
+	RefreshHomeView = "taskexplorer.view.home.refresh",
+	RefreshLicensePage = "taskexplorer.view.licensePage.refresh",
+	RefreshParsingReportPage = "taskexplorer.view.parsingReport.refresh",
+	RefreshReleaseNotesPage = "taskexplorer.view.releaseNotes.refresh",
+	RefreshTaskCountView = "taskexplorer.view.taskCount.refresh",
+	RefreshTaskUsageView = "taskexplorer.view.taskUsage.refresh",
+	RefreshWelcomePage = "taskexplorer.view.welcome.refresh",
+	ShowLicensePage = "taskexplorer.view.licensePage.show",
+	ShowParsingReportPage = "taskexplorer.view.parsingReport.show",
+	ShowReleaseNotesPage = "taskexplorer.view.releaseNotes.show",
+	ShowWelcomePage = "taskexplorer.view.welcome.show"
 }
 
 export const enum VsCodeCommands

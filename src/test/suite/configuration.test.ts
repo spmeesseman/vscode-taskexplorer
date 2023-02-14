@@ -80,7 +80,7 @@ suite("Configuration / Settings Tests", () =>
         //
         teWrapper.configwatcher = false;
         //
-        // 3-part i.e. taskExplorer.pathToPrograms.ant
+        // 3-part i.e. taskexplorer.pathToPrograms.ant
         //
         let v = teWrapper.config.get<any>("pathToPrograms.ant");
         expect(teWrapper.utils.isString(v)).to.equal(true);
@@ -102,7 +102,7 @@ suite("Configuration / Settings Tests", () =>
         v = teWrapper.config.get<any>("visual.disableAnimatedIcons");
         expect(teWrapper.utils.isBoolean(v) && v === cv).to.equal(true);
         //
-        // 4-part i.e. taskExplorer.specialFolders.folderState.lastTasks
+        // 4-part i.e. taskexplorer.specialFolders.folderState.lastTasks
         //
         const cv2 = cv = teWrapper.config.get<any>("specialFolders.folderState.lastTasks");
         expect(teWrapper.utils.isString(cv) && teWrapper.utils.isString(cv2)).to.equal(true);

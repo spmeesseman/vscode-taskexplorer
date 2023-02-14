@@ -1,8 +1,8 @@
 {
-    "taskExplorer.exclude": [
+    "taskexplorer.exclude": [
         "**/tasks_test_ignore_/**"
     ],
-    "taskExplorer.globPatternsAnt": [
+    "taskexplorer.globPatternsAnt": [
         "**/hello.xml"
     ]
 }

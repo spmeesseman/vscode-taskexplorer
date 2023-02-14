@@ -24,7 +24,7 @@ export default {};
 // 		{
 // 			resource: new Resource(
 // 			{
-// 				[SemanticResourceAttributes.SERVICE_NAME]: "taskExplorer",
+// 				[SemanticResourceAttributes.SERVICE_NAME]: "taskexplorer",
 // 				[SemanticResourceAttributes.SERVICE_VERSION]: context.extensionVersion,
 // 				[SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: context.env,
 // 				[SemanticResourceAttributes.DEVICE_ID]: context.machineId,

@@ -82,7 +82,7 @@ export class TaskItem extends TreeItem
         this.groupLevel = 0;                // Grouping level - will get set by treefile.addTreeNode()
         this.command = {                    // Note that 'groupLevel' will be set by TaskFile.addScript()
             title: "Open definition",       // Default click action is just Open file since it's easy to click on accident
-            command: "vscode-taskexplorer.open",
+            command: "taskexplorer.open",
             arguments: [ this, true ]
         };
         //

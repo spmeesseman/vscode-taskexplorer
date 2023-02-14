@@ -82,13 +82,7 @@ export class TeWrapper
 	// private _onWorkCompleted: EventEmitter<void> = new EventEmitter<void>();
 
 
-	static create(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
-    {
-		return new TeWrapper(context, storage, configuration, log);
-	}
-
-
-	private constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
+	constructor(context: ExtensionContext, storage: IStorage, configuration: IConfiguration, log: ILog)
     {
 		this._context = context;
         this._storage = storage;
@@ -97,7 +91,7 @@ export class TeWrapper
 		this._providers = {};
 
 		this._version = this._context.extension.packageJSON.version;
-		this._previousVersion = this._storage.get<string>("taskExplorer.version");
+		this._previousVersion = this._storage.get<string>("taskexplorer.version");
 
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
@@ -241,7 +235,7 @@ export class TeWrapper
 		// Maybe how 'what's new'or 'welcome' page
 		//
 		if (this._version !== this._previousVersion) { /* TODO */ }
-		await this.storage.update("taskExplorer.version", this.version);
+		await this.storage.update("taskexplorer.version", this.version);
 		// utilities.oneTimeEvent(this.onReady)(() => { /* TODO */ });
 		//
 		// Build the file cache, this kicks off the whole process as refresh cmd will be issued

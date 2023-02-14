@@ -17,7 +17,7 @@ export abstract class IExternalProvider implements ITaskExplorerProvider
 
     async provideTasks()
     {
-        const teApi = await commands.executeCommand<ITaskExplorerApi>("vscode-taskexplorer.getApi");
+        const teApi = await commands.executeCommand<ITaskExplorerApi>("taskexplorer.getApi");
         if (teApi.providers[this.providerName])
         {
             return this.getTasks();

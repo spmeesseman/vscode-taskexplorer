@@ -16,7 +16,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/spmeesseman/vscode-taskexplorer.git"
+        "url": "https://github.com/spmeesseman/taskexplorer.git"
     },
     "engines": {
         "vscode": "^1.63.0"
@@ -242,8 +242,9 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "taskActivity",
+                    "id": "taskExplorerSideBar",
                     "title": "%view.name%",
+                    "when": "config.taskexplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg"
                 }
@@ -252,46 +253,48 @@
         "views": {
             "explorer": [
                 {
-                    "id": "taskExplorer",
+                    "type": "tree",
+                    "id": "taskexplorer.view.taskTreeExplorer",
                     "name": "%view.name%",
-                    "when": "config.taskExplorer.enableExplorerView",
+                    "when": "config.taskexplorer.enableExplorerView",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 }
             ],
-            "taskActivity": [
+            "taskExplorerSideBar": [
                 {
                     "type": "webview",
-                    "id": "taskExplorer.view.home",
+                    "id": "taskexplorer.view.home",
                     "name": "Home",
+                    "when": "config.taskexplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 },
                 {
                     "type": "tree",
-                    "id": "taskExplorerSideBar",
+                    "id": "taskexplorer.view.taskTreeSideBar",
                     "name": "Explorer",
-                    "when": "config.taskExplorer.enableSideBar",
+                    "when": "config.taskexplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "visible"
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.view.taskUsage",
+                    "id": "taskexplorer.view.taskUsage",
                     "name": "Task Usage",
-                    "when": "config.taskExplorer.enableSideBar",
+                    "when": "config.taskexplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "collapsed"
                 },
                 {
                     "type": "webview",
-                    "id": "taskExplorer.view.taskCount",
+                    "id": "taskexplorer.view.taskCount",
                     "name": "Task Count",
-                    "when": "config.taskExplorer.enableSideBar",
+                    "when": "config.taskexplorer.enableSideBar",
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "collapsed"
@@ -300,1358 +303,1358 @@
         },
         "commands": [
             {
-                "command": "vscode-taskexplorer.clearTaskStats",
+                "command": "taskexplorer.clearTaskStats",
                 "title": "%command.clearTaskStats%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/clear.svg",
                     "dark": "res/img/dark/clear.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.getApi",
+                "command": "taskexplorer.getApi",
                 "title": "%command.getApi%",
                 "enablement": "false"
             },
             {
-                "command": "vscode-taskexplorer.showOutput",
+                "command": "taskexplorer.showOutput",
                 "title": "Task Explorer: Show Log in Output Window",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.showParsingReportPage",
+                "command": "taskexplorer.showParsingReportPage",
                 "title": "%command.showParsingReportPage%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.donate",
+                "command": "taskexplorer.donate",
                 "title": "%command.donate%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/donate.svg",
                     "dark": "res/img/dark/donate.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.enterLicense",
+                "command": "taskexplorer.enterLicense",
                 "title": "%command.enterLicense%"
             },
             {
-                "command": "vscode-taskexplorer.getLicense",
+                "command": "taskexplorer.getLicense",
                 "title": "%command.getLicense%"
             },
             {
-                "command": "vscode-taskexplorer.showLicensePage",
+                "command": "taskexplorer.showLicensePage",
                 "title": "%command.showLicensePage%"
             },
             {
-                "command": "vscode-taskexplorer.showReleaseNotesPage",
+                "command": "taskexplorer.showReleaseNotesPage",
                 "title": "%command.showReleaseNotesPage%"
             },
             {
-                "command": "vscode-taskexplorer.enableTaskType",
+                "command": "taskexplorer.enableTaskType",
                 "title": "%command.enableTaskType%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.disableTaskType",
+                "command": "taskexplorer.disableTaskType",
                 "title": "%command.disableTaskType%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.addToExcludesEx",
+                "command": "taskexplorer.addToExcludesEx",
                 "title": "%command.addToExcludesEx%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.removeFromExcludes",
+                "command": "taskexplorer.removeFromExcludes",
                 "title": "%command.removeFromExcludes%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.refresh",
+                "command": "taskexplorer.refresh",
                 "title": "%command.refresh%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/refresh.svg",
                     "dark": "res/img/dark/refresh.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.clearFavorites",
+                "command": "taskexplorer.clearFavorites",
                 "title": "%command.clearFavorites%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/clear.svg",
                     "dark": "res/img/dark/clear.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.clearLastTasks",
+                "command": "taskexplorer.clearLastTasks",
                 "title": "%command.clearLastTasks%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/clear.svg",
                     "dark": "res/img/dark/clear.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.addRemoveCustomLabel",
+                "command": "taskexplorer.addRemoveCustomLabel",
                 "title": "%command.addRemoveCustomLabel%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.addToExcludes",
+                "command": "taskexplorer.addToExcludes",
                 "title": "Add to Excludes List",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.run",
+                "command": "taskexplorer.run",
                 "title": "%command.run%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.runNoTerm",
+                "command": "taskexplorer.runNoTerm",
                 "title": "%command.runNoTerm%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.runWithArgs",
+                "command": "taskexplorer.runWithArgs",
                 "title": "%command.runWithArgs%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.runLastTask",
+                "command": "taskexplorer.runLastTask",
                 "title": "Task Explorer: Run Last Task",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "light": "res/img/light/continue.svg",
                     "dark": "res/img/dark/continue.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.addRemoveFavorite",
+                "command": "taskexplorer.addRemoveFavorite",
                 "title": "%command.addRemoveFavorite%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/favorite.svg",
                     "light": "res/img/light/favorite.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.pause",
+                "command": "taskexplorer.pause",
                 "title": "%command.pause%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/pause.svg",
                     "light": "res/img/light/pause.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.restart",
+                "command": "taskexplorer.restart",
                 "title": "%command.restart%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/restart.svg",
                     "light": "res/img/light/restart.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.stop",
+                "command": "taskexplorer.stop",
                 "title": "%command.stop%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/stop.svg",
                     "light": "res/img/light/stop.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.open",
+                "command": "taskexplorer.open",
                 "title": "%command.open%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/file.svg",
                     "light": "res/img/light/file.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.openTerminal",
+                "command": "taskexplorer.openTerminal",
                 "title": "%command.openTerminal%",
-                "when": "taskExplorer:enabled",
+                "when": "taskexplorer:enabled",
                 "icon": {
                     "dark": "res/img/dark/terminal.svg",
                     "light": "res/img/light/terminal.svg"
                 }
             },
             {
-                "command": "vscode-taskexplorer.runInstall",
+                "command": "taskexplorer.runInstall",
                 "title": "%command.runInstall%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.runUpdate",
+                "command": "taskexplorer.runUpdate",
                 "title": "%command.runUpdate%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.runUpdatePackage",
+                "command": "taskexplorer.runUpdatePackage",
                 "title": "%command.runUpdatePackage%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.runAudit",
+                "command": "taskexplorer.runAudit",
                 "title": "%command.runAudit%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             },
             {
-                "command": "vscode-taskexplorer.runAuditFix",
+                "command": "taskexplorer.runAuditFix",
                 "title": "%command.runAuditFix%",
-                "when": "taskExplorer:enabled"
+                "when": "taskexplorer:enabled"
             }
         ],
         "keybindings": [
             {
-                "command": "vscode-taskexplorer.runLastTask",
+                "command": "taskexplorer.runLastTask",
                 "key": "alt+r t",
-                "when": "config.taskExplorer.enableExplorerView"
+                "when": "config.taskexplorer.enableExplorerView"
             },
             {
-                "command": "vscode-taskexplorer.runLastTask",
+                "command": "taskexplorer.runLastTask",
                 "key": "alt+r t",
-                "when": "config.taskExplorer.enableSideBar"
+                "when": "config.taskexplorer.enableSideBar"
             }
         ],
         "menus": {
             "explorer/context": [
                 {
-                    "command": "vscode-taskexplorer.disableTaskType",
+                    "command": "taskexplorer.disableTaskType",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath in vscodeTaskExplorer.taskFiles"
                 },
                 {
-                    "command": "vscode-taskexplorer.enableTaskType",
+                    "command": "taskexplorer.enableTaskType",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath not in vscodeTaskExplorer.taskFiles"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "command": "taskexplorer.addToExcludesEx",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath in vscodeTaskExplorer.taskFiles"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "command": "taskexplorer.addToExcludesEx",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
                 },
                 {
-                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "command": "taskexplorer.removeFromExcludes",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourceScheme == file && resourcePath not in vscodeTaskExplorer.taskFiles"
                 },
                 {
-                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "command": "taskexplorer.removeFromExcludes",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
                 },
                 {
-                    "command": "vscode-taskexplorer.showParsingReportPage",
+                    "command": "taskexplorer.showParsingReportPage",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
                 }
             ],
             "commandPalette": [
                 {
-                    "command": "vscode-taskexplorer.refresh",
-                    "when": "taskExplorer:enabled"
+                    "command": "taskexplorer.refresh",
+                    "when": "taskexplorer:enabled"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "taskExplorer:enabled"
+                    "command": "taskexplorer.clearFavorites",
+                    "when": "taskexplorer:enabled"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "taskExplorer:enabled"
+                    "command": "taskexplorer.clearLastTasks",
+                    "when": "taskexplorer:enabled"
                 },
                 {
-                    "command": "vscode-taskexplorer.donate",
-                    "when": "taskExplorer:enabled"
+                    "command": "taskexplorer.donate",
+                    "when": "taskexplorer:enabled"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearTaskStats",
-                    "when": "taskExplorer:enabled"
+                    "command": "taskexplorer.clearTaskStats",
+                    "when": "taskexplorer:enabled"
                 },
                 {
-                    "command": "vscode-taskexplorer.disableTaskType",
+                    "command": "taskexplorer.disableTaskType",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.enableTaskType",
+                    "command": "taskexplorer.enableTaskType",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludesEx",
+                    "command": "taskexplorer.addToExcludesEx",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.removeFromExcludes",
+                    "command": "taskexplorer.removeFromExcludes",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
+                    "command": "taskexplorer.addRemoveFavorite",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
+                    "command": "taskexplorer.run",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
+                    "command": "taskexplorer.runNoTerm",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
+                    "command": "taskexplorer.runWithArgs",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
+                    "command": "taskexplorer.addToExcludes",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
+                    "command": "taskexplorer.addRemoveCustomLabel",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.pause",
+                    "command": "taskexplorer.pause",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.restart",
+                    "command": "taskexplorer.restart",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.stop",
+                    "command": "taskexplorer.stop",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
+                    "command": "taskexplorer.open",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.openTerminal",
+                    "command": "taskexplorer.openTerminal",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runInstall",
+                    "command": "taskexplorer.runInstall",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdate",
+                    "command": "taskexplorer.runUpdate",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdatePackage",
+                    "command": "taskexplorer.runUpdatePackage",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runAudit",
+                    "command": "taskexplorer.runAudit",
                     "when": "false"
                 },
                 {
-                    "command": "vscode-taskexplorer.runAuditFix",
+                    "command": "taskexplorer.runAuditFix",
                     "when": "false"
                 }
             ],
             "view/title": [
                 {
-                    "command": "vscode-taskexplorer.runLastTask",
+                    "command": "taskexplorer.runLastTask",
                     "when": "view == taskExplorer || view == taskExplorerSideBar",
                     "group": "navigation"
                 },
                 {
-                    "command": "vscode-taskexplorer.refresh",
+                    "command": "taskexplorer.refresh",
                     "when": "view == taskExplorer || view == taskExplorerSideBar",
                     "group": "navigation"
                 },
                 {
-                    "command": "vscode-taskexplorer.donate",
+                    "command": "taskexplorer.donate",
                     "when": "view == taskExplorer.views.home",
                     "group": "navigation"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearTaskStats",
+                    "command": "taskexplorer.clearTaskStats",
                     "when": "view == taskExplorer.views.taskUsage",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "vscode-taskexplorer.runAudit",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runAudit",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runAuditFix",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runAuditFix",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runInstall",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runInstall",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdate",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runUpdate",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdatePackage",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runUpdatePackage",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApppublisher"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApppublisher"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileWorkspace"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileWorkspace"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePython"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePython"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileAnt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileAnt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePerl"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePerl"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGradle"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGradle"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileMake"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileMake"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGrunt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGrunt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGulp"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGulp"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBash"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBash"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBatch"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBatch"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePowershell"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePowershell"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileRuby"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileRuby"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNsis"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNsis"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApppublisher"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApppublisher"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNpm"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupWorkspace"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupWorkspace"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPython"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPython"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPipenv"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPipenv"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupAnt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupAnt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPerl"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPerl"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGradle"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGradle"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupMake"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupMake"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGrunt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGrunt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGulp"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGulp"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBash"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBash"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBatch"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBatch"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPowershell"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPowershell"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupRuby"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupRuby"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNsis"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNsis"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == favorites"
+                    "command": "taskexplorer.clearFavorites",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == favorites"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks"
+                    "command": "taskexplorer.clearLastTasks",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptS",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == script",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.openTerminal",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.openTerminal",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.openTerminal",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.openTerminal",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.restart",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.restart",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.restart",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.restart",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.pause",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.pause",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.pause",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.pause",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.stop",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.stop",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.stop",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.stop",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableExplorerView && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == favorites",
+                    "command": "taskexplorer.clearFavorites",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == favorites",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "config.taskExplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks",
+                    "command": "taskexplorer.clearLastTasks",
+                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runAudit",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runAudit",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runAuditFix",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runAuditFix",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runInstall",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runInstall",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdate",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runUpdate",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.runUpdatePackage",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.runUpdatePackage",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApppublisher"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApppublisher"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileWorkspace"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileWorkspace"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePython"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePython"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileAnt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileAnt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePerl"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePerl"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGradle"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGradle"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileMake"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileMake"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGrunt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGrunt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGulp"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGulp"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBash"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBash"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBatch"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBatch"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePowershell"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePowershell"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileRuby"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileRuby"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNsis"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNsis"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApppublisher"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApppublisher"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNpm"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNpm"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupWorkspace"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupWorkspace"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPython"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPython"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPipenv"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPipenv"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupAnt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupAnt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPerl"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPerl"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGradle"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGradle"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupMake"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupMake"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGrunt"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGrunt"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGulp"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGulp"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBash"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBash"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBatch"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBatch"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPowershell"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPowershell"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupRuby"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupRuby"
                 },
                 {
-                    "command": "vscode-taskexplorer.addToExcludes",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNsis"
+                    "command": "taskexplorer.addToExcludes",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNsis"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "command": "taskexplorer.addRemoveCustomLabel",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites"
+                    "command": "taskexplorer.clearFavorites",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks"
+                    "command": "taskexplorer.clearLastTasks",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.run",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "command": "taskexplorer.run",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runNoTerm",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.runWithArgs",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "command": "taskexplorer.runWithArgs",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.open",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.open",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.openTerminal",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.openTerminal",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.openTerminal",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.openTerminal",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.restart",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.restart",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.restart",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.restart",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.pause",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.pause",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.pause",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.pause",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.stop",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.stop",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.stop",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.stop",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.addRemoveFavorite",
-                    "when": "config.taskExplorer.enableSideBar && config.taskExplorer.specialFolders.showFavorites && config.taskExplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "command": "taskexplorer.addRemoveFavorite",
+                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearFavorites",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites",
+                    "command": "taskexplorer.clearFavorites",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites",
                     "group": "inline"
                 },
                 {
-                    "command": "vscode-taskexplorer.clearLastTasks",
-                    "when": "config.taskExplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
+                    "command": "taskexplorer.clearLastTasks",
+                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
                     "group": "inline"
                 }
             ]
         },
         "configuration": {
-            "id": "taskExplorer",
+            "id": "taskexplorer",
             "type": "object",
             "title": "Task Explorer",
             "properties": {
-                "taskExplorer.enableExplorerView": {
+                "taskexplorer.enableExplorerView": {
                     "type": "boolean",
                     "default": true,
                     "order": 0,
-                    "description": "%config.taskExplorer.enableExplorerView%"
+                    "description": "%config.taskexplorer.enableExplorerView%"
                 },
-                "taskExplorer.enableSideBar": {
+                "taskexplorer.enableSideBar": {
                     "type": "boolean",
                     "default": false,
                     "order": 1,
-                    "description": "%config.taskExplorer.enableSideBar%"
+                    "description": "%config.taskexplorer.enableSideBar%"
                 },
-                "taskExplorer.enablePersistentFileCaching": {
+                "taskexplorer.enablePersistentFileCaching": {
                     "type": "boolean",
                     "default": false,
                     "order": 1,
-                    "markdownDescription": "%config.taskExplorer.enablePersistentFileCaching%"
+                    "markdownDescription": "%config.taskexplorer.enablePersistentFileCaching%"
                 },
-                "taskExplorer.enabledTasks": {
+                "taskexplorer.enabledTasks": {
                     "type": "object",
                     "order": 15,
                     "additionalProperties": false,
-                    "description": "%config.taskExplorer.enabledTaskTypes%",
+                    "description": "%config.taskexplorer.enabledTaskTypes%",
                     "properties": {
                         "ant": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableAnt%"
+                            "description": "%config.taskexplorer.enableAnt%"
                         },
                         "apppublisher": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableAppPublisher%"
+                            "description": "%config.taskexplorer.enableAppPublisher%"
                         },
                         "bash": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableBash%"
+                            "description": "%config.taskexplorer.enableBash%"
                         },
                         "batch": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableBatch%"
+                            "description": "%config.taskexplorer.enableBatch%"
                         },
                         "composer": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableComposer%"
+                            "description": "%config.taskexplorer.enableComposer%"
                         },
                         "gradle": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableGradle%"
+                            "description": "%config.taskexplorer.enableGradle%"
                         },
                         "grunt": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableGrunt%"
+                            "description": "%config.taskexplorer.enableGrunt%"
                         },
                         "gulp": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableGulp%"
+                            "description": "%config.taskexplorer.enableGulp%"
                         },
                         "jenkins": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableJenkins%"
+                            "description": "%config.taskexplorer.enableJenkins%"
                         },
                         "make": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableMake%"
+                            "description": "%config.taskexplorer.enableMake%"
                         },
                         "maven": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableMaven%"
+                            "description": "%config.taskexplorer.enableMaven%"
                         },
                         "npm": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableNpm%"
+                            "description": "%config.taskexplorer.enableNpm%"
                         },
                         "nsis": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableNsis%"
+                            "description": "%config.taskexplorer.enableNsis%"
                         },
                         "perl": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enablePerl%"
+                            "description": "%config.taskexplorer.enablePerl%"
                         },
                         "pipenv": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enablePipenv%"
+                            "description": "%config.taskexplorer.enablePipenv%"
                         },
                         "powershell": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enablePowershell%"
+                            "description": "%config.taskexplorer.enablePowershell%"
                         },
                         "python": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enablePython%"
+                            "description": "%config.taskexplorer.enablePython%"
                         },
                         "ruby": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableRuby%"
+                            "description": "%config.taskexplorer.enableRuby%"
                         },
                         "tsc": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableTsc%"
+                            "description": "%config.taskexplorer.enableTsc%"
                         },
                         "webpack": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableWebpack%"
+                            "description": "%config.taskexplorer.enableWebpack%"
                         },
                         "workspace": {
                             "type": "boolean",
-                            "description": "%config.taskExplorer.enableWorkspace%"
+                            "description": "%config.taskexplorer.enableWorkspace%"
                         }
                     },
                     "default": {
@@ -1678,22 +1681,22 @@
                         "workspace": true
                     }
                 },
-                "taskExplorer.environment": {
+                "taskexplorer.environment": {
                     "type": "object",
                     "order": 18,
                     "additionalProperties": false,
-                    "markdownDescription": "%config.taskExplorer.environment%",
+                    "markdownDescription": "%config.taskexplorer.environment%",
                     "properties": {
                         "jenkinsApiToken": "JENKINS_API_TOKEN"
                     }
                 },
-                "taskExplorer.exclude": {
+                "taskexplorer.exclude": {
                     "type": "array",
                     "order": 20,
                     "items": {
                         "type": "string"
                     },
-                    "markdownDescription": "%config.taskExplorer.exclude%",
+                    "markdownDescription": "%config.taskexplorer.exclude%",
                     "default": [
                         "**/.coverage/**",
                         "**/.nuget/**",
@@ -1727,7 +1730,7 @@
                         "**/work/**"
                     ]
                 },
-                "taskExplorer.excludeTask": {
+                "taskexplorer.excludeTask": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -1736,9 +1739,9 @@
                         "pre-launch[0-9]{2}\\.r(?:b|c)"
                     ],
                     "order": 25,
-                    "markdownDescription": "%config.taskExplorer.excludeTask%"
+                    "markdownDescription": "%config.taskexplorer.excludeTask%"
                 },
-                "taskExplorer.includeAnt": {
+                "taskexplorer.includeAnt": {
                     "type": [
                         "string",
                         "array"
@@ -1748,10 +1751,10 @@
                     },
                     "default": [],
                     "order": 30,
-                    "markdownDeprecationMessage": "%config.taskExplorer.includeAntDeprecated%",
-                    "markdownDescription": "%config.taskExplorer.includeAntDsc%"
+                    "markdownDeprecationMessage": "%config.taskexplorer.includeAntDeprecated%",
+                    "markdownDescription": "%config.taskexplorer.includeAntDsc%"
                 },
-                "taskExplorer.globPatternsAnt": {
+                "taskexplorer.globPatternsAnt": {
                     "type": [
                         "array"
                     ],
@@ -1760,9 +1763,9 @@
                     },
                     "default": [],
                     "order": 35,
-                    "markdownDescription": "%config.taskExplorer.globPatternsAnt%"
+                    "markdownDescription": "%config.taskexplorer.globPatternsAnt%"
                 },
-                "taskExplorer.globPatternsBash": {
+                "taskexplorer.globPatternsBash": {
                     "type": [
                         "array"
                     ],
@@ -1771,19 +1774,19 @@
                     },
                     "default": [],
                     "order": 40,
-                    "markdownDescription": "%config.taskExplorer.globPatternsBash%"
+                    "markdownDescription": "%config.taskexplorer.globPatternsBash%"
                 },
-                "taskExplorer.keepTermOnStop": {
+                "taskexplorer.keepTermOnStop": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.keepTermOnStop%"
+                    "description": "%config.taskexplorer.keepTermOnStop%"
                 },
-                "taskExplorer.groupWithSeparator": {
+                "taskexplorer.groupWithSeparator": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.groupWithSeparator%"
+                    "description": "%config.taskexplorer.groupWithSeparator%"
                 },
-                "taskExplorer.groupSeparator": {
+                "taskexplorer.groupSeparator": {
                     "type": "string",
                     "enum": [
                         "-",
@@ -1792,14 +1795,14 @@
                         "|"
                     ],
                     "default": "-",
-                    "description": "%config.taskExplorer.groupSeparator%"
+                    "description": "%config.taskexplorer.groupSeparator%"
                 },
-                "taskExplorer.groupStripTaskLabel": {
+                "taskexplorer.groupStripTaskLabel": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.groupStripTaskLabel%"
+                    "description": "%config.taskexplorer.groupStripTaskLabel%"
                 },
-                "taskExplorer.groupMaxLevel": {
+                "taskexplorer.groupMaxLevel": {
                     "type": "number",
                     "enum": [
                         1,
@@ -1809,33 +1812,33 @@
                         5
                     ],
                     "default": 1,
-                    "description": "%config.taskExplorer.groupMaxLevel%"
+                    "description": "%config.taskexplorer.groupMaxLevel%"
                 },
-                "taskExplorer.logging.enable": {
+                "taskexplorer.logging.enable": {
                     "type": "boolean",
                     "default": false,
                     "order": 50,
-                    "markdownDescription": "%config.taskExplorer.logging.enable%"
+                    "markdownDescription": "%config.taskexplorer.logging.enable%"
                 },
-                "taskExplorer.logging.enableFile": {
+                "taskexplorer.logging.enableFile": {
                     "type": "boolean",
                     "default": false,
                     "order": 53,
-                    "markdownDescription": "%config.taskExplorer.logging.enableFile%"
+                    "markdownDescription": "%config.taskexplorer.logging.enableFile%"
                 },
-                "taskExplorer.logging.enableFileSymbols": {
+                "taskexplorer.logging.enableFileSymbols": {
                     "type": "boolean",
                     "default": true,
                     "order": 56,
-                    "markdownDescription": "%config.taskExplorer.logging.enableFileSymbols%"
+                    "markdownDescription": "%config.taskexplorer.logging.enableFileSymbols%"
                 },
-                "taskExplorer.logging.enableOutputWindow": {
+                "taskexplorer.logging.enableOutputWindow": {
                     "type": "boolean",
                     "default": true,
                     "order": 60,
-                    "markdownDescription": "%config.taskExplorer.logging.enableOutputWindow%"
+                    "markdownDescription": "%config.taskexplorer.logging.enableOutputWindow%"
                 },
-                "taskExplorer.logging.level": {
+                "taskexplorer.logging.level": {
                     "type": "number",
                     "enum": [
                         1,
@@ -1846,68 +1849,68 @@
                     ],
                     "default": 1,
                     "order": 55,
-                    "markdownDescription": "%config.taskExplorer.logging.level%"
+                    "markdownDescription": "%config.taskexplorer.logging.level%"
                 },
-                "taskExplorer.pathToPrograms": {
+                "taskexplorer.pathToPrograms": {
                     "type": "object",
                     "additionalProperties": false,
-                    "description": "%config.taskExplorer.pathToPrograms%",
+                    "description": "%config.taskexplorer.pathToPrograms%",
                     "properties": {
                         "ant": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToAnt%"
+                            "description": "%config.taskexplorer.pathToAnt%"
                         },
                         "ansicon": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToAnsicon%"
+                            "description": "%config.taskexplorer.pathToAnsicon%"
                         },
                         "composer": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToComposer%"
+                            "description": "%config.taskexplorer.pathToComposer%"
                         },
                         "curl": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToCurl%"
+                            "description": "%config.taskexplorer.pathToCurl%"
                         },
                         "gradle": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToGradle%"
+                            "description": "%config.taskexplorer.pathToGradle%"
                         },
                         "jenkins": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToJenkins%"
+                            "description": "%config.taskexplorer.pathToJenkins%"
                         },
                         "make": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToMake%"
+                            "description": "%config.taskexplorer.pathToMake%"
                         },
                         "maven": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToMaven%"
+                            "description": "%config.taskexplorer.pathToMaven%"
                         },
                         "nsis": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToNsis%"
+                            "description": "%config.taskexplorer.pathToNsis%"
                         },
                         "perl": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToPerl%"
+                            "description": "%config.taskexplorer.pathToPerl%"
                         },
                         "pipenv": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToPipenv%"
+                            "description": "%config.taskexplorer.pathToPipenv%"
                         },
                         "powershell": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToPowershell%"
+                            "description": "%config.taskexplorer.pathToPowershell%"
                         },
                         "python": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToPython%"
+                            "description": "%config.taskexplorer.pathToPython%"
                         },
                         "ruby": {
                             "type": "string",
-                            "description": "%config.taskExplorer.pathToRuby%"
+                            "description": "%config.taskexplorer.pathToRuby%"
                         }
                     },
                     "default": {
@@ -1927,67 +1930,67 @@
                         "ruby": "ruby"
                     }
                 },
-                "taskExplorer.showHiddenWsTasks": {
+                "taskexplorer.showHiddenWsTasks": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.showHiddenWsTasks%"
+                    "markdownDescription": "%config.taskexplorer.showHiddenWsTasks%"
                 },
-                "taskExplorer.showRunningTask": {
+                "taskexplorer.showRunningTask": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.showRunningTask%"
+                    "description": "%config.taskexplorer.showRunningTask%"
                 },
-                "taskExplorer.sortProjectFoldersAlpha": {
+                "taskexplorer.sortProjectFoldersAlpha": {
                     "type": "boolean",
                     "default": true,
-                    "description": "%config.taskExplorer.sortProjectFoldersAlpha%"
+                    "description": "%config.taskexplorer.sortProjectFoldersAlpha%"
                 },
-                "taskExplorer.taskButtons.clickAction": {
+                "taskexplorer.taskButtons.clickAction": {
                     "type": "string",
                     "enum": [
                         "Execute",
                         "Open"
                     ],
                     "default": "Open",
-                    "description": "%config.taskExplorer.taskButtons.clickAction%"
+                    "description": "%config.taskexplorer.taskButtons.clickAction%"
                 },
-                "taskExplorer.taskButtons.controlCharacter": {
+                "taskexplorer.taskButtons.controlCharacter": {
                     "type": "string",
                     "default": "Y",
                     "pattern": "[A-Z]{1}",
-                    "description": "%config.taskExplorer.taskButtons.controlCharacter%"
+                    "description": "%config.taskexplorer.taskButtons.controlCharacter%"
                 },
-                "taskExplorer.taskButtons.showExecuteWithArgumentsButton": {
+                "taskexplorer.taskButtons.showExecuteWithArgumentsButton": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithArgumentsButton%"
+                    "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithArgumentsButton%"
                 },
-                "taskExplorer.taskButtons.showFavoritesButton": {
+                "taskexplorer.taskButtons.showFavoritesButton": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.taskButtons.showFavoritesButton%"
+                    "markdownDescription": "%config.taskexplorer.taskButtons.showFavoritesButton%"
                 },
-                "taskExplorer.taskButtons.showExecuteWithNoTerminalButton": {
+                "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.taskButtons.showExecuteWithNoTerminalButton%"
+                    "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton%"
                 },
-                "taskExplorer.specialFolders.showFavorites": {
+                "taskexplorer.specialFolders.showFavorites": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.showFavorites%"
+                    "markdownDescription": "%config.taskexplorer.specialFolders.showFavorites%"
                 },
-                "taskExplorer.specialFolders.showLastTasks": {
+                "taskexplorer.specialFolders.showLastTasks": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.showLastTasks%"
+                    "markdownDescription": "%config.taskexplorer.specialFolders.showLastTasks%"
                 },
-                "taskExplorer.specialFolders.showUserTasks": {
+                "taskexplorer.specialFolders.showUserTasks": {
                     "type": "boolean",
                     "default": false,
-                    "description": "%config.taskExplorer.specialFolders.showUserTasks%"
+                    "description": "%config.taskexplorer.specialFolders.showUserTasks%"
                 },
-                "taskExplorer.specialFolders.numLastTasks": {
+                "taskexplorer.specialFolders.numLastTasks": {
                     "type": "number",
                     "enum": [
                         1,
@@ -2017,11 +2020,11 @@
                         25
                     ],
                     "default": 10,
-                    "markdownDescription": "%config.taskExplorer.specialFolders.numLastTasks%"
+                    "markdownDescription": "%config.taskexplorer.specialFolders.numLastTasks%"
                 },
-                "taskExplorer.specialFolders.folderState": {
+                "taskexplorer.specialFolders.folderState": {
                     "type": "object",
-                    "markdownDescription": "%config.taskExplorer.specialFolders.folderState%",
+                    "markdownDescription": "%config.taskexplorer.specialFolders.folderState%",
                     "additionalProperties": {
                         "enum": [
                             "Collapsed",
@@ -2035,21 +2038,21 @@
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.specialFolders.folderState.lastTasks%"
+                            "description": "%config.taskexplorer.specialFolders.folderState.lastTasks%"
                         },
                         "favorites": {
                             "enum": [
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.specialFolders.folderState.favorites%"
+                            "description": "%config.taskexplorer.specialFolders.folderState.favorites%"
                         },
                         "userTasks": {
                             "enum": [
                                 "Collapsed",
                                 "Expanded"
                             ],
-                            "description": "%config.taskExplorer.specialFolders.folderState.userTasks%"
+                            "description": "%config.taskexplorer.specialFolders.folderState.userTasks%"
                         }
                     },
                     "default": {
@@ -2058,25 +2061,25 @@
                         "userTasks": "Expanded"
                     }
                 },
-                "taskExplorer.visual.disableAnimatedIcons": {
+                "taskexplorer.visual.disableAnimatedIcons": {
                     "type": "boolean",
                     "default": false,
-                    "description": "%config.taskExplorer.visual.disableAnimatedIcons%"
+                    "description": "%config.taskexplorer.visual.disableAnimatedIcons%"
                 },
-                "taskExplorer.visual.enableAnsiconForAnt": {
+                "taskexplorer.visual.enableAnsiconForAnt": {
                     "type": "boolean",
                     "default": true,
-                    "markdownDescription": "%config.taskExplorer.visual.enableAnsiconForAnt%"
+                    "markdownDescription": "%config.taskexplorer.visual.enableAnsiconForAnt%"
                 },
-                "taskExplorer.useAnt": {
+                "taskexplorer.useAnt": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.useAnt%"
+                    "markdownDescription": "%config.taskexplorer.useAnt%"
                 },
-                "taskExplorer.useGulp": {
+                "taskexplorer.useGulp": {
                     "type": "boolean",
                     "default": false,
-                    "markdownDescription": "%config.taskExplorer.useGulp%"
+                    "markdownDescription": "%config.taskexplorer.useGulp%"
                 }
             }
         },

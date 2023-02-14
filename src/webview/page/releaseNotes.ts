@@ -23,7 +23,7 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 			"release-notes.html",
 			ReleaseNotesPage.viewTitle.replace("#{version}", wrapper.context.extension.packageJSON.version),
 			"res/img/logo-bl.png",
-			`taskExplorer.${ReleaseNotesPage.viewId}`,
+			`taskexplorer.${ReleaseNotesPage.viewId}`,
 			`${ContextKeys.WebviewPrefix}releaseNotes`,
 			"releaseNotesPage",
 			Commands.ShowReleaseNotesPage

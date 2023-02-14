@@ -28,7 +28,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		title: string,
 		description: string,
 		fileName: string,
-		public readonly id: `taskExplorer.view.${WebviewViewIds}`,
+		public readonly id: `taskexplorer.view.${WebviewViewIds}`,
 		private readonly contextKeyPrefix: `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}`,
 		private readonly trackingFeature: TrackedUsageFeatures)
 	{

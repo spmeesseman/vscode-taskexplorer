@@ -69,7 +69,7 @@ export class LicenseManager implements Disposable
 
 	private displayPopup = async (message: string) =>
 	{
-		await this.wrapper.storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
+		await this.wrapper.storage.update("taskexplorer.lastLicenseNag", Date.now().toString());
 		window.showInformationMessage(message, "Enter License Key", "Info", "Not Now")
 		.then(async (action) =>
 		{
@@ -225,7 +225,7 @@ export class LicenseManager implements Disposable
 	async setTasks(tasks: Task[], logPad = "   ")
 	{
 		let displayPopup = !this.licensed;
-		const lastNag = this.wrapper.storage.get<string>("taskExplorer.lastLicenseNag");
+		const lastNag = this.wrapper.storage.get<string>("taskexplorer.lastLicenseNag");
 
 		if (this.numTasks === tasks.length) {
 			return;
@@ -254,7 +254,7 @@ export class LicenseManager implements Disposable
 			setTimeout(async () =>
 			{
 				await this.wrapper.licensePage.show();
-				await this.wrapper.storage.update("taskExplorer.lastLicenseNag", Date.now().toString());
+				await this.wrapper.storage.update("taskexplorer.lastLicenseNag", Date.now().toString());
 			}, 1);
 		}
 		else if (displayPopup)

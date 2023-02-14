@@ -9,7 +9,7 @@ import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
 const initSettings = async () =>
 {
-    const config = workspace.getConfiguration("taskExplorer");
+    const config = workspace.getConfiguration("taskexplorer");
     console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
     //
     // This function runs BEFORE the extension is initialized, so any updates have no immediate

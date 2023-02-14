@@ -49,11 +49,11 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
         this.taskFiles = [];
         if (this.isFavorites)
         {
-            this.disposables.push(commands.registerCommand("vscode-taskexplorer.addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
-            this.disposables.push(commands.registerCommand("vscode-taskexplorer.clearFavorites", () => this.clearSavedTasks(), this));
+            this.disposables.push(commands.registerCommand("taskexplorer.addRemoveFavorite", (taskItem: TaskItem) => this.addRemoveFavorite(taskItem), this));
+            this.disposables.push(commands.registerCommand("taskexplorer.clearFavorites", () => this.clearSavedTasks(), this));
         }
         else {
-            this.disposables.push(commands.registerCommand("vscode-taskexplorer.clearLastTasks", () => this.clearSavedTasks(), this));
+            this.disposables.push(commands.registerCommand("taskexplorer.clearLastTasks", () => this.clearSavedTasks(), this));
         }
         const d = workspace.onDidChangeConfiguration(async e => { await this.processConfigChanges(e); }, this);
         this.disposables.push(d);
@@ -315,7 +315,7 @@ export class SpecialTaskFolder extends TaskFolder implements Disposable
 
     async processConfigChanges(e: ConfigurationChangeEvent)
     {
-        if (e.affectsConfiguration("taskExplorer." + this.settingNameEnabled))
+        if (e.affectsConfiguration("taskexplorer." + this.settingNameEnabled))
         {
             this.store = storage.get<string[]>(this.storeName, []);
             this.enabled = configuration.get<boolean>(this.settingNameEnabled);

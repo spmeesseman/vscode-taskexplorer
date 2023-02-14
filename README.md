@@ -145,7 +145,7 @@ App-Publisher is a multi-purpose versioning/release tool that can be used for, b
 
 The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
 
-- `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
+- `taskexplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
@@ -153,13 +153,13 @@ Task files that are found by Task Explorer can also be added to the *excludes* l
 
 **Apache Ant** uses an .xml file extension, the setting *globPatternsAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
 
-- `taskExplorer.globPatternsAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
+- `taskexplorer.globPatternsAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
 
 In the same way as for **Ant** tasks, **Bash** scripts without extensions can be configured to be found by the Bash Task Provider by using glob patterns in the same way, with the *globPatternsBash* setting:
 
-- `taskExplorer.globPatternsBash: [ "**/bash_scripts/**", "**/sh/scripts/**", "/usr/local/bin/start_task" ]`
+- `taskexplorer.globPatternsBash: [ "**/bash_scripts/**", "**/sh/scripts/**", "/usr/local/bin/start_task" ]`
 
 ## Ant and Gulp Self-Provided Tasks
 
@@ -257,15 +257,15 @@ Any extension that implements `TaskProvider` (specifically it's `provideTasks` m
 
 Get the TaskExplorer API object:
 
-    const teApi = await vscode.commands.executeCommand("taskExplorer.getApi");
+    const teApi = await vscode.commands.executeCommand("taskexplorer.getApi");
 
 Alternatively, using the Task Explorer type definitions:
 
     let teApi;
     const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    if (taskExplorer && taskExplorer.isActive)
+    if (taskExplorer && taskexplorer.isActive)
     {
-        teApi = taskExplorer.exports as TaskExplorerApi;
+        teApi = taskexplorer.exports as TaskExplorerApi;
     }
 
 **Note:** Before using any of the API functions, check busy status using the `teApi.isBusy` API function first, to ensure the indexer is not running.
@@ -286,7 +286,7 @@ You can optionally install the Task Explorer API types:
 
     npm install @spmeesseman/vscode-taskexplorer-types
 
-The provided tasks must implement the taskExplorer.external task interface:
+The provided tasks must implement the taskexplorer.external task interface:
 
     {
         script: "the task name",
@@ -382,9 +382,9 @@ Putting it all together:
     {
         ... other code ...
         const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (taskExplorer && taskExplorer.isActive && taskExplorerRegistered)
+        if (taskExplorer && taskexplorer.isActive && taskExplorerRegistered)
         {
-            const teApi = taskExplorer.exports as TaskExplorerApi;
+            const teApi = taskexplorer.exports as TaskExplorerApi;
             await teApi.unregister("extjs");
         }
         ... other code ...
@@ -394,9 +394,9 @@ Putting it all together:
     function registerWithTaskExplorer(taskProvider: ExternalExplorerProvider)
     {
         const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (taskExplorer && taskExplorer.isActive)
+        if (taskExplorer && taskexplorer.isActive)
         {
-            const teApi = taskExplorer.exports as TaskExplorerApi;
+            const teApi = taskexplorer.exports as TaskExplorerApi;
             if (!teApi.isBusy())
             {
                 await teApi.register("taskTypeName", taskProvider);

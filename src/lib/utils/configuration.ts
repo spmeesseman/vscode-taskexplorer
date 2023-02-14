@@ -5,14 +5,13 @@ import {
     ConfigurationChangeEvent, workspace, WorkspaceConfiguration, ConfigurationTarget, ExtensionContext, ExtensionMode, Event, EventEmitter
 } from "vscode";
 
-const extensionName = "taskExplorer";
-
 
 class Configuration implements IConfiguration
 {
     private isDev = false;
     private isTests = false;
     private pkgJsonCfgProps: any;
+    private baseConfigSection = "taskexplorer";
     private configuration: WorkspaceConfiguration;
     private configurationGlobal: WorkspaceConfiguration;
     private _onDidChange = new EventEmitter<ConfigurationChangeEvent>();
@@ -20,7 +19,7 @@ class Configuration implements IConfiguration
 
     constructor()
     {
-        this.configuration = workspace.getConfiguration(extensionName);
+        this.configuration = workspace.getConfiguration(this.baseConfigSection);
         this.configurationGlobal = workspace.getConfiguration();
     }
 
@@ -36,7 +35,7 @@ class Configuration implements IConfiguration
         this.isTests = context.extensionMode === ExtensionMode.Test;
         this.isDev = context.extensionMode === ExtensionMode.Development;
         this.configurationGlobal = workspace.getConfiguration();
-        this.configuration = workspace.getConfiguration(extensionName);
+        this.configuration = workspace.getConfiguration(this.baseConfigSection);
         this.pkgJsonCfgProps = context.extension.packageJSON.contributes.configuration.properties;
         context.subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigurationChanged, this));
     }
@@ -44,9 +43,9 @@ class Configuration implements IConfiguration
 
     private onConfigurationChanged(e: ConfigurationChangeEvent)
     {
-        if (e.affectsConfiguration(extensionName))
+        if (e.affectsConfiguration(this.baseConfigSection))
         {
-            this.configuration = workspace.getConfiguration(extensionName);
+            this.configuration = workspace.getConfiguration(this.baseConfigSection);
             this.configurationGlobal = workspace.getConfiguration();
             this._onDidChange.fire(e);
         }
@@ -68,7 +67,7 @@ class Configuration implements IConfiguration
             for (let i = 0; i < keys.length - 1; i++) {
                 propsKey += ((i > 0 ? "." : "") + keys[i]);
             }
-            const pkgJsonPropsKey = extensionName + "." + propsKey;
+            const pkgJsonPropsKey = this.baseConfigSection + "." + propsKey;
             if (this.pkgJsonCfgProps[pkgJsonPropsKey] && this.pkgJsonCfgProps[pkgJsonPropsKey].type === "object")
             {
                 isObject = true;
@@ -148,7 +147,7 @@ class Configuration implements IConfiguration
     // public updateWsf(section: string, value: any, uri?: Uri): Thenable<void>
     // {
     //     uri = uri || (workspace.workspaceFolders ? workspace.workspaceFolders[0].uri : undefined);
-    //     return workspace.getConfiguration(extensionName, uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
+    //     return workspace.getConfiguration(baseConfigSection, uri).update(section, value, ConfigurationTarget.WorkspaceFolder);
     // }
 
 

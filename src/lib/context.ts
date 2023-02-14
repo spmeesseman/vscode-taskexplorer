@@ -14,20 +14,20 @@ export const onDidChangeContext = _onDidChangeContext.event;
 
 export const enum ContextKeys
 {
-	ActionPrefix = "taskExplorer:action:",
-	KeyPrefix = "taskExplorer:key:",
-	WebviewPrefix = "taskExplorer:webview:",
-	WebviewViewPrefix = "taskExplorer:webviewView:",
-	Debugging = "taskExplorer:debugging",
-	Disabled = "taskExplorer:disabled",
-	Enabled = "taskExplorer:enabled",
-	Untrusted = "taskExplorer:untrusted",
-	licensePage = "taskExplorer:licensePage",
-	ParsingReport = "taskExplorer:parsingReport",
-	ReleaseNotes = "taskExplorer:releaseNotes",
-	TaskFiles = "taskExplorer:taskFiles",
-	Tests = "taskExplorer:tests",
-	TestsTest = "taskExplorer:testsTest"
+	ActionPrefix = "taskexplorer:action:",
+	KeyPrefix = "taskexplorer:key:",
+	WebviewPrefix = "taskexplorer:webview:",
+	WebviewViewPrefix = "taskexplorer:webviewView:",
+	Debugging = "taskexplorer:debugging",
+	Disabled = "taskexplorer:disabled",
+	Enabled = "taskexplorer:enabled",
+	Untrusted = "taskexplorer:untrusted",
+	licensePage = "taskexplorer:licensePage",
+	ParsingReport = "taskexplorer:parsingReport",
+	ReleaseNotes = "taskexplorer:releaseNotes",
+	TaskFiles = "taskexplorer:taskFiles",
+	Tests = "taskexplorer:tests",
+	TestsTest = "taskexplorer:testsTest"
 }
 
 

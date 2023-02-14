@@ -16,7 +16,7 @@ export const executeSettingsUpdate = async (key: string, value?: any, minWait?: 
 
 export const executeTeCommandAsync = async (command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    commands.executeCommand(`vscode-taskexplorer.${command}`, ...args);
+    commands.executeCommand(`taskexplorer.${command}`, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
 };
@@ -27,7 +27,7 @@ export const executeTeCommand2Async = (command: string, args: any[], minWait?: n
 
 export const executeTeCommand = async <T>(command: string, minWait?: number, maxWait?: number, ...args: any[]) =>
 {
-    command = !command.startsWith("vscode-taskexplorer.") && !command.startsWith("taskExplorer.") ? `vscode-taskexplorer.${command}` : command;
+    command = !command.startsWith("taskexplorer.") ? `taskexplorer.${command}` : command;
     const rc = await commands.executeCommand(command, ...args);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.command),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
@@ -45,7 +45,7 @@ export const focusExplorerView = async (instance?: any) =>
         if (instance) {
             instance.slow(tc.slowTime.commands.focus + tc.slowTime.commands.refresh);
         }
-        await commands.executeCommand("taskExplorer.focus");
+        await commands.executeCommand("taskexplorer.view.taskTreeExplorer.focus");
         await waitForTeIdle(tc.waitTime.focusCommand);
         explorerHasFocused = true;
     }
@@ -62,7 +62,8 @@ export const focusFileExplorer = () => commands.executeCommand("workbench.files.
 export const focusSearchView = () => commands.executeCommand("workbench.view.search.focus");
 
 
-export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
+// export const focusSidebarView = () => commands.executeCommand("taskExplorerSideBar.focus");
+export const focusSidebarView = () => commands.executeCommand("taskexplorer.view.taskTreeSideBar.focus");
 
 
 export const hasExplorerFocused = () => explorerHasFocused;

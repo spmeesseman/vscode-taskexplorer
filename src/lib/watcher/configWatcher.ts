@@ -54,11 +54,11 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Main excludes list changes requires global refresh
     //
-    if (e.affectsConfiguration("taskExplorer.exclude") || e.affectsConfiguration("taskExplorer.excludeTask"))
+    if (e.affectsConfiguration("taskexplorer.exclude") || e.affectsConfiguration("taskexplorer.excludeTask"))
     {
         log.write("   the 'exclude/excludeTask' setting has changed", 1);
-        log.value("      exclude changed", e.affectsConfiguration("taskExplorer.exclude"), 1);
-        log.value("      excludeTask changed", e.affectsConfiguration("taskExplorer.excludeTask"), 1);
+        log.value("      exclude changed", e.affectsConfiguration("taskexplorer.exclude"), 1);
+        log.value("      excludeTask changed", e.affectsConfiguration("taskexplorer.excludeTask"), 1);
         refresh = true;
     }
 
@@ -66,7 +66,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     // User Tasks / specialFolders.showUserTasks
     // Other specialFolder config events are process in tree/folderCache module
     //
-    if (e.affectsConfiguration("taskExplorer.specialFolders.showUserTasks"))
+    if (e.affectsConfiguration("taskexplorer.specialFolders.showUserTasks"))
     {
         log.write("   the 'specialFolders.showUserTasks' setting has changed", 1);
         log.value("      new value", configuration.get<boolean>("specialFolders.showUserTasks"), 1);
@@ -80,7 +80,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     {   //
         // Task Types
         //
-        if (e.affectsConfiguration("taskExplorer.enabledTasks"))
+        if (e.affectsConfiguration("taskexplorer.enabledTasks"))
         {
             const newEnabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks");
             for (const p of Object.keys(enabledTasks))
@@ -102,8 +102,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Groupings changes require global refresh
         //
-        if (e.affectsConfiguration("taskExplorer.groupWithSeparator") || e.affectsConfiguration("taskExplorer.groupSeparator") ||
-            e.affectsConfiguration("taskExplorer.groupMaxLevel") || e.affectsConfiguration("taskExplorer.groupStripTaskLabel"))
+        if (e.affectsConfiguration("taskexplorer.groupWithSeparator") || e.affectsConfiguration("taskexplorer.groupSeparator") ||
+            e.affectsConfiguration("taskexplorer.groupMaxLevel") || e.affectsConfiguration("taskexplorer.groupStripTaskLabel"))
         {
             log.write("   A tree grouping setting has changed", 1);
             log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 1);
@@ -116,7 +116,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Workspace/project folder sorting
         //
-        if (e.affectsConfiguration("taskExplorer.sortProjectFoldersAlpha"))
+        if (e.affectsConfiguration("taskexplorer.sortProjectFoldersAlpha"))
         {
             log.write("   the 'sortProjectFoldersAlpha' setting has changed", 1);
             log.value("      new value", configuration.get<boolean>("sortProjectFoldersAlpha"), 1);
@@ -126,7 +126,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Program paths
         //
-        if (e.affectsConfiguration("taskExplorer.pathToPrograms"))
+        if (e.affectsConfiguration("taskexplorer.pathToPrograms"))
         {
             const newPathToPrograms = configuration.get<IDictionary<string>>("pathToPrograms");
             for (const p of Object.keys(pathToPrograms))
@@ -153,7 +153,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Extra Bash Globs (for extensionless script files)
         //
-        if (e.affectsConfiguration("taskExplorer.globPatternsBash") && !refreshTaskTypes.includes("bash"))
+        if (e.affectsConfiguration("taskexplorer.globPatternsBash") && !refreshTaskTypes.includes("bash"))
         {
             log.write("   the 'globPatternsBash' setting has changed", 1);
             await registerFileWatcher(ctx, "bash", false, configuration.get<boolean>("enabledTasks.bash"), "   ");
@@ -163,7 +163,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Extra Apache Ant Globs (for non- build.xml files)s
         //
-        if ((e.affectsConfiguration("taskExplorer.includeAnt") || e.affectsConfiguration("taskExplorer.globPatternsAnt")) && !refreshTaskTypes.includes("ant"))
+        if ((e.affectsConfiguration("taskexplorer.includeAnt") || e.affectsConfiguration("taskexplorer.globPatternsAnt")) && !refreshTaskTypes.includes("ant"))
         {
             log.write("   the 'globPatternsAnt' setting has changed", 1);
             await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
@@ -173,7 +173,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Whether or not to use 'ansicon'when running 'ant' tasks
         //
-        if (e.affectsConfiguration("taskExplorer.visual.enableAnsiconForAnt"))
+        if (e.affectsConfiguration("taskexplorer.visual.enableAnsiconForAnt"))
         {
             const newValue = configuration.get<boolean>("visual.enableAnsiconForAnt");
             log.write("   the 'visual.enableAnsiconForAnt' setting has changed", 1);
@@ -187,7 +187,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Whether or not to use the 'ant' program to detect ant tasks (default is xml2js parser)
         //
-        if (e.affectsConfiguration("taskExplorer.useAnt"))
+        if (e.affectsConfiguration("taskexplorer.useAnt"))
         {
             log.write("   the 'useAnt' setting has changed", 1);
             log.value("      new value", configuration.get<boolean>("useAnt"), 1);
@@ -197,7 +197,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Whether or not to use the 'gulp' program to detect gulp tasks (default is custom parser)
         //
-        if (e.affectsConfiguration("taskExplorer.useGulp"))
+        if (e.affectsConfiguration("taskexplorer.useGulp"))
         {
             log.write("   the 'useGulp' setting has changed", 1);
             log.value("      new value", configuration.get<boolean>("useGulp"), 1);
@@ -220,7 +220,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         // flag but the flag is not visible via the Task API Task definition, the file must be read
         // and parsed by the application to locate the value.
         //
-        if (e.affectsConfiguration("taskExplorer.showHiddenWsTasks"))
+        if (e.affectsConfiguration("taskexplorer.showHiddenWsTasks"))
         {
             log.write("   the 'npm.showHiddenWsTasks' setting has changed", 1);
             log.value("      new value", configuration.get<boolean>("showHiddenWsTasks"), 1);
@@ -248,7 +248,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Explorer / sidebar view
     //
-    if (e.affectsConfiguration("taskExplorer.enableExplorerView"))
+    if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
     {
         const newValue = configuration.get<boolean>("enableExplorerView");
         log.write("   the 'enableExplorerView' setting has changed", 1);
@@ -257,7 +257,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
                                               configuration.get<boolean>("enableSideBar"));
     }
-    if (e.affectsConfiguration("taskExplorer.enableSideBar"))
+    if (e.affectsConfiguration("taskexplorer.enableSideBar"))
     {
         const newValue = configuration.get<boolean>("enableSideBar");
         log.write("   the 'enableSideBar' setting has changed", 1);
@@ -270,7 +270,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Persistent file caching
     //
-    if (e.affectsConfiguration("taskExplorer.enablePersistentFileCaching"))
+    if (e.affectsConfiguration("taskexplorer.enablePersistentFileCaching"))
     {
         const newValue = configuration.get<boolean>("enablePersistentFileCaching");
         log.write("   the 'enablePersistentFileCaching' setting has changed", 1);

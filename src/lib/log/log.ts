@@ -137,16 +137,16 @@ const getLogPad = () => logControl.lastLogPad;
 
 const processConfigChanges = (ctx: ExtensionContext, e: ConfigurationChangeEvent) =>
 {
-    if (e.affectsConfiguration("taskExplorer.logging.enable"))
+    if (e.affectsConfiguration("taskexplorer.logging.enable"))
     {
         logControl.enable = configuration.get<boolean>("logging.enable", false);
         enableLog(logControl.enable);
     }
-    if (e.affectsConfiguration("taskExplorer.logging.enableOutputWindow"))
+    if (e.affectsConfiguration("taskexplorer.logging.enableOutputWindow"))
     {
         logControl.enableOutputWindow = configuration.get<boolean>("logging.enableOutputWindow", true);
     }
-    if (e.affectsConfiguration("taskExplorer.logging.enableFile"))
+    if (e.affectsConfiguration("taskexplorer.logging.enableFile"))
     {
         logControl.enableFile = configuration.get<boolean>("logging.enableFile", false);
         logLogFileLocation();
@@ -154,11 +154,11 @@ const processConfigChanges = (ctx: ExtensionContext, e: ConfigurationChangeEvent
             window.showInformationMessage("Log file location: " + logControl.fileName);
         }
     }
-    if (e.affectsConfiguration("taskExplorer.logging.enableFileSymbols"))
+    if (e.affectsConfiguration("taskexplorer.logging.enableFileSymbols"))
     {
         logControl.enableFileSymbols = configuration.get<boolean>("logging.enableFileSymbols", true);
     }
-    if (e.affectsConfiguration("taskExplorer.logging.level"))
+    if (e.affectsConfiguration("taskexplorer.logging.level"))
     {
         logControl.logLevel = configuration.get<number>("logging.level", 1);
     }
@@ -187,7 +187,7 @@ const registerLog = async(context: ExtensionContext, testsRunning: number) =>
     //
     context.subscriptions.push(...[
         logControl.logOutputChannel,
-        commands.registerCommand("vscode-taskexplorer.showOutput", (show: boolean) => showLogOutput(show)),
+        commands.registerCommand("taskexplorer.showOutput", (show: boolean) => showLogOutput(show)),
         workspace.onDidChangeConfiguration(e => processConfigChanges(context, e))
     ]);
 
@@ -231,7 +231,6 @@ const showLogOutput = async(show: boolean) =>
     else {
         channel.hide();
     }
-    // await commands.executeCommand("taskExplorer.focus");
 };
 
 

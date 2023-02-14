@@ -21,7 +21,7 @@ export class LicensePage extends TeWebviewPanel<State>
 			"license.html",
 			LicensePage.viewTitle,
 			"res/img/logo-bl.png",
-			`taskExplorer.${LicensePage.viewId}`,
+			`taskexplorer.${LicensePage.viewId}`,
 			`${ContextKeys.WebviewPrefix}licensePage`,
 			"licensePage",
 			Commands.ShowLicensePage

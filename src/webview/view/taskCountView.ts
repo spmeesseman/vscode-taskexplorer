@@ -22,7 +22,7 @@ export class TaskCountView extends TeWebviewView<State>
 			TaskCountView.viewTitle,
 			TaskCountView.viewDescription,
 			"task-count.html",
-			`taskExplorer.view.${TaskCountView.viewId}`,
+			`taskexplorer.view.${TaskCountView.viewId}`,
 			`${ContextKeys.WebviewViewPrefix}home`,
 			`${TaskCountView.viewId}View`
 		);

@@ -221,7 +221,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
-		await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
@@ -238,7 +238,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
-		await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
@@ -255,7 +255,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
-		await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
@@ -327,7 +327,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
-		await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Info");
 		await setTasks();
@@ -355,7 +355,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
-		await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
@@ -566,7 +566,7 @@ suite("License Manager Tests", () =>
         if (licMgr)
 		{
 			this.slow(tc.slowTime.commands.refresh);
-			await teWrapper.storage.update("taskExplorer.lastLicenseNag", undefined);
+			await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 			utils.overrideNextShowInfoBox("Enter License Key");
 			utils.overrideNextShowInputBox("1234-5678-9098-7654321");
 			utils.overrideNextShowInfoBox(undefined);

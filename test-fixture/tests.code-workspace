@@ -10,11 +10,50 @@
         }
     ],
     "settings": {
-        "taskExplorer.exclude": [
+        "taskexplorer.exclude": [
             "**/tasks_test_ignore_/**"
         ],
-        "taskExplorer.globPatternsAnt": [
+        "taskexplorer.globPatternsAnt": [
             "**/hello.xml"
-        ]
+        ],
+        "taskexplorer.enabledTasks": {
+            "ant": true,
+            "apppublisher": true,
+            "bash": true,
+            "batch": true,
+            "composer": false,
+            "gradle": false,
+            "grunt": true,
+            "gulp": true,
+            "jenkins": true,
+            "make": true,
+            "maven": false,
+            "npm": true,
+            "nsis": true,
+            "perl": false,
+            "pipenv": false,
+            "powershell": false,
+            "python": true,
+            "ruby": false,
+            "tsc": true,
+            "webpack": true,
+            "workspace": true
+        },
+        "taskexplorer.pathToPrograms": {
+            "ant": "c:\\Code\\ant\\bin\\ant.bat",
+            "ansicon": "c:\\Code\\ansicon\\x64\\ansicon.exe",
+            "composer": "composer",
+            "curl": "curl",
+            "gradle": "c:\\Code\\gradle\\bin\\gradle.bat",
+            "jenkins": "https://jenkins.pjats.com",
+            "make": "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
+            "maven": "mvn",
+            "nsis": "c:\\Code\\nsis\\makensis.exe",
+            "perl": "perl",
+            "pipenv": "pipenv",
+            "powershell": "powershell",
+            "python": "c:\\Code\\python\\python.exe",
+            "ruby": "ruby"
+        }
     }
 }

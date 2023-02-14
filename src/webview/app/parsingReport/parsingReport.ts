@@ -46,10 +46,10 @@ export class ParsingReportWebviewApp extends TeWebviewApp<State>
         }
 	}
 
-	private enterLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.enterLicense"});
-    private getLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.getLicense"});
-    private showReleaseNotes = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.releaseNotes.show"});
-    private showLicensePage = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.licensePage.show"});
+	private enterLicense = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.enterLicense"});
+    private getLicense = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.getLicense"});
+    private showReleaseNotes = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.releaseNotes.show"});
+    private showLicensePage = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.licensePage.show"});
 }
 
 new ParsingReportWebviewApp();

@@ -17,7 +17,7 @@ export class TeApi implements ITaskExplorerApi
         if (this._tests) {
             void setContext(ContextKeys.Tests, true);
         }
-        this._wrapper.context.subscriptions.push(registerCommand("vscode-taskexplorer.getApi", () => this, this));
+        this._wrapper.context.subscriptions.push(registerCommand("taskexplorer.getApi", () => this, this));
     }
 
 

@@ -67,11 +67,11 @@ export class HomeWebviewApp extends TeWebviewApp<State>
     {
 	}
 
-	private enterLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.enterLicense"});
-    private getLicense = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.getLicense"});
-    private showReleaseNotes = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.view.releaseNotes.show"});
-    private showParsingReport = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.view.parsingReport.show"});
-    private showLicensePage = () => this.sendCommand(ExecuteCommandType, { command: "vscode-taskexplorer.view.licensePage.show"});
+	private enterLicense = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.enterLicense"});
+    private getLicense = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.getLicense"});
+    private showReleaseNotes = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.view.releaseNotes.show"});
+    private showParsingReport = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.view.parsingReport.show"});
+    private showLicensePage = () => this.sendCommand(ExecuteCommandType, { command: "taskexplorer.view.licensePage.show"});
 }
 
 

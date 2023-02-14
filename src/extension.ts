@@ -4,7 +4,7 @@ import { log } from "./lib/log/log";
 import { TeWrapper } from "./lib/wrapper";
 import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
-import { ExtensionContext, ExtensionMode } from "vscode";
+import { ExtensionContext, ExtensionMode, workspace } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { disposeFileWatchers } from "./lib/watcher/fileWatcher";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
@@ -54,7 +54,7 @@ export async function activate(context: ExtensionContext)
     //
     // Instantiate application container (beautiful concept from GitLens project)
     //
-    teWrapper = TeWrapper.create(context, storage, configuration, log);
+    teWrapper = new TeWrapper(context, storage, configuration, log);
     //
     // Wait for `onInitialized` event from application container
     //
@@ -109,57 +109,38 @@ export async function deactivate()
 /* istanbul ignore next */
 const migrateSettings = async () =>
 {
-    const groupSep = configuration.get<string>("groupSeparator", "-");
-    if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
-        await configuration.update("groupSeparator", "-");
-    }
-
-    let ptp = configuration.get<string>("pathToPrograms.apppublisher");
-    if (ptp !== undefined) {
-        await configuration.update("pathToPrograms.apppublisher", undefined);
-        await configuration.updateWs("pathToPrograms.apppublisher", undefined);
-    }
-    ptp = configuration.get<string>("pathToPrograms.bash");
-    if (ptp !== undefined) {
-        await configuration.update("pathToPrograms.bash", undefined);
-        await configuration.updateWs("pathToPrograms.bash", undefined);
-    }
-    ptp = configuration.get<any>("specialFolders.expanded");
-    if (ptp !== undefined) {
-        await configuration.update("specialFolders.expanded", undefined);
-        await configuration.updateWs("specialFolders.expanded", undefined);
-    }
-
-    const didSettingUpgrade = storage.get<boolean>("DID_SETTINGS_UPGRADE", false);
-    if (didSettingUpgrade)
+    const didSettingUpgrade = storage.get<boolean>("taskexplorer.v3SettingsUpgrade", false);
+    if (!didSettingUpgrade)
     {
+        const oldConfig = workspace.getConfiguration("taskExplorer");
+
+        const groupSep = oldConfig.get<string>("groupSeparator", "-");
+        if (groupSep !== "-" && groupSep !== "_" && groupSep !== ":" && groupSep !== "|") {
+            await configuration.update("groupSeparator", "-");
+        }
+
         const taskTypes = getTaskTypes();
         taskTypes.push("ansicon");
         for (const taskType of taskTypes)
         {
             let oldEnabledSetting = getTaskTypeSettingName(taskType, "enable"),
                 newEnabledSetting = getTaskTypeEnabledSettingName(taskType);
-            if (taskType !== "ansicon" && taskType !== "curl")
+            const oldSettingValue1 = oldConfig.get<boolean | undefined>(oldEnabledSetting, undefined) ||
+                                     oldConfig.get<boolean | undefined>(newEnabledSetting, undefined);
+            if (oldSettingValue1 !== undefined)
             {
-                const oldSettingValue1 = configuration.get<boolean | undefined>(oldEnabledSetting, undefined);
-                if (oldSettingValue1 !== undefined)
-                {
-                    await configuration.update(newEnabledSetting, oldSettingValue1);
-                    await configuration.update(oldEnabledSetting, undefined);
-                    await configuration.updateWs(oldEnabledSetting, undefined);
-                }
+                await configuration.update(newEnabledSetting, oldSettingValue1);
             }
 
             oldEnabledSetting = getTaskTypeSettingName(taskType, "pathTo");
             newEnabledSetting = getTaskTypeSettingName(taskType, "pathToPrograms.");
-            const oldSettingValue2 = configuration.get<string | undefined>(oldEnabledSetting, undefined);
+            const oldSettingValue2 = oldConfig.get<string | undefined>(oldEnabledSetting, undefined) ||
+                                     oldConfig.get<string | undefined>(newEnabledSetting, undefined);
             if (oldSettingValue2 !== undefined)
             {
                 await configuration.update(newEnabledSetting, oldSettingValue2);
-                await configuration.update(oldEnabledSetting, undefined);
-                await configuration.updateWs(oldEnabledSetting, undefined);
             }
         }
-        await storage.update("DID_SETTINGS_UPGRADE", true);
+        await storage.update("taskexplorer.v3SettingsUpgrade", true);
     }
 };
