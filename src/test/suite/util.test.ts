@@ -10,7 +10,6 @@ import { log, logControl } from "../../lib/log/log";
 import { env } from "process";
 import { join } from "path";
 import { expect } from "chai";
-import { InitScripts } from "../../lib/noScripts";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { camelCase, properCase } from "../../lib/utils/commonUtils";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
@@ -413,8 +412,6 @@ suite("Util Tests", () =>
     test("Miscellaneous", async function()
     {
         if (exitRollingCount(this)) return;
-		// it won't cover since no focus the view until after a bunch of test suites
-        new InitScripts(teWrapper.explorer as TaskTree);
 		teWrapper.explorer?.isVisible();
         await pathUtils.getInstallPath();
         endRollingCount(this);

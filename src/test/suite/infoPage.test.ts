@@ -14,11 +14,9 @@ import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
 
-let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
-let sidebarWasEmpty = false;
 let origExplorer: TaskTree | undefined;
 let origSidebar: TaskTree | undefined;
 let pkgMgr: string;
@@ -29,14 +27,10 @@ suite("Info Report Tests", () =>
 	suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teWrapper, teApi } = await activate(this));
+        ({ teWrapper } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
 		origExplorer = teWrapper.explorer;
 		origSidebar = teWrapper.sidebar;
-		if (!teWrapper.views.taskExplorerSideBar) {
-			sidebarWasEmpty = true;
-			teWrapper.views.taskExplorerSideBar = {} as ITaskTreeView;
-		}
 		pkgMgr = teWrapper.config.getVs<string>("npm.packageManager");
 		userTasks = teWrapper.config.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);
@@ -46,11 +40,8 @@ suite("Info Report Tests", () =>
 	suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-		teWrapper.explorer = origExplorer;
-		teWrapper.sidebar = origSidebar;
-		if (sidebarWasEmpty) {
-			delete teWrapper.views.taskExplorerSideBar;
-		}
+		// teWrapper.explorer = origExplorer;
+		// teWrapper.sidebar = origSidebar;
 		await closeEditors();
 		await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.eventFast);
@@ -138,13 +129,13 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + 150);
 		const oExplorer = teWrapper.explorer;
 		const oSidebar = teWrapper.sidebar;
-		teWrapper.explorer = undefined;
-		teWrapper.sidebar = undefined;
+		// teWrapper.explorer = undefined;
+		// teWrapper.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-		teWrapper.explorer = oExplorer;
-		teWrapper.sidebar = oSidebar;
+		// teWrapper.explorer = oExplorer;
+		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -156,13 +147,13 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + 150);
 		const oExplorer = teWrapper.explorer;
 		const oSidebar = teWrapper.sidebar;
-		teWrapper.explorer = undefined;
-		teWrapper.sidebar = oExplorer;
+		// teWrapper.explorer = undefined;
+		// teWrapper.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		panel.hide();
-		teWrapper.explorer = oExplorer;
-		teWrapper.sidebar = oSidebar;
+		// teWrapper.explorer = oExplorer;
+		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -174,14 +165,14 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 		const oExplorer = teWrapper.explorer;
 		const oSidebar = teWrapper.sidebar;
-		teWrapper.explorer = undefined;
-		teWrapper.sidebar = undefined;
+		// teWrapper.explorer = undefined;
+		// teWrapper.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
-		teWrapper.explorer = oExplorer;
-		teWrapper.sidebar = oSidebar;
+		// teWrapper.explorer = oExplorer;
+		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -193,14 +184,14 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 		const oExplorer = teWrapper.explorer;
 		const oSidebar = teWrapper.sidebar;
-		teWrapper.explorer = undefined;
-		teWrapper.sidebar = oExplorer;
+		// teWrapper.explorer = undefined;
+		// teWrapper.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		panel.hide();
-		teWrapper.explorer = oExplorer;
-		teWrapper.sidebar = oSidebar;
+		// teWrapper.explorer = oExplorer;
+		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
         endRollingCount(this);
 	});

@@ -44,7 +44,8 @@ suite("Webview Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refreshNoChanges);
-        teWrapper.treeManager.enableTaskTree("taskExplorerSideBar", true, "");
+        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
         endRollingCount(this);

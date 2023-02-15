@@ -365,13 +365,13 @@ export class TeWrapper
 		return !isDev && !isTests ? /* istanbul ignore next */"production" : (isDev ? "dev" : "tests");
 	}
 
-    get explorer(): TaskTree | undefined {
-        return this.treeManager.views.taskExplorer?.tree;
+    get explorer(): TaskTree {
+        return this.treeManager.views.taskExplorer.tree;
     }
 
-    set explorer(tree) {
-		// this.treeManager.views.taskExplorer.tree = tree;
-    }
+    // set explorer(tree: TaskTree | undefined) {
+	// 	(this.treeManager.views.taskExplorer.tree as TaskTree) = tree as TaskTree;
+    // }
 
     get explorerView() {
         return this.treeManager.views.taskExplorer?.view;
@@ -421,13 +421,13 @@ export class TeWrapper
 		return this._server;
 	}
 
-    get sidebar(): TaskTree | undefined {
-        return this.treeManager.views.taskExplorerSideBar?.tree;
+    get sidebar(): TaskTree {
+        return this.treeManager.views.taskExplorerSideBar.tree;
     }
 
-    set sidebar(tree: TaskTree | undefined) {
-		// this.treeManager.views.taskExplorerSideBar.tree = tree;
-    }
+    // set sidebar(tree: TaskTree | undefined) {
+	// 	((this.treeManager.views.taskExplorerSideBar.tree) as TaskTree) = tree as TaskTree;
+    // }
 
     get sidebarView() {
         return this.treeManager.views.taskExplorerSideBar?.view;

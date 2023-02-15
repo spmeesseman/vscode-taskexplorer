@@ -1556,7 +1556,7 @@
                 },
                 "taskexplorer.enableSideBar": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
                     "order": 1,
                     "description": "%config.taskexplorer.enableSideBar%"
                 },
