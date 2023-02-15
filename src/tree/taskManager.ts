@@ -289,7 +289,7 @@ export class TaskManager implements Disposable
             return;
         }
 
-        const lastTasks = this.wrapper.treeManager.getlastTasksFolder();
+        const lastTasks = this.wrapper.treeManager.lastTasksFolder;
         const lastTaskId = lastTasks.getLastRanId();
         if (!lastTaskId) { return; }
 

@@ -6,7 +6,6 @@ import { TaskFolder } from "./folder";
 import { IEvent } from "../interface";
 import { TreeViewIds } from "./treeView";
 import { TaskTreeManager } from "./treeManager";
-import { InitScripts, LoadScripts } from "../lib/noScripts";
 import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } from "vscode";
 
 
@@ -37,24 +36,23 @@ import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } fro
 export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
 {
     private static loadStage = 0;
-    private defaultGetChildrenLogLevel = 1;
-    private defaultGetChildrenLogPad = "";
-    private eventQueue: IEvent[] = [];
-    private disposables: Disposable[];
     private visible = false;
     private wasVisible = false;
     private refreshPending = false;
-    private currentRefreshEvent: string | undefined;
-    private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
-    private getChildrenLogPad = this.defaultGetChildrenLogPad;
+    private eventQueue: IEvent[] = [];
     private treeManager: TaskTreeManager;
+    private disposables: Disposable[] = [];
+    private defaultGetChildrenLogPad = "";
+    private defaultGetChildrenLogLevel = 1;
+    private currentRefreshEvent: string | undefined;
+    private getChildrenLogPad = this.defaultGetChildrenLogPad;
+    private getChildrenLogLevel = this.defaultGetChildrenLogLevel;
     private _onDidChangeTreeData: EventEmitter<TreeItem | undefined | null | void> = new EventEmitter<TreeItem | undefined | null | void>();
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 
-    constructor(public readonly name: `${TreeViewIds}`, treeManager: TaskTreeManager)
+    constructor(public readonly name: TreeViewIds, treeManager: TaskTreeManager)
     {
-        this.disposables = [];
         this.treeManager = treeManager;
     }
 
@@ -66,9 +64,9 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
         // we keep the dispose() event here.  Who knows maybe we'll need it again someday. I
         // know if I removed it, i 100% would need it again.
         //
-        // this.disposables.forEach((d) => {
-        //     d.dispose();
-        // });
+        this.disposables.forEach((d) => {
+            d.dispose();
+        });
         this.disposables = [];
     };
 
@@ -138,24 +136,11 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
               tasks = this.treeManager.getTasks(),
               taskItemTree = this.treeManager.getTaskTree();
 
-        this.refreshPending = true;
+        if (!taskItemTree)  {
+            return [];
+        }
 
-        if (TaskTree.loadStage === 0)
-        {
-            ++TaskTree.loadStage;
-            this.refreshPending = false;
-            return [ new InitScripts(this) ];
-        }
-        else if (TaskTree.loadStage === 1 || !taskItemTree)
-        {
-            ++TaskTree.loadStage;
-            this.refreshPending = false;
-            if (!taskItemTree && TaskTree.loadStage > 2) {
-                this.refreshPending = true;
-                // setTimeout(() => this._onDidChangeTreeData.fire(), 50);
-            }
-            return [ new LoadScripts(this) ];
-        }
+        this.refreshPending = true;
 
         this.getChildrenLogPad = "";  // just can't see a nice way to ever line this up unless we use the log queue
         this.getChildrenLogLevel = 1; // just can't see a nice way to ever line this up unless we use the log queue
@@ -269,11 +254,16 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
 
     onVisibilityChanged = (visible: boolean, dataChanged: boolean) =>
     {
-        log.methodStart("visibility event received", 1, "", true, [[ "is visible", visible ], [ "data changed", dataChanged ]]);
+        log.methodStart("visibility event received", 1, "", true, [[ "tree", this.name ], [ "is visible", visible ], [ "data changed", dataChanged ]]);
         this.visible = visible;
-        if (dataChanged && this.visible && this.wasVisible)
+        if (dataChanged && this.visible)
         {
-            this.processEventQueue("   ");
+            if (this.wasVisible){
+                this.processEventQueue("   ");
+            }
+            else {
+                this._onDidChangeTreeData.fire();
+            }
         }
         this.wasVisible = true;
         log.methodDone("visibility event received", 1);

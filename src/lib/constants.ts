@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import * as nls from "vscode-nls";
 import { IDictionary } from "../interface";
 
+
+const localize = nls.loadMessageBundle();
 
 export const Strings =
 {
@@ -12,6 +15,10 @@ export const Strings =
     FAV_TASKS_LABEL: "Favorites",
     USER_TASKS_LABEL: "User Tasks",
     TASKS_RENAME_STORE: "Renames",
+	ScanningTaskFiles: localize("appstrings.scanningTaskFiles", "Scanning task files..."),
+	RequestingTasks: localize("appstrings.requestingTasks", "Requesting tasks from providers..."),
+	BuildingTaskTree: localize("appstrings.buildingTaskTree", "Building task tree..."),
+	NoTasks: localize("appstrings.noTasks", "No tasks found")
 };
 
 export const Globs: IDictionary<string> =

@@ -49,6 +49,7 @@ import { registerRemoveFromExcludesCommand } from "../commands/removeFromExclude
 import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder, env } from "vscode";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
 import { TeServer } from "./auth/server";
+import { Strings } from "./constants";
 
 
 export class TeWrapper
@@ -245,6 +246,7 @@ export class TeWrapper
 		// regardless if the user settings has activated it or not when the extension deactivates
 		// in this scenario. So check this case and proceed as necessary.
 		//
+		this._treeManager.setMessage(Strings.ScanningTaskFiles);
 		const rootFolderChanged  = now < lastDeactivated + 5000 && /* istanbul ignore next */now < lastWsRootPathChange + 5000;
 		/* istanbul ignore else */
 		if (this.tests || /* istanbul ignore next */!rootFolderChanged)
@@ -266,7 +268,9 @@ export class TeWrapper
 		//
 		// Start the first tree build/load
 		//
-		await this.treeManager.loadTasks("   ");
+		this._treeManager.setMessage(Strings.RequestingTasks);
+		await this._treeManager.loadTasks("   ");
+		this._treeManager.setMessage();
 		//
 		// Log the environment
 		//

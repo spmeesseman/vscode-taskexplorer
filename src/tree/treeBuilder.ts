@@ -7,7 +7,6 @@ import { TaskFolder } from "./folder";
 import { Strings } from "../lib/constants";
 import { IDictionary } from "../interface";
 import * as utils from "../lib/utils/utils";
-import { NoScripts } from "../lib/noScripts";
 import * as sortTasks from "../lib/sortTasks";
 import { TaskTreeManager } from "./treeManager";
 import { SpecialTaskFolder } from "./specialFolder";
@@ -25,11 +24,11 @@ export class TaskTreeBuilder implements Disposable
 {
     private static treeBuilding = false;
     private static taskMap: TaskMap = {};
-    private static taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
+    private static taskTree: TaskFolder[] | undefined | null | void = null;
 
     private treeManager: TaskTreeManager;
     private taskMap: TaskMap;
-    private taskTree: TaskFolder[] | NoScripts[] | undefined | null | void = null;
+    private taskTree: TaskFolder[] | undefined | null | void = null;
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
 
@@ -81,12 +80,12 @@ export class TaskTreeBuilder implements Disposable
     };
 
 
-    private buildTaskItemTree = async(logPad: string, logLevel: number): Promise<TaskFolder[] | NoScripts[]> =>
+    private buildTaskItemTree = async(logPad: string, logLevel: number): Promise<TaskFolder[]> =>
     {
         let taskCt = 0;
         const folders: IDictionary<TaskFolder> = {};
         const files: IDictionary<TaskFile> = {};
-        let sortedFolders: TaskFolder[]|NoScripts[];
+        let sortedFolders: TaskFolder[];
         const tasks = this.treeManager.getTasks();
 
         log.methodStart("build task tree", logLevel, logPad);
@@ -135,7 +134,7 @@ export class TaskTreeBuilder implements Disposable
         {   // if their respective 'autoDetect' settings are `on`) tasks are returned in fetchTasks() since
             // they are internally provided, and we ignored them in buildTaskTreeList().
             //
-            sortedFolders = [ new NoScripts() ];
+            sortedFolders = [];
         }
 
         //
@@ -754,7 +753,7 @@ export class TaskTreeBuilder implements Disposable
             else
             {
                 let allTasks = false;
-                for (const each2 of (each as TaskFile).treeNodes)
+                for (const each2 of each.treeNodes)
                 {
                     if (each2 instanceof TaskItem)
                     {
@@ -767,7 +766,7 @@ export class TaskTreeBuilder implements Disposable
                 }
 
                 if (!allTasks) {
-                    me.removeTreeNodes(each as TaskFile, folder, subfolders, level + 1, logPad, logLevel + 1);
+                    me.removeTreeNodes(each, folder, subfolders, level + 1, logPad, logLevel + 1);
                 }
             }
         }
@@ -812,7 +811,7 @@ export class TaskTreeBuilder implements Disposable
                 }
             }
             else {
-                await this.renameGroupedTasks(each2 as TaskFile);
+                await this.renameGroupedTasks(each2);
             }
         }
     };

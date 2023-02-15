@@ -679,866 +679,866 @@
             "view/title": [
                 {
                     "command": "taskexplorer.runLastTask",
-                    "when": "view == taskExplorer || view == taskExplorerSideBar",
+                    "when": "view == taskexplorer.view.taskTreeExplorer || view == taskexplorer.view.taskTreeSideBar",
                     "group": "navigation"
                 },
                 {
                     "command": "taskexplorer.refresh",
-                    "when": "view == taskExplorer || view == taskExplorerSideBar",
+                    "when": "view == taskexplorer.view.taskTreeExplorer || view == taskexplorer.view.taskTreeSideBar",
                     "group": "navigation"
                 },
                 {
                     "command": "taskexplorer.donate",
-                    "when": "view == taskExplorer.views.home",
+                    "when": "view == taskexplorer.view.taskTreeExplorer.views.home",
                     "group": "navigation"
                 },
                 {
                     "command": "taskexplorer.clearTaskStats",
-                    "when": "view == taskExplorer.views.taskUsage",
+                    "when": "view == taskexplorer.view.taskTreeExplorer.views.taskUsage",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
                     "command": "taskexplorer.runAudit",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runAuditFix",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runInstall",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runUpdate",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runUpdatePackage",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileApppublisher"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileApppublisher"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileWorkspace"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileWorkspace"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePython"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFilePython"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileAnt"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileAnt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePerl"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFilePerl"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGradle"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileGradle"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileMake"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileMake"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGrunt"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileGrunt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileGulp"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileGulp"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBash"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileBash"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileBatch"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileBatch"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFilePowershell"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFilePowershell"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileRuby"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileRuby"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskFileNsis"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskFileNsis"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupApppublisher"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupApppublisher"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNpm"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupNpm"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupWorkspace"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupWorkspace"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPython"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupPython"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPipenv"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupPipenv"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupAnt"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupAnt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPerl"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupPerl"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGradle"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupGradle"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupMake"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupMake"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGrunt"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupGrunt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupGulp"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupGulp"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBash"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupBash"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupBatch"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupBatch"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupPowershell"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupPowershell"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupRuby"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupRuby"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == taskGroupNsis"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == taskGroupNsis"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.clearFavorites",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == favorites"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == favorites"
                 },
                 {
                     "command": "taskexplorer.clearLastTasks",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks"
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == lasttasks"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == script",
-                    "group": "inline"
-                },
-                {
-                    "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskexplorer.runNoTerm",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == script",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFile",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.openTerminal",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.openTerminal",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.restart",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.restart",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.pause",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.pause",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.stop",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.stop",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == script",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFile",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunning",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableExplorerView && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorer && viewItem == scriptRunningS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeExplorer && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.clearFavorites",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == favorites",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == favorites",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.clearLastTasks",
-                    "when": "config.taskexplorer.enableExplorerView && view == taskExplorer && viewItem == lasttasks",
+                    "when": "view == taskexplorer.view.taskTreeExplorer && viewItem == lasttasks",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runAudit",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runAuditFix",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runInstall",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runUpdate",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.runUpdatePackage",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileApppublisher"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileApppublisher"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNpm"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileWorkspace"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileWorkspace"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePython"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFilePython"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileAnt"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileAnt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePerl"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFilePerl"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGradle"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileGradle"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileMake"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileMake"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGrunt"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileGrunt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileGulp"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileGulp"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBash"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileBash"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileBatch"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileBatch"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFilePowershell"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFilePowershell"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileRuby"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileRuby"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskFileNsis"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskFileNsis"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupApppublisher"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupApppublisher"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNpm"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupNpm"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupWorkspace"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupWorkspace"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPython"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupPython"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPipenv"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupPipenv"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupAnt"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupAnt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPerl"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupPerl"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGradle"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupGradle"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupMake"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupMake"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGrunt"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupGrunt"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupGulp"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupGulp"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBash"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupBash"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupBatch"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupBatch"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupPowershell"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupPowershell"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupRuby"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupRuby"
                 },
                 {
                     "command": "taskexplorer.addToExcludes",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == taskGroupNsis"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == taskGroupNsis"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS"
                 },
                 {
                     "command": "taskexplorer.addRemoveCustomLabel",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS"
                 },
                 {
                     "command": "taskexplorer.clearFavorites",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == favorites"
                 },
                 {
                     "command": "taskexplorer.clearLastTasks",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks"
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == lasttasks"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
-                    "group": "inline"
-                },
-                {
-                    "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.run",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS",
+                    "group": "inline"
+                },
+                {
+                    "command": "taskexplorer.run",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == script",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runNoTerm",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.runWithArgs",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.taskButtons.showExecuteWithArgumentsButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == script",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.open",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.openTerminal",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.openTerminal",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.restart",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.restart",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.pause",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.pause",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.stop",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.stop",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == script",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == script",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFile",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFile",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunning",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunning",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptFileS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptFileS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.addRemoveFavorite",
-                    "when": "config.taskexplorer.enableSideBar && config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskExplorerSideBar && viewItem == scriptRunningS",
+                    "when": "config.taskexplorer.specialFolders.showFavorites && config.taskexplorer.taskButtons.showFavoritesButton && view == taskexplorer.view.taskTreeSideBar && viewItem == scriptRunningS",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.clearFavorites",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == favorites",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == favorites",
                     "group": "inline"
                 },
                 {
                     "command": "taskexplorer.clearLastTasks",
-                    "when": "config.taskexplorer.enableSideBar && view == taskExplorerSideBar && viewItem == lasttasks",
+                    "when": "view == taskexplorer.view.taskTreeSideBar && viewItem == lasttasks",
                     "group": "inline"
                 }
             ]
