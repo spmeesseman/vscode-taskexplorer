@@ -4,8 +4,9 @@ import * as fs from "./utils/fs";
 import * as fileCache from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
-import { TaskManager } from "src/tree/task";
 import { IStorage } from "../interface/IStorage";
+import { IDictionary, ILog } from "../interface";
+import { TaskManager } from "src/tree/taskManager";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
 import { ContextKeys, setContext } from "./context";
@@ -36,7 +37,6 @@ import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
 import { TeAuthenticationProvider } from "./auth/authProvider";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
-import { IDictionary, ILog, ITaskTreeView } from "../interface";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
@@ -366,7 +366,7 @@ export class TeWrapper
     }
 
     set explorer(tree) {
-		(this.treeManager.views.taskExplorer as ITaskTreeView).tree = tree as TaskTree;
+		// this.treeManager.views.taskExplorer.tree = tree;
     }
 
     get explorerView() {
@@ -422,7 +422,7 @@ export class TeWrapper
     }
 
     set sidebar(tree: TaskTree | undefined) {
-		(this.treeManager.views.taskExplorerSideBar as ITaskTreeView).tree = tree as TaskTree;
+		// this.treeManager.views.taskExplorerSideBar.tree = tree;
     }
 
     get sidebarView() {

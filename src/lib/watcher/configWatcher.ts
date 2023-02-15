@@ -248,24 +248,24 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Explorer / sidebar view
     //
-    if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
-    {
-        const newValue = configuration.get<boolean>("enableExplorerView");
-        log.write("   the 'enableExplorerView' setting has changed", 1);
-        log.value("      new value", newValue, 1);
-        _wrapper.treeManager.enableTaskTree("taskExplorer", newValue, "   ");
-        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                              configuration.get<boolean>("enableSideBar"));
-    }
-    if (e.affectsConfiguration("taskexplorer.enableSideBar"))
-    {
-        const newValue = configuration.get<boolean>("enableSideBar");
-        log.write("   the 'enableSideBar' setting has changed", 1);
-        log.value("      new value", newValue, 1);
-        _wrapper.treeManager.enableTaskTree("taskExplorerSideBar", newValue, "   ");
-        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                              configuration.get<boolean>("enableSideBar"));
-    }
+    // if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
+    // {
+    //     const newValue = configuration.get<boolean>("enableExplorerView");
+    //     log.write("   the 'enableExplorerView' setting has changed", 1);
+    //     log.value("      new value", newValue, 1);
+    //     _wrapper.treeManager.enableTaskTree("taskTreeExplorer", newValue, "   ");
+    //     await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+    //                                           configuration.get<boolean>("enableSideBar"));
+    // }
+    // if (e.affectsConfiguration("taskexplorer.enableSideBar"))
+    // {
+    //     const newValue = configuration.get<boolean>("enableSideBar");
+    //     log.write("   the 'enableSideBar' setting has changed", 1);
+    //     log.value("      new value", newValue, 1);
+    //     _wrapper.treeManager.enableTaskTree("taskTreeSideBar", newValue, "   ");
+    //     await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+    //                                           configuration.get<boolean>("enableSideBar"));
+    // }
 
     //
     // Persistent file caching

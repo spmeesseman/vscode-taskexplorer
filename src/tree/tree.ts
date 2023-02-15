@@ -4,6 +4,7 @@ import { TaskItem } from "./item";
 import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
 import { IEvent } from "../interface";
+import { TreeViewIds } from "./treeView";
 import { TaskTreeManager } from "./treeManager";
 import { InitScripts, LoadScripts } from "../lib/noScripts";
 import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } from "vscode";
@@ -39,7 +40,6 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
     private defaultGetChildrenLogLevel = 1;
     private defaultGetChildrenLogPad = "";
     private eventQueue: IEvent[] = [];
-    private name: string;
     private disposables: Disposable[];
     private visible = false;
     private wasVisible = false;
@@ -52,9 +52,8 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
     readonly onDidChangeTreeData: Event<TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
 
 
-    constructor(name: "taskExplorer"|"taskExplorerSideBar", treeManager: TaskTreeManager)
+    constructor(public readonly name: `${TreeViewIds}`, treeManager: TaskTreeManager)
     {
-        this.name = name;
         this.disposables = [];
         this.treeManager = treeManager;
     }

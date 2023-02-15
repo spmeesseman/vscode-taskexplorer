@@ -20,7 +20,9 @@ export type TrackedUsageFeatures =
 	| "releaseNotesPage"
 	| "homeView"
 	| "taskCountView"
-	| "taskUsageView";
+	| "taskUsageView"
+	| "taskTreeExplorer"
+	| "taskTreeSideBar";
 
 export type TrackedUsageKeys = `${TrackedUsageFeatures}:shown`;
 

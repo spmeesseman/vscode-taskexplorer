@@ -16,6 +16,7 @@ export const enum ContextKeys
 {
 	ActionPrefix = "taskexplorer:action:",
 	KeyPrefix = "taskexplorer:key:",
+	TreeViewPrefix = "taskexplorer:treeView:",
 	WebviewPrefix = "taskexplorer:webview:",
 	WebviewViewPrefix = "taskexplorer:webviewView:",
 	Debugging = "taskexplorer:debugging",

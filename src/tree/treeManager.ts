@@ -3,12 +3,13 @@
 import { log } from "../lib/log/log";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
-import { TaskManager } from "./task";
 import { TaskFolder } from "./folder";
 import { TaskTree } from "../tree/tree";
+import { ITaskTreeView, TeTreeView, TreeViewIds } from "./treeView";
 import { Strings } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import * as utils from "../lib/utils/utils";
+import { TaskManager } from "./taskManager";
 import { isDirectory } from "../lib/utils/fs";
 import { TaskTreeBuilder } from "./treeBuilder";
 import { rebuildCache } from "../lib/fileCache";
@@ -19,11 +20,12 @@ import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { configuration } from "../lib/utils/configuration";
+import { Commands, registerCommand } from "../lib/command";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
-import { IDictionary, ITaskTreeView, TasksChangeEvent } from "../interface";
+import { IDictionary, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
-    window, TreeItem, Uri, workspace, Task, commands, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
+    TreeItem, Uri, workspace, Task, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
 
 
@@ -31,7 +33,6 @@ export class TaskTreeManager implements Disposable
 {
 
     private tasks: Task[];
-    private wrapper: TeWrapper;
     private refreshPending = false;
     private _taskManager: TaskManager;
     private _taskWatcher: TaskWatcher;
@@ -43,60 +44,62 @@ export class TaskTreeManager implements Disposable
     private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
     private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
 
-    private specialFolders: {
+    private _specialFolders: {
         favorites: SpecialTaskFolder;
         lastTasks: SpecialTaskFolder;
     };
 
-    private _views: IDictionary<ITaskTreeView|undefined> = {
-        taskExplorer: undefined,
-        taskExplorerSideBar: undefined
+    private _views: {
+        taskExplorer: TeTreeView;
+        taskExplorerSideBar: TeTreeView;
     };
 
-
-    constructor(wrapper: TeWrapper)
+    constructor(private readonly wrapper: TeWrapper)
     {
         log.methodStart("construct task tree manager", 1, "   ");
 
         this.tasks = [];
-        this.wrapper = wrapper;
 
         const nodeExpandedeMap = configuration.get<IDictionary<"Collapsed"|"Expanded">>("specialFolders.folderState");
-        this.specialFolders = {
+        this._specialFolders = {
             favorites: new SpecialTaskFolder(this, Strings.FAV_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.favorites]),
             lastTasks: new SpecialTaskFolder(this, Strings.LAST_TASKS_LABEL, TreeItemCollapsibleState[nodeExpandedeMap.lastTasks])
         };
 
-        this._taskWatcher = new TaskWatcher(this, this.specialFolders);
-        this._treeBuilder = new TaskTreeBuilder(this, this.specialFolders);
-        this._taskManager = new TaskManager(wrapper, this.specialFolders);
+        this._taskWatcher = new TaskWatcher(this, this._specialFolders);
+        this._treeBuilder = new TaskTreeBuilder(this, this._specialFolders);
+        this._taskManager = new TaskManager(wrapper, this._specialFolders);
 
-        this.createTaskTree("taskExplorer", "      ");
-        this.createTaskTree("taskExplorerSideBar", "      ");
+        this._views = {
+            taskExplorer: new TeTreeView(wrapper, this, "Task Explorer", "", "taskTreeExplorer", "taskexplorer:treeView:taskTreeExplorer", "taskTreeExplorer"),
+            taskExplorerSideBar: new TeTreeView(wrapper, this, "Task Explorer", "", "taskTreeSideBar", "taskexplorer:treeView:taskTreeSideBar", "taskTreeSideBar")
+        };
 
         this.disposables.push(
             this._taskWatcher,
             this._treeBuilder,
             this._taskManager,
-            this.specialFolders.favorites,
-            this.specialFolders.lastTasks,
-            commands.registerCommand("taskexplorer.refresh", (taskType?: boolean, uri?: Uri, logPad = "") => this.refresh(taskType, uri, logPad), this),
-            commands.registerCommand("taskexplorer.addRemoveCustomLabel", async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
-            commands.registerCommand("taskexplorer.run",  async (item: TaskItem) => this.taskManager.run(item), this),
-            commands.registerCommand("taskexplorer.runNoTerm",  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
-            commands.registerCommand("taskexplorer.runWithArgs",  async (item: TaskItem, args?: string) => this._taskManager.run(item, false, true, args), this),
-            commands.registerCommand("taskexplorer.runLastTask",  async () => this.taskManager.runLastTask(this._treeBuilder.getTaskMap()), this),
-            commands.registerCommand("taskexplorer.stop", async (item: TaskItem) => this.taskManager.stop(item), this),
-            commands.registerCommand("taskexplorer.restart",  async (item: TaskItem) => this.taskManager.restart(item), this),
-            commands.registerCommand("taskexplorer.pause",  (item: TaskItem) => this.taskManager.pause(item), this),
-            commands.registerCommand("taskexplorer.open", async (item: TaskItem, itemClick?: boolean) => this.taskManager.open(item, itemClick), this),
-            commands.registerCommand("taskexplorer.openTerminal", (item: TaskItem) => this.openTerminal(item), this),
-            commands.registerCommand("taskexplorer.runInstall", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "install"), this),
-            commands.registerCommand("taskexplorer.runUpdate", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update"), this),
-            commands.registerCommand("taskexplorer.runUpdatePackage", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update <packagename>"), this),
-            commands.registerCommand("taskexplorer.runAudit", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit"), this),
-            commands.registerCommand("taskexplorer.runAuditFix", async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit fix"), this),
-            commands.registerCommand("taskexplorer.addToExcludes", async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this)
+            this._specialFolders.favorites,
+            this._specialFolders.lastTasks,
+            this._views.taskExplorer,
+            this._views.taskExplorerSideBar,
+            registerCommand(Commands.Refresh, (taskType?: boolean, uri?: Uri, logPad = "") => this.refresh(taskType, uri, logPad), this),
+            registerCommand(Commands.AddRemoveCustomLabel, async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
+            registerCommand(Commands.Run,  async (item: TaskItem) => this.taskManager.run(item), this),
+            registerCommand(Commands.RunWithNoTerminal,  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
+            registerCommand(Commands.RunWithArgs,  async (item: TaskItem, args?: string) => this._taskManager.run(item, false, true, args), this),
+            registerCommand(Commands.RunLastTask,  async () => this.taskManager.runLastTask(this._treeBuilder.getTaskMap()), this),
+            registerCommand(Commands.Stop, async (item: TaskItem) => this.taskManager.stop(item), this),
+            registerCommand(Commands.Restart,  async (item: TaskItem) => this.taskManager.restart(item), this),
+            registerCommand(Commands.Pause,  (item: TaskItem) => this.taskManager.pause(item), this),
+            registerCommand(Commands.Open, async (item: TaskItem, itemClick?: boolean) => this.taskManager.open(item, itemClick), this),
+            registerCommand(Commands.OpenTerminal, (item: TaskItem) => this.openTerminal(item), this),
+            registerCommand(Commands.NpmRunInstall, async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "install"), this),
+            registerCommand(Commands.NpmRunUpdate, async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update"), this),
+            registerCommand(Commands.NpmRunUpdatePackage, async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "update <packagename>"), this),
+            registerCommand(Commands.NpmRunAudit, async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit"), this),
+            registerCommand(Commands.NpmRunAuditFix, async (taskFile: TaskFile) => this.taskManager.runNpmCommand(taskFile, "audit fix"), this),
+            registerCommand(Commands.AddToExcludes, async (taskFile: TaskFile | TaskItem) => this.addToExcludes(taskFile), this)
         );
 
         log.methodDone("construct task tree manager", 1, "   ");
@@ -131,7 +134,7 @@ export class TaskTreeManager implements Disposable
         if (taskItem.folder)
         {
             const folderName = utils.lowerCaseFirstChar(taskItem.folder.label as string, true) as "favorites"|"lastTasks";
-            return this.specialFolders[folderName].addRemoveRenamedLabel(taskItem);
+            return this._specialFolders[folderName].addRemoveRenamedLabel(taskItem);
         }
     };
 
@@ -210,56 +213,6 @@ export class TaskTreeManager implements Disposable
     };
 
 
-    private createTaskTree = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
-    {
-        log.methodStart("create task tree provider", 1, logPad, false, [[ "name", name ]]);
-        if (!this._views[name])
-        {
-            const taskTree = new TaskTree(name, this),
-                  treeView = window.createTreeView(name, { treeDataProvider: taskTree, showCollapseAll: true });
-            //
-            // Add to tracked disposables
-            //
-            this.disposables.push(taskTree);
-            this.disposables.push(treeView);
-            //
-            // Create inVisibilityChanged event on the task tree instance and have the call
-            // add to the tracked disposables array
-            //
-            treeView.onDidChangeVisibility((e) =>
-            {
-                taskTree.onVisibilityChanged(e.visible, this.firstTreeBuildDone);
-            },
-            this, this.disposables);
-            //
-            // Set view/tree pair in tracked views dictionary
-            //
-            this._views[name] = { view: treeView, tree: taskTree };
-            log.write("   tree data provider '" + name + "' created", 1, logPad);
-        }
-        log.methodDone("create task tree provider", 1, logPad);
-    };
-
-
-    private disposeTaskTree = (name: "taskExplorer"|"taskExplorerSideBar", logPad: string) =>
-    {
-        log.methodStart("dispose explorer view / tree provider", 1, logPad, false, [[ "name", name ]]);
-        const view = this._views[name];
-        if (view)
-        {   //
-            // Get/remove the 3 disposables created in createTaskTree() and dispose() each
-            //
-            const disposables = this.disposables.splice(this.disposables.findIndex(s => s instanceof TaskTree && s.getName() === name), 3);
-            disposables.forEach((d) => {
-                d.dispose();
-            });
-            this._views[name] = undefined;
-            log.write("   tree data provider '" + name + "' un-registered", 1, "   ");
-        }
-        log.methodDone("dispose explorer view / tree provider", 1, logPad);
-    };
-
-
     private doTaskCacheRemovals = (invalidation: string | undefined, logPad: string) =>
     {
         let ctRmv = 0;
@@ -291,19 +244,6 @@ export class TaskTreeManager implements Disposable
         });
         log.write(`   removed ${ctRmv} ${invalidation} current tasks from cache`, 2, logPad);
         log.methodDone("do task cache removals", 2, logPad);
-    };
-
-
-    enableTaskTree = (name: "taskExplorer"|"taskExplorerSideBar", enable: boolean, logPad: string) =>
-    {
-        log.methodStart("enable explorer view / tree provider", 1, logPad, false, [[ "name", name ], [ "enable", enable ]]);
-        if (enable) {
-            this.createTaskTree(name, logPad + "   ");
-        }
-        else {
-            this.disposeTaskTree(name, logPad + "   ");
-        }
-        log.methodDone("enable explorer view / tree provider", 1, logPad);
     };
 
 
@@ -389,15 +329,15 @@ export class TaskTreeManager implements Disposable
 
     fireTreeRefreshEvent = (logPad: string, logLevel: number, treeItem?: TreeItem) =>
     {
-        Object.values(this._views).filter(v => !!v && v.tree).forEach((v) =>
+        Object.values(this._views).filter(v => v.enabled).forEach((v) =>
         {
-            ((v as ITaskTreeView).tree as TaskTree).fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
+            v.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
         });
         this._onDidTasksChange.fire({ taskCount: this.tasks.length });
     };
 
 
-    getlastTasksFolder = () => this.specialFolders.lastTasks;
+    getlastTasksFolder = () => this._specialFolders.lastTasks;
 
 
     getTaskMap = () => this._treeBuilder.getTaskMap();
