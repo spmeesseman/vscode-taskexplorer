@@ -11,7 +11,9 @@ type SupportedCommands = Commands | `taskexplorer.view.${string}.focus` | `taske
 
 export const enum Commands
 {
+	AddToExcludes = "taskexplorer.addToExcludes",
 	AddToExcludesMenu = "taskexplorer.addToExcludesEx",
+	AddRemoveCustomLabel = "taskexplorer.addRemoveCustomLabel",
 	ClearTaskStats = "taskexplorer.clearTaskStats",
 	Donate = "taskexplorer.donate",
 	DisableTaskType = "taskexplorer.disableTaskType",
@@ -25,12 +27,15 @@ export const enum Commands
 	FocusTaskUsageView  = "taskexplorer.view.taskUsage.focus",
 	GetApi = "taskexplorer.getApi",
 	GetLicense = "taskexplorer.getLicense",
+	NpmRunAudit = "taskexplorer.runAudit",
+	NpmRunAuditFix = "taskexplorer.runAuditFix",
+	NpmRunInstall = "taskexplorer.runInstall",
+	NpmRunUpdate = "taskexplorer.runUpdate",
+	NpmRunUpdatePackage = "taskexplorer.runUpdatePackage",
     Open = "taskexplorer.open",
+	OpenTerminal = "taskexplorer.openTerminal",
+	Pause = "taskexplorer.pause",
 	Refresh = "taskexplorer.refresh",
-	RemovefromExcludes = "taskexplorer.removeFromExcludes",
-    Run = "taskexplorer.run",
-    RunWithArgs = "taskexplorer.runWithArgs",
-    RunLastTask = "taskexplorer.runLastTask",
 	RefreshHomeView = "taskexplorer.view.home.refresh",
 	RefreshLicensePage = "taskexplorer.view.licensePage.refresh",
 	RefreshParsingReportPage = "taskexplorer.view.parsingReport.refresh",
@@ -38,41 +43,35 @@ export const enum Commands
 	RefreshTaskCountView = "taskexplorer.view.taskCount.refresh",
 	RefreshTaskUsageView = "taskexplorer.view.taskUsage.refresh",
 	RefreshWelcomePage = "taskexplorer.view.welcome.refresh",
+	RemovefromExcludes = "taskexplorer.removeFromExcludes",
+	Restart = "taskexplorer.restart",
+    Run = "taskexplorer.run",
+    RunLastTask = "taskexplorer.runLastTask",
+    RunWithArgs = "taskexplorer.runWithArgs",
+	RunWithNoTerminal = "taskexplorer.runNoTerm",
 	ShowLicensePage = "taskexplorer.view.licensePage.show",
 	ShowParsingReportPage = "taskexplorer.view.parsingReport.show",
 	ShowReleaseNotesPage = "taskexplorer.view.releaseNotes.show",
-	ShowWelcomePage = "taskexplorer.view.welcome.show"
+	ShowWelcomePage = "taskexplorer.view.welcome.show",
+	Stop = "taskexplorer.stop"
 }
 
 export const enum VsCodeCommands
 {
 	CloseActiveEditor = "workbench.action.closeActiveEditor",
 	CloseAllEditors = "workbench.action.closeAllEditors",
-	CursorMove = "cursorMove",
-	CustomEditorShowFindWidget = "editor.action.webvieweditor.showFind",
-	Diff = "vscode.diff",
-	EditorScroll = "editorScroll",
-	EditorShowHover = "editor.action.showHover",
-	ExecuteDocumentSymbolProvider = "vscode.executeDocumentSymbolProvider",
-	ExecuteCodeLensProvider = "vscode.executeCodeLensProvider",
 	FocusFilesExplorer = "workbench.files.action.focusFilesExplorer",
-	InstallExtension = "workbench.extensions.installExtension",
 	MoveViews = "vscode.moveViews",
 	Open = "vscode.open",
 	OpenFolder = "vscode.openFolder",
 	OpenInTerminal = "openInTerminal",
 	OpenWalkthrough = "workbench.action.openWalkthrough",
-	OpenWith = "vscode.openWith",
 	NextEditor = "workbench.action.nextEditor",
 	PreviewHtml = "vscode.previewHtml",
-	RevealLine = "revealLine",
 	RevealInExplorer = "revealInExplorer",
 	RevealInFileExplorer = "revealFileInOS",
 	SetContext = "setContext",
-	ShowExplorer = "workbench.view.explorer",
-	ShowReferences = "editor.action.showReferences",
-	ShowSCM = "workbench.view.scm",
-	UninstallExtension = "workbench.extensions.uninstallExtension",
+	ShowExplorer = "workbench.view.explorer"
 }
 
 // type CommandConstructor = new (container: TeWrapper) => Command;
