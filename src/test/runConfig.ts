@@ -123,6 +123,9 @@ export default async() =>
     // Add all files to the test suite
     //
     const files = glob.sync(filesToTest, { cwd: testsRoot });
+    files.sort((a: string, b: string) => {
+        return path.basename(a) < path.basename(b) ? -1 : 1;
+    });
     // const files = glob.sync(`{**/_api.test.js,**/${fileToTest}.test.js}`, { cwd: testsRoot });
     files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));
 

@@ -11,9 +11,9 @@ import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { LicensePage } from "../../webview/page/licensePage";
 import { LicenseManager } from "../../lib/auth/licenseManager";
+import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { copyDir, createDir, deleteDir, writeFile } from "../../lib/utils/fs";
-import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -223,6 +223,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await utils.setLicensed(false);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
@@ -256,7 +257,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
-		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.delete("taskexplorer.lastLicenseNag");
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");
@@ -368,7 +369,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow((tc.slowTime.licenseMgr.enterKey * 2) + 1000);
-		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.delete("taskexplorer.lastLicenseNag");
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
@@ -386,7 +387,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.enterKey * 3);
-		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.delete("taskexplorer.lastLicenseNag");
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");

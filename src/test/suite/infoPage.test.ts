@@ -123,8 +123,6 @@ suite("Info Report Tests", () =>
 		(teWrapper.parsingReportPage.view as WebviewPanel)?.dispose();
 		panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
 		await sleep(5);
-		// teWrapper.busy = true;
-		setTimeout(() => { /* teWrapper.busy = false; */ }, 50);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(5);
 		await closeEditors();

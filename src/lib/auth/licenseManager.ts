@@ -184,6 +184,7 @@ export class LicenseManager implements Disposable
 		},
 		logPad);
 
+		/* istanbul ignore else */
 		if (rsp.success === true && rsp.data && this.wrapper.utils.isObject(rsp.data.token))
 		{
 			token = rsp.data.token.token;
@@ -238,7 +239,7 @@ export class LicenseManager implements Disposable
 		// changed, the webview will be shown instead regardless of the nag state.
 		//
 		let displayPopup = !this.licensed;
-		if (lastNag)
+		if (displayPopup && lastNag)
 		{
 			const now = Date.now(),
 				  lastNagDate = parseInt(lastNag, 10);
