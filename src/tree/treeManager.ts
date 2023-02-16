@@ -77,7 +77,7 @@ export class TaskTreeManager implements Disposable
             this._specialFolders.lastTasks,
             this._views.taskExplorer,
             this._views.taskExplorerSideBar,
-            registerCommand(Commands.Refresh, (taskType?: string | boolean | undefined, uri?: Uri | false | undefined, logPad = "") => this.refresh(taskType, uri, logPad), this),
+            registerCommand(Commands.Refresh, (taskType?: string | false | undefined, uri?: Uri | false | undefined, logPad = "") => this.refresh(taskType, uri, logPad), this),
             registerCommand(Commands.AddRemoveCustomLabel, async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
             registerCommand(Commands.Run,  async (item: TaskItem) => this.taskManager.run(item), this),
             registerCommand(Commands.RunWithNoTerminal,  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
@@ -338,7 +338,7 @@ export class TaskTreeManager implements Disposable
     getTaskTree = () => this._treeBuilder.getTaskTree();
 
 
-    private handleRebuildEvent = async(invalidate: any, opt: boolean | Uri | undefined, logPad: string) =>
+    private handleRebuildEvent = async(invalidate: string | undefined, opt: Uri | false | undefined, logPad: string) =>
     {   //
         // The file cache only needs to update once on any change, since this will get called through
         // twice if both the Explorer and Sidebar Views are enabled, do a lil check here to make sure
@@ -353,7 +353,7 @@ export class TaskTreeManager implements Disposable
             this.wrapper.log.write("   handling 'rebuild cache' event complete", 1, logPad + "   ");
         }
         this.wrapper.log.write("   handling 'invalidate tasks cache' event", 1, logPad);
-        await this.invalidateTasksCache(invalidate !== true ? invalidate : undefined, opt, logPad + "   ");
+        await this.invalidateTasksCache(invalidate, opt, logPad + "   ");
         this.wrapper.log.methodDone("   handle tree rebuild event", 1, logPad);
     };
 
@@ -577,7 +577,7 @@ export class TaskTreeManager implements Disposable
      *
      * @param opt Uri of the invalidated resource
      */
-    refresh = async(invalidate: string | boolean | undefined, opt: Uri | false | undefined, logPad: string) =>
+    refresh = async(invalidate: string | false | undefined, opt: Uri | false | undefined, logPad: string) =>
     {
         this.wrapper.log.methodStart("refresh task tree", 1, logPad, logPad === "", [
             [ "invalidate", invalidate ], [ "opt fsPath", this.wrapper.utils.isUri(opt) ? opt.fsPath : "n/a" ]
