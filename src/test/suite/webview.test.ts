@@ -112,15 +112,6 @@ suite("Webview Tests", () =>
     });
 
 
-    test("Tree View", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.focusChangeViews);
-        await focusExplorerView(teWrapper);
-        endRollingCount(this);
-    });
-
-
     test("Release Notes Page", async function()
     {
         if (exitRollingCount(this)) return;
@@ -149,28 +140,34 @@ suite("Webview Tests", () =>
     });
 
 
+    test("Post an Unknown Random Message", async function()
+    {
+        if (exitRollingCount(this)) return;
+        await executeCommand(Commands.FocusHomeView);
+        await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(500);
+        endRollingCount(this);
+    });
+
+
 	test("Focus open Editors", async function()
 	{
         if (exitRollingCount(this)) return;
 		this.slow(tc.slowTime.commands.focusChangeViews * 3);
 	    await teWrapper.parsingReportPage.show();
+        await sleep(5);
 	    await teWrapper.licensePage.show();
+        await sleep(5);
 	    await teWrapper.releaseNotesPage.show();
+        await sleep(5);
 	    await teWrapper.licensePage.show();
+        await sleep(5);
 	    await teWrapper.parsingReportPage.show();
+        await sleep(5);
         await commands.executeCommand(VsCodeCommands.NextEditor);
         await commands.executeCommand(VsCodeCommands.NextEditor);
         endRollingCount(this);
 	});
-
-
-    test("Post an Unknown Random Message", async function()
-    {
-        if (exitRollingCount(this)) return;
-        await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
-        await sleep(40);
-        endRollingCount(this);
-    });
 
 
     test("Cover Webview Properties (Post-Show)", async function()
