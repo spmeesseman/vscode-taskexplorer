@@ -3,8 +3,8 @@
 	"description": "Extension to add support for tasks in VSCode.",
 	"displayName": "Task support for VSCode",
 
-	"config.taskexplorer.enableExplorerView": "Add a task explorer tray in the Explorer sidebar view.",
-	"config.taskexplorer.enableSideBar": "Add a task explorer to the the sidebar.",
+	"config.taskexplorer.enableExplorerView": "Enable **Task Explorer** in the `Files Explorer` view.",
+	"config.taskexplorer.enableSideBar": "Enable **Task Explorer** in the `side/activity bar`.",
 
 	"config.taskexplorer.enablePersistentFileCaching": "Enable Persistent File Caching  `Experimental`",
 

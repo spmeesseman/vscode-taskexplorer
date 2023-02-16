@@ -173,10 +173,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         // Whether or not to use 'ansicon'when running 'ant' tasks
         //
-        if (e.affectsConfiguration("taskexplorer.visual.enableAnsiconForAnt"))
+        if (e.affectsConfiguration("taskexplorer.enableAnsiconForAnt"))
         {
-            const newValue = configuration.get<boolean>("visual.enableAnsiconForAnt");
-            log.write("   the 'visual.enableAnsiconForAnt' setting has changed", 1);
+            const newValue = configuration.get<boolean>("enableAnsiconForAnt");
+            log.write("   the '.enableAnsiconForAnt' setting has changed", 1);
             log.value("      new value", newValue, 1);
             if (newValue) {
                 window.showInformationMessage("For Ant/Ansicon configuration change to take effect, close all open terminals");
@@ -248,24 +248,22 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     // Explorer / sidebar view
     //
-    // if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
-    // {
-    //     const newValue = configuration.get<boolean>("enableExplorerView");
-    //     log.write("   the 'enableExplorerView' setting has changed", 1);
-    //     log.value("      new value", newValue, 1);
-    //     _wrapper.treeManager.enableTaskTree("taskTreeExplorer", newValue, "   ");
-    //     await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-    //                                           configuration.get<boolean>("enableSideBar"));
-    // }
-    // if (e.affectsConfiguration("taskexplorer.enableSideBar"))
-    // {
-    //     const newValue = configuration.get<boolean>("enableSideBar");
-    //     log.write("   the 'enableSideBar' setting has changed", 1);
-    //     log.value("      new value", newValue, 1);
-    //     _wrapper.treeManager.enableTaskTree("taskTreeSideBar", newValue, "   ");
-    //     await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-    //                                           configuration.get<boolean>("enableSideBar"));
-    // }
+    if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
+    {
+        const newValue = configuration.get<boolean>("enableExplorerView");
+        log.write("   the 'enableExplorerView' setting has changed", 1);
+        log.value("      new value", newValue, 1);
+        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                              configuration.get<boolean>("enableSideBar"));
+    }
+    if (e.affectsConfiguration("taskexplorer.enableSideBar"))
+    {
+        const newValue = configuration.get<boolean>("enableSideBar");
+        log.write("   the 'enableSideBar' setting has changed", 1);
+        log.value("      new value", newValue, 1);
+        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                              configuration.get<boolean>("enableSideBar"));
+    }
 
     //
     // Persistent file caching

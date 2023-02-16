@@ -1543,546 +1543,605 @@
                 }
             ]
         },
-        "configuration": {
-            "id": "taskexplorer",
-            "type": "object",
-            "title": "Task Explorer",
-            "properties": {
-                "taskexplorer.enableExplorerView": {
-                    "type": "boolean",
-                    "default": true,
-                    "order": 0,
-                    "description": "%config.taskexplorer.enableExplorerView%"
-                },
-                "taskexplorer.enableSideBar": {
-                    "type": "boolean",
-                    "default": true,
-                    "order": 1,
-                    "description": "%config.taskexplorer.enableSideBar%"
-                },
-                "taskexplorer.enablePersistentFileCaching": {
-                    "type": "boolean",
-                    "default": false,
-                    "order": 1,
-                    "markdownDescription": "%config.taskexplorer.enablePersistentFileCaching%"
-                },
-                "taskexplorer.enabledTasks": {
-                    "type": "object",
-                    "order": 15,
-                    "additionalProperties": false,
-                    "description": "%config.taskexplorer.enabledTaskTypes%",
-                    "properties": {
-                        "ant": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableAnt%"
+        "configuration": [
+            {
+                "id": "general",
+                "order": 0,
+                "title": "General",
+                "properties": {
+                    "taskexplorer.enableExplorerView": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 0,
+                        "markdownDescription": "%config.taskexplorer.enableExplorerView%"
+                    },
+                    "taskexplorer.enableSideBar": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 1,
+                        "markdownDescription": "%config.taskexplorer.enableSideBar%"
+                    },
+                    "taskexplorer.enablePersistentFileCaching": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 2,
+                        "markdownDescription": "%config.taskexplorer.enablePersistentFileCaching%"
+                    },
+                    "taskexplorer.keepTermOnStop": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 3,
+                        "description": "%config.taskexplorer.keepTermOnStop%"
+                    }
+                }
+            },
+            {
+                "id": "taskproviders",
+                "order": 20,
+                "title": "Task Providers",
+                "properties": {
+                    "taskexplorer.enabledTasks": {
+                        "type": "object",
+                        "order": 15,
+                        "additionalProperties": false,
+                        "description": "%config.taskexplorer.enabledTaskTypes%",
+                        "properties": {
+                            "ant": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableAnt%"
+                            },
+                            "apppublisher": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableAppPublisher%"
+                            },
+                            "bash": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableBash%"
+                            },
+                            "batch": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableBatch%"
+                            },
+                            "composer": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableComposer%"
+                            },
+                            "gradle": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableGradle%"
+                            },
+                            "grunt": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableGrunt%"
+                            },
+                            "gulp": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableGulp%"
+                            },
+                            "jenkins": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableJenkins%"
+                            },
+                            "make": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableMake%"
+                            },
+                            "maven": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableMaven%"
+                            },
+                            "npm": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableNpm%"
+                            },
+                            "nsis": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableNsis%"
+                            },
+                            "perl": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enablePerl%"
+                            },
+                            "pipenv": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enablePipenv%"
+                            },
+                            "powershell": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enablePowershell%"
+                            },
+                            "python": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enablePython%"
+                            },
+                            "ruby": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableRuby%"
+                            },
+                            "tsc": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableTsc%"
+                            },
+                            "webpack": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableWebpack%"
+                            },
+                            "workspace": {
+                                "type": "boolean",
+                                "description": "%config.taskexplorer.enableWorkspace%"
+                            }
                         },
-                        "apppublisher": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableAppPublisher%"
-                        },
-                        "bash": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableBash%"
-                        },
-                        "batch": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableBatch%"
-                        },
-                        "composer": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableComposer%"
-                        },
-                        "gradle": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableGradle%"
-                        },
-                        "grunt": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableGrunt%"
-                        },
-                        "gulp": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableGulp%"
-                        },
-                        "jenkins": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableJenkins%"
-                        },
-                        "make": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableMake%"
-                        },
-                        "maven": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableMaven%"
-                        },
-                        "npm": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableNpm%"
-                        },
-                        "nsis": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableNsis%"
-                        },
-                        "perl": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enablePerl%"
-                        },
-                        "pipenv": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enablePipenv%"
-                        },
-                        "powershell": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enablePowershell%"
-                        },
-                        "python": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enablePython%"
-                        },
-                        "ruby": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableRuby%"
-                        },
-                        "tsc": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableTsc%"
-                        },
-                        "webpack": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableWebpack%"
-                        },
-                        "workspace": {
-                            "type": "boolean",
-                            "description": "%config.taskexplorer.enableWorkspace%"
+                        "default": {
+                            "ant": true,
+                            "apppublisher": false,
+                            "bash": true,
+                            "batch": true,
+                            "composer": false,
+                            "gradle": false,
+                            "grunt": true,
+                            "gulp": true,
+                            "jenkins": false,
+                            "make": true,
+                            "maven": false,
+                            "npm": true,
+                            "nsis": false,
+                            "perl": false,
+                            "pipenv": false,
+                            "powershell": false,
+                            "python": true,
+                            "ruby": false,
+                            "tsc": true,
+                            "webpack": false,
+                            "workspace": true
                         }
                     },
-                    "default": {
-                        "ant": true,
-                        "apppublisher": false,
-                        "bash": true,
-                        "batch": true,
-                        "composer": false,
-                        "gradle": false,
-                        "grunt": true,
-                        "gulp": true,
-                        "jenkins": false,
-                        "make": true,
-                        "maven": false,
-                        "npm": true,
-                        "nsis": false,
-                        "perl": false,
-                        "pipenv": false,
-                        "powershell": false,
-                        "python": true,
-                        "ruby": false,
-                        "tsc": true,
-                        "webpack": false,
-                        "workspace": true
+                    "taskexplorer.useAnt": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%config.taskexplorer.useAnt%"
+                    },
+                    "taskexplorer.useGulp": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%config.taskexplorer.useGulp%"
                     }
-                },
-                "taskexplorer.environment": {
-                    "type": "object",
-                    "order": 18,
-                    "additionalProperties": false,
-                    "markdownDescription": "%config.taskexplorer.environment%",
-                    "properties": {
-                        "jenkinsApiToken": "JENKINS_API_TOKEN"
-                    }
-                },
-                "taskexplorer.exclude": {
-                    "type": "array",
-                    "order": 20,
-                    "items": {
-                        "type": "string"
+                }
+            },
+            {
+                "id": "excludeinclude",
+                "order": 40,
+                "title": "Exclude / Include",
+                "properties": {
+                    "taskexplorer.exclude": {
+                        "type": "array",
+                        "order": 20,
+                        "items": {
+                            "type": "string"
+                        },
+                        "markdownDescription": "%config.taskexplorer.exclude%",
+                        "default": [
+                            "**/.coverage/**",
+                            "**/.nuget/**",
+                            "**/.nyc_output/**",
+                            "**/.vscode-test/**",
+                            "**/Assets/**",
+                            "**/bin/**",
+                            "**/build/**",
+                            "**/coverage/**",
+                            "**/dep/**",
+                            "**/dependency/**",
+                            "**/dist/**",
+                            "**/doc/**",
+                            "**/example/**",
+                            "**/examples/**",
+                            "**/ext/**",
+                            "**/obj/**",
+                            "**/dist/**",
+                            "**/output/**",
+                            "**/packages/**",
+                            "**/release/**",
+                            "**/releases/**",
+                            "**/samples/**",
+                            "**/sdks/**",
+                            "**/static/**",
+                            "**/target/**",
+                            "**/test/**",
+                            "**/test-fixture/**",
+                            "**/third_party/**",
+                            "**/vendor/**",
+                            "**/work/**"
+                        ]
                     },
-                    "markdownDescription": "%config.taskexplorer.exclude%",
-                    "default": [
-                        "**/.coverage/**",
-                        "**/.nuget/**",
-                        "**/.nyc_output/**",
-                        "**/.vscode-test/**",
-                        "**/Assets/**",
-                        "**/bin/**",
-                        "**/build/**",
-                        "**/coverage/**",
-                        "**/dep/**",
-                        "**/dependency/**",
-                        "**/dist/**",
-                        "**/doc/**",
-                        "**/example/**",
-                        "**/examples/**",
-                        "**/ext/**",
-                        "**/obj/**",
-                        "**/dist/**",
-                        "**/output/**",
-                        "**/packages/**",
-                        "**/release/**",
-                        "**/releases/**",
-                        "**/samples/**",
-                        "**/sdks/**",
-                        "**/static/**",
-                        "**/target/**",
-                        "**/test/**",
-                        "**/test-fixture/**",
-                        "**/third_party/**",
-                        "**/vendor/**",
-                        "**/work/**"
-                    ]
-                },
-                "taskexplorer.excludeTask": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [
-                        "pre-launch[0-9]{2}\\.r(?:b|c)"
-                    ],
-                    "order": 25,
-                    "markdownDescription": "%config.taskexplorer.excludeTask%"
-                },
-                "taskexplorer.includeAnt": {
-                    "type": [
-                        "string",
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "order": 30,
-                    "markdownDeprecationMessage": "%config.taskexplorer.includeAntDeprecated%",
-                    "markdownDescription": "%config.taskexplorer.includeAntDsc%"
-                },
-                "taskexplorer.globPatternsAnt": {
-                    "type": [
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "order": 35,
-                    "markdownDescription": "%config.taskexplorer.globPatternsAnt%"
-                },
-                "taskexplorer.globPatternsBash": {
-                    "type": [
-                        "array"
-                    ],
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "order": 40,
-                    "markdownDescription": "%config.taskexplorer.globPatternsBash%"
-                },
-                "taskexplorer.keepTermOnStop": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskexplorer.keepTermOnStop%"
-                },
-                "taskexplorer.groupWithSeparator": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskexplorer.groupWithSeparator%"
-                },
-                "taskexplorer.groupSeparator": {
-                    "type": "string",
-                    "enum": [
-                        "-",
-                        "_",
-                        ":",
-                        "|"
-                    ],
-                    "default": "-",
-                    "description": "%config.taskexplorer.groupSeparator%"
-                },
-                "taskexplorer.groupStripTaskLabel": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskexplorer.groupStripTaskLabel%"
-                },
-                "taskexplorer.groupMaxLevel": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "default": 1,
-                    "description": "%config.taskexplorer.groupMaxLevel%"
-                },
-                "taskexplorer.logging.enable": {
-                    "type": "boolean",
-                    "default": false,
-                    "order": 50,
-                    "markdownDescription": "%config.taskexplorer.logging.enable%"
-                },
-                "taskexplorer.logging.enableFile": {
-                    "type": "boolean",
-                    "default": false,
-                    "order": 53,
-                    "markdownDescription": "%config.taskexplorer.logging.enableFile%"
-                },
-                "taskexplorer.logging.enableFileSymbols": {
-                    "type": "boolean",
-                    "default": true,
-                    "order": 56,
-                    "markdownDescription": "%config.taskexplorer.logging.enableFileSymbols%"
-                },
-                "taskexplorer.logging.enableOutputWindow": {
-                    "type": "boolean",
-                    "default": true,
-                    "order": 60,
-                    "markdownDescription": "%config.taskexplorer.logging.enableOutputWindow%"
-                },
-                "taskexplorer.logging.level": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5
-                    ],
-                    "default": 1,
-                    "order": 55,
-                    "markdownDescription": "%config.taskexplorer.logging.level%"
-                },
-                "taskexplorer.pathToPrograms": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "description": "%config.taskexplorer.pathToPrograms%",
-                    "properties": {
-                        "ant": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToAnt%"
+                    "taskexplorer.excludeTask": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         },
-                        "ansicon": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToAnsicon%"
-                        },
-                        "composer": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToComposer%"
-                        },
-                        "curl": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToCurl%"
-                        },
-                        "gradle": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToGradle%"
-                        },
-                        "jenkins": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToJenkins%"
-                        },
-                        "make": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToMake%"
-                        },
-                        "maven": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToMaven%"
-                        },
-                        "nsis": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToNsis%"
-                        },
-                        "perl": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToPerl%"
-                        },
-                        "pipenv": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToPipenv%"
-                        },
-                        "powershell": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToPowershell%"
-                        },
-                        "python": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToPython%"
-                        },
-                        "ruby": {
-                            "type": "string",
-                            "description": "%config.taskexplorer.pathToRuby%"
-                        }
-                    },
-                    "default": {
-                        "ant": "ant.bat",
-                        "ansicon": "ansicon",
-                        "composer": "composer",
-                        "curl": "curl",
-                        "gradle": "gradle.bat",
-                        "jenkins": "",
-                        "make": "nmake",
-                        "maven": "mvn",
-                        "nsis": "makensis",
-                        "perl": "perl",
-                        "pipenv": "pipenv",
-                        "powershell": "powershell",
-                        "python": "python",
-                        "ruby": "ruby"
-                    }
-                },
-                "taskexplorer.showHiddenWsTasks": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskexplorer.showHiddenWsTasks%"
-                },
-                "taskexplorer.showRunningTask": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskexplorer.showRunningTask%"
-                },
-                "taskexplorer.sortProjectFoldersAlpha": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "%config.taskexplorer.sortProjectFoldersAlpha%"
-                },
-                "taskexplorer.taskButtons.clickAction": {
-                    "type": "string",
-                    "enum": [
-                        "Execute",
-                        "Open"
-                    ],
-                    "default": "Open",
-                    "description": "%config.taskexplorer.taskButtons.clickAction%"
-                },
-                "taskexplorer.taskButtons.controlCharacter": {
-                    "type": "string",
-                    "default": "Y",
-                    "pattern": "[A-Z]{1}",
-                    "description": "%config.taskexplorer.taskButtons.controlCharacter%"
-                },
-                "taskexplorer.taskButtons.showExecuteWithArgumentsButton": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithArgumentsButton%"
-                },
-                "taskexplorer.taskButtons.showFavoritesButton": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskexplorer.taskButtons.showFavoritesButton%"
-                },
-                "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton%"
-                },
-                "taskexplorer.specialFolders.showFavorites": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskexplorer.specialFolders.showFavorites%"
-                },
-                "taskexplorer.specialFolders.showLastTasks": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskexplorer.specialFolders.showLastTasks%"
-                },
-                "taskexplorer.specialFolders.showUserTasks": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskexplorer.specialFolders.showUserTasks%"
-                },
-                "taskexplorer.specialFolders.numLastTasks": {
-                    "type": "number",
-                    "enum": [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        14,
-                        15,
-                        16,
-                        17,
-                        18,
-                        19,
-                        20,
-                        21,
-                        22,
-                        23,
-                        24,
-                        25
-                    ],
-                    "default": 10,
-                    "markdownDescription": "%config.taskexplorer.specialFolders.numLastTasks%"
-                },
-                "taskexplorer.specialFolders.folderState": {
-                    "type": "object",
-                    "markdownDescription": "%config.taskexplorer.specialFolders.folderState%",
-                    "additionalProperties": {
-                        "enum": [
-                            "Collapsed",
-                            "Expanded"
+                        "default": [
+                            "pre-launch[0-9]{2}\\.r(?:b|c)"
                         ],
-                        "description": ""
+                        "order": 25,
+                        "markdownDescription": "%config.taskexplorer.excludeTask%"
                     },
-                    "properties": {
-                        "lastTasks": {
-                            "enum": [
-                                "Collapsed",
-                                "Expanded"
-                            ],
-                            "description": "%config.taskexplorer.specialFolders.folderState.lastTasks%"
+                    "taskexplorer.includeAnt": {
+                        "type": [
+                            "string",
+                            "array"
+                        ],
+                        "items": {
+                            "type": "string"
                         },
-                        "favorites": {
-                            "enum": [
-                                "Collapsed",
-                                "Expanded"
-                            ],
-                            "description": "%config.taskexplorer.specialFolders.folderState.favorites%"
+                        "default": [],
+                        "order": 30,
+                        "markdownDeprecationMessage": "%config.taskexplorer.includeAntDeprecated%",
+                        "markdownDescription": "%config.taskexplorer.includeAntDsc%"
+                    },
+                    "taskexplorer.globPatternsAnt": {
+                        "type": [
+                            "array"
+                        ],
+                        "items": {
+                            "type": "string"
                         },
-                        "userTasks": {
-                            "enum": [
-                                "Collapsed",
-                                "Expanded"
-                            ],
-                            "description": "%config.taskexplorer.specialFolders.folderState.userTasks%"
+                        "default": [],
+                        "order": 35,
+                        "markdownDescription": "%config.taskexplorer.globPatternsAnt%"
+                    },
+                    "taskexplorer.globPatternsBash": {
+                        "type": [
+                            "array"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "default": [],
+                        "order": 40,
+                        "markdownDescription": "%config.taskexplorer.globPatternsBash%"
+                    }
+                }
+            },
+            {
+                "id": "grouping",
+                "order": 60,
+                "title": "Grouping",
+                "properties": {
+                    "taskexplorer.groupWithSeparator": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%config.taskexplorer.groupWithSeparator%"
+                    },
+                    "taskexplorer.groupSeparator": {
+                        "type": "string",
+                        "enum": [
+                            "-",
+                            "_",
+                            ":",
+                            "|"
+                        ],
+                        "default": "-",
+                        "description": "%config.taskexplorer.groupSeparator%"
+                    },
+                    "taskexplorer.groupStripTaskLabel": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%config.taskexplorer.groupStripTaskLabel%"
+                    },
+                    "taskexplorer.groupMaxLevel": {
+                        "type": "number",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "default": 1,
+                        "description": "%config.taskexplorer.groupMaxLevel%"
+                    }
+                }
+            },
+            {
+                "id": "logging",
+                "order": 80,
+                "title": "Logging",
+                "properties": {
+                    "taskexplorer.logging.enable": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 50,
+                        "markdownDescription": "%config.taskexplorer.logging.enable%"
+                    },
+                    "taskexplorer.logging.enableFile": {
+                        "type": "boolean",
+                        "default": false,
+                        "order": 53,
+                        "markdownDescription": "%config.taskexplorer.logging.enableFile%"
+                    },
+                    "taskexplorer.logging.enableFileSymbols": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 56,
+                        "markdownDescription": "%config.taskexplorer.logging.enableFileSymbols%"
+                    },
+                    "taskexplorer.logging.enableOutputWindow": {
+                        "type": "boolean",
+                        "default": true,
+                        "order": 60,
+                        "markdownDescription": "%config.taskexplorer.logging.enableOutputWindow%"
+                    },
+                    "taskexplorer.logging.level": {
+                        "type": "number",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5
+                        ],
+                        "default": 1,
+                        "order": 55,
+                        "markdownDescription": "%config.taskexplorer.logging.level%"
+                    }
+                }
+            },
+            {
+                "id": "programs",
+                "order": 80,
+                "title": "Programs",
+                "properties": {
+                    "taskexplorer.pathToPrograms": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "description": "%config.taskexplorer.pathToPrograms%",
+                        "properties": {
+                            "ant": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToAnt%"
+                            },
+                            "ansicon": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToAnsicon%"
+                            },
+                            "composer": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToComposer%"
+                            },
+                            "curl": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToCurl%"
+                            },
+                            "gradle": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToGradle%"
+                            },
+                            "jenkins": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToJenkins%"
+                            },
+                            "make": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToMake%"
+                            },
+                            "maven": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToMaven%"
+                            },
+                            "nsis": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToNsis%"
+                            },
+                            "perl": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToPerl%"
+                            },
+                            "pipenv": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToPipenv%"
+                            },
+                            "powershell": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToPowershell%"
+                            },
+                            "python": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToPython%"
+                            },
+                            "ruby": {
+                                "type": "string",
+                                "description": "%config.taskexplorer.pathToRuby%"
+                            }
+                        },
+                        "default": {
+                            "ant": "ant.bat",
+                            "ansicon": "ansicon",
+                            "composer": "composer",
+                            "curl": "curl",
+                            "gradle": "gradle.bat",
+                            "jenkins": "",
+                            "make": "nmake",
+                            "maven": "mvn",
+                            "nsis": "makensis",
+                            "perl": "perl",
+                            "pipenv": "pipenv",
+                            "powershell": "powershell",
+                            "python": "python",
+                            "ruby": "ruby"
                         }
                     },
-                    "default": {
-                        "lastTasks": "Expanded",
-                        "favorites": "Expanded",
-                        "userTasks": "Expanded"
+                    "taskexplorer.enableAnsiconForAnt": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "%config.taskexplorer.visual.enableAnsiconForAnt%"
+                    },
+                    "taskexplorer.environment": {
+                        "type": "object",
+                        "order": 18,
+                        "additionalProperties": false,
+                        "markdownDescription": "%config.taskexplorer.environment%",
+                        "properties": {
+                            "jenkinsApiToken": "JENKINS_API_TOKEN"
+                        }
                     }
-                },
-                "taskexplorer.visual.disableAnimatedIcons": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "%config.taskexplorer.visual.disableAnimatedIcons%"
-                },
-                "taskexplorer.visual.enableAnsiconForAnt": {
-                    "type": "boolean",
-                    "default": true,
-                    "markdownDescription": "%config.taskexplorer.visual.enableAnsiconForAnt%"
-                },
-                "taskexplorer.useAnt": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskexplorer.useAnt%"
-                },
-                "taskexplorer.useGulp": {
-                    "type": "boolean",
-                    "default": false,
-                    "markdownDescription": "%config.taskexplorer.useGulp%"
+                }
+            },
+            {
+                "id": "specialfolders",
+                "order": 100,
+                "title": "Special Folders",
+                "properties": {
+                    "taskexplorer.specialFolders.showFavorites": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "%config.taskexplorer.specialFolders.showFavorites%"
+                    },
+                    "taskexplorer.specialFolders.showLastTasks": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "%config.taskexplorer.specialFolders.showLastTasks%"
+                    },
+                    "taskexplorer.specialFolders.showUserTasks": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%config.taskexplorer.specialFolders.showUserTasks%"
+                    },
+                    "taskexplorer.specialFolders.numLastTasks": {
+                        "type": "number",
+                        "enum": [
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6,
+                            7,
+                            8,
+                            9,
+                            10,
+                            11,
+                            12,
+                            13,
+                            14,
+                            15,
+                            16,
+                            17,
+                            18,
+                            19,
+                            20,
+                            21,
+                            22,
+                            23,
+                            24,
+                            25
+                        ],
+                        "default": 10,
+                        "markdownDescription": "%config.taskexplorer.specialFolders.numLastTasks%"
+                    },
+                    "taskexplorer.specialFolders.folderState": {
+                        "type": "object",
+                        "markdownDescription": "%config.taskexplorer.specialFolders.folderState%",
+                        "additionalProperties": {
+                            "enum": [
+                                "Collapsed",
+                                "Expanded"
+                            ],
+                            "description": ""
+                        },
+                        "properties": {
+                            "lastTasks": {
+                                "enum": [
+                                    "Collapsed",
+                                    "Expanded"
+                                ],
+                                "description": "%config.taskexplorer.specialFolders.folderState.lastTasks%"
+                            },
+                            "favorites": {
+                                "enum": [
+                                    "Collapsed",
+                                    "Expanded"
+                                ],
+                                "description": "%config.taskexplorer.specialFolders.folderState.favorites%"
+                            },
+                            "userTasks": {
+                                "enum": [
+                                    "Collapsed",
+                                    "Expanded"
+                                ],
+                                "description": "%config.taskexplorer.specialFolders.folderState.userTasks%"
+                            }
+                        },
+                        "default": {
+                            "lastTasks": "Expanded",
+                            "favorites": "Expanded",
+                            "userTasks": "Expanded"
+                        }
+                    }
+                }
+            },
+            {
+                "id": "taskbuttons",
+                "order": 120,
+                "title": "Task Buttons",
+                "properties": {
+                    "taskexplorer.taskButtons.clickAction": {
+                        "type": "string",
+                        "enum": [
+                            "Execute",
+                            "Open"
+                        ],
+                        "default": "Open",
+                        "description": "%config.taskexplorer.taskButtons.clickAction%"
+                    },
+                    "taskexplorer.taskButtons.controlCharacter": {
+                        "type": "string",
+                        "default": "Y",
+                        "pattern": "[A-Z]{1}",
+                        "description": "%config.taskexplorer.taskButtons.controlCharacter%"
+                    },
+                    "taskexplorer.taskButtons.showExecuteWithArgumentsButton": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithArgumentsButton%"
+                    },
+                    "taskexplorer.taskButtons.showFavoritesButton": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "%config.taskexplorer.taskButtons.showFavoritesButton%"
+                    },
+                    "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": {
+                        "type": "boolean",
+                        "default": false,
+                        "markdownDescription": "%config.taskexplorer.taskButtons.showExecuteWithNoTerminalButton%"
+                    }
+                }
+            },
+            {
+                "id": "visual",
+                "order": 120,
+                "title": "Visual",
+                "properties": {
+                    "taskexplorer.visual.disableAnimatedIcons": {
+                        "type": "boolean",
+                        "default": false,
+                        "description": "%config.taskexplorer.visual.disableAnimatedIcons%"
+                    },
+                    "taskexplorer.showHiddenWsTasks": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "%config.taskexplorer.showHiddenWsTasks%"
+                    },
+                    "taskexplorer.showRunningTask": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%config.taskexplorer.showRunningTask%"
+                    },
+                    "taskexplorer.sortProjectFoldersAlpha": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "%config.taskexplorer.sortProjectFoldersAlpha%"
+                    }
                 }
             }
-        },
+        ],
         "taskDefinitions": [
             {
                 "type": "ant",

@@ -273,7 +273,7 @@ const createDefaultSettings = async() =>
         "taskexplorer.taskButtons.showExecuteWithArgumentsButton": false,
         "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": false,
         "taskexplorer.visual.disableAnimatedIcons": true,
-        "taskexplorer.visual.enableAnsiconForAnt": false,
+        "taskexplorer.enableAnsiconForAnt": false,
         "taskexplorer.groupMaxLevel": 1,
         "taskexplorer.groupSeparator": "-",
         "taskexplorer.groupWithSeparator": true,
