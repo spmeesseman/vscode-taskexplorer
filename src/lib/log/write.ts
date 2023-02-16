@@ -158,11 +158,18 @@ const _write = (msg: string, logPad: string, queueId: string | undefined, isValu
 };
 
 
-export const write = (msg: string, level?: number, logPad = "", queueId?: string, isValue?: boolean, isError?: boolean) =>
+export const write = (msg: string, level?: number, logPad?: string, queueId?: string, isValue?: boolean, isError?: boolean) =>
 {
     // if (shouldSkip(msg)) {
     if (msg === null || msg === undefined || (logControl.lastWriteWasBlank && msg === "")) {
         return;
+    }
+
+    //
+    // Auto-pad to last used padding if `logPad` is unspecified / undefined
+    //
+    if (logPad === undefined) {
+        logPad = logControl.lastLogPad || "";
     }
 
     //
