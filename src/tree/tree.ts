@@ -108,15 +108,8 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
                 log.write("   a refresh event for this item is already running or queued, skip", logLevel, logPad);
             }
         }
-        else
-        {
-            if (TaskTree.loadStage <= 1) {
-                this.getChildren(treeItem);
-            }
-            else {
-                ++TaskTree.loadStage;
-            }
-            log.write("   a refresh event will be skipped as the view has not yet been made visible", logLevel, logPad);
+        else {
+            log.write("   a refresh event will be skipped as the view has not yet been shown", logLevel, logPad);
         }
         log.methodDone("fire tree refresh event", logLevel, logPad);
     };

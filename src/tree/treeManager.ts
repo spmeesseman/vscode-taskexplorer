@@ -320,7 +320,8 @@ export class TaskTreeManager implements Disposable
 
     fireTreeRefreshEvent = (logPad: string, logLevel: number, treeItem?: TreeItem) =>
     {
-        Object.values(this._views).filter(v => v.enabled && v.visible).forEach((v) =>
+        // Object.values(this._views).filter(v => v.enabled && v.visible).forEach((v) =>
+        Object.values(this._views).filter(v => v.enabled).forEach((v) =>
         {
             v.tree.fireTreeRefreshEvent(logPad + "   ", logLevel, treeItem);
         });
@@ -457,7 +458,8 @@ export class TaskTreeManager implements Disposable
     };
 
 
-    isBusy = () => this.refreshPending || TaskTreeBuilder.isBusy();
+    isBusy = () => this.views.taskExplorer.tree.isBusy() || this.views.taskExplorerSideBar.tree.isBusy() ||
+                   this.refreshPending || TaskTreeBuilder.isBusy();
 
 
 	get onTasksChanged(): Event<TasksChangeEvent>
