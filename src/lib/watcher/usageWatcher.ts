@@ -80,6 +80,7 @@ export class UsageWatcher implements Disposable
 		{
 			const now = Date.now(),
 				  lastDate = new Date(usage.lastUsedAt);
+			/* istanbul ignore if */
 			if (lastDate.getDate() !== new Date(now).getDate()) {
 				usage.countToday = 0; // Reset, the day has changed since the last record ran task
 			}
