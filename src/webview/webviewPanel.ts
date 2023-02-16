@@ -72,11 +72,10 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ...args: any[])
 	{
-		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
-
 		while (this.wrapper.busy) {
 			await timeout(100);
 		}
+		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
 
 		const column = options?.column ?? ViewColumn.One; // ViewColumn.Beside;
 		// Only try to open beside if there is an active tab
