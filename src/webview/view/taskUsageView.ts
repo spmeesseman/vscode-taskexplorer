@@ -54,4 +54,13 @@ export class TaskUsageView extends TeWebviewView<State>
 		return html;
 	};
 
+
+	protected override includeBody = async() => ""; // For coverage, empty body
+
+
+	protected override includeHead = async() => ""; // For coverage, empty head
+
+
+	protected override includeEndOfBody = async() => ""; // For coverage, empty endOfBody
+
 }

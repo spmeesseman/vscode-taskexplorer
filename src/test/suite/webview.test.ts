@@ -9,9 +9,9 @@ import { EchoCommandRequestType } from "../../webview/common/ipc";
 import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
-    activate, closeEditors, endRollingCount, exitRollingCount, sleep, suiteFinished, testControl as tc, waitForTeIdle
+    activate, closeEditors, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
-import { commands } from "vscode";
+import { commands, Uri } from "vscode";
 
 
 let teWrapper: TeWrapper;
@@ -56,7 +56,7 @@ suite("Webview Tests", () =>
     test("Home View", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.focusChangeViews + 1000);
+        this.slow((tc.slowTime.commands.focusChangeViews * 3) + tc.slowTime.commands.fast + (tc.slowTime.config.enableEvent * 2) + 2000);
         let loaded = false,
             loadTime = 0;
         const d = teWrapper.homeView.onContentLoaded(() => { loaded = true; }); // cover onContentLoaded
@@ -69,14 +69,16 @@ suite("Webview Tests", () =>
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
         expect(teWrapper.homeView.description).to.not.be.undefined;
         await focusExplorerView(teWrapper);
+        await sleep(5);
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage }); // not visible, ignored
         await executeCommand(Commands.FocusHomeView);
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage });
-        await closeEditors();
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(5);
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage, args: [ Uri.file(getWsPath(".")) ] });
         await sleep(500);
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(1500);
         await executeCommand(Commands.RefreshHomeView);
         await executeCommand(Commands.Donate);
-        await closeEditors();
         endRollingCount(this);
     });
 
@@ -88,6 +90,7 @@ suite("Webview Tests", () =>
         await executeCommand(Commands.FocusTaskUsageView);
         await focusExplorerView(teWrapper);
         await teWrapper.taskUsageView.show();
+        await sleep(5);
         endRollingCount(this);
     });
 
@@ -97,8 +100,10 @@ suite("Webview Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
         await teWrapper.taskCountView.show();
+        await sleep(5);
         await focusExplorerView(teWrapper);
         await executeCommand(Commands.FocusTaskCountView);
+        await sleep(5);
         endRollingCount(this);
     });
 
@@ -117,6 +122,7 @@ suite("Webview Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
         await teWrapper.releaseNotesPage.show();
+        await sleep(5);
         endRollingCount(this);
     });
 
@@ -153,6 +159,16 @@ suite("Webview Tests", () =>
 		await closeEditors();
         endRollingCount(this);
 	});
+
+
+    test("Post an Unknown Random Message", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(500);
+        endRollingCount(this);
+    });
 
 
     test("Disable SideBar", async function()

@@ -163,4 +163,11 @@ export class HomeView extends TeWebviewView<State>
 	// {
 	// 	return this.getState();
 	// }
+
+	// private async getState(): Promise<State> { // For coverage, haven't messed with states yet
+	// 	return {
+	// 		pinned: true, // this.wrapper.storage.get('home:state:pinned') ?? true;
+	// 		extensionEnabled: !!getContext(ContextKeys.Enabled, false)
+	// 	};
+	// }
 }

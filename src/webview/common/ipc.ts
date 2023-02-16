@@ -56,7 +56,7 @@ export const WebviewFocusChangedCommandType = new IpcCommandType<WebviewFocusCha
 export interface ExecuteCommandParams
 {
 	command: string;
-	args?: [];
+	args?: any[];
 }
 export const ExecuteCommandType = new IpcCommandType<ExecuteCommandParams>("command/execute");
 
