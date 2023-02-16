@@ -144,8 +144,8 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	private setContextKeys(active: boolean | undefined, focus?: boolean, inputFocus?: boolean)
 	{
 		void setContext(`${this.contextKeyPrefix}:active`, !!active);
-		void setContext(`${this.contextKeyPrefix}:focus`, !!focus && !!active);
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!inputFocus && !!active);
+		void setContext(`${this.contextKeyPrefix}:focus`, !!active && !!focus);
+		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!active && !!inputFocus);
 	}
 
 

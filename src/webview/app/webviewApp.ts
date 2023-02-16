@@ -147,14 +147,13 @@ export abstract class TeWebviewApp<State = undefined>
         this.log(`[BASE]${this.appName}.onMessageReceived(${msg.id}): method=${msg.method}: name=${e.data.command}`);
         switch (msg.method)
         {
-			case EchoCommandRequestType.method:    // Standard echo service for testing web->host commands
+			case EchoCommandRequestType.method:       // Standard echo service for testing web->host commands in mocha tests
                 onIpc(EchoCommandRequestType, msg, params => this.sendCommand(ExecuteCommandType, params));
                 break;
-			case EchoCustomCommandRequestType.method:
+			case EchoCustomCommandRequestType.method: // Standard echo service for testing web->host commands in mocha tests
 				onIpc(EchoCustomCommandRequestType, msg, params => this.sendCommand(ExecuteCustomCommandType, params));
                 break;
 			default:
-				this.sendCommand(new IpcCommandType<void>("webview/test"), msg.params as any);
                 break;
 		}
 	};
