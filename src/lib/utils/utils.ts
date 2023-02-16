@@ -200,23 +200,13 @@ export const lowerCaseFirstChar = (s: string, removeSpaces: boolean) =>
 };
 
 
-export const oneTimeEvent = <T>(event: Event<T>): Event<T> =>
-{
-	return (listener: (e: T) => unknown, thisArgs?: unknown, disposables?: Disposable[]) =>
-    {
-		const result = event(e => { result.dispose(); return listener.call(thisArgs, e); }, null, disposables);
-		return result;
-	};
-};
-
-
 export const pushIfNotExists = (arr: any[], item: any) =>
 {
     if (!arr.includes(item)) { arr.push(item); }
 };
 
 
-export const pluralize = (s: string, count: number) => `${count} ${s}${count === 1 ? "" : "s"}`;
+// export const pluralize = (s: string, count: number) => `${count} ${s}${count === 1 ? "" : "s"}`;
 
 
 // export const removeFromArray = <T>(arr: T[], cb: (value: any, index: number, array: T[]) => void)

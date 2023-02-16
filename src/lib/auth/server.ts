@@ -58,7 +58,7 @@ export class TeServer implements Disposable
 
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
-		/* istanbul ignore if */
+		/* istanbul ignore next */
 		if (this.wrapper.tests)
 		{
 			if (!value && value !== false) {

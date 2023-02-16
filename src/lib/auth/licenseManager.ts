@@ -150,6 +150,10 @@ export class LicenseManager implements Disposable
 	isLicensed = () => this.licensed;
 
 
+	//
+	// TODO - Remove istanbul tags when auth sessions are implemented
+	//
+	/* istanbul ignore next */
 	private onSessionChanged = (e: TeAuthenticationSessionChangeEvent) =>
 	{
 		this._onSessionChange.fire(e);
@@ -184,7 +188,7 @@ export class LicenseManager implements Disposable
 		if (rsp.success === true && rsp.data && this.wrapper.utils.isObject(rsp.data.token))
 		{
 			token = rsp.data.token.token;
-			await this.setLicenseKeyFromRsp(rsp.success, rsp.data, logPad);
+			await this.setLicenseKeyFromRsp(rsp.data, logPad);
 			await this.wrapper.storage.updateSecret("license_key_30day", token);
 		}
 
@@ -197,27 +201,20 @@ export class LicenseManager implements Disposable
 	setLicenseKey = async (licenseKey: string | undefined) => this.wrapper.storage.updateSecret("license_key", licenseKey);
 
 
-	private setLicenseKeyFromRsp = async(licensed: boolean, jso: any, logPad: string) =>
+	private setLicenseKeyFromRsp = async(jso: any, logPad: string) =>
 	{
-		if (licensed && jso.token)
+		if (this.wrapper.utils.isString(jso.token))
 		{
-			if (this.wrapper.utils.isString(jso.token))
-			{
-				this.wrapper.log.write("license key", 1, logPad, jso.token);
-				await this.setLicenseKey(jso.token);
-			}
-			else {
-				this.wrapper.log.write("license key", 1, logPad, jso.token.token);
-				this.wrapper.log.write("   issued", 1, logPad, jso.token.issuedFmt);
-				this.wrapper.log.write("   expires", 1, logPad, jso.token.expiresFmt || jso.expiresFmt);
-				await this.setLicenseKey(jso.token.token);
-			}
-			this.wrapper.log.write("license key saved to secure storage", 1, logPad);
+			this.wrapper.log.write("license key", 1, logPad, jso.token);
+			await this.setLicenseKey(jso.token);
 		}
 		else {
-			this.wrapper.log.write("license key will not be saved", 1, logPad);
+			this.wrapper.log.value("license key", jso.token.token, 1, logPad);
+			this.wrapper.log.value("   issued", jso.token.issuedFmt, 1, logPad);
+			this.wrapper.log.value("   expires", jso.token.expiresFmt || jso.expiresFmt, 1, logPad);
+			await this.setLicenseKey(jso.token.token);
 		}
-		this.wrapper.log.write("request to license server completed", 1, logPad);
+		this.wrapper.log.write("license key saved to secure storage", 1, logPad);
 	};
 
 
@@ -284,7 +281,7 @@ export class LicenseManager implements Disposable
 		{
 			licensed = rsp.success;
 			rsp.token = licenseKey;
-			await this.setLicenseKeyFromRsp(rsp.success, rsp, logPad);
+			await this.setLicenseKeyFromRsp(rsp, logPad);
 		}
 
 		this.busy = false;
