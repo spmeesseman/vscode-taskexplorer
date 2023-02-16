@@ -88,8 +88,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 	return commands.registerCommand(
 		command,
 		function (this: any, ...args) {
-			// this.wrapper.telemetry.sendEvent("command", { command: command });
-			void this.wrapper?.usage.track(`command:${command}:started`);
+			void this?.wrapper?.usage.track(`command:${command}`);
 			return callback.call(this, ...args);
 		},
 		thisArg

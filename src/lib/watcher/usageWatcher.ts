@@ -85,7 +85,7 @@ export class UsageWatcher implements Disposable
 		if (!usage)
 		{
 			usage = {
-				count: 0,
+				count: 1,
 				firstUsedAt: usedAt,
 				lastUsedAt: usedAt,
 			};
