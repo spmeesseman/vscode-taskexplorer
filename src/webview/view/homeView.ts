@@ -131,10 +131,8 @@ export class HomeView extends TeWebviewView<State>
 
 	protected override onHtmlFinalize = async (html: string) =>
 	{
-    	const taskStats = this.wrapper.taskManager.getTaskStats(),
-			  taskCount = this.wrapper.treeManager.getTasks().length;
-		html = html.replace("#{taskCounts.length}",  taskCount.toString())
-				   .replace("#{taskCounts.today}", taskStats.todayCount.toString())
+    	html = html.replace("#{taskCounts.length}", this.wrapper.treeManager.getTasks().length.toString())
+				   .replace("#{taskCounts.today}", this.wrapper.taskManager.getTodayCount("").toString())
 				   .replace("#{license.status}", "UNLICENSED")
 				   .replace("#{license.statusIcon}", "lock");
 		return removeLicenseButtons(this.wrapper, html);

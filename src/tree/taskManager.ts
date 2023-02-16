@@ -2,12 +2,12 @@
 import { dirname } from "path";
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
+import { ILog } from "../interface";
 import { TaskMap } from "./treeBuilder";
 import { TeWrapper } from "../lib/wrapper";
 import { pathExists } from "../lib/utils/fs";
 import { getTerminal } from "../lib/getTerminal";
 import { SpecialTaskFolder } from "./specialFolder";
-import { ILog, ITaskStats } from "../interface";
 import { ScriptTaskProvider } from "../providers/script";
 import { isScriptType } from "../lib/utils/taskTypeUtils";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
@@ -438,6 +438,7 @@ export class TaskManager implements Disposable
                 taskName = k;
             }
         });
+        taskName = taskName.replace("task:", "");
         this.log.methodDone("get most used task", 2, logPad, [[ "most used task", taskName ]]);
         return taskName;
     };

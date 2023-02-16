@@ -5,8 +5,6 @@ import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { registerCommand } from "../lib/command";
 import { setContext, ContextKeys } from "../lib/context";
-import { WebviewFocusChangedParams } from "./common/ipc";
-import { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands, Uri
@@ -30,7 +28,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		fileName: string,
 		public readonly id: `taskexplorer.view.${WebviewViewIds}`,
 		private readonly contextKeyPrefix: `${ContextKeys.WebviewViewPrefix}${WebviewViewIds}`,
-		private readonly trackingFeature: TrackedUsageFeatures)
+		private readonly trackingFeature: string)
 	{
 		super(wrapper, title, fileName);
 		this.description = description;

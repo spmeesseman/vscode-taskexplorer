@@ -4,8 +4,6 @@ import { TeWebviewBase } from "./webviewBase";
 import { isObject, timeout } from "../lib/utils/utils";
 import { ContextKeys, setContext } from "../lib/context";
 import { Commands, registerCommand } from "../lib/command";
-import type { WebviewFocusChangedParams } from "./common/ipc";
-import type { TrackedUsageFeatures } from "../lib/watcher/usageWatcher";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
     Disposable, Uri, ViewColumn, window, WebviewPanelSerializer
@@ -26,7 +24,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				private readonly iconPath: string,
 				public readonly id: `taskexplorer.${WebviewIds}`,
 				private readonly contextKeyPrefix: `${ContextKeys.WebviewPrefix}${WebviewIds}`,
-				private readonly trackingFeature: TrackedUsageFeatures,
+				private readonly trackingFeature: string,
 				showCommand: Commands)
 	{
 		super(wrapper, title, fileName);

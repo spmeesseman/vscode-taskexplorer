@@ -3,7 +3,6 @@ import { TaskTree } from "./tree";
 import { TeWrapper } from "src/lib/wrapper";
 import { ContextKeys } from "src/lib/context";
 import { TaskTreeManager } from "./treeManager";
-import { TrackedUsageFeatures } from "src/lib/watcher/usageWatcher";
 import {
     Disposable, TreeItem, TreeView, TreeViewExpansionEvent, TreeViewSelectionChangeEvent,
     TreeViewVisibilityChangeEvent, window
@@ -33,7 +32,7 @@ export class TeTreeView implements ITaskTreeView, Disposable
 		description: string,
 		private readonly id: TreeViewIds,
 		private readonly contextKeyPrefix: `${ContextKeys.TreeViewPrefix}${TreeViewIds}`,
-		private readonly trackingFeature: TrackedUsageFeatures)
+		private readonly trackingFeature: string)
 	{
         this._tree = new TaskTree(id, treeManager);
         this._view = window.createTreeView("taskexplorer.view." + id, { treeDataProvider: this._tree, showCollapseAll: true });

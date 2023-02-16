@@ -8,7 +8,6 @@ import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ParsingReportPage } from "../../webview/page/parsingReportPage";
-import { ITaskExplorerApi, ITaskTreeView } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
@@ -17,8 +16,6 @@ import {
 let teWrapper: TeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
-let origExplorer: TaskTree | undefined;
-let origSidebar: TaskTree | undefined;
 let pkgMgr: string;
 
 
@@ -29,8 +26,6 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teWrapper } = await activate(this));
 		projectUri = Uri.file(getWsPath("."));
-		origExplorer = teWrapper.explorer;
-		origSidebar = teWrapper.sidebar;
 		pkgMgr = teWrapper.config.getVs<string>("npm.packageManager");
 		userTasks = teWrapper.config.get<boolean>("specialFolders.showUserTasks");
         endRollingCount(this, true);

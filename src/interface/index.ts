@@ -2,7 +2,6 @@
 export { ILog } from "./ILog";
 export { IEvent } from "./IEvent";
 export { IRecord } from "./IRecord";
-export { ITaskStats } from "./ITaskStats";
 export { ICacheItem } from "./ICacheItem";
 export { IDictionary } from "./IDictionary";
 export { ILogQueueItem } from "./ILogQueueItem";
