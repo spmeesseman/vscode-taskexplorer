@@ -31,16 +31,13 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	}
 
 
+	// protected override includeBody = async(...args: any[]) => this.getExtraContent(args[0]);
 	protected override onHtmlPreview = async(html: string, ...args: any[]) =>
 	{
 		const uri = args[0] as Uri | undefined;
 		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
 		html = await createTaskCountTable(this.wrapper, project, html);
-		const infoContent = this.getExtraContent(uri);
-		html = html.replace("<!-- addtlContent -->", infoContent);
-		const idx1 = html.indexOf("<!-- startParsingReportButton -->"),
-			  idx2 = html.indexOf("<!-- endParsingReportButton -->") + 31;
-		html = html.replace(html.slice(idx1, idx2), "");
+		html = html.replace("#{parsingReportTable}", this.getExtraContent(uri));
 		return html;
 	};
 

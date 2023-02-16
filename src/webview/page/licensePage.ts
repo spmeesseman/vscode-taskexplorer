@@ -35,9 +35,9 @@ export class LicensePage extends TeWebviewPanel<State>
 		html = await createTaskCountTable(this.wrapper, undefined, html);
 		html = removeViewLicenseButton(html);
 		let infoContent = await this.getExtraContent(newKey);
-		html = html.replace("<!-- addtlContentTop -->", infoContent);
+		html = html.replace("#{licensePageBodyTop}", infoContent);
 		infoContent = this.getExtraContent2();
-		html = html.replace("<!-- addtlContent -->", infoContent);
+		html = html.replace("#{licensePageBodyBottom}", infoContent);
 		return html;
 	};
 

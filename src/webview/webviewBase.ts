@@ -25,10 +25,10 @@ export abstract class TeWebviewBase<State> implements Disposable
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
     protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
 
-	protected includeBootstrap?(): any;
-	protected includeBody?(): string | Promise<string>;
-	protected includeEndOfBody?(): string | Promise<string>;
-	protected includeHead?(): string | Promise<string>;
+	protected includeBootstrap?(...args: unknown[]): any;
+	protected includeBody?(...args: unknown[]): string | Promise<string>;
+	protected includeEndOfBody?(...args: unknown[]): string | Promise<string>;
+	protected includeHead?(...args: unknown[]): string | Promise<string>;
 	protected onActiveChanged?(active: boolean): void;
 	protected onInitializing?(): Disposable[] | undefined;
 	protected onFocusChanged?(focused: boolean): void;
@@ -106,10 +106,10 @@ export abstract class TeWebviewBase<State> implements Disposable
 			  webRoot = webview.asWebviewUri(webRootUri).toString();
 
 		const [ bootstrap, head, body, endOfBody ] = await Promise.all([
-			this.includeBootstrap?.(),
-			this.includeHead?.(),
-			this.includeBody?.(),
-			this.includeEndOfBody?.(),
+			this.includeBootstrap?.(...args),
+			this.includeHead?.(...args),
+			this.includeBody?.(...args),
+			this.includeEndOfBody?.(...args),
 		]);
 
 		let html = content;
