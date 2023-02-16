@@ -6,30 +6,14 @@ import { Disposable, Event, EventEmitter } from "vscode";
 
 export interface TrackedUsage {
 	count: number;
+	countToday: number;
 	firstUsedAt: number;
 	lastUsedAt: number;
 }
 
-export type TrackedUsageFeatures =
-	| "runlastTask"
-	| "openSideBar"
-	| "clearFavorites"
-	| "clearLastTasks"
-	| "licensePage"
-	| "parsingReportPage"
-	| "releaseNotesPage"
-	| "homeView"
-	| "taskCountView"
-	| "taskUsageView"
-	| "taskTreeExplorer"
-	| "taskTreeSideBar";
-
-export type TrackedUsageKeys = `${TrackedUsageFeatures}:shown`;
-
-
 export interface UsageChangeEvent
 {
-	readonly key: TrackedUsageKeys;
+	readonly key: string;
 	readonly usage?: TrackedUsage;
 };
 
@@ -51,13 +35,13 @@ export class UsageWatcher implements Disposable
 	}
 
 
-	get = (key: TrackedUsageKeys): TrackedUsage | undefined => this.wrapper.storage.get<TrackedUsage>("usages." + key);
+	get = (key: string): TrackedUsage | undefined => this.wrapper.storage.get<TrackedUsage>("usages." + key);
 
 
 	getAll = (): IDictionary<TrackedUsage> => this.wrapper.storage.get<IDictionary<TrackedUsage>>("usages", {});
 
 
-	async reset(key?: TrackedUsageKeys): Promise<void>
+	async reset(key?: string): Promise<void>
 	{
 		const usages =  this.wrapper.storage.get<IDictionary<TrackedUsage>>("usages");
 		if (!usages) return;
@@ -72,7 +56,7 @@ export class UsageWatcher implements Disposable
 	}
 
 
-	async track(key: TrackedUsageKeys): Promise<void>
+	async track(key: string): Promise<void>
 	{
 		let usages =  this.wrapper.storage.get<IDictionary<TrackedUsage>>("usages");
 		if (!usages) {
@@ -86,13 +70,21 @@ export class UsageWatcher implements Disposable
 		{
 			usage = {
 				count: 1,
+				countToday: 1,
 				firstUsedAt: usedAt,
 				lastUsedAt: usedAt,
 			};
 			usages[key] = usage;
 		}
-		else {
+		else
+		{
+			const now = Date.now(),
+				  lastDate = new Date(usage.lastUsedAt);
+			if (lastDate.getDate() !== new Date(now).getDate()) {
+				usage.countToday = 0; // Reset, the day has changed since the last record ran task
+			}
 			usage.count++;
+			usage.countToday++;
 			usage.lastUsedAt = usedAt;
 		}
 

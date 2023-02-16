@@ -10,15 +10,12 @@ import { SpecialTaskFolder } from "./specialFolder";
 import { ILog, ITaskStats } from "../interface";
 import { ScriptTaskProvider } from "../providers/script";
 import { isScriptType } from "../lib/utils/taskTypeUtils";
-import { Commands, registerCommand } from "../lib/command";
 import { findDocumentPosition } from "../lib/findDocumentPosition";
 import { getDateDifference, getPackageManager, timeout } from "../lib/utils/utils";
 import {
     CustomExecution, Disposable, InputBoxOptions, Selection, ShellExecution, Task, TaskDefinition,
     TaskExecution, TaskRevealKind, tasks, TextDocument, Uri, window, workspace, WorkspaceFolder
 } from "vscode";
-
-// const views: IDictionary<any> = {};
 
 
 export class TaskManager implements Disposable
@@ -315,7 +312,7 @@ export class TaskManager implements Disposable
         task.presentationOptions.reveal = noTerminal !== true ? TaskRevealKind.Always : TaskRevealKind.Silent;
         const exec = await tasks.executeTask(task);
         await this.specialFolders.lastTasks.saveTask(taskItem, logPad);
-        await this.saveTaskRunDetails(taskItem, logPad);
+        await this.saveTaskRunDetails(taskItem);
         this.log.methodDone("run task", 1, logPad, [[ "success", !!exec ]]);
         return exec;
     };
@@ -373,40 +370,10 @@ export class TaskManager implements Disposable
     };
 
 
-    private saveTaskRunDetails = async(taskItem: TaskItem, logPad: string) =>
+    private saveTaskRunDetails = async(taskItem: TaskItem) =>
     {
-        this.log.methodStart("save task details", 3, logPad);
-        const taskStats = this.wrapper.storage.get<ITaskStats>("taskStats", { ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
-        //
-        // Track per-day tasks ran
-        //
-        const now = Date.now();
-        const lastDate = new Date(taskStats.lastTime);
-        if (lastDate.getDate() !== new Date(now).getDate())
-        {   //
-            // Reset, the day has changed since the last record ran task
-            //
-            taskStats.todayCount = 0;
-        }
-        ++taskStats.todayCount;
-        taskStats.lastTime = now;
-        //
-        // Track run counts for each provider
-        //
         const taskName = `${taskItem.task.name} (${taskItem.task.source})`;
-        if (!taskStats.runCounts[taskName]) {
-            taskStats.runCounts[taskName] = 0;
-        }
-        ++taskStats.runCounts[taskName];
-        //
-        // Track the time every task is ran for avg. daily and weekly count calculations
-        //
-        taskStats.ranOn.push(now);
-        //
-        // Persist task stats
-        //
-        await this.wrapper.storage.update("taskStats", taskStats);
-        this.log.methodDone("save task details", 3, logPad, [[ "task count today", taskStats.todayCount ]]);
+        void this?.wrapper?.usage.track(`task:${taskName}`);
     };
 
 
@@ -416,36 +383,61 @@ export class TaskManager implements Disposable
         let avg = 0,
             lowestTime = now;
         this.log.methodStart("get average run count", 2, logPad, false, [[ "period", period ]]);
-        const taskStats = this.getTaskStats();
-        taskStats.ranOn.forEach((t) => {
-            if (t < lowestTime)  {
-                lowestTime = t;
+        const taskStats = this.wrapper.usage.getAll();
+        Object.keys(taskStats).filter(k => k.startsWith("task:")).forEach(k =>
+        {
+            if (taskStats[k].lastUsedAt < lowestTime)  {
+                lowestTime = taskStats[k].lastUsedAt ;
             }
         });
         const daysSinceFirstRunTask = getDateDifference(lowestTime, now, "d")  || 1;
-        avg = Math.floor(taskStats.ranOn.length / daysSinceFirstRunTask / (period === "d" ? 1 : 7));
+        avg = Math.floor(Object.keys(taskStats).length / daysSinceFirstRunTask / (period === "d" ? 1 : 7));
         this.log.methodDone("get average run count", 2, logPad, [[ "calculated average", avg ]]);
         return avg;
     };
 
 
-    private getDefaultStats = () => ({ ranOn: [], todayCount: 0, lastTime: 0, runCounts: {} });
+    getTodayCount = (logPad: string) =>
+    {
+        let count = 0;
+        this.log.methodStart("get today run count", 2, logPad);
+        const taskStats = this.wrapper.usage.getAll();
+        Object.keys(taskStats).filter(k => k.startsWith("task:")).forEach(k =>
+        {
+            count += taskStats[k].countToday;
+        });
+        this.log.methodDone("get today run count", 2, logPad, [[ "today run count", count ]]);
+        return count;
+    };
 
 
-    getTaskStats = () => this.wrapper.storage.get<ITaskStats>("taskStats", this.getDefaultStats());
+    getLastRanTaskTime = (logPad: string) =>
+    {
+        let lastTime = 0;
+        this.log.methodStart("get last ran task time", 2, logPad);
+        const taskStats = this.wrapper.usage.getAll();
+        Object.keys(taskStats).filter(k => k.startsWith("task:")).forEach(k =>
+        {
+            if (taskStats[k].lastUsedAt > lastTime)  {
+                lastTime = taskStats[k].lastUsedAt ;
+            }
+        });
+        this.log.methodDone("get last ran task time", 2, logPad, [[ "last task time", lastTime ]]);
+        return lastTime;
+    };
 
 
     getMostUsedTask = (logPad: string) =>
     {
         this.log.methodStart("get most used task", 2, logPad);
         let taskName = "";
-        const taskStats = this.getTaskStats();
-        for (const k of Object.keys(taskStats.runCounts))
+        const taskStats = this.wrapper.usage.getAll();
+        Object.keys(taskStats).filter(k => k.startsWith("task:")).forEach(k =>
         {
-            if (!taskName || taskStats.runCounts[k] > taskStats.runCounts[taskName]) {
+            if (!taskName || taskStats[k].count > taskStats[taskName].count) {
                 taskName = k;
             }
-        }
+        });
         this.log.methodDone("get most used task", 2, logPad, [[ "most used task", taskName ]]);
         return taskName;
     };

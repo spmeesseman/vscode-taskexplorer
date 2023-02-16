@@ -43,14 +43,14 @@ export class TaskUsageView extends TeWebviewView<State>
 
 	protected override onHtmlFinalize = async (html: string) =>
 	{
-    	const taskStats = this.wrapper.taskManager.getTaskStats(),
-			  lastTime = new Date(taskStats.lastTime).toLocaleDateString() + " " +
-			  			 new Date(taskStats.lastTime).toLocaleTimeString();
+    	const lastTime = this.wrapper.taskManager.getLastRanTaskTime(""),
+			  lastTimeFmt = new Date(lastTime).toLocaleDateString() + " " +
+			  			   new Date(lastTime).toLocaleTimeString();
 		html = html.replace(/\#\{taskUsage\.avgPerDay\}/g, this.wrapper.taskManager.getAvgRunCount("d", "").toString())
 				   .replace(/\#\{taskUsage\.avgPerWeek\}/g, this.wrapper.taskManager.getAvgRunCount("w", "").toString())
 				   .replace(/\#\{taskUsage\.mostUsedTask\}/g, this.wrapper.taskManager.getMostUsedTask(""))
-				   .replace(/\#\{taskUsage\.today\}/g, taskStats.todayCount.toString())
-				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, lastTime);
+				   .replace(/\#\{taskUsage\.today\}/g, this.wrapper.taskManager.getTodayCount("").toString())
+				   .replace(/\#\{taskUsage\.lastTaskRanAt\}/g, lastTimeFmt);
 		return html;
 	};
 
