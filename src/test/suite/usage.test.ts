@@ -29,9 +29,9 @@ suite("Usage / Telemetry Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const usage = teWrapper.usage.getAll();
-try {
-    console.log(JSON.stringify(usage, null, 3));
-}catch {}
+        // try {
+        //     console.log(JSON.stringify(usage, null, 3));
+        // } catch {}
         Object.keys(usage).forEach((k) => {
             teWrapper.usage.get(k as any);
             aKey = k;
