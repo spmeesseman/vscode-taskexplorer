@@ -147,7 +147,11 @@ export class TeServer implements Disposable
 			{   // Not going to fail unless i birth a bug
 				this.onServerError(e, "request", logPad);
 				this.busy = false;
-				resolve(undefined);
+				resolve({
+					data: undefined,
+					status: undefined,
+					success: false
+				});
 			});
 
 			req.write(JSON.stringify(params), () =>
