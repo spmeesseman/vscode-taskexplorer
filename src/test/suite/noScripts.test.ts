@@ -103,8 +103,7 @@ suite("NoScripts TreeItem Tests", () =>
         await waitForTeIdle(tc.waitTime.refreshCommand);
         const treeTasks = teWrapper.treeManager.getTaskTree() as TreeItem[];
         expect(treeTasks).to.not.be.undefined;
-        expect(treeTasks.length).to.be.equal(1);
-        expect(treeTasks[0].label).to.be.equal("No tasks found");
+        expect(treeTasks.length).to.be.equal(0);
         await verifyTaskCount("ant", 0);
         await verifyTaskCount("grunt", 0);
         await verifyTaskCount("gulp", 0);

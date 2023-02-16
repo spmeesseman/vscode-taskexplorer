@@ -63,7 +63,6 @@ suite("Info Report Tests", () =>
 		await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
 		const panel = await executeTeCommand2<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, [ projectUri ], testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -76,7 +75,6 @@ suite("Info Report Tests", () =>
 		await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
 	    const panel = await executeTeCommand2<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, [ projectUri, "", 5 ], testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -88,7 +86,6 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + 150);
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -102,7 +99,6 @@ suite("Info Report Tests", () =>
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
         await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
 		await closeEditors();
@@ -117,7 +113,6 @@ suite("Info Report Tests", () =>
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowLicensePage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
-		panel.hide();
 		await closeEditors();
         endRollingCount(this);
 	});
@@ -133,7 +128,6 @@ suite("Info Report Tests", () =>
 		// teWrapper.sidebar = undefined;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
 		// teWrapper.explorer = oExplorer;
 		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
@@ -151,7 +145,6 @@ suite("Info Report Tests", () =>
 		// teWrapper.sidebar = oExplorer;
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
-		panel.hide();
 		// teWrapper.explorer = oExplorer;
 		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
@@ -170,7 +163,6 @@ suite("Info Report Tests", () =>
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
-		panel.hide();
 		// teWrapper.explorer = oExplorer;
 		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
@@ -189,7 +181,6 @@ suite("Info Report Tests", () =>
 	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await panel.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
-		panel.hide();
 		// teWrapper.explorer = oExplorer;
 		// teWrapper.sidebar = oSidebar;
 		await closeEditors();
