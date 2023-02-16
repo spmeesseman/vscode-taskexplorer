@@ -146,9 +146,10 @@
 	"command.getLicense" : "Task Explorer: Get 30-Day license key",
 	"command.removeFromExcludes": "Task Explorer: Remove from Excludes List",
 	"command.showOutput": "Task Explorer: Show the log output window",
-	"command.showLicensePage" : "Task Explorer: View licensing information",
-	"command.showReleaseNotesPage" : "Task Explorer: View release notes",
-	"command.showParsingReportPage" : "Task Explorer: View parsing report",
+
+	"command.view.licensePage.show" : "Task Explorer: View licensing information",
+	"command.view.releaseNotes.show" : "Task Explorer: View release notes",
+	"command.view.parsingReport.show" : "Task Explorer: View parsing report",
 
 	"messages.noAssociatedTaskType": "This file does not appear to be associated to any known task type"
 }
