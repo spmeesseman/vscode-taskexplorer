@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { Uri } from "vscode";
+import { Uri, WebviewPanel } from "vscode";
 import { TaskTree } from "../../tree/tree";
 import { Commands } from "../../lib/command";
 import { TeWrapper } from "../../lib/wrapper";
@@ -195,7 +195,7 @@ suite("Info Report Tests", () =>
 		let panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(50);
-		teWrapper.parsingReportPage.dispose();
+		(teWrapper.parsingReportPage.view as WebviewPanel)?.dispose();
 		panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
 		await sleep(50);
 		// teWrapper.busy = true;
