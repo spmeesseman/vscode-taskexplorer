@@ -495,6 +495,30 @@ suite("Util Tests", () =>
 		util.isObjectEmpty("" as unknown as object);
 		util.isObjectEmpty(undefined as unknown as object);
 
+		const d1 = Date.now() - 6400000;
+		const d2 = Date.now();
+		const dt1 = new Date();
+		util.getDateDifference(d1, d2, "d");
+		util.getDateDifference(d1, d2, "h");
+		util.getDateDifference(d1, d2, "m");
+		util.getDateDifference(d1, d2, "s");
+		util.getDateDifference(d1, d2);
+		util.getDateDifference(dt1, d2, "d");
+		util.getDateDifference(dt1, d2, "h");
+		util.getDateDifference(dt1, d2, "m");
+		util.getDateDifference(dt1, d2, "s");
+		util.getDateDifference(dt1, d2);
+		util.getDateDifference(d1, dt1, "d");
+		util.getDateDifference(d1, dt1, "h");
+		util.getDateDifference(d1, dt1, "m");
+		util.getDateDifference(d1, dt1, "s");
+		util.getDateDifference(d1, dt1);
+		util.getDateDifference(d2, dt1, "d");
+		util.getDateDifference(d2, dt1, "h");
+		util.getDateDifference(d2, dt1, "m");
+		util.getDateDifference(d2, dt1, "s");
+		util.getDateDifference(d2, dt1);
+
         endRollingCount(this);
 	});
 
@@ -717,6 +741,10 @@ suite("Util Tests", () =>
 			expect(await teWrapper.storage.get2<string>("TEST_KEY2_DOESNT_EXIST")).to.be.equal(undefined);
 			expect(await teWrapper.storage.get2<number>("TEST_KEY2_DOESNT_EXIST", 0)).to.be.equal(0);
 			expect(await teWrapper.storage.get2<string>("TEST_KEY2_DOESNT_EXIST", "")).to.be.equal("");
+
+			const disposable = teWrapper.storage.onDidChangeSecrets(() => {});
+			await sleep(1);
+			disposable.dispose();
 
 			log.write("STORAGE KEYS: " + teWrapper.storage.keys().join(", "));
         }

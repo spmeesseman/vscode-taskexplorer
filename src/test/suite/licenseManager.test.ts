@@ -369,6 +369,8 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow((tc.slowTime.licenseMgr.enterKey * 2) + 1600);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await licMgr.enterLicenseKey();
@@ -385,6 +387,8 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.enterKey * 3);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
 		await executeTeCommand("enterLicense", tc.waitTime.command * 2);

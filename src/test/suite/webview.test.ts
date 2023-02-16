@@ -55,7 +55,7 @@ suite("Webview Tests", () =>
     test("Home View", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.focusChangeViews);
+        this.slow(tc.slowTime.commands.focusChangeViews + 1000);
         let loaded = false,
             loadTime = 0;
         const d = teWrapper.homeView.onContentLoaded(() => { loaded = true; }); // cover onContentLoaded
@@ -72,6 +72,7 @@ suite("Webview Tests", () =>
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage });
         await closeEditors();
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(500);
         await executeCommand(Commands.RefreshHomeView);
         await executeCommand(Commands.Donate);
         await closeEditors();
