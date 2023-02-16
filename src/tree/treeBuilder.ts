@@ -22,12 +22,9 @@ export type TaskMap = { [id: string]: TaskItem | undefined };
 
 export class TaskTreeBuilder implements Disposable
 {
-    private static treeBuilding = false;
-    private static taskMap: TaskMap = {};
-    private static taskTree: TaskFolder[] | undefined | null | void = null;
-
+    private treeBuilding = false;
     private treeManager: TaskTreeManager;
-    private taskMap: TaskMap;
+    private taskMap: TaskMap = {};
     private taskTree: TaskFolder[] | undefined | null | void = null;
     private specialFolders: { favorites: SpecialTaskFolder; lastTasks: SpecialTaskFolder };
 
@@ -36,8 +33,6 @@ export class TaskTreeBuilder implements Disposable
     {
         this.treeManager = treeManager;
         this.specialFolders = specialFolders;
-        this.taskMap = TaskTreeBuilder.taskMap;
-        this.taskTree = TaskTreeBuilder.taskTree;
     }
 
     dispose()
@@ -242,12 +237,12 @@ export class TaskTreeBuilder implements Disposable
     createTaskItemTree = async(logPad: string, logLevel: number) =>
     {
         log.methodStart("create task tree", logLevel, logPad);
-        TaskTreeBuilder.treeBuilding = true;
+        this.treeBuilding = true;
         statusBarItem.show();
         this.taskTree = await this.buildTaskItemTree(logPad + "   ", logLevel + 1);
         statusBarItem.update("Building task explorer tree");
         statusBarItem.hide();
-        TaskTreeBuilder.treeBuilding = false;
+        this.treeBuilding = false;
         log.methodDone("create task tree", logLevel, logPad, [[ "current task count", this.treeManager.getTasks().length ]]);
     };
 
@@ -564,17 +559,14 @@ export class TaskTreeBuilder implements Disposable
     getTaskTree = () => this.taskTree;
 
 
-    static getTaskMap = () => this.taskMap;
-
-
     invalidate  = () =>
     {
-        this.taskMap = TaskTreeBuilder.taskMap = {};
-        this.taskTree = TaskTreeBuilder.taskTree = null;
+        this.taskMap = {};
+        this.taskTree = null;
     };
 
 
-    static isBusy = () => this.treeBuilding;
+    isBusy = () => this.treeBuilding;
 
 
     private logTask = (task: Task, scopeName: string, logPad: string) =>

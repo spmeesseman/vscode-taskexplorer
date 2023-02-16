@@ -36,9 +36,9 @@ export class IpcNotificationType<Params = void> extends IpcMessageType<Params> {
 
 export const onIpc = <T extends IpcMessageType<any>>(type: T, msg: IpcMessage, fn: (params: IpcMessageParams<T>, type: T) => unknown) =>
 {
-	if (type.method !== msg.method) return;
-
-	fn(msg.params as IpcMessageParams<T>, type);
+	// if (type.method === msg.method) {
+		fn(msg.params as IpcMessageParams<T>, type);
+	// }
 };
 
 

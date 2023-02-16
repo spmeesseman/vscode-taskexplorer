@@ -38,7 +38,7 @@ export class TaskTreeManager implements Disposable
     private disposables: Disposable[] = [];
 
     private _onDidTasksChange = new EventEmitter<TasksChangeEvent>();
-    private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
+    // private _onDidTasksLoad = new EventEmitter<TasksChangeEvent>();
 
     private _specialFolders: {
         favorites: SpecialTaskFolder;
@@ -313,7 +313,7 @@ export class TaskTreeManager implements Disposable
         // Done!
         //
         this.firstTreeBuildDone = true;
-        this._onDidTasksLoad.fire({ taskCount: this._tasks.length });
+        // this._onDidTasksLoad.fire({ taskCount: this._tasks.length });
         this.wrapper.log.methodDone("fetch tasks", 1, logPad);
     };
 
@@ -458,20 +458,20 @@ export class TaskTreeManager implements Disposable
     };
 
 
-    isBusy = () => this.views.taskExplorer.tree.isBusy() || this.views.taskExplorerSideBar.tree.isBusy() ||
-                   this.refreshPending || TaskTreeBuilder.isBusy();
+    isBusy = () => this.refreshPending || this._treeBuilder.isBusy();
+    // isBusy = () => this.views.taskExplorer.tree.isBusy() || this.views.taskExplorerSideBar.tree.isBusy() ||
+    //                this.refreshPending || this._treeBuilder.isBusy();
 
 
-	get onTasksChanged(): Event<TasksChangeEvent>
-    {
+	get onTasksChanged(): Event<TasksChangeEvent> {
 		return this._onDidTasksChange.event;
 	}
 
 
-	get onTasksLoaded(): Event<TasksChangeEvent>
-    {
-		return this._onDidTasksLoad.event;
-	}
+	// get onTasksLoaded(): Event<TasksChangeEvent>
+    // {
+	// 	return this._onDidTasksLoad.event;
+	// }
 
 
     private onWorkspaceFolderRemoved = (uri: Uri, logPad: string) =>

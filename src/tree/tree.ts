@@ -35,13 +35,12 @@ import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } fro
  */
 export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
 {
-    private static loadStage = 0;
     private visible = false;
     private wasVisible = false;
     private refreshPending = false;
     private eventQueue: IEvent[] = [];
     private treeManager: TaskTreeManager;
-    private disposables: Disposable[] = [];
+    // private disposables: Disposable[] = [];
     private defaultGetChildrenLogPad = "";
     private defaultGetChildrenLogLevel = 1;
     private currentRefreshEvent: string | undefined;
@@ -64,10 +63,10 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
         // we keep the dispose() event here.  Who knows maybe we'll need it again someday. I
         // know if I removed it, i 100% would need it again.
         //
-        this.disposables.forEach((d) => {
-            d.dispose();
-        });
-        this.disposables = [];
+        // his.disposables.forEach((d) => {
+        //    d.dispose();
+        // );
+        // this.disposables = [];
     };
 
 
@@ -210,7 +209,7 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
     };
 
 
-    isBusy = () => this.refreshPending;
+    // isBusy = () => this.refreshPending;
 
 
     isVisible = () => this.visible;
