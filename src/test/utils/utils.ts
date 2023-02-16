@@ -29,7 +29,6 @@ export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
-export let teExplorer: TaskTree;
 
 let activated = false;
 let caughtControlC = false;
@@ -152,11 +151,6 @@ export const activate = async (instance?: Mocha.Context) =>
         // Set a valid license key to run in 'licensed mode' at startup
         //
         await teWrapper.storage.updateSecret("license_key", "1234-5678-9098-7654321");
-        //
-        // _api pre-test suite will reset after disable/enable
-        //
-        console.log(`    ${figures.color.info} ${figures.withColor("Settings tests active explorer instance", figures.colors.grey)}`);
-        setExplorer(teWrapper.explorer as TaskTree);
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
@@ -411,9 +405,6 @@ export const overrideNextShowInputBox = (value: any) => overridesShowInputBox.pu
 
 
 export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push(value);
-
-
-export const setExplorer = (explorer: TaskTree) => teExplorer = explorer;
 
 
 export const setFailed = (ctrlc = true) =>

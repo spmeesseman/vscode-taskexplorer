@@ -77,7 +77,7 @@ export class TaskTreeManager implements Disposable
             this._specialFolders.lastTasks,
             this._views.taskExplorer,
             this._views.taskExplorerSideBar,
-            registerCommand(Commands.Refresh, (taskType?: boolean, uri?: Uri, logPad = "") => this.refresh(taskType, uri, logPad), this),
+            registerCommand(Commands.Refresh, (taskType?: string | boolean | undefined, uri?: Uri | false | undefined, logPad = "") => this.refresh(taskType, uri, logPad), this),
             registerCommand(Commands.AddRemoveCustomLabel, async(taskItem: TaskItem) => this.addRemoveSpecialTaskLabel(taskItem), this),
             registerCommand(Commands.Run,  async (item: TaskItem) => this.taskManager.run(item), this),
             registerCommand(Commands.RunWithNoTerminal,  async (item: TaskItem) => this.taskManager.run(item, true, false), this),
@@ -347,6 +347,7 @@ export class TaskTreeManager implements Disposable
         if (invalidate === undefined && opt === undefined) // i.e. refresh button was clicked
         {
             this.wrapper.log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
+            this.setMessage(Strings.ScanningTaskFiles);
             await rebuildCache(logPad + "   ");
             this.wrapper.log.write("   handling 'rebuild cache' event complete", 1, logPad + "   ");
         }

@@ -58,19 +58,19 @@ export class TeTreeView implements ITaskTreeView, Disposable
         this.disposables.splice(0);
 	}
 
-    get tree() {
+    get tree(): TaskTree {
         return this._tree;
     }
 
-    get view() {
+    get view(): TreeView<TreeItem> {
         return this._view;
     }
 
-    get enabled() {
+    get enabled(): boolean {
         return this.wrapper.config.get<boolean>(this.id === "taskTreeExplorer" ? "enableExplorerView" : "enableSideBar");
     }
 
-    get visible() {
+    get visible(): boolean {
         return this._visible;
     }
 

@@ -3,14 +3,13 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
-import { TaskTree } from "../../tree/tree";
 import { TeWrapper } from "../../lib/wrapper";
 import {
     executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView
 } from "../utils/commandUtils";
 import {
-    activate, closeEditors, endRollingCount, exitRollingCount, setExplorer, sleep,
-    suiteFinished, testControl as tc, waitForTeIdle
+    activate, closeEditors, endRollingCount, exitRollingCount, sleep, suiteFinished,
+    testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
 
@@ -66,9 +65,10 @@ suite("Initialization", () =>
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         expect(teWrapper.sidebar).to.not.be.undefined;
         expect(teWrapper.sidebarView).to.not.be.undefined;
-        expect(teWrapper.explorer).not.to.be.undefined;
-        expect(teWrapper.explorerView).not.to.be.undefined;
-        expect(teWrapper.explorer.tree.enabled).to.be.equal(false);
+        expect(teWrapper.explorer).to.not.be.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.views.taskExplorer.enabled).to.be.equal(false);
+        expect(teWrapper.views.taskExplorerSideBar.enabled).to.be.equal(true);
         endRollingCount(this);
     });
 
@@ -88,12 +88,13 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
         await executeSettingsUpdate("enableExplorerView", true, tc.waitTime.config.enableEvent);
-        setExplorer(teWrapper.explorer as TaskTree);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         expect(teWrapper.sidebar).to.not.be.undefined;
         expect(teWrapper.sidebarView).to.not.be.undefined;
-        expect(teWrapper.explorer).to.be.not.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
         expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.views.taskExplorer.enabled).to.be.equal(true);
+        expect(teWrapper.views.taskExplorerSideBar.enabled).to.be.equal(true);
         endRollingCount(this);
     });
 
@@ -111,14 +112,14 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
-        // teApi.sidebar?.setEnabled(false, "");
-        teWrapper.treeManager.refresh(undefined, undefined, ""); // cover getChildren new InitScripts() || new NoScripts()
         await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
-        expect(teWrapper.sidebar).to.be.undefined;
-        expect(teWrapper.sidebarView).to.be.undefined;
-        expect(teWrapper.explorer).to.be.not.undefined;
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
         expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.views.taskExplorer.enabled).to.be.equal(true);
+        expect(teWrapper.views.taskExplorerSideBar.enabled).to.be.equal(false);
         endRollingCount(this);
     });
 
@@ -128,6 +129,7 @@ suite("Initialization", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
         await focusFileExplorer();
+        expect(teWrapper.views.taskExplorer.visible).to.be.equal(false);
         endRollingCount(this);
     });
 
