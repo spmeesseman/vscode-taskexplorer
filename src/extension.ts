@@ -2,11 +2,10 @@
 
 import { log } from "./lib/log/log";
 import { TeWrapper } from "./lib/wrapper";
-import { oneTimeEvent } from "./lib/utils/utils";
 import { initStorage, storage } from "./lib/utils/storage";
+import { disposeFileWatchers } from "./lib/watcher/fileWatcher";
 import { ExtensionContext, ExtensionMode, workspace } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
-import { disposeFileWatchers } from "./lib/watcher/fileWatcher";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
 
 // import "tsconfig-paths/register";

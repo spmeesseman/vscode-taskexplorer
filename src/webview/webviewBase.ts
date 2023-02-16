@@ -117,7 +117,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 
 		const repl = (h: string) =>
 		{
-			h = h.replace(/#{(head|body|endOfBody|placement|cspSource|cspNonce|title|version|webroot)}/g, (_s: string, token: string) =>
+			h = h.replace(/#{(head|body|endOfBody|cspSource|cspNonce|title|version|webroot)}/g, (_s: string, token: string) =>
 			{
 				switch (token)
 				{
@@ -127,8 +127,6 @@ export abstract class TeWebviewBase<State> implements Disposable
 						return repl(body ?? "");
 					case "endOfBody":
 						return `${bootstrap ? `<script type="text/javascript" nonce="${this._cspNonce}">window.bootstrap=${JSON.stringify(bootstrap)};</script>` : ""}${endOfBody ?? ""}`;
-					case "placement":
-						return "editor";
 					case "cspSource":
 						return cspSource;
 					case "cspNonce":
@@ -137,10 +135,8 @@ export abstract class TeWebviewBase<State> implements Disposable
 						return this.title;
 					case "version":
 						return this.wrapper.version;
-					case "webroot":
+					default: // case "webroot":
 						return webRoot;
-					default:
-						return "";
 				}
 			});
 			return h;
@@ -155,6 +151,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 
     private nextIpcId  = () =>
     {
+		/* istanbul ignore if */
         if (this.ipcSequence === this.maxSmallIntegerV8)
         {
             this.ipcSequence = 1;
