@@ -115,7 +115,7 @@ export class TeServer implements Disposable
 		{
 			let rspData = "";
 			this.wrapper.log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
-			this.log("starting https get 30-day license request to license server", logPad + "   ");
+			this.log("starting https request to license server", logPad + "   ");
 
 			const req = request(this.getDefaultServerOptions(endpoint), (res) =>
 			{
@@ -123,7 +123,7 @@ export class TeServer implements Disposable
 				res.on("end", async() =>
 				{
                     let jso = { success: false, message: "" };
-                    try {console.log(rspData);
+                    try {
                         jso = JSON.parse(rspData);
                     }
                     catch {}
