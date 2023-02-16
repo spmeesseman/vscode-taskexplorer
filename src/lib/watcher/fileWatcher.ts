@@ -538,7 +538,7 @@ const _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: s
         if (numFilesFound > 0 || numFilesRemoved > 0)
         {
             const all =  [ ...e.added, ...e.removed ];
-            await executeCommand(Commands.Refresh, undefined, all.length === 1 ? all[0].uri : undefined, logPad + "   ");
+            await executeCommand(Commands.Refresh, undefined, all.length === 1 ? all[0].uri : false, logPad + "   ");
         }
         log.methodDone("workspace folder 'add/remove'", 1, logPad, [
             [ "# of files found", numFilesFound ], [ "# of files removed", numFilesRemoved ]
