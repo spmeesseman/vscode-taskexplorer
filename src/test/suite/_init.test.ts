@@ -83,6 +83,39 @@ suite("Initialization", () =>
     });
 
 
+    test("Disable SideBar View", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableSideBar", false, tc.waitTime.config.enableEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.views.taskExplorer.enabled).to.be.equal(false);
+        expect(teWrapper.views.taskExplorerSideBar.enabled).to.be.equal(false);
+        endRollingCount(this);
+    });
+
+
+    test("Re-enable SideBar View", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.config.registerExplorerEvent + tc.slowTime.config.enableEvent);
+        await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
+        await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
+        expect(teWrapper.explorer).to.not.be.undefined;
+        expect(teWrapper.explorerView).to.not.be.undefined;
+        expect(teWrapper.views.taskExplorer.enabled).to.be.equal(false);
+        expect(teWrapper.views.taskExplorerSideBar.enabled).to.be.equal(true);
+        endRollingCount(this);
+    });
+
+
+
     test("Re-enable Explorer View", async function()
     {
         if (exitRollingCount(this)) return;
