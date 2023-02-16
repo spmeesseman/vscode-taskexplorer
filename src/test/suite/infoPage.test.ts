@@ -116,17 +116,17 @@ suite("Info Report Tests", () =>
 	test("Deserialize Report Page (All Projects)", async function()
 	{
         if (exitRollingCount(this)) return;
-		this.slow(testControl.slowTime.viewReport + 200);
+		this.slow(testControl.slowTime.viewReport + 30);
 		let panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
-		await sleep(50);
+		await sleep(5);
 		(teWrapper.parsingReportPage.view as WebviewPanel)?.dispose();
 		panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
-		await sleep(50);
+		await sleep(5);
 		// teWrapper.busy = true;
 		setTimeout(() => { /* teWrapper.busy = false; */ }, 50);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
-		await sleep(50);
+		await sleep(5);
 		await closeEditors();
         endRollingCount(this);
 	});

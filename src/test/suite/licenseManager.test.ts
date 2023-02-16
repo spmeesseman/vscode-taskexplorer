@@ -13,6 +13,7 @@ import { LicensePage } from "../../webview/page/licensePage";
 import { LicenseManager } from "../../lib/auth/licenseManager";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { copyDir, createDir, deleteDir, writeFile } from "../../lib/utils/fs";
+import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -185,7 +186,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(50);
 		await teWrapper.licensePage.view?.webview.postMessage({ command: "showParsingReport" });
-		await utils.sleep(500);
+        await promiseFromEvent(teWrapper.parsingReportPage.onReadyReceived).promise;
         utils.endRollingCount(this);
 	});
 
@@ -205,13 +206,13 @@ suite("License Manager Tests", () =>
 	test("Has License", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.licenseMgr.page + (tc.slowTime.licenseMgr.setLicenseCmd * 2) + 800);
+		this.slow(tc.slowTime.licenseMgr.checkLicense + tc.slowTime.licenseMgr.page + (tc.slowTime.licenseMgr.setLicenseCmd * 2) + 500);
 		teWrapper.tests = false;
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		teWrapper.tests = true;
 		await licMgr.setTasks(tasks);
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -220,7 +221,7 @@ suite("License Manager Tests", () =>
 	test("License Prompt (Enter Valid Key)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
@@ -228,7 +229,7 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInputBox("1234-5678-9098-7654321");
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -237,7 +238,7 @@ suite("License Manager Tests", () =>
 	test("License Prompt (Enter Invalid Key)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
@@ -245,7 +246,7 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -254,7 +255,7 @@ suite("License Manager Tests", () =>
 	test("License Prompt (Enter Invalid Key Length)", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
@@ -262,7 +263,7 @@ suite("License Manager Tests", () =>
 		utils.overrideNextShowInputBox("1234");
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -271,10 +272,10 @@ suite("License Manager Tests", () =>
 	test("License Page w/ No License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.checkLicense + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.checkLicense + 500);
 		await licMgr.checkLicense();
 		await teWrapper.licensePage.show();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -283,11 +284,11 @@ suite("License Manager Tests", () =>
 	test("License Page w/ Set License Key", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + tc.slowTime.licenseMgr.checkLicense + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + tc.slowTime.licenseMgr.checkLicense + 500);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
 		await teWrapper.licensePage.show();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -296,17 +297,15 @@ suite("License Manager Tests", () =>
 	test("Deserialize License Page", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.viewReport + 200);
+		this.slow(tc.slowTime.viewReport + 30);
 		let panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
 	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
-		await utils.sleep(50);
+		await utils.sleep(5);
 		(teWrapper.licensePage.view as WebviewPanel)?.dispose();
 		panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
-		await utils.sleep(50);
-		// teWrapper.busy = false;
-		setTimeout(() => { /* teWrapper.isBusy = false; */ }, 50);
+		await utils.sleep(5);
 	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
-		await utils.sleep(50);
+		await utils.sleep(5);
 		panel.dispose();
 		await utils.closeEditors();
         utils.endRollingCount(this);
@@ -326,12 +325,12 @@ suite("License Manager Tests", () =>
 	test("License Info", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Info");
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -340,11 +339,11 @@ suite("License Manager Tests", () =>
 	test("License Not Now", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + 500);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Not Now");
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -354,12 +353,12 @@ suite("License Manager Tests", () =>
 	test("License Cancel", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 800);
+		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.setLicenseCmd + 500);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox(undefined);
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		await utils.closeEditors();
         utils.endRollingCount(this);
 	});
@@ -368,17 +367,17 @@ suite("License Manager Tests", () =>
 	test("Enter License Key on Startup", async function()
 	{
         if (utils.exitRollingCount(this)) return;
-		this.slow((tc.slowTime.licenseMgr.enterKey * 2) + 1600);
+		this.slow((tc.slowTime.licenseMgr.enterKey * 2) + 1000);
 		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
 		await licMgr.setLicenseKey(undefined);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("1111-2222-3333-4444-5555");
 		await licMgr.enterLicenseKey();
-		await utils.sleep(400);
+		await utils.sleep(250);
 		utils.overrideNextShowInfoBox("Enter License Key");
 		utils.overrideNextShowInputBox("");
 		await setTasks();
-		await utils.sleep(400);
+		await utils.sleep(250);
         utils.endRollingCount(this);
 	});
 
