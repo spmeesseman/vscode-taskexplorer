@@ -17,7 +17,7 @@ export const startupFocus = async(instance: Mocha.Context, cb?: () => Promise<vo
 {
     if (exitRollingCount(instance)) return;
     if (needsTreeBuild(true)) {
-        await focusExplorerView(instance);
+        await focusExplorerView(undefined, instance);
     }
     if (cb) {
         await cb();

@@ -227,7 +227,7 @@ suite("Task Tests", () =>
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), tc.waitTime.config.enableEvent);
         utils.overrideNextShowInfoBox(undefined);
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", true, tc.waitTime.config.enableEvent);
+        await executeSettingsUpdate("enableAnsiconForAnt", true, tc.waitTime.config.enableEvent);
         await startTask(antTask, false);
         const exec = await executeTeCommand2<TaskExecution | undefined>("run", [ antTask ], tc.waitTime.runCommandMin) ;
         await utils.sleep(150);
@@ -242,7 +242,7 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.event * 2) + tc.slowTime.commands.run + tc.slowTime.tasks.antTask);
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
+        await executeSettingsUpdate("enableAnsiconForAnt", false, tc.waitTime.config.enableEvent);
         await executeSettingsUpdate("keepTermOnStop", true);
         await startTask(antTask, false);
         const exec = await executeTeCommand2<TaskExecution | undefined>("run", [ antTask ], tc.waitTime.runCommandMin) ;

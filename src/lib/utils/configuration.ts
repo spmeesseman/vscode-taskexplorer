@@ -36,7 +36,9 @@ class Configuration implements IConfiguration
         this.isDev = context.extensionMode === ExtensionMode.Development;
         this.configurationGlobal = workspace.getConfiguration();
         this.configuration = workspace.getConfiguration(this.baseConfigSection);
-        this.pkgJsonCfgProps = context.extension.packageJSON.contributes.configuration.properties;
+        this.pkgJsonCfgProps = {};
+        const pkgJsonConfiguration = context.extension.packageJSON.contributes.configuration;
+        pkgJsonConfiguration.forEach((c: any) => Object.assign(this.pkgJsonCfgProps, c.properties));
         context.subscriptions.push(workspace.onDidChangeConfiguration(this.onConfigurationChanged, this));
     }
 

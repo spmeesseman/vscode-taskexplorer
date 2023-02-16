@@ -113,7 +113,7 @@ suite("Ant Tests", () =>
         this.slow(tc.slowTime.config.enableEvent + (tc.slowTime.config.pathToProgramsEvent * 4));
         await executeSettingsUpdate("pathToPrograms.ansicon", "ansicon\\x64\\ansicon.exe");
         overrideNextShowInfoBox(undefined);
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", true);
+        await executeSettingsUpdate("enableAnsiconForAnt", true);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
@@ -130,7 +130,7 @@ suite("Ant Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.enableEvent + (tc.slowTime.config.pathToProgramsEvent* 2));
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"));
-        await executeSettingsUpdate("visual.enableAnsiconForAnt", false);
+        await executeSettingsUpdate("enableAnsiconForAnt", false);
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);
         await executeSettingsUpdate("pathToPrograms.ansicon", getWsPath("..\\tools\\ansicon\\x64\\"));
         provider.createTask("test", "test", rootWorkspace, buildXmlFileUri, []);

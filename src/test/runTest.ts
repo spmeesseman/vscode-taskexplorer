@@ -227,7 +227,7 @@ const createDefaultSettings = async() =>
     const packageJson = JSON.parse(await readFileAsync(getWsPath("../../package.json")));
     const enabledTasks: IDictionary<boolean> = {};
     getTaskTypes().map(t => getTaskTypeRealName(t)).forEach(t => {
-        enabledTasks[t] = packageJson.contributes.configuration.properties["taskexplorer.enabledTasks"].default[t];
+        enabledTasks[t] = packageJson.contributes.configuration[1].properties["taskexplorer.enabledTasks"].default[t];
     });
 
     return {

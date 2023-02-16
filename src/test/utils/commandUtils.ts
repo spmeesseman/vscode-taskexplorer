@@ -39,9 +39,9 @@ export const executeTeCommand = async <T>(command: string, minWait?: number, max
 export const executeTeCommand2 = <T>(command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand<T>(command, minWait, maxWait, ...args);
 
 
-export const focusExplorerView = async (wrapper: TeWrapper, instance?: any) =>
+export const focusExplorerView = async (wrapper: TeWrapper | undefined, instance?: any) =>
 {
-    if (!wrapper.treeManager.views.taskExplorer.visible)
+    if (!wrapper || !wrapper.treeManager.views.taskExplorer.visible)
     {
         if (instance) {
             instance.slow(tc.slowTime.commands.focus + tc.slowTime.commands.refresh);
