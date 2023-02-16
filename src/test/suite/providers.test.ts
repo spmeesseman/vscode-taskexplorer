@@ -20,7 +20,6 @@ import {
 
 const tempFiles: string[] = [];
 
-let teApi: ITaskExplorerApi;
 let teWrapper: TeWrapper;
 let taskFile: TaskFile | undefined;
 let rootPath: string;
@@ -37,7 +36,7 @@ suite("Provider Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, teWrapper } = await activate(this));
+        ({ teWrapper } = await activate(this));
         rootPath = getWsPath(".");
         dirName = join(rootPath, "tasks_test_");
         dirNameL2 = join(dirName, "subfolder");
@@ -191,7 +190,7 @@ suite("Provider Tests", () =>
 	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
+            await focusExplorerView(teWrapper, this);
         }
         else {
             this.slow(tc.slowTime.commands.focusAlreadyFocused + tc.slowTime.min);

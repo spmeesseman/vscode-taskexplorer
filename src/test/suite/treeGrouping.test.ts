@@ -1,9 +1,11 @@
 
+import { TeWrapper } from "../../lib/wrapper";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, getSuccessCount, needsTreeBuild, suiteFinished, testControl as tc
 } from "../utils/utils";
 
+let teWrapper: TeWrapper;
 
 
 suite("Tree Grouping Tests", () =>
@@ -12,7 +14,7 @@ suite("Tree Grouping Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        await activate(this);
+        ({ teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -34,7 +36,7 @@ suite("Tree Grouping Tests", () =>
 	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
+            await focusExplorerView(teWrapper, this);
         }
         endRollingCount(this);
 	});

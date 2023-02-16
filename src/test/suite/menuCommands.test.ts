@@ -2,12 +2,14 @@
 /* tslint:disable */
 
 import { Uri } from "vscode";
+import { TeWrapper } from "../../lib/wrapper";
 import { executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, overrideNextShowInfoBox, suiteFinished, testControl as tc, verifyTaskCount
 } from "../utils/utils";
 
+let teWrapper: TeWrapper;
 const antUri: Uri = Uri.file(getWsPath("build.xml"));
 const gruntFolderUri: Uri = Uri.file(getWsPath("grunt"));
 const pythonUri: Uri = Uri.file(getWsPath("test.py"));
@@ -23,7 +25,7 @@ suite("Menu Command Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        await activate(this);
+        ({ teWrapper } = await activate(this));
         endRollingCount(this, true);
     });
 
@@ -39,7 +41,7 @@ suite("Menu Command Tests", () =>
 	{
         if (exitRollingCount(this)) return;
         if (needsTreeBuild(true)) {
-            await focusExplorerView(this);
+            await focusExplorerView(teWrapper, this);
         }
         endRollingCount(this);
 	});

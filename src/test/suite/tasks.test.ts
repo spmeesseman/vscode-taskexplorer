@@ -52,7 +52,7 @@ suite("Task Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
         if (utils.needsTreeBuild()) {
-            await focusExplorerView(this);
+            await focusExplorerView(teWrapper, this);
         }
         utils.endRollingCount(this);
 	});
@@ -207,7 +207,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.run + tc.slowTime.tasks.bashScript + tc.slowTime.commands.runStop  + 5200);
         const bashTask = bash[0];
-        await startTask(bashTask as TaskItem, false);
+        await startTask(bashTask, false);
         const exec = await executeTeCommand2<TaskExecution | undefined>("runNoTerm", [ bashTask ], tc.waitTime.runCommandMin) ;
         await utils.sleep(100);
         await utils.waitForTaskExecution(exec, 2000);
@@ -259,9 +259,9 @@ suite("Task Tests", () =>
                           startTaskSlowTime + (tc.slowTime.config.event * 5) +
                           (tc.slowTime.commands.standard * 2) + tc.slowTime.closeEditors + tc.slowTime.tasks.batchScriptCmd;
         this.slow(slowTime);
-        await focusExplorerView(); // randomly show/hide view to test refresh event queue in tree/tree.ts
+        await focusExplorerView(teWrapper); // randomly show/hide view to test refresh event queue in tree/tree.ts
         const batchTask = batch[0];
-        await startTask(batchTask as TaskItem, true);
+        await startTask(batchTask, true);
         await executeSettingsUpdate("keepTermOnStop", false);
         await executeSettingsUpdate("visual.disableAnimatedIcons", false);
         await executeSettingsUpdate("specialFolders.showLastTasks", false);
@@ -315,7 +315,7 @@ suite("Task Tests", () =>
                          (tc.slowTime.commands.standard * 3) + (tc.slowTime.config.event * 4) + tc.slowTime.tasks.batchScriptBat + tc.slowTime.config.showHideSpecialFolder;
         this.slow(slowTime);
         const batchTask = batch[1];
-        await startTask(batchTask as TaskItem, true);
+        await startTask(batchTask, true);
         await executeSettingsUpdate("visual.disableAnimatedIcons", true);
         await executeSettingsUpdate("taskButtons.clickAction", "Execute");
         await executeSettingsUpdate("specialFolders.showLastTasks", true);

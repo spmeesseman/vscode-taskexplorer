@@ -99,7 +99,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this, false, true)) return;
         if (!teWrapper.explorer?.isVisible()) {
-            await focusExplorerView();
+            await focusExplorerView(teWrapper);
         }
         await teWrapper.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
         if (!tc.isMultiRootWorkspace) {
@@ -470,7 +470,7 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focus);
-        await focusExplorerView();
+        await focusExplorerView(teWrapper);
         await waitForTeIdle(tc.waitTime.focusCommand);
         endRollingCount(this);
     });

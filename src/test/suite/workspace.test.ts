@@ -4,8 +4,8 @@
 
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
+import { executeSettingsUpdate } from "../utils/commandUtils";
 import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished, testControl,
     treeUtils

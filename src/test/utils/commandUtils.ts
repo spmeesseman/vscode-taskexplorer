@@ -1,6 +1,7 @@
 import { commands } from "vscode";
 import { configuration } from "../../lib/utils/configuration";
-import { waitForTeIdle, testControl as tc, teExplorer } from "./utils";
+import { TeWrapper } from "../../lib/wrapper";
+import { waitForTeIdle, testControl as tc } from "./utils";
 
 let explorerHasFocused = false;
 
@@ -38,9 +39,9 @@ export const executeTeCommand = async <T>(command: string, minWait?: number, max
 export const executeTeCommand2 = <T>(command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand<T>(command, minWait, maxWait, ...args);
 
 
-export const focusExplorerView = async (instance?: any) =>
+export const focusExplorerView = async (wrapper: TeWrapper, instance?: any) =>
 {
-    if (!teExplorer.isVisible())
+    if (!wrapper.treeManager.views.taskExplorer.visible)
     {
         if (instance) {
             instance.slow(tc.slowTime.commands.focus + tc.slowTime.commands.refresh);
