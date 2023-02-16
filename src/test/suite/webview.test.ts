@@ -3,16 +3,16 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
+import { commands, Uri } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { EchoCommandRequestType, IpcCommandType } from "../../webview/common/ipc";
+import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
+import { EchoCommandRequestType, EchoCustomCommandRequestType } from "../../webview/common/ipc";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
     activate, closeEditors, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
-import { commands, Uri } from "vscode";
-import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 
 
 let teWrapper: TeWrapper;
@@ -160,19 +160,25 @@ suite("Webview Tests", () =>
 	    await teWrapper.parsingReportPage.show();
         await commands.executeCommand(VsCodeCommands.NextEditor);
         await commands.executeCommand(VsCodeCommands.NextEditor);
-		await closeEditors();
-        await focusExplorerView(teWrapper);
-        await sleep(5);
         endRollingCount(this);
 	});
 
 
-    // test("Post an Unknown Random Message", async function()
-    // {
-    //     if (exitRollingCount(this)) return;
-    //     await teWrapper.homeView.notify(new IpcCommandType<void>("webview/unknown"), void undefined);
-    //     endRollingCount(this);
-    // });
+    test("Post an Unknown Random Message", async function()
+    {
+        if (exitRollingCount(this)) return;
+        await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        endRollingCount(this);
+    });
+
+
+    test("Cover Webview Properties (Post-Show)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        teWrapper.homeView.description = teWrapper.homeView.description;
+		await closeEditors();
+        endRollingCount(this);
+    });
 
 
     test("Disable SideBar", async function()

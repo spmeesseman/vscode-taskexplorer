@@ -1,8 +1,8 @@
 
 import { Disposable, DOM } from "./common/dom";
 import {
-	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams,
-	WebviewFocusChangedCommandType, WebviewReadyCommandType, ExecuteCommandType, onIpc, EchoCommandRequestType, ExecuteCommandParams, LogWriteCommandType
+	IpcCommandType, IpcMessage, IpcMessageParams, WebviewFocusChangedParams, WebviewFocusChangedCommandType, WebviewReadyCommandType,
+	ExecuteCommandType, onIpc, EchoCommandRequestType, LogWriteCommandType, EchoCustomCommandRequestType, ExecuteCustomCommandType
 } from "../common/ipc";
 
 interface VsCodeApi {
@@ -150,7 +150,11 @@ export abstract class TeWebviewApp<State = undefined>
 			case EchoCommandRequestType.method:    // Standard echo service for testing web->host commands
                 onIpc(EchoCommandRequestType, msg, params => this.sendCommand(ExecuteCommandType, params));
                 break;
+			case EchoCustomCommandRequestType.method:
+				onIpc(EchoCustomCommandRequestType, msg, params => this.sendCommand(ExecuteCustomCommandType, params));
+                break;
 			default:
+				this.sendCommand(new IpcCommandType<void>("webview/test"), msg.params as any);
                 break;
 		}
 	};

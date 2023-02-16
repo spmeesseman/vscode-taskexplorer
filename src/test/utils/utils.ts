@@ -268,11 +268,12 @@ export const createwebviewForRevive = (viewTitle: string, viewType: string) =>
 {
     const resourceDir = Uri.joinPath(teWrapper.context.extensionUri, "res");
     const panel = window.createWebviewPanel(
-        `taskexplorer.${viewType}`,
+        `taskexplorer.view.${viewType}`,
         viewTitle,
         ViewColumn.One,
         {
             enableScripts: true,
+            enableCommandUris: true,
             localResourceRoots: [ resourceDir ]
         }
     );

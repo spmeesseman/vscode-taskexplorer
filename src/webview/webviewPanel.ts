@@ -117,7 +117,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		}
 		else {
 			await this.refresh(true, ...args);
-			this._view.reveal(this._view.viewColumn ?? ViewColumn.Active, options?.preserveFocus ?? false);
+			this._view.reveal(this._view.viewColumn, !!options?.preserveFocus);
 		}
 
 		return this;
@@ -144,12 +144,8 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	private setContextKeys(active: boolean | undefined, focus?: boolean, inputFocus?: boolean)
 	{
 		void setContext(`${this.contextKeyPrefix}:active`, !!active);
-		if (!active) {
-			focus = false;
-			inputFocus = false;
-		}
-		void setContext(`${this.contextKeyPrefix}:focus`, !!focus);
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!inputFocus);
+		void setContext(`${this.contextKeyPrefix}:focus`, !!focus && !!active);
+		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!inputFocus && !!active);
 	}
 
 

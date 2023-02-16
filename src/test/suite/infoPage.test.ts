@@ -79,7 +79,7 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 150);
-	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
+	    await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		await closeEditors();
         endRollingCount(this);
@@ -92,7 +92,7 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
         await teWrapper.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
-	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
+	    await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
         await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
