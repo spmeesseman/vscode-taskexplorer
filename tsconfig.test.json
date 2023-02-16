@@ -2,9 +2,12 @@
     "extends": "./tsconfig.base.json",
     // "ts-node": {"require": ["tsconfig-paths/register"]},
     "compilerOptions": {
+        "module": "commonjs",
+		"outDir": "dist",
         "paths": {
 			"@env/*": [ "src/lib/env/node/*" ]
-		}
+		},
+		"tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
     },
     "exclude": [
         "node_modules",

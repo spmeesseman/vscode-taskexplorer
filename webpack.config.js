@@ -388,6 +388,9 @@ const optimization = (env, wpConfig) =>
 	}
 	else {
 		wpConfig.optimization = {};
+		// wpConfig.optimization = {
+		// 	runtimeChunk: true
+		// };
 	}
 };
 
@@ -638,7 +641,7 @@ const rules = (env, wpConfig) =>
 					tsconfigRaw: resolveTSConfig(
 						path.join(
 							__dirname,
-							env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
+							env.build === "extension_web" ? "tsconfig.browser.json" : (env.build !== "extension_tests" ? "tsconfig.json" : "tsconfig.test.json"),
 						),
 					),
 				},
@@ -648,7 +651,7 @@ const rules = (env, wpConfig) =>
 				options: {
 					configFile: path.join(
 						__dirname,
-						env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json",
+						env.build === "extension_web" ? "tsconfig.browser.json" : (env.build !== "extension_tests" ? "tsconfig.json" : "tsconfig.test.json"),
 					),
 					experimentalWatchApi: true,
 					transpileOnly: true
