@@ -23,7 +23,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 	protected readonly disposables: Disposable[] = [];
 
     abstract show(options?: any, ..._args: unknown[]): Promise<TeWebviewBase<any>>;
-    protected abstract onViewFocusChanged(e: WebviewFocusChangedParams): void;
+    protected onViewFocusChanged?(e: WebviewFocusChangedParams): void;
 
 	protected includeBootstrap?(...args: unknown[]): any;
 	protected includeBody?(...args: unknown[]): string | Promise<string>;
@@ -189,17 +189,15 @@ export abstract class TeWebviewBase<State> implements Disposable
 
 	protected onMessageReceivedCore(e: IpcMessage)
 	{
-		if (!e) return;
-
 		switch (e.method)
 		{
 			case WebviewReadyCommandType.method:
 				onIpc(WebviewReadyCommandType, e, () => { this._isReady = true; this.onReady?.(); });
 				break;
 
-			case WebviewFocusChangedCommandType.method:
-				onIpc(WebviewFocusChangedCommandType, e, params => this.onViewFocusChanged(params));
-				break;
+			// case WebviewFocusChangedCommandType.method:
+			// 	onIpc(WebviewFocusChangedCommandType, e, params => this.onViewFocusChanged(params));
+			// 	break;
 
 			case ExecuteCommandType.method:
 				onIpc(ExecuteCommandType, e, params =>
@@ -224,7 +222,9 @@ export abstract class TeWebviewBase<State> implements Disposable
 
 	private postMessage(message: IpcMessage)
 	{
-		if (!this._view || !this._isReady || !this.visible) return Promise.resolve(false);
+		if (!this._view || !this._isReady || !this.visible) {
+			return Promise.resolve(false);
+		}
 		//
 		// From GitLens:
 		//     It looks like there is a bug where `postMessage` can sometimes just hang infinitely.

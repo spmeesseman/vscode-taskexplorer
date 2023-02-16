@@ -48,9 +48,9 @@ export class TaskCountView extends TeWebviewView<State>
 	}
 
 
-	protected override onWindowFocusChanged(focused: boolean)
-	{
-	}
+	// protected override onWindowFocusChanged(focused: boolean)
+	// {
+	// }
 
 
 	protected override registerCommands(): Disposable[]

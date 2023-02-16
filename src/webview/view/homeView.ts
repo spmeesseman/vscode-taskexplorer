@@ -93,6 +93,10 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
+	//
+	// TODO - Remove istanbul tags when auth sessions are implemented
+	//
+	/* istanbul ignore next */
 	private onSessionChanged = (_e: TeSessionChangeEvent) =>
 	{
 		this.wrapper.log.methodStart("HomeView Event: onSessionChanged", 2, this.wrapper.log.getLogPad());
@@ -144,11 +148,11 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
-	protected override onWindowFocusChanged(_focused: boolean)
-	{
-		this.wrapper.log.methodStart("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
-		this.wrapper.log.methodDone("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
-	}
+	// protected override onWindowFocusChanged(_focused: boolean)
+	// {
+	// 	this.wrapper.log.methodStart("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
+	// 	this.wrapper.log.methodDone("HomeView Event: onWindowFocusChanged", 2, this.wrapper.log.getLogPad());
+	// }
 
 
 	protected override registerCommands(): Disposable[]

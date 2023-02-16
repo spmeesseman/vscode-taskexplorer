@@ -95,30 +95,34 @@ export abstract class TeWebviewApp<State = undefined>
 		}
 
 		this.bindDisposables.push(
-			DOM.on(document, "focusin", e => {
+			DOM.on(document, "focusin", (e) =>
+			{
 				const inputFocused = e.composedPath().some(el => (el as HTMLElement).tagName === "INPUT");
-
-				if (this._focused !== true || this._inputFocused !== inputFocused) {
+				if (this._focused !== true || this._inputFocused !== inputFocused)
+				{
 					this._focused = true;
 					this._inputFocused = inputFocused;
 					sendWebviewFocusChangedCommand({ focused: true, inputFocused });
 				}
 			}),
-			DOM.on(document, "focusout", () => {
+			DOM.on(document, "focusout", () =>
+			{
 				if (this._focused !== false || this._inputFocused !== false) {
 					this._focused = false;
 					this._inputFocused = false;
 					sendWebviewFocusChangedCommand({ focused: false, inputFocused: false });
 				}
-			}),
+			})
 		);
 	}
 
 
 	protected log = (message: string, ...optionalParams: any[]) =>
 	{
-		// this.sendCommand(LogWriteCommandType, { message, value: undefined });
-		console.log(message, ...optionalParams);
+		setTimeout(() => {
+			this.postMessage({ id: this.nextIpcId(), method: LogWriteCommandType.method, params: { message, value: undefined }});
+		},  1);
+		// console.log(message, ...optionalParams);
 	};
 
 

@@ -181,11 +181,11 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	protected onViewFocusChanged(e: WebviewFocusChangedParams)
-	{
-		this.setContextKeys(undefined, e.focused, e.inputFocused);
-		this.onFocusChanged?.(e.focused);
-	}
+	// protected override onViewFocusChanged(e: WebviewFocusChangedParams)
+	// {
+	// 	this.setContextKeys(undefined, e.focused, e.inputFocused);
+	// 	this.onFocusChanged?.(e.focused);
+	// }
 
 
 	protected onViewStateChanged(e: WebviewPanelOnDidChangeViewStateEvent)
