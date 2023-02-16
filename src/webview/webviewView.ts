@@ -52,8 +52,9 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	set description(description: string | undefined)
 	{
 		this._description = description;
-		if (!this._view) return;
-		this._view.description = description;
+		if (this._view) {
+			this._view.description = description;
+		}
 	}
 
 
@@ -63,15 +64,12 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	async show(options?: { preserveFocus?: boolean })
 	{
 		while (this.wrapper.busy) {
+			/* istanbul ignore next */
 			await timeout(100);
 		}
 		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
-		try {
-			void (await commands.executeCommand(`${this.id}.focus`, options));
-		}
-		catch (ex) {
-			log.error(ex);
-		}
+		void (await commands.executeCommand(`${this.id}.focus`, options));
+		this.setContextKeys(true, false);
 		return this;
 	}
 
@@ -79,6 +77,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	async resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Promise<void>
 	{
 		while (this.wrapper.busy) {
+			/* istanbul ignore next */
 			await timeout(100);
 		}
 
@@ -154,6 +153,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	}
 
 
+	/* istanbul ignore next */
 	private onWindowStateChanged(e: WindowState)
 	{
 		if (this.visible) {

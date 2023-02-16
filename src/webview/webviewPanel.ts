@@ -124,6 +124,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
+	/* istanbul ignore next */
 	private onWindowStateChanged(e: WindowState)
 	{
 		if (this.visible) {
@@ -142,20 +143,13 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 	private setContextKeys(active: boolean | undefined, focus?: boolean, inputFocus?: boolean)
 	{
-		if (!active)
-		{
-			void setContext(`${this.contextKeyPrefix}:active`, active);
-			if (!active) {
-				focus = false;
-				inputFocus = false;
-			}
+		void setContext(`${this.contextKeyPrefix}:active`, !!active);
+		if (!active) {
+			focus = false;
+			inputFocus = false;
 		}
-		if (!focus) {
-			void setContext(`${this.contextKeyPrefix}:focus`, focus);
-		}
-		if (!inputFocus) {
-			void setContext(`${this.contextKeyPrefix}:inputFocus`, inputFocus);
-		}
+		void setContext(`${this.contextKeyPrefix}:focus`, !!focus);
+		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!inputFocus);
 	}
 
 
@@ -192,9 +186,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 		{
 			this.setContextKeys(active);
 			this.onActiveChanged?.(active);
-			if (!active) {
-				this.onFocusChanged?.(false);
-			}
+			this.onFocusChanged?.(active);
 		}
 		else {
 			this.resetContextKeys();

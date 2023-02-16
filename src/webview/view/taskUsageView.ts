@@ -54,20 +54,4 @@ export class TaskUsageView extends TeWebviewView<State>
 		return html;
 	};
 
-
-	protected override onVisibilityChanged(visible: boolean)
-	{
-	}
-
-
-	// protected override onWindowFocusChanged(focused: boolean)
-	// {
-	// }
-
-
-	protected override registerCommands(): Disposable[]
-	{
-		return [];
-	}
-
 }
