@@ -70,8 +70,8 @@ suite("Misc Tests - Wrapper", () =>
         if (exitRollingCount(this)) return;
         expect(teWrapper.explorer).to.not.be.undefined;
         expect(teWrapper.explorerView).to.not.be.undefined;
-        expect(teWrapper.sidebar).to.be.undefined;
-        expect(teWrapper.sidebarView).to.be.undefined;
+        expect(teWrapper.sidebar).to.not.be.undefined;
+        expect(teWrapper.sidebarView).to.not.be.undefined;
         expect(teWrapper.licenseManager.isLicensed()).to.be.oneOf([ true, false ]);
         expect(teWrapper.busy).to.be.oneOf([ true, false ]);
         expect(teWrapper.tests).to.be.equal(true);
