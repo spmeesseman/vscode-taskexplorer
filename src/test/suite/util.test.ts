@@ -3,22 +3,21 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
+import { join } from "path";
+import { env } from "process";
+import { expect } from "chai";
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
-import * as pathUtils from "../../lib/utils/pathUtils";
+import { TeWrapper } from "../../lib/wrapper";
 import { log, logControl } from "../../lib/log/log";
-import { env } from "process";
-import { join } from "path";
-import { expect } from "chai";
+import * as pathUtils from "../../lib/utils/pathUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { camelCase, properCase } from "../../lib/utils/commonUtils";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
-	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
+	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep, figures
 } from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
-import { TaskTree } from "../../tree/tree";
 
 const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
@@ -391,6 +390,7 @@ suite("Util Tests", () =>
 		logControl.useTags = true;
 		log.blank(3);
 		log.write("test1", 1);
+		log.withColor("Test1", figures.colors.blue);
 		logControl.useTags = useTags;
 		//
 		// Disable logging
@@ -401,6 +401,7 @@ suite("Util Tests", () =>
 		log.write("test");
 		log.write("Test1", 1);
 		log.write("Test1", 1);
+		log.withColor("Test1", figures.colors.blue);
 		//
 		// Re-enable logging
 		//
