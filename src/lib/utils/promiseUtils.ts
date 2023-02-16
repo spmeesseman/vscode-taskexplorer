@@ -1,6 +1,10 @@
 
 import { Disposable, Event, EventEmitter } from "vscode";
 
+//
+//  TODO - Remove istanbul tags when sessions are implemented
+//
+/* istanbul ignore next */
 const passthrough = (value: any, resolve: (value?: any) => void) => resolve(value);
 
 export type PromiseAdapter<T, U> = (

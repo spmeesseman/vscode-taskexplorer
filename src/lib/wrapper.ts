@@ -95,7 +95,7 @@ export class TeWrapper
 
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
-		this._usage = new UsageWatcher(this, storage);
+		this._usage = new UsageWatcher(this);
 
 		this._homeView = new HomeView(this);
 		this._taskCountView = new TaskCountView(this);

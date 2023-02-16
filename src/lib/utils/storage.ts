@@ -62,7 +62,8 @@ class Storage implements IStorage, Memento
     }
 
 
-    private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" : (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
+    private getKey = (key: string) => (!this.isTests ? /* istanbul ignore next */"" :
+                                      (this.isDev ? /* istanbul ignore next */"dev" : "tests")) + key;
 
 
     private _get2<T>(key: string, store: IDictionary<T>, defaultValue?: T): T | undefined
