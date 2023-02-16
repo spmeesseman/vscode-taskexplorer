@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { TeWrapper } from "../../../lib/wrapper";
-import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
+import { TeWrapper } from "../../lib/wrapper";
+import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../utils/utils";
 
 let aKey: string;
 let teWrapper: TeWrapper;
@@ -29,12 +29,13 @@ suite("Usage / Telemetry Tests", () =>
     {
         if (exitRollingCount(this)) return;
         const usage = teWrapper.usage.getAll();
+try {
+    console.log(JSON.stringify(usage, null, 3));
+}catch {}
         Object.keys(usage).forEach((k) => {
             teWrapper.usage.get(k as any);
-console.log(k);
             aKey = k;
         });
-console.log("aKey = " + aKey);
         endRollingCount(this);
     });
 

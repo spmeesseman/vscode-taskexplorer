@@ -32,17 +32,14 @@ export class TaskManager implements Disposable
     {
         this.log = wrapper.log;
         this.specialFolders = specialFolders;
-        this.disposables.push(
-			registerCommand(Commands.ClearTaskStats, () => this.clearTaskStats(), this)
-        );
     }
 
 
     dispose()
     {
-        this.disposables.forEach((d) => {
-            d.dispose();
-        });
+        // this.disposables.forEach((d) => {
+        //     d.dispose();
+        // });
         this.disposables = [];
     }
 
@@ -411,9 +408,6 @@ export class TaskManager implements Disposable
         await this.wrapper.storage.update("taskStats", taskStats);
         this.log.methodDone("save task details", 3, logPad, [[ "task count today", taskStats.todayCount ]]);
     };
-
-
-    clearTaskStats = () => this.wrapper.storage.update("taskStats", this.getDefaultStats());
 
 
     getAvgRunCount = (period: "d" | "w", logPad: string) =>

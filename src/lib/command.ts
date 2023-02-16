@@ -14,7 +14,6 @@ export const enum Commands
 	AddToExcludes = "taskexplorer.addToExcludes",
 	AddToExcludesMenu = "taskexplorer.addToExcludesEx",
 	AddRemoveCustomLabel = "taskexplorer.addRemoveCustomLabel",
-	ClearTaskStats = "taskexplorer.clearTaskStats",
 	Donate = "taskexplorer.donate",
 	DisableTaskType = "taskexplorer.disableTaskType",
 	EnableTaskType = "taskexplorer.enableTaskType",
@@ -90,6 +89,7 @@ export const registerCommand = (command: string, callback: (...args: any[]) => a
 		command,
 		function (this: any, ...args) {
 			// this.wrapper.telemetry.sendEvent("command", { command: command });
+			void this.wrapper?.usage.track(`command:${command}:started`);
 			return callback.call(this, ...args);
 		},
 		thisArg
