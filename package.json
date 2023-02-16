@@ -326,11 +326,6 @@
                 "when": "taskexplorer:enabled"
             },
             {
-                "command": "taskexplorer.showParsingReportPage",
-                "title": "%command.showParsingReportPage%",
-                "when": "taskexplorer:enabled"
-            },
-            {
                 "command": "taskexplorer.donate",
                 "title": "%command.donate%",
                 "when": "taskexplorer:enabled",
@@ -348,12 +343,16 @@
                 "title": "%command.getLicense%"
             },
             {
-                "command": "taskexplorer.showLicensePage",
-                "title": "%command.showLicensePage%"
+                "command": "taskexplorer.view.licensePage.show",
+                "title": "%command.view.licensePage.show%"
             },
             {
-                "command": "taskexplorer.showReleaseNotesPage",
-                "title": "%command.showReleaseNotesPage%"
+                "command": "taskexplorer.view.releaseNotes.show",
+                "title": "%command.view.releaseNotes.show%"
+            },
+            {
+                "command": "taskexplorer.view.parsingReport.show",
+                "title": "%command.view.parsingReport.show%"
             },
             {
                 "command": "taskexplorer.enableTaskType",
@@ -573,7 +572,7 @@
                     "when": "explorerViewletVisible && filesExplorerFocus && !explorerResourceIsRoot && !inputFocus && resourcePath && resourceScheme == folder"
                 },
                 {
-                    "command": "taskexplorer.showParsingReportPage",
+                    "command": "taskexplorer.view.parsingReport.show",
                     "group": "9_taskexplorer",
                     "when": "explorerViewletVisible && filesExplorerFocus && explorerResourceIsRoot && !inputFocus && resourcePath"
                 }
