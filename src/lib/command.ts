@@ -60,6 +60,7 @@ export const enum VsCodeCommands
 	CloseActiveEditor = "workbench.action.closeActiveEditor",
 	CloseAllEditors = "workbench.action.closeAllEditors",
 	FocusFilesExplorer = "workbench.files.action.focusFilesExplorer",
+	FocusSearch = "workbench.view.search.focus",
 	MoveViews = "vscode.moveViews",
 	Open = "vscode.open",
 	OpenFolder = "vscode.openFolder",

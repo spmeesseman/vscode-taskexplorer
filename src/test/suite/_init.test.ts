@@ -136,7 +136,7 @@ suite("Initialization", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refreshNoChanges * 2);
-        await executeTeCommand2("refresh", [ undefined, undefined, "" ]);
+        await executeTeCommand2("refresh", [ undefined, false, "" ]);
         endRollingCount(this);
     });
 

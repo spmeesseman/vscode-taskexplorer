@@ -6,11 +6,12 @@ import { expect } from "chai";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { EchoCommandRequestType } from "../../webview/common/ipc";
-import { Commands, executeCommand } from "../../lib/command";
+import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
     activate, closeEditors, endRollingCount, exitRollingCount, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
+import { commands } from "vscode";
 
 
 let teWrapper: TeWrapper;
@@ -109,6 +110,49 @@ suite("Webview Tests", () =>
         await focusExplorerView(teWrapper);
         endRollingCount(this);
     });
+
+
+    test("Release Notes Page", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
+        await teWrapper.releaseNotesPage.show();
+        endRollingCount(this);
+    });
+
+
+    test("Parsing Report Page", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
+        await teWrapper.parsingReportPage.show();
+        endRollingCount(this);
+    });
+
+
+    test("License Info Page", async function()
+    {
+        if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.focusChangeViews);
+        await teWrapper.licensePage.show();
+        endRollingCount(this);
+    });
+
+
+	test("Focus open Editors", async function()
+	{
+        if (exitRollingCount(this)) return;
+		this.slow(tc.slowTime.commands.focusChangeViews * 3);
+	    await teWrapper.parsingReportPage.show();
+	    await teWrapper.licensePage.show();
+	    await teWrapper.releaseNotesPage.show();
+	    await teWrapper.licensePage.show();
+	    await teWrapper.parsingReportPage.show();
+        await commands.executeCommand(VsCodeCommands.NextEditor);
+        await commands.executeCommand(VsCodeCommands.NextEditor);
+		await closeEditors();
+        endRollingCount(this);
+	});
 
 
     test("Disable SideBar", async function()
