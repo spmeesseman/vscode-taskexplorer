@@ -499,7 +499,7 @@ suite("Tree Tests", () =>
         expect(teWrapper.explorer?.getParent(batch[0].taskFile)).to.not.be.null;
         expect(await teWrapper.explorer?.getChildren(taskTree[2].taskFiles[0])).to.not.be.null;
         expect(await teWrapper.explorer?.getChildren(taskTree[2].taskFiles[1])).to.not.be.null;
-        expect(teWrapper.explorer?.getName()).to.be.oneOf([ "taskExplorer", "taskExplorerSideBar" ]);
+        expect(teWrapper.explorer?.getName()).to.be.oneOf([ "taskTreeExplorer", "taskTreeSideBar" ]);
         utils.endRollingCount(this);
     });
 

@@ -70,12 +70,6 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	hide()
-	{
-		this._view?.dispose();
-	}
-
-
 	async show(options?: { column?: ViewColumn; preserveFocus?: boolean }, ...args: any[])
 	{
 		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
