@@ -273,7 +273,7 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.storageUpdate + tc.slowTime.licenseMgr.checkLicense + 800);
 		await licMgr.checkLicense();
-		await setTasks();
+		await teWrapper.licensePage.show();
 		await utils.sleep(400);
 		await utils.closeEditors();
         utils.endRollingCount(this);
@@ -286,7 +286,7 @@ suite("License Manager Tests", () =>
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.setLicenseCmd + tc.slowTime.licenseMgr.checkLicense + 800);
 		await licMgr.setLicenseKey("1234-5678-9098-7654321");
 		await licMgr.checkLicense();
-		await setTasks();
+		await teWrapper.licensePage.show();
 		await utils.sleep(400);
 		await utils.closeEditors();
         utils.endRollingCount(this);

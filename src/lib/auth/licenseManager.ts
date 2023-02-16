@@ -67,6 +67,11 @@ export class LicenseManager implements Disposable
     }
 
 
+	get serverToken() {
+		return this.wrapper.server.serverToken;
+	}
+
+
 	private displayPopup = async (message: string) =>
 	{
 		await this.wrapper.storage.update("taskexplorer.lastLicenseNag", Date.now().toString());
@@ -134,9 +139,6 @@ export class LicenseManager implements Disposable
 
 
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);
-
-
-	serverToken = () => this.wrapper.server.serverToken;
 
 
 	getVersion = () => this.wrapper.version;
@@ -224,14 +226,12 @@ export class LicenseManager implements Disposable
 
 	async setTasks(tasks: Task[], logPad = "   ")
 	{
-		let displayPopup = !this.licensed;
-		const lastNag = this.wrapper.storage.get<string>("taskexplorer.lastLicenseNag");
-
 		if (this.numTasks === tasks.length) {
 			return;
 		}
 		this.numTasks = tasks.length;
 
+		const lastNag = this.wrapper.storage.get<string>("taskexplorer.lastLicenseNag");
 		this.wrapper.log.methodStart("license manager set tasks", 1, logPad, false, [
 			[ "is licensed", this.licensed ], [ "is version change", this.wrapper.versionchanged ],
 			[ "# of tasks", this.numTasks ], [ "last nag", lastNag ]
@@ -241,24 +241,15 @@ export class LicenseManager implements Disposable
 		// Only display the nag on startup once every 30 days.  If the version
 		// changed, the webview will be shown instead regardless of the nag state.
 		//
-		if (!this.licensed && lastNag)
+		let displayPopup = !this.licensed;
+		if (lastNag)
 		{
-			const now = Date.now();
-			let lastNagDate = now;
-			lastNagDate = parseInt(lastNag, 10);
+			const now = Date.now(),
+				  lastNagDate = parseInt(lastNag, 10);
 			displayPopup = ((now - lastNagDate)  / 1000 / 60 / 60 / 24) > 30;
 		}
 
-		if (this.wrapper.versionchanged)
-		{
-			setTimeout(async () =>
-			{
-				await this.wrapper.licensePage.show();
-				await this.wrapper.storage.update("taskexplorer.lastLicenseNag", Date.now().toString());
-			}, 1);
-		}
-		else if (displayPopup)
-		{
+		if (displayPopup) {
 			this.displayPopup("Purchase a license to unlock unlimited parsed tasks.");
 		}
 

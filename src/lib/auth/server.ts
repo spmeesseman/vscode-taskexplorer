@@ -1,12 +1,12 @@
 
 import { request } from "https";
 // import fetch from "@env/fetch";
-import { IncomingMessage } from "http";
 // import fetch from "node-fetch";
-import { Disposable, env } from "vscode";
-import { TeWrapper } from "../wrapper";
-import { logControl } from "../log/log";
+import { Disposable } from "vscode";
 import { figures } from "../figures";
+import { TeWrapper } from "../wrapper";
+import { IncomingMessage } from "http";
+import { logControl } from "../log/log";
 
 
 export class TeServer implements Disposable
@@ -25,9 +25,12 @@ export class TeServer implements Disposable
 
     dispose()
     {
-        this.disposables.forEach((d) => {
-            d.dispose();
-        });
+        // this.disposables.forEach((d) => {
+        //     d.dispose();
+        // });
+		// if (this.busy) {
+		//
+		// }
     }
 
 
@@ -48,13 +51,15 @@ export class TeServer implements Disposable
 	};
 
 
-	serverToken = () => this.idToken;
+	get serverToken() {
+		return this.idToken;
+	};
 
 
 	private log = (msg: any, logPad?: string, value?: any, symbol?: string) =>
 	{
 		/* istanbul ignore if */
-		if (this.wrapper.tests && !logControl.writeToConsole)
+		if (this.wrapper.tests)
 		{
 			if (!value && value !== false) {
 				console.log(`       ${symbol || figures.color.infoTask} ${figures.withColor(msg.toString(), figures.colors.grey)}`);
@@ -128,6 +133,7 @@ export class TeServer implements Disposable
                     }
                     catch {}
                     this.logServerResponse(res, jso, rspData, logPad);
+					this.busy = false;
 					resolve({
                         data: jso,
                         status: res.statusCode,

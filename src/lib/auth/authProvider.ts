@@ -19,9 +19,13 @@ const CLIENT_ID = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/
 const TEAUTH_DOMAIN = "app1.spmeesseman.com";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
 
+/*
+    TODO - Remove istanbul tags when sessions are implemented
+*/
 
 class UriEventHandler extends EventEmitter<Uri> implements UriHandler
 {
+    /* istanbul ignore next */
     public handleUri(uri: Uri)
     {
         this.fire(uri);

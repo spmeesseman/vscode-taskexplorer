@@ -26,7 +26,6 @@ export class TeTreeView implements ITaskTreeView, Disposable
     private readonly _view: TreeView<TreeItem>;
     private _visible = false;
 
-
 	constructor(
 		private readonly wrapper: TeWrapper,
         treeManager: TaskTreeManager,
@@ -44,9 +43,9 @@ export class TeTreeView implements ITaskTreeView, Disposable
             this._tree,
             this._view,
             this._view.onDidChangeVisibility(this.onVisibilityChanged, this),
-            this._view.onDidCollapseElement(this.onElementCollapsed, this),
-            this._view.onDidExpandElement(this.onElementExpanded, this),
-            this._view.onDidChangeSelection(this.onElementSelectionChanged, this)
+            // this._view.onDidCollapseElement(this.onElementCollapsed, this),
+            // this._view.onDidExpandElement(this.onElementExpanded, this),
+            // this._view.onDidChangeSelection(this.onElementSelectionChanged, this)
         );
 	}
 
@@ -74,17 +73,17 @@ export class TeTreeView implements ITaskTreeView, Disposable
         return this._visible;
     }
 
-    onElementCollapsed(e: TreeViewExpansionEvent<TreeItem>)
-    {
-    }
+    // onElementCollapsed(e: TreeViewExpansionEvent<TreeItem>)
+    // {
+    // }
 
-    onElementExpanded(e: TreeViewExpansionEvent<TreeItem>)
-    {
-    }
+    // onElementExpanded(e: TreeViewExpansionEvent<TreeItem>)
+    // {
+    // }
 
-    onElementSelectionChanged(e: TreeViewSelectionChangeEvent<TreeItem>)
-    {
-    }
+    // onElementSelectionChanged(e: TreeViewSelectionChangeEvent<TreeItem>)
+    // {
+    // }
 
     onVisibilityChanged(e: TreeViewVisibilityChangeEvent)
     {

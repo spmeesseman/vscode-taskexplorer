@@ -1,6 +1,8 @@
 
 import { TeApi } from "./api";
 import * as fs from "./utils/fs";
+import { Strings } from "./constants";
+import { TeServer } from "./auth/server";
 import * as fileCache from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
@@ -35,7 +37,6 @@ import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
 import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
-import { TeAuthenticationProvider } from "./auth/authProvider";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
 import { PowershellTaskProvider } from "../providers/powershell";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
@@ -46,10 +47,8 @@ import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
-import { ExtensionContext, EventEmitter, ExtensionMode, tasks, workspace, WorkspaceFolder, env } from "vscode";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
-import { TeServer } from "./auth/server";
-import { Strings } from "./constants";
+import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView } from "vscode";
 
 
 export class TeWrapper
@@ -78,8 +77,8 @@ export class TeWrapper
 	private readonly _previousVersion: string | undefined;
 	private readonly _parsingReportPage: ParsingReportPage;
     private readonly _providers: IDictionary<ITaskExplorerProvider>;
-	private _onReady: EventEmitter<void> = new EventEmitter<void>();
-	private _onInitialized: EventEmitter<void> = new EventEmitter<void>();
+	// private _onReady: EventEmitter<void> = new EventEmitter<void>();
+	// private _onInitialized: EventEmitter<void> = new EventEmitter<void>();
 	// private _onWorkCompleted: EventEmitter<void> = new EventEmitter<void>();
 
 
@@ -152,17 +151,6 @@ export class TeWrapper
 		);
 	}
 
-
-	get onInitialized() {
-		return this._onInitialized.event;
-	}
-
-
-	get onReady() {
-		return this._onReady.event;
-	}
-
-
 	init = async() =>
 	{
 		if (this._initialized) {
@@ -171,6 +159,7 @@ export class TeWrapper
 		this.log.methodStart("app wrapper init", 1, "", false, [
 			[ "version", this._version ], [ "previous version", this._previousVersion  ],
 		]);
+		await this.storage.update("taskexplorer.version", this._version);
 		//
 		// Register global status bar item
 		//
@@ -203,11 +192,11 @@ export class TeWrapper
 		await setContext(ContextKeys.Debugging, this.debugging);
 		await setContext(ContextKeys.Tests, this.tests);
         await setContext(ContextKeys.Enabled, this.config.get<boolean>("enableSideBar") ||
-                                              this.config.get<boolean>("enableExplorerView"));
+                   /* istanbul ignore next */ this.config.get<boolean>("enableExplorerView"));
 		//
 		// Signal we are ready/done
 		//
-		queueMicrotask(() => { this._initialized = true; this._onInitialized.fire(); });
+		queueMicrotask(() => { this._initialized = true; /* this._onInitialized.fire();  */ });
 		//
 		// Start the whole work process, i.e. read task files and build the task tree, etc.
 		// Large workspaces can take a bit of time if persistent caching isn't enabled, so
@@ -235,8 +224,8 @@ export class TeWrapper
 		//
 		// Maybe how 'what's new'or 'welcome' page
 		//
-		if (this._version !== this._previousVersion) { /* TODO */ }
-		await this.storage.update("taskexplorer.version", this.version);
+		/* istanbul ignore next */
+		if (this.versionchanged) { /* TODO */ }
 		// utilities.oneTimeEvent(this.onReady)(() => { /* TODO */ });
 		//
 		// Build the file cache, this kicks off the whole process as refresh cmd will be issued
@@ -281,7 +270,7 @@ export class TeWrapper
 		//
 		// Signal that the startup work has completed
 		//
-		queueMicrotask(() => { this._ready = true; this._onReady.fire(); });
+		queueMicrotask(() => { this._ready = true; /* this._onReady.fire(); */ });
 	};
 
 
@@ -362,19 +351,16 @@ export class TeWrapper
 	get env(): "dev" | "tests" | "production" {
 		const isDev = this._context.extensionMode === ExtensionMode.Development,
 			  isTests = this._context.extensionMode === ExtensionMode.Test;
-		return !isDev && !isTests ? /* istanbul ignore next */"production" : (isDev ? "dev" : "tests");
+		/* istanbul ignore next */
+		return !isDev && !isTests ? "production" : (isDev ? "dev" : "tests");
 	}
 
     get explorer(): TaskTree {
         return this.treeManager.views.taskExplorer.tree;
     }
 
-    // set explorer(tree: TaskTree | undefined) {
-	// 	(this.treeManager.views.taskExplorer.tree as TaskTree) = tree as TaskTree;
-    // }
-
-    get explorerView() {
-        return this.treeManager.views.taskExplorer?.view;
+    get explorerView(): TreeView<TreeItem> {
+        return this.treeManager.views.taskExplorer.view;
     }
 
 	get filecache(): typeof fileCache {
@@ -396,6 +382,14 @@ export class TeWrapper
 	get log(): ILog {
 		return this._log;
 	}
+
+	// get onInitialized() {
+	// 	return this._onInitialized.event;
+	// }
+
+	// get onReady() {
+	// 	return this._onReady.event;
+	// }
 
 	get providers(): IDictionary<ITaskExplorerProvider> {
 		return this._providers;
@@ -425,12 +419,8 @@ export class TeWrapper
         return this.treeManager.views.taskExplorerSideBar.tree;
     }
 
-    // set sidebar(tree: TaskTree | undefined) {
-	// 	((this.treeManager.views.taskExplorerSideBar.tree) as TaskTree) = tree as TaskTree;
-    // }
-
-    get sidebarView() {
-        return this.treeManager.views.taskExplorerSideBar?.view;
+    get sidebarView(): TreeView<TreeItem> {
+        return this.treeManager.views.taskExplorerSideBar.view;
     }
 
 	get storage(): IStorage {
