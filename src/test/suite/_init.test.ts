@@ -47,12 +47,25 @@ suite("Initialization", () =>
     });
 
 
+    test("Cover Webview Properties (Pre-Show)", async function()
+    {
+        if (exitRollingCount(this)) return;
+        teWrapper.homeView.title = teWrapper.homeView.title;
+        teWrapper.releaseNotesPage.title = teWrapper.releaseNotesPage.title;
+        expect(teWrapper.releaseNotesPage.visible).to.be.equal(false);
+        expect(teWrapper.homeView.visible).to.be.equal(false);
+        expect(teWrapper.homeView.originalTitle).to.be.equal(teWrapper.homeView.title);
+        endRollingCount(this);
+    });
+
+
     test("Focus SideBar View Tree", async function()
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.refresh);
         await focusSidebarView();
         await waitForTeIdle(tc.waitTime.refreshCommand);
+        teWrapper.homeView.title = teWrapper.homeView.title;
         endRollingCount(this);
     });
 
