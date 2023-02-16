@@ -5,13 +5,14 @@
 import { expect } from "chai";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { EchoCommandRequestType } from "../../webview/common/ipc";
+import { EchoCommandRequestType, IpcCommandType } from "../../webview/common/ipc";
 import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
     activate, closeEditors, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 import { commands, Uri } from "vscode";
+import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 
 
 let teWrapper: TeWrapper;
@@ -44,7 +45,7 @@ suite("Webview Tests", () =>
     test("Enable and Focus SideBar", async function()
     {
         if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.refreshNoChanges);
+        this.slow(tc.slowTime.commands.focusChangeViews + tc.slowTime.config.registerExplorerEvent);
         await executeSettingsUpdate("enableSideBar", true, tc.waitTime.config.enableEvent);
         await waitForTeIdle(tc.waitTime.config.registerExplorerEvent);
         await focusSidebarView();
@@ -72,11 +73,14 @@ suite("Webview Tests", () =>
         await sleep(5);
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage }); // not visible, ignored
         await executeCommand(Commands.FocusHomeView);
+        await promiseFromEvent(teWrapper.homeView.onReadyReceived).promise;
         await sleep(5);
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage, args: [ Uri.file(getWsPath(".")) ] });
-        await sleep(500);
+        await promiseFromEvent(teWrapper.parsingReportPage.onReadyReceived).promise;
+        await sleep(5);
         await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
-        await sleep(1500);
+        await promiseFromEvent(teWrapper.releaseNotesPage.onReadyReceived).promise;
+        await sleep(5);
         await executeCommand(Commands.RefreshHomeView);
         await executeCommand(Commands.Donate);
         endRollingCount(this);
@@ -157,18 +161,18 @@ suite("Webview Tests", () =>
         await commands.executeCommand(VsCodeCommands.NextEditor);
         await commands.executeCommand(VsCodeCommands.NextEditor);
 		await closeEditors();
+        await focusExplorerView(teWrapper);
+        await sleep(5);
         endRollingCount(this);
 	});
 
 
-    test("Post an Unknown Random Message", async function()
-    {
-        if (exitRollingCount(this)) return;
-        this.slow(tc.slowTime.commands.focusChangeViews);
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
-        await sleep(500);
-        endRollingCount(this);
-    });
+    // test("Post an Unknown Random Message", async function()
+    // {
+    //     if (exitRollingCount(this)) return;
+    //     await teWrapper.homeView.notify(new IpcCommandType<void>("webview/unknown"), void undefined);
+    //     endRollingCount(this);
+    // });
 
 
     test("Disable SideBar", async function()

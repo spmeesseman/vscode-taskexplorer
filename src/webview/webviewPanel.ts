@@ -113,7 +113,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				window.onDidChangeWindowState(this.onWindowStateChanged, this),
 			);
 
-			this._view.webview.html = await this.getHtml(this._view.webview, ...args);
+			await this.refresh(false, ...args);
 		}
 		else {
 			await this.refresh(true, ...args);

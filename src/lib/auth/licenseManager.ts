@@ -134,8 +134,7 @@ export class LicenseManager implements Disposable
 
 	getMaxNumberOfTasks = (taskType?: string) =>
 		(this.licensed ? Infinity : (!taskType ? this.maxFreeTasks :
-												 (isScriptType(taskType) ? this.maxFreeTasksForScriptType :
-																		   this.maxFreeTasksForTaskType)));
+						(isScriptType(taskType) ? this.maxFreeTasksForScriptType : this.maxFreeTasksForTaskType)));
 
 
 	getMaxNumberOfTaskFiles = () =>  (this.licensed ? Infinity : this.maxFreeTaskFiles);

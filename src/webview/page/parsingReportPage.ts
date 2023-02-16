@@ -35,7 +35,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 	protected override onHtmlPreview = async(html: string, ...args: any[]) =>
 	{
 		const uri = args[0] as Uri | undefined;
-		const project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
+		const project = uri ? getWorkspaceProjectName(uri.fsPath || uri.path) : undefined;
 		html = await createTaskCountTable(this.wrapper, project, html);
 		html = html.replace("#{parsingReportTable}", this.getExtraContent(uri));
 		return html;
@@ -44,7 +44,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 
 	private getExtraContent = (uri?: Uri) =>
 	{
-		let project = uri ? getWorkspaceProjectName(uri.fsPath) : undefined;
+		let project = uri ? getWorkspaceProjectName(uri.fsPath || uri.path) : undefined;
 
 		let details = `<table class="margin-top-15" width="97%" align="center">
 		<tr class="content-section-header">

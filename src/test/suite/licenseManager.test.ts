@@ -4,7 +4,7 @@
 
 import { join } from "path";
 import { expect } from "chai";
-import { Task } from "vscode";
+import { Task, WebviewPanel } from "vscode";
 import * as utils from "../utils/utils";
 import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
@@ -298,14 +298,14 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.viewReport + 200);
 		let panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
-	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(50);
-		teWrapper.parsingReportPage.dispose();
+		(teWrapper.licensePage.view as WebviewPanel)?.dispose();
 		panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
 		await utils.sleep(50);
 		// teWrapper.busy = false;
 		setTimeout(() => { /* teWrapper.isBusy = false; */ }, 50);
-	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(50);
 		panel.dispose();
 		await utils.closeEditors();

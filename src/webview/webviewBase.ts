@@ -53,12 +53,16 @@ export abstract class TeWebviewBase<State> implements Disposable
 		return this._onContentLoaded.event;
 	}
 
+	private _onReadyReceived: EventEmitter<void> = new EventEmitter<void>();
+	get onReadyReceived() {
+		return this._onReadyReceived.event;
+	}
+
 
     constructor(protected readonly wrapper: TeWrapper, title: string, protected readonly fileName: string)
     {
 		this._title = title;
 		this._originalTitle = title;
-		this._onContentLoaded = new EventEmitter<string>();
 		this.disposables.push(this._onContentLoaded);
     }
 
@@ -192,7 +196,7 @@ export abstract class TeWebviewBase<State> implements Disposable
 		switch (e.method)
 		{
 			case WebviewReadyCommandType.method:
-				onIpc(WebviewReadyCommandType, e, () => { this._isReady = true; this.onReady?.(); });
+				onIpc(WebviewReadyCommandType, e, () => { this._isReady = true; this.onReady?.(); this._onReadyReceived.fire(); });
 				break;
 
 			// case WebviewFocusChangedCommandType.method:
