@@ -240,7 +240,7 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.licenseMgr.page + tc.slowTime.licenseMgr.enterKey + tc.slowTime.storageUpdate + 500);
-		await teWrapper.storage.update("taskexplorer.lastLicenseNag", undefined);
+		await teWrapper.storage.update("taskexplorer.lastLicenseNag", Date.now() - (1000 * 60 * 60 * 24) + 45);
 		utils.clearOverrideShowInfoBox();
 		utils.clearOverrideShowInputBox();
 		utils.overrideNextShowInfoBox("Enter License Key");

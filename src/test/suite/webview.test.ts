@@ -168,6 +168,7 @@ suite("Webview Tests", () =>
     {
         if (exitRollingCount(this)) return;
         await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await sleep(40);
         endRollingCount(this);
     });
 
