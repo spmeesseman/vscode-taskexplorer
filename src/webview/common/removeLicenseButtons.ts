@@ -5,12 +5,15 @@ export const removeLicenseButtons = (wrapper: TeWrapper, html: string) =>
 {
     if (wrapper.licenseManager.isLicensed())
     {
-        let idx1 = html.indexOf("<!-- startEnterLicenseButton -->"),
-            idx2 = html.indexOf("<!-- endEnterLicenseButton -->") + 30;
-        html = html.replace(html.slice(idx1, idx2), "");
-        idx1 = html.indexOf("<!-- startGetLicenseButton -->");
-        idx2 = html.indexOf("<!-- endGetLicenseButton -->") + 28;
-        html = html.replace(html.slice(idx1, idx2), "");
+        let idx1 = html.indexOf("<button data-action=\"command:taskexplorer.enterLicense\""),
+            idx2 = html.lastIndexOf("<div class=\"te-button-container", idx1),
+            idx3 = html.indexOf("</div>", idx2);
+        html = html.replace(html.slice(idx2, idx3), "");
+
+        idx1 = html.indexOf("<button data-action=\"command:taskexplorer.getLicense\"");
+        idx2 = html.lastIndexOf("<div class=\"te-button-container", idx1);
+        idx3 = html.indexOf("</div>", idx2);
+        html = html.replace(html.slice(idx2, idx3), "");
     }
     else {
         html = removeViewLicenseButton(html);
@@ -21,8 +24,9 @@ export const removeLicenseButtons = (wrapper: TeWrapper, html: string) =>
 
 export const removeViewLicenseButton = (html: string) =>
 {
-    const idx1 = html.indexOf("<!-- startViewLicenseButton -->"),
-          idx2 = html.indexOf("<!-- endViewLicenseButton -->") + 29;
-    html = html.replace(html.slice(idx1, idx2), "");
+    const idx1 = html.indexOf("<button data-action=\"command:taskexplorer.view.licensePage.show\""),
+          idx2 = html.lastIndexOf("<div class=\"te-button-container", idx1),
+          idx3 = html.indexOf("</div>", idx2);
+    html = html.replace(html.slice(idx2, idx3), "");
     return html;
 };
