@@ -45,7 +45,14 @@ svg {
 }
 
 .te-icon {
-    height: 44px;
+    height: 46px;
+}
+
+.homeview-title-container {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: -20px;
+    margin-top: -2px;
 }
 
 .homeview-info-panel {
@@ -71,8 +78,8 @@ svg {
 }
 
 .homeview-content-title {
-    font-size: 22px;
-    line-height: 22px;
+    font-size: 24px;
+    line-height: 24px;
     font-weight: bold;
     text-align: left;
     color: var(--vscode-button-background);
@@ -84,7 +91,7 @@ svg {
     font-weight: normal;
     text-align: end;
     margin-top: 3px;
-    margin-left: 24px;
+    margin-left: 28px;
     opacity: 0.95;
     vertical-align: bottom;
 }
