@@ -57,7 +57,8 @@ module.exports = (env, argv) =>
 		return getWebpackConfig(env.build, env, argv);
 	}
 
-	if (env.environment === "test"){
+	if (env.environment === "test") {
+		// env.esbuild = true;
 		return [
 			getWebpackConfig("extension_tests", env, argv),
 			// getWebpackConfig("extension", { ...env, ...{ environment: "dev" }}, argv)
@@ -386,6 +387,21 @@ const optimization = (env, wpConfig) =>
 			}
 		*/
 	}
+	// else if (env.environment === "test")
+	// {
+	// 	wpConfig.optimization = {
+	// 		runtimeChunk: "single",
+	// 		splitChunks: env.build === "extension_web" ? false : {
+	// 			cacheGroups: {
+	// 				vendor: {
+	// 					test: /[\\/]test[\\/]((?!(suite)).*)[\\/]/,
+	// 					name: "suite",
+	// 					chunks: "all"
+	// 				}
+	// 			}
+	// 		}
+	// 	};
+	// }
 	else {
 		wpConfig.optimization = {};
 		// wpConfig.optimization = {
@@ -427,12 +443,13 @@ const output = (env, wpConfig) =>
 		if (env.environment === "test" && env.build === "extension")
 		{
 			wpConfig.output = {
-				globalObject: "this",
+				// globalObject: "this",
+				libraryTarget: 'commonjs2',
 				path: path.join(__dirname, "dist"),
 				filename: '[name].js',
-				library: {
-					type: "commonjs2"
-				}
+				//library: {
+				//	type: "commonjs2"
+				//}
 			};
 		}
 		else if (env.build === "extension" || env.environment !== "test")

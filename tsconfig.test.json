@@ -7,7 +7,8 @@
         "paths": {
 			"@env/*": [ "src/lib/env/node/*" ]
 		},
-		"tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
+        // "incremental": true,
+		// "tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
     },
     "exclude": [
         "node_modules",
