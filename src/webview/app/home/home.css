@@ -18,6 +18,7 @@ button {
     border-radius: 3px;
     margin-right: 5px;
     border: gray 1px solid;
+    max-width: 160px;
     background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000);
 }
 
@@ -38,9 +39,16 @@ button:hover {
     display: inline-block;
 }
 
+.homeview-button-container {
+  align-content: left;
+  display: -webkit-inline-flex;
+}
+
 .button-panel {
-    width: -webkit-fill-available;
-    align-content:stretch;
+  width: -webkit-fill-available;
+  align-content: left;
+  align-items: left;
+  align-content: left;
 }
 
 .margin-top-3 {
@@ -72,7 +80,7 @@ button:hover {
     font-weight: normal;
     text-align: end;
     margin-top: 3px;
-    margin-left: 22px;
+    margin-left: 24px;
     opacity: 0.95;
     vertical-align: bottom;
 }
@@ -116,10 +124,4 @@ button:hover {
 
 .homeview-license-status-container {
     padding: 0px;
-}
-
-.homeview-button-container {
-    width: -webkit-fill-available;
-    align-content: flex-end;
-    display: inline-block;
 }

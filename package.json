@@ -283,7 +283,7 @@
                     "id": "taskexplorer.view.taskTreeSideBar",
                     "name": "Explorer",
                     "when": "config.taskexplorer.enableSideBar",
-                    "initialSize": 5,
+                    "initialSize": 10,
                     "contextualTitle": "TaskExplorer",
                     "icon": "res/img/logo.svg",
                     "visibility": "visible"
