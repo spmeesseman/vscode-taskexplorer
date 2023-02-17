@@ -58,6 +58,7 @@
         "clean:extension": "rimraf dist",
         "clean:webviews": "rimraf res/css && rimraf res/js && rimraf res/page",
         "copy-build-to-code": "cmd /c xcopy .\\dist\\*.js ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\dist /s /i /y",
+        "copy-res-to-code": "cmd /c xcopy .\\res\\*.* ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2\\res /s /i /y",
         "copy-pkgjson-to-code": "cmd /c copy /Y .\\package*.json ..\\..\\Code\\data\\extensions\\spmeesseman.vscode-taskexplorer-2.13.2",
         "create-release-notes-html": "npx marked -i CHANGELOG.md -o res/release-notes.html",
         "lint": "eslint -c .eslintrc.js --ext .ts .",
