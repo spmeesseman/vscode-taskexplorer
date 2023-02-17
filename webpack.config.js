@@ -86,7 +86,8 @@ const getWebpackConfig = (buildTarget, env, argv) =>
 {   
 	env.build = buildTarget;
 	env.basePath = env.build === "webview" ? path.join(__dirname, "src", "webview", "app") : __dirname;
-	/**@type {WebpackConfig}*/const wpConfig = {};
+	/**@type {WebpackConfig}*/
+	const wpConfig = {};
 	mode(env, argv, wpConfig);    // Mode i.e. "production", "development", "none"
 	context(env, wpConfig);       // Context for build
 	entry(env, wpConfig);         // Entry points for built output
@@ -207,6 +208,22 @@ const entry = (env, wpConfig) =>
 					return obj;
 				}, {})
 			};
+			// wpConfig.entry =
+			// {
+			// 	runTest: './src/test/runTest.ts'
+			// 	// runTest: {
+			// 	// 	import: [
+			// 	// 		'./src/test/runTest.ts',
+			// 	// 		'./src/test/suite/index.ts',
+			// 	// 		// @ts-ignore
+			// 	// 		...glob.sync('./src/test/suite/**/*.test.ts').reduce(function (obj, e) {
+			// 	// 				obj['suite/' + path.parse(e).name] = e;
+			// 	// 				return obj;
+			// 	// 			}, {})
+			// 	// 	],
+			// 	// 
+			// 	// }
+			// };
 		}
 	}
 };
@@ -387,26 +404,22 @@ const optimization = (env, wpConfig) =>
 			}
 		*/
 	}
-	// else if (env.environment === "test")
-	// {
-	// 	wpConfig.optimization = {
-	// 		runtimeChunk: "single",
-	// 		splitChunks: env.build === "extension_web" ? false : {
-	// 			cacheGroups: {
-	// 				vendor: {
-	// 					test: /[\\/]test[\\/]((?!(suite)).*)[\\/]/,
-	// 					name: "suite",
-	// 					chunks: "all"
-	// 				}
-	// 			}
-	// 		}
-	// 	};
-	// }
-	else {
-		wpConfig.optimization = {};
+	else if (env.environment === "test")
+	{
 		// wpConfig.optimization = {
 		// 	runtimeChunk: true
 		// };
+		wpConfig.optimization = {
+			usedExports: true,
+			concatenateModules: true
+		};
+		// wpConfig.experiments = {
+		// 	outputModule: true
+		// };
+		// wpConfig.optimization = {};
+	}
+	else {
+		wpConfig.optimization = {};
 	}
 };
 
@@ -440,19 +453,40 @@ const output = (env, wpConfig) =>
 	}
 	else
 	{
-		if (env.environment === "test" && env.build === "extension")
+		if (env.environment === "test")
 		{
-			wpConfig.output = {
-				// globalObject: "this",
-				libraryTarget: 'commonjs2',
-				path: path.join(__dirname, "dist"),
-				filename: '[name].js',
-				//library: {
-				//	type: "commonjs2"
-				//}
-			};
+			if (env.build === "extension")
+			{
+				wpConfig.output = {
+					globalObject: "this",
+					libraryTarget: 'commonjs2',
+					path: path.join(__dirname, "dist"),
+					filename: '[name].js',
+					//library: {
+					//	type: "commonjs2"
+					//}
+					// module: true,
+					chunkFormat: "commonjs",
+					library: {
+						type: "commonjs"
+					}
+				};
+			}
+			else {
+				wpConfig.output = {
+					path: env.build === "extension_web" ? path.join(__dirname, 'dist', 'test', 'browser') : path.join(__dirname, 'dist', 'test'),
+					filename: '[name].js',
+					libraryTarget: 'commonjs2',
+					sourceMapFilename: '[name].js.map',
+					chunkFormat: "commonjs",
+					// module: true,
+					library: {
+						type: "commonjs"
+					}
+				};
+			}
 		}
-		else if (env.build === "extension" || env.environment !== "test")
+		else
 		{
 			wpConfig.output = {
 				clean: env.clean === true,
@@ -460,15 +494,6 @@ const output = (env, wpConfig) =>
 				filename: '[name].js',
 				libraryTarget: 'commonjs2',
 				sourceMapFilename: wpConfig.mode !== "production" ? '[name].js.map' : undefined
-			};
-		}
-		else
-		{
-			wpConfig.output = {
-				path: env.build === "extension_web" ? path.join(__dirname, 'dist', 'test', 'browser') : path.join(__dirname, 'dist', 'test'),
-				filename: '[name].js',
-				libraryTarget: 'commonjs2',
-				sourceMapFilename: '[name].js.map'
 			};
 		}
 	}
@@ -739,7 +764,7 @@ const resolveTSConfig = (tsConfigFile) =>
  */
 const target = (env, wpConfig) =>
 {
-	if (env.build === "webview") {
+	if (env.build === "webview"|| env.build === "extension_web") {
 		wpConfig.target = "webworker";
 	}
 	else {
