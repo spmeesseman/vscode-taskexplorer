@@ -4,20 +4,21 @@
 import { v4 as uuid } from "uuid";
 import { URLSearchParams } from "url";
 import { TeWrapper } from "../wrapper";
-import { IDictionary } from "../../interface";
+import { IDictionary, TeSessionChangeEvent } from "../../interface";
 import { PromiseAdapter, promiseFromEvent } from "../utils/promiseUtils";
 import {
-    authentication, AuthenticationProvider, AuthenticationProviderAuthenticationSessionsChangeEvent, AuthenticationSession,
+    authentication, AuthenticationProvider, AuthenticationSession,
     Disposable, env, EventEmitter, ProgressLocation, Uri, UriHandler, window
 } from "vscode";
 
-export type TeAuthenticationSessionChangeEvent = AuthenticationProviderAuthenticationSessionsChangeEvent;
+export type TeAuthenticationSessionChangeEvent = TeSessionChangeEvent;
 
 export const AUTH_TYPE = "teauth";
 const AUTH_NAME = "TeAuth";
 const CLIENT_ID = "1Ac4qiBjXsNQP82FqmeJ5iH7IIw3Bou7eibskqg+Jg0U6rYJ0QhvoWZ+5RpH/Kq0EbIrZ9874fDG9u7bnrQP3zYf69DFkOSnOmz3lCMwEA85ZDn79P+fbRubTS+eDrbinnOdPe/BBQhVW7pYHxeK28tYuvcJuj0mOjIOz+3ZgTY=";
 const TEAUTH_DOMAIN = "app1.spmeesseman.com";
 const SESSIONS_SECRET_KEY = `${AUTH_TYPE}.sessions`;
+
 
 /*
     TODO - Remove istanbul tags when sessions are implemented

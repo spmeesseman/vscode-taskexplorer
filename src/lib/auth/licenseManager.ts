@@ -2,9 +2,11 @@
 
 import { TeWrapper } from "../wrapper";
 import { isScriptType } from "../utils/taskTypeUtils";
+import { IServerResponseData, TeServer } from "./server";
+import { ISessionToken } from "src/interface/IAuthentication";
 import { executeCommand, registerCommand, Commands } from "../command";
+import { Disposable, env, EventEmitter, InputBoxOptions, Task, window } from "vscode";
 import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";
-import { Disposable, env, EventEmitter, InputBoxOptions, Task, WebviewPanel, window } from "vscode";
 
 
 export class LicenseManager implements Disposable
@@ -17,6 +19,7 @@ export class LicenseManager implements Disposable
 	private maxFreeTasks = 500;
 	private maxFreeTaskFiles = 100;
 	private maxTasksReached = false;
+	private readonly _server: TeServer;
 	private _auth: TeAuthenticationProvider;
 	private maxFreeTasksForTaskType = 100;
 	private maxFreeTasksForScriptType = 50;
@@ -26,6 +29,7 @@ export class LicenseManager implements Disposable
 	constructor(wrapper: TeWrapper)
     {
 		this.wrapper = wrapper;
+		this._server = new TeServer(wrapper);
 		this._auth = new TeAuthenticationProvider(wrapper);
 		this._auth.onDidChangeSessions(this.onSessionChanged);
 		this.disposables.push(
@@ -201,7 +205,7 @@ export class LicenseManager implements Disposable
 	setLicenseKey = async (licenseKey: string | undefined) => this.wrapper.storage.updateSecret("license_key", licenseKey);
 
 
-	private setLicenseKeyFromRsp = async(jso: any, logPad: string) =>
+	private setLicenseKeyFromRsp = async(jso: IServerResponseData, logPad: string) =>
 	{
 		if (this.wrapper.utils.isString(jso.token))
 		{
@@ -209,10 +213,11 @@ export class LicenseManager implements Disposable
 			await this.setLicenseKey(jso.token);
 		}
 		else {
-			this.wrapper.log.value("license key", jso.token.token, 1, logPad);
-			this.wrapper.log.value("   issued", jso.token.issuedFmt, 1, logPad);
-			this.wrapper.log.value("   expires", jso.token.expiresFmt || jso.expiresFmt, 1, logPad);
-			await this.setLicenseKey(jso.token.token);
+			const token = jso.token as ISessionToken;
+			this.wrapper.log.value("license key", token.token, 1, logPad);
+			this.wrapper.log.value("   issued", token.issuedFmt, 1, logPad);
+			this.wrapper.log.value("   expires", token.expiresFmt /* || jso.expiresFmt */, 1, logPad);
+			await this.setLicenseKey(token.token);
 		}
 		this.wrapper.log.write("license key saved to secure storage", 1, logPad);
 	};
@@ -253,6 +258,10 @@ export class LicenseManager implements Disposable
 		this.wrapper.log.methodDone("license manager set tasks", 1, logPad);
 	}
 
+	get server(): TeServer {
+		return this._server;
+	}
+
 
 	setTestData = (data: any) =>
 	{
@@ -277,12 +286,7 @@ export class LicenseManager implements Disposable
 		},
 		logPad);
 
-		if (rsp.success === true)
-		{
-			licensed = rsp.success;
-			rsp.token = licenseKey;
-			await this.setLicenseKeyFromRsp(rsp, logPad);
-		}
+		licensed = rsp.success;
 
 		this.busy = false;
 		this.wrapper.log.methodDone("validate license", 1, logPad, [[ "is valid license", licensed ]]);

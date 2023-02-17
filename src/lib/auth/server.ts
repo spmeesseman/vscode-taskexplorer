@@ -6,12 +6,27 @@ import { Disposable } from "vscode";
 import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
 import { IncomingMessage } from "http";
-import { logControl } from "../log/log";
+import { ISessionToken } from "src/interface/IAuthentication";
 
 
-export class TeServer implements Disposable
+export interface IServerResponseData
 {
-    private disposables: Disposable[] = [];
+	token?: ISessionToken;
+	success: boolean;
+	message: string;
+}
+
+export interface IServerResponse
+{
+	data: IServerResponseData;
+	status: number | undefined;
+	success: boolean;
+}
+
+export class TeServer
+{
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	private readonly MAX_CONNECTION_TIME = 7500;
 	private busy = false;
 	private port = 443;
 	private host = "license.spmeesseman.com";
@@ -23,17 +38,6 @@ export class TeServer implements Disposable
     }
 
 
-    dispose()
-    {
-        // this.disposables.forEach((d) => {
-        //     d.dispose();
-        // });
-		// if (this.busy) {
-		//
-		// }
-    }
-
-
 	private getDefaultServerOptions = (apiEndpoint: string) =>
 	{
 		return {
@@ -41,6 +45,9 @@ export class TeServer implements Disposable
 			port: this.port,
 			path: apiEndpoint,
 			method: "POST",
+			//
+			// Timeout don't work worth a s***.  Do a promise race in request()
+			//
 			timeout: this.host !== "localhost" ? 4000 : /* istanbul ignore next*/1250,
 			headers: {
 				"token": this.idToken,
@@ -112,11 +119,28 @@ export class TeServer implements Disposable
 	};
 
 
-    request = (endpoint: string, params: any, logPad: string) =>
+	request = (endpoint: string, params: any, logPad: string) =>
+	{
+		return Promise.race<IServerResponse>(
+		[
+			this._request(endpoint, params, logPad),
+			new Promise<IServerResponse>(resolve => setTimeout(resolve, this.MAX_CONNECTION_TIME,
+			<IServerResponse> {
+				data: {
+					success: false,
+					message: `Maximum connection attempt time of ${this.MAX_CONNECTION_TIME}ms reached`
+				},
+				status: undefined, success: false
+			}))
+		]);
+	};
+
+
+    private _request = (endpoint: string, params: any, logPad: string) =>
 	{
 		this.busy = true;
 
-		return new Promise<any>(async(resolve) =>
+		return new Promise<IServerResponse>(async(resolve) =>
 		{
 			let rspData = "";
 			this.wrapper.log.methodStart("request license", 1, logPad, false, [[ "host", this.host ], [ "port", this.port ]]);
@@ -134,7 +158,7 @@ export class TeServer implements Disposable
                     catch {}
                     this.logServerResponse(res, jso, rspData, logPad);
 					this.busy = false;
-					resolve({
+					resolve(<IServerResponse>{
                         data: jso,
                         status: res.statusCode,
                         success: res.statusCode === 200 && jso.success && jso.message === "Success"
@@ -147,8 +171,11 @@ export class TeServer implements Disposable
 			{   // Not going to fail unless i birth a bug
 				this.onServerError(e, "request", logPad);
 				this.busy = false;
-				resolve({
-					data: undefined,
+				resolve(<IServerResponse>{
+					data: {
+						success: false,
+						message: e.message
+					},
 					status: undefined,
 					success: false
 				});

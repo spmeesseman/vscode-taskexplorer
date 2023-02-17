@@ -61,7 +61,6 @@ export class TeWrapper
 	private readonly _log: ILog;
 	private readonly _teApi: TeApi;
 	private readonly _version: string;
-	private readonly _server: TeServer;
 	private readonly _storage: IStorage;
 	private readonly _homeView: HomeView;
 	private readonly _usage: UsageWatcher;
@@ -101,7 +100,6 @@ export class TeWrapper
 		this._taskCountView = new TaskCountView(this);
 		this._taskUsageView = new TaskUsageView(this);
 
-		this._server = new TeServer(this);
 		this._licensePage = new LicensePage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
@@ -139,7 +137,6 @@ export class TeWrapper
 
 		context.subscriptions.push(
 			this._usage,
-			this._server,
 			this._homeView,
 			this._treeManager,
 			this._licensePage,
@@ -412,7 +409,7 @@ export class TeWrapper
 	}
 
 	get server(): TeServer {
-		return this._server;
+		return this.licenseManager.server;
 	}
 
     get sidebar(): TaskTree {

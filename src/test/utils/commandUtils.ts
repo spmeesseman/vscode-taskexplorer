@@ -1,7 +1,7 @@
 import { commands } from "vscode";
-import { configuration } from "../../lib/utils/configuration";
 import { TeWrapper } from "../../lib/wrapper";
 import { waitForTeIdle, testControl as tc } from "./utils";
+import { configuration } from "../../lib/utils/configuration";
 
 let explorerHasFocused = false;
 
