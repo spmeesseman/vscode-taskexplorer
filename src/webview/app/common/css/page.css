@@ -31,9 +31,12 @@ hr {
     width: 640px;
     height: 512px;
     z-index: -1;
-    opacity: 0.1;
-    background-repeat: no-repeat;
-    background-image: url('../img/logo-fas.svg');
+    opacity: 0.08;
+    mask-size: cover;
+    background-color: #777;
+    -webkit-mask-size: cover;
+    mask: url("../img/logo-fas.svg") no-repeat 100% 100%;
+    -webkit-mask:url("../img/logo-fas.svg") no-repeat 100% 100%;
 }
 
 /*
