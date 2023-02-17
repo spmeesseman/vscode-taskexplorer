@@ -66,7 +66,7 @@ export class ParsingReportPage extends TeWebviewPanel<State>
 			if (isWorkspaceFolder(t.scope))
 			{
 				wsFolder = t.scope;
-				project = project || getWorkspaceProjectName(wsFolder.uri.fsPath);
+				project = getWorkspaceProjectName(wsFolder.uri.fsPath);
 			}
 			else {
 				project = "User";
