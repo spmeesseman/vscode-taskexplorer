@@ -20,14 +20,15 @@ button {
     border: gray 1px solid;
     background: -webkit-linear-gradient(bottom, #000000, #222222, #696767, #222222, #000000);
 }
-/*
+
 button:hover {
-	cursor: pointer;
-	background: var(--vscode-background--50);
+  cursor: pointer;
+  background: inherit;
+  background: -webkit-linear-gradient(bottom, #222222, #444444, #727272, #444444, #222222);
 }
-*/
+
 .te-icon {
-    height: 46px;
+    height: 44px;
 }
 
 .homeview-info-panel {
