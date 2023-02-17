@@ -28,15 +28,8 @@ button:hover {
   background: -webkit-linear-gradient(bottom, #222222, #444444, #727272, #444444, #222222);
 }
 
-.te-icon {
-    height: 44px;
-}
-
-.homeview-info-panel {
-    min-width: 170px;
-    max-width: 190px;
-    padding-right: 5px;
-    display: inline-block;
+svg {
+  fill: var(--vscode-button-background)
 }
 
 .homeview-button-container {
@@ -49,6 +42,17 @@ button:hover {
   align-content: left;
   align-items: left;
   align-content: left;
+}
+
+.te-icon {
+    height: 44px;
+}
+
+.homeview-info-panel {
+    min-width: 170px;
+    max-width: 190px;
+    padding-right: 5px;
+    display: inline-block;
 }
 
 .margin-top-3 {
