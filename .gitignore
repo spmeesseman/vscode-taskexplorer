@@ -4,6 +4,7 @@ out
 *.vsix
 *.vscode-test
 *.buildinfo
+*.tsbuildinfo
 coverage
 .nyc_output
 install_extensions.bat
