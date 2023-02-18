@@ -6,6 +6,8 @@ Bugs:
     ✔ Saving package.json is throwing the 'tree node already exists' error @done(21-03-22 22:24)
     ✔ Swutching away from view while task is running, and switching back after task has ended, view still shows it as running, must refresh @done(20-10-09 02:41)
     ✔ Damn son of bitch shit hole bug - '..... is already registered' @done(23-01-08 16:23)
+    ☐ Again - Running task not updating icon when task is finished
+        random, mostly when view was not visiblewhen ended
 
 Features:
 
@@ -49,6 +51,18 @@ Features:
 
     ☐ Icons in  Task Counts view action
         Make clickable, open up a page webview with nice large layout, can run the tasks in the group clicked from
+
+    ☐ New 'Famous Tasks' webview page/panel
+        Display Most Used tasks
+        Big green 'run' buttons layout
+        Maybe use tabs and list most used tasks per project
+
+    ☐ New 'Usage Report' webview page/panel
+        Open from TaskUsage view in sidebar, maybe header button
+        Detailed report on task usage, day view,, week view, month view
+
+    ☐ Display message for 'set new record' when new daily high total is seen
+        Maybe suppress msg until user has used extension for at least a month or so
 
 General Todos:
 
@@ -97,6 +111,7 @@ Tests:
 
     ☐ Tests for external provider (via API)
         adjust instanbul ignores in cache.ts
+        Use 'install extenion' command to install vscode-extjs
     
     ✔ Tests for adding folder with files in it @done(23-01-21 22:07)
         i.e. a copy/move folder action by user, there's no other way.
