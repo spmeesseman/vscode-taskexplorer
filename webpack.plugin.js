@@ -56,7 +56,7 @@ const wpPlugin =
 				}
 			};
 		}
-		else if (env.build === "extension" && env.environment === "test")
+		if (env.build === "extension" && env.environment.startsWith("test"))
 		{
 			const babel = [
 				"babel", "./src/test", "--out-dir", "./dist/test", "--extensions", ".ts",

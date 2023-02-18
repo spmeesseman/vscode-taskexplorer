@@ -67,6 +67,14 @@ module.exports = (env, argv) =>
 		];
 	}
 
+	if (env.environment === "testprod") {
+		// env.esbuild = true;
+		return [
+			getWebpackConfig("extension", env, argv),
+			getWebpackConfig("webview", { ...env, ...{ environment: "prod" }}, argv)
+		];
+	}
+
 	return [
 		getWebpackConfig("extension", env, argv),
 		// getWebpackConfig("extension_web", env, argv),
@@ -354,7 +362,7 @@ const mode = (env, argv, wpConfig) =>
 		}
 		else {
 			wpConfig.mode = "production";
-			env.environment = "prod";
+			// env.environment = "prod"; ~ "testprod"
 		}
 	}
 	else
@@ -363,7 +371,7 @@ const mode = (env, argv, wpConfig) =>
 		if (argv.mode === "development") {
 			env.environment = "dev";
 		}
-		else if (argv.mode === "production") {
+		else { // if (argv.mode === "production") {
 			env.environment = "prod";
 		}
 	}

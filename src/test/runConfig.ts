@@ -2,6 +2,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 "use strict";
 //
+import * as fs from "fs";
 import * as glob from "glob";
 import * as path from "path";
 import Mocha from "mocha";
@@ -11,13 +12,6 @@ const NYC = require("nyc");
 // Simulates the recommended config option
 // extends: "@istanbuljs/nyc-config-typescript",
 // import * as baseConfig from "@istanbuljs/nyc-config-typescript";
-
-//
-// Recommended modules, loading them here to speed up NYC init
-// and minimize risk of race condition
-//
-import "ts-node/register";
-import "source-map-support/register";
 
 // const sleep = (ms: number) =>
 // {
@@ -32,61 +26,66 @@ export default async() =>
           // testsRoot = path.resolve(__dirname, ".."),  // <- WP
           // nycRoot = path.resolve(__dirname, "..", "..", ".."),
           testsRoot = path.resolve(__dirname),           // <- TS
-          nycRoot = path.resolve(__dirname, "..", ".."); // <- TS
+          nycRoot = path.resolve(__dirname, "..", ".."), // <- TS
+          projectRoot = path.resolve(testsRoot, ".."),
+          cover = fs.existsSync(path.join(projectRoot, "extension.js.map"));
 
-    // Setup coverage pre-test, including post-test hook to report
-    const nyc = new NYC({
-        extends: "@istanbuljs/nyc-config-typescript",
-        cwd: nycRoot,
-        reportDir: "./.coverage",
-        tempDir: "./.nyc_output",
-        reporter: [ "text-summary", "html", "lcov", "cobertura" ],
-        all: true,
-        // cache: false,
-        silent: false,
-        instrument: true,
-        // sourceMap: true,
-        // instrument: false,
-        // sourceMap: false,
-        hookRequire: true,
-        hookRunInContext: true,
-        hookRunInThisContext: true,
-        // useSpawnWrap: true,
-        include: [ "dist/**/*.js" ],
-        exclude: [ "dist/test/**", "**/external*.*", "external*" ],
-    });
-    await nyc.wrap();
-
-    //
-    // Check the modules already loaded and warn in case of race condition
-    // (ideally, at this point the require cache should only contain one file - this module)
-    //
-    // console.log("Check requires cache");
-    // Object.keys(require.cache).forEach((reqKey) => {
-    //     console.log("   " + reqKey);
-    // });
-    const myFilesRegex = /vscode-taskexplorer\/dist/;
-    const filterFn = myFilesRegex.test.bind(myFilesRegex);
-    if (Object.keys(require.cache).filter(filterFn).length > 1)
+    let nyc: any;
+    if (cover)
     {
-        console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
-    }
+        // Setup coverage pre-test, including post-test hook to report
+        nyc = new NYC({
+            extends: "@istanbuljs/nyc-config-typescript",
+            cwd: nycRoot,
+            reportDir: "./.coverage",
+            tempDir: "./.nyc_output",
+            reporter: [ "text-summary", "html", "lcov", "cobertura" ],
+            all: true,
+            // cache: false,
+            silent: false,
+            instrument: true,
+            // sourceMap: true,
+            // instrument: false,
+            // sourceMap: false,
+            hookRequire: true,
+            hookRunInContext: true,
+            hookRunInThisContext: true,
+            // useSpawnWrap: true,
+            include: [ "dist/**/*.js" ],
+            exclude: [ "dist/test/**", "**/external*.*", "external*" ],
+        });
+        await nyc.wrap();
 
-    //
-    // Debug which files will be included/excluded
-    // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
-    //
-
-    if (xArgs.includes("--no-clean"))
-    {
-        await nyc.createTempDirectory();
-    }
-    else {
-        try {
-            await nyc.reset();
+        //
+        // Check the modules already loaded and warn in case of race condition
+        // (ideally, at this point the require cache should only contain one file - this module)
+        //
+        // console.log("Check requires cache");
+        // Object.keys(require.cache).forEach((reqKey) => {
+        //     console.log("   " + reqKey);
+        // });
+        const myFilesRegex = /vscode-taskexplorer\/dist/;
+        const filterFn = myFilesRegex.test.bind(myFilesRegex);
+        if (Object.keys(require.cache).filter(filterFn).length > 1)
+        {
+            console.warn("NYC initialized after modules were loaded", Object.keys(require.cache).filter(filterFn));
         }
-        catch {
+
+        //
+        // Debug which files will be included/excluded
+        // console.log('Glob verification', await nyc.exclude.glob(nyc.cwd));
+        //
+        if (xArgs.includes("--no-clean"))
+        {
             await nyc.createTempDirectory();
+        }
+        else {
+            try {
+                await nyc.reset();
+            }
+            catch {
+                await nyc.createTempDirectory();
+            }
         }
     }
 
@@ -99,6 +98,10 @@ export default async() =>
         timeout: 30000, // default timeout: 10 seconds
         retries: 0, // ,
         slow: 250,
+        require: [
+            "ts-node/register",
+            "source-map-support/register"
+        ]
         // reporter: "mocha-multi-reporters",
         // reporterOptions: {
         //     reporterEnabled: "spec, mocha-junit-reporter",

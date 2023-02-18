@@ -67,12 +67,13 @@
         "vsce-publish_types": "npm publish",
         "install_extensions.bat": "cmd /c .\\install_extensions.bat",
         "test-all": "npm run test-default_build && node ./dist/test/runTest.js",
-        "test-all_nobuild": "node ./dist/test/runTest.js",
+        "test-all_no_build": "node ./dist/test/runTest.js",
         "test-all_mws": "npm run test-default_build && node ./dist/test/runTest.js --multi-root",
-        "test-all_mws_nobuild": "node ./dist/test/runTest.js --multi-root",
+        "test-all_mws_no_build": "node ./dist/test/runTest.js --multi-root",
         "test-all_smws_combined": "npm run test-all && node ./dist/test/runTest.js --no-clean --multi-root",
-        "test-default_build": "npm run tsc-build_test",
+        "test-default_build3": "npm run tsc-build_test",
         "test-default_build2": "npm run webpack-build:test",
+        "test-default_build": "npm run webpack-build:test:prod",
         "test-transpile_tests": "babel ./src/test --out-dir ./dist/test --extensions \".ts\" --presets=@babel/preset-env,@babel/preset-typescript",
         "test-single-mws-ant": "npm run test-default_build && node ./dist/test/runTest.js ant xDeactivate --multi-root",
         "test-single-mws-file_cache": "npm run test-default_build && node ./dist/test/runTest.js fileCache xDeactivate --multi-root",
@@ -150,7 +151,8 @@
         "webpack-build:verbose": "webpack --stats verbose --mode production --config ./webpack.config.js",
         "webpack-build:dev": "webpack --mode development --config ./webpack.config.js",
         "webpack-rebuild:dev": "npm run webpack-build:dev --env clean=true --config ./webpack.config.js",
-        "webpack-build:test": "webpack --env environment=test --config ./webpack.config.js"
+        "webpack-build:test": "webpack --env environment=test --config ./webpack.config.js",
+        "webpack-build:test:prod": "webpack --env environment=testprod --config ./webpack.config.js"
     },
     "dependencies": {
         "@microsoft/fast-element": "^1.11.0",

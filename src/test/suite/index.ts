@@ -24,20 +24,23 @@ export async function run(): Promise<void>
 
     const failures: number = await new Promise(resolve => runCfg.mocha.run(resolve));
 
-    try {
-        await runCfg.nyc.writeCoverageFile();
-        //
-        // Capture text-summary reporter's output and log it in console
-        //
-        console.log(await captureStdout(runCfg.nyc.report.bind(runCfg.nyc)));
-    }
-    catch (e) {
-        console.log("!!!");
-        console.log("!!! Error writing coverage file:");
+    if (runCfg.nyc)
+    {
         try {
-            console.log("!!!    " + (e as any).toString());
-        }catch {}
-        console.log("!!!");
+            await runCfg.nyc.writeCoverageFile();
+            //
+            // Capture text-summary reporter's output and log it in console
+            //
+            console.log(await captureStdout(runCfg.nyc.report.bind(runCfg.nyc)));
+        }
+        catch (e) {
+            console.log("!!!");
+            console.log("!!! Error writing coverage file:");
+            try {
+                console.log("!!!    " + (e as any).toString());
+            }catch {}
+            console.log("!!!");
+        }
     }
 
     if (failures > 0)

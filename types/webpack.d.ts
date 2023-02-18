@@ -16,10 +16,10 @@ declare interface WebpackEnvironment
     basePath: string;
     build: WebpackBuild;
     clean: boolean;
-    environment: "dev"|"prod"|"test";
+    environment: "dev"|"prod"|"test"|"testprod";
     esbuild: boolean; // Is ES build
     imageOpt: boolean; // Perform image optimization
-    target: "dev"|"prod"|"test";
+    target: "webworker"|"node"|"web";
 }
 
 export {
