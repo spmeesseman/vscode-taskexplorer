@@ -102,7 +102,7 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
 	    const panel = await executeTeCommand("taskexplorer.view.licensePage.show", testControl.waitTime.viewReport);
-		await teWrapper.licensePage.view.webview.postMessage({ command: "showLicensePage" });
+		await teWrapper.licensePage.view?.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		await closeEditors();
         endRollingCount(this);
@@ -114,12 +114,12 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 30);
 		let panel = createwebviewForRevive("Task Explorer Parsing Report", "parsingReport");
-	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer?.deserializeWebviewPanel(panel, null);
 		await sleep(5);
 		(teWrapper.parsingReportPage.view as WebviewPanel)?.dispose();
 		panel = createwebviewForRevive("Task Explorer Parsing Report", "parsingReport");
 		await sleep(5);
-	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.parsingReportPage.serializer?.deserializeWebviewPanel(panel, null);
 		await sleep(5);
 		await closeEditors();
         endRollingCount(this);

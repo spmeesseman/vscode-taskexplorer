@@ -7,6 +7,7 @@
  */
 
 import { TextDecoder } from "util";
+import { ITeWebview } from "../interface";
 // import { getNonce } from "@env/crypto";
 import { TeWrapper } from "../lib/wrapper";
 import { getNonce } from "../lib/env/node/crypto";
@@ -18,7 +19,7 @@ import {
 } from "./common/ipc";
 
 
-export abstract class TeWebviewBase<State> implements Disposable
+export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 {
 	protected readonly disposables: Disposable[] = [];
 

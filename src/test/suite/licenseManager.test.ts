@@ -294,12 +294,12 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.viewReport + 30);
 		let panel = utils.createwebviewForRevive("Task Explorer Licensing", "licensePage");
-	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.licensePage.serializer?.deserializeWebviewPanel(panel, null);
 		await utils.sleep(5);
 		(teWrapper.licensePage.view as WebviewPanel)?.dispose();
 		panel = utils.createwebviewForRevive("Task Explorer Licensing", "licensePage");
 		await utils.sleep(5);
-	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
+	    await teWrapper.licensePage.serializer?.deserializeWebviewPanel(panel, null);
 		await utils.sleep(5);
 		panel.dispose();
 		await utils.closeEditors();

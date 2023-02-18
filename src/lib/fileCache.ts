@@ -5,12 +5,12 @@ import { TeWrapper } from "./wrapper";
 import { ContextKeys } from "./context";
 import { statusBarItem } from "./statusBarItem";
 import * as taskTypeUtils from "./utils/taskTypeUtils";
-import { IDictionary, ICacheItem } from "../interface";
 import { findFiles, numFilesInDirectory } from "./utils/fs";
+import { IDictionary, ICacheItem, ITeFileCache } from "../interface";
 import { workspace, RelativePattern, WorkspaceFolder, Uri, commands } from "vscode";
 
 
-export class TeFileCache
+export class TeFileCache implements ITeFileCache
 {
 
     private cancel = false;

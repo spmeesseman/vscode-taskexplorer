@@ -1,58 +1,57 @@
 
 import { ExtensionContext, WorkspaceFolder } from "vscode";
 import { IConfiguration } from "./IConfiguration";
+import { ITeFileCache } from "./ITeFileCache";
+import { ITeFilesystem } from "./ITeFilesystem";
 import { ILog } from "./ILog";
 import { IStorage } from "./IStorage";
-
-
-export interface ITeContext
-{
-	getContext<T>(key: string, defaultValue?: T): T;
-	getContext<T>(key: string): T | undefined;
-	setContext(key: string, value: unknown): Promise<void>;
-}
+import { ITaskExplorerApi } from "./ITaskExplorerApi";
+import { ITeContext } from "./ITeContext";
+import { ITeUtilities } from "./ITeUtilities";
+import { ITeWebview } from "./ITeWebview";
 
 export interface ITeWrapper
 {
-    // api: TeApi;
-	busy: boolean;
-	config: IConfiguration;
-	context: ExtensionContext;
-	contextTe: ITeContext; // TeContext;
+	init(): Promise<void>;
+
 	debugging: boolean;
-	configwatcher: boolean;
-	utils: any;
-	storage: IStorage;
-	treeManager: any;
-	explorer: any;
-	sidebar: any;
-	fs: any;
-	filecache: any;
-	api: any;
-	log: ILog;
-	tests: boolean;
-	licenseManager: any;
-	homeView: any;
-	taskUsageView: any;
-	taskCountView: any;
-	parsingReportPage: any;
-	licensePage: any;
-	releaseNotesPage: any;
-	explorerView: any;
-	sidebarView: any;
-	views: any;
-	wsfolder: WorkspaceFolder;
-	usage: any;
 	env: string;
 	id: string;
-	taskManager: any;
+	tests: boolean;
+	busy: boolean;
+
+	api: ITaskExplorerApi;
+	commonUtils: any;
+	config: IConfiguration;
+	context: ExtensionContext;
+	contextTe: ITeContext;
+	configwatcher: boolean;
 	// configWatcher: any;
+	explorer: any;
+	explorerView: any;
 	fileWatcher: any;
 	figures: any;
-	init(): Promise<void>;
+	homeView: ITeWebview;
+	filecache: ITeFileCache;
+	fs: ITeFilesystem;
+	licenseManager: any;
+	licensePage: ITeWebview;
+	log: ILog;
 	logControl: any;
+	parsingReportPage: ITeWebview;
 	pathUtils: any;
-	taskUtils: any;
+	releaseNotesPage: ITeWebview;
+	sidebar: any;
+	sidebarView: any;
 	sorters: any;
-	commonUtils: any;
+	storage: IStorage;
+	treeManager: any;
+	taskManager: any;
+	taskUsageView: ITeWebview;
+	taskCountView: ITeWebview;
+	taskUtils: any;
+	usage: any;
+	utils: ITeUtilities;
+	views: any;
+	wsfolder: WorkspaceFolder;
 }

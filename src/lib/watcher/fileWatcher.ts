@@ -10,7 +10,7 @@ import {
 } from "vscode";
 
 
-export class TeFileWatcher implements Disposable
+export class TeFileWatcher implements TeFileWatcher, Disposable
 {
 
     private disposables: Disposable[];

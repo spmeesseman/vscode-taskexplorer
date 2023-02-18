@@ -289,4 +289,4 @@ export const showMaxTasksReachedMessage = (licMgr: LicenseManager, taskType?: st
 export const testPattern = (path: string, pattern: string) => minimatch(path, pattern, { dot: true, nocase: true });
 
 
-export const timeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+export const timeout = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
