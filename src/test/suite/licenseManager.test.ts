@@ -4,11 +4,10 @@
 
 import { join } from "path";
 import { expect } from "chai";
-import { Task, WebviewPanel } from "vscode";
 import * as utils from "../utils/utils";
+import { Task, WebviewPanel } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
-import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
@@ -181,7 +180,7 @@ suite("License Manager Tests", () =>
 		await setTasks();
 		await utils.sleep(50);
 		await teWrapper.licensePage.view?.webview.postMessage({ command: "showParsingReport" });
-        await promiseFromEvent(teWrapper.parsingReportPage.onReadyReceived).promise;
+        await utils.promiseFromEvent(teWrapper.parsingReportPage.onReadyReceived).promise;
         utils.endRollingCount(this);
 	});
 

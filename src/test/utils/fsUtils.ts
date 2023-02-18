@@ -1,25 +1,25 @@
-import * as fs from "../../lib/utils/fs";
-import { testControl as tc, waitForTeIdle } from "./utils";
+
+import { testControl as tc, waitForTeIdle, teWrapper } from "./utils";
 
 
 const createFile = async(fsPath: string, content: string, waitTime?: number) =>
 {
-    await fs.writeFile(fsPath, content);
+    await teWrapper.fs.writeFile(fsPath, content);
     await waitForTeIdle(waitTime || tc.waitTime.fs.createEvent);
 };
 
 
 const writeFile = async(fsPath: string, content: string, waitTime?: number) =>
 {
-    await fs.writeFile(fsPath, content);
+    await teWrapper.fs.writeFile(fsPath, content);
     await waitForTeIdle(waitTime || tc.waitTime.fs.modifyEvent);
 };
 
 
 const deleteFile = async(fsPath: string, waitTime?: number) =>
 {
-    if (await fs.pathExists(fsPath)) {
-        await fs.deleteFile(fsPath);
+    if (await teWrapper.fs.pathExists(fsPath)) {
+        await teWrapper.fs.deleteFile(fsPath);
         await waitForTeIdle(waitTime || tc.waitTime.fs.deleteEvent);
     }
 };
@@ -27,8 +27,8 @@ const deleteFile = async(fsPath: string, waitTime?: number) =>
 
 const createDir = async(fsPath: string, waitTime?: number) =>
 {
-    if (!(await fs.pathExists(fsPath))) {
-        await fs.createDir(fsPath);
+    if (!(await teWrapper.fs.pathExists(fsPath))) {
+        await teWrapper.fs.createDir(fsPath);
         await waitForTeIdle(waitTime || tc.waitTime.fs.createFolderEvent);
     }
 };
@@ -36,8 +36,8 @@ const createDir = async(fsPath: string, waitTime?: number) =>
 
 const deleteDir = async(fsPath: string, waitTime?: number) =>
 {
-    if (await fs.pathExists(fsPath)) {
-        await fs.deleteDir(fsPath);
+    if (await teWrapper.fs.pathExists(fsPath)) {
+        await teWrapper.fs.deleteDir(fsPath);
         await waitForTeIdle(waitTime || tc.waitTime.fs.createFolderEvent);
     }
 };

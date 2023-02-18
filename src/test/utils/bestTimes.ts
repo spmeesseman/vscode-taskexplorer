@@ -1,10 +1,7 @@
 
 
-import { figures } from "../../lib/figures";
 import { testControl as tc } from "../control";
-import { storage } from "../../lib/utils/storage";
-import { properCase } from "../../lib/utils/commonUtils";
-import { lowerCaseFirstChar } from "../../lib/utils/utils";
+import { teWrapper } from "./utils";
 
 const tct = tc.tests;
 const timeSep = "----------------------------------------------------------------------------------------------------";
@@ -13,9 +10,9 @@ const timeSep = "---------------------------------------------------------------
 const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
 {
     const _clr = async () => {
-        await storage.update2(storageKey, undefined);
-        await storage.update2(storageKey + "Fmt", undefined);
-        await storage.update2(storageKey + "NumTests", undefined);
+        await teWrapper.storage.update2(storageKey, undefined);
+        await teWrapper.storage.update2(storageKey + "Fmt", undefined);
+        await teWrapper.storage.update2(storageKey + "NumTests", undefined);
     };
     if (tct.clearBestTime || tct.clearAllBestTimes)
     {
@@ -23,7 +20,7 @@ const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
     }
     else if (tct.clearBestTimesOnTestCountChange)
     {
-        const prevNumTests = await storage.get2<number>(storageKey + "NumTests", 0);
+        const prevNumTests = await teWrapper.storage.get2<number>(storageKey + "NumTests", 0);
         if (prevNumTests < numTests) {
             await _clr();
         }
@@ -40,9 +37,9 @@ export const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" T
 export const getSuiteKey = (suiteName: string, preKey = "") =>
 {
     if (preKey) {
-        return preKey + properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
+        return preKey + teWrapper.utils.properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
     }
-    return lowerCaseFirstChar(properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
+    return teWrapper.utils.lowerCaseFirstChar(teWrapper.utils.properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
 };
 
 
@@ -59,30 +56,30 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 {
     let msg: string;
     let wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
-    const prevBestTimeElapsedFmt = await storage.get2<string>(storageKey + "Fmt", ""),
+    const prevBestTimeElapsedFmt = await teWrapper.storage.get2<string>(storageKey + "Fmt", ""),
           prevMsg = ` The previous fastest time recorded for a ${wsTypeMsg} workspace was ${prevBestTimeElapsedFmt}`,
-          preMsg = `    ${figures.color.info} ${figures.withColor("!!!", figures.colors.cyan)}`;
+          preMsg = `    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("!!!", teWrapper.figures.colors.cyan)}`;
     wsTypeMsg = tc.isMultiRootWorkspace ? "Multi-Root" : "Single-Root";
     if (title)
     {
         if (title.includes("Logging")) {
-            msg = ` New Fastest Time with ${title} (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+            msg = ` New Fastest Time with ${title} (${wsTypeMsg} workspace) ${teWrapper.figures.withColor(timeElapsedFmt, teWrapper.figures.colors.cyan)}`;
         }
         else {
             if (tct.numSuites > 1) {
-                msg = ` New Fastest Time for Suite '${title}' (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' (${wsTypeMsg} workspace) ${teWrapper.figures.withColor(timeElapsedFmt, teWrapper.figures.colors.cyan)}`;
             }
             else {
-                msg = ` New Fastest Time for Suite '${title}' (Single Test)(${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+                msg = ` New Fastest Time for Suite '${title}' (Single Test)(${wsTypeMsg} workspace) ${teWrapper.figures.withColor(timeElapsedFmt, teWrapper.figures.colors.cyan)}`;
             }
         }
     }
     else {
-        msg = ` New Fastest Time for 'All Tests' (${wsTypeMsg} workspace) ${figures.withColor(timeElapsedFmt, figures.colors.cyan)}`;
+        msg = ` New Fastest Time for 'All Tests' (${wsTypeMsg} workspace) ${teWrapper.figures.withColor(timeElapsedFmt, teWrapper.figures.colors.cyan)}`;
     }
     // console.log(preMsg);
-    console.log(preMsg + figures.withColor(msg, figures.colors.grey));
-    console.log(preMsg + figures.withColor(prevMsg, figures.colors.grey));
+    console.log(preMsg + teWrapper.figures.withColor(msg, teWrapper.figures.colors.grey));
+    console.log(preMsg + teWrapper.figures.withColor(prevMsg, teWrapper.figures.colors.grey));
     // console.log(preMsg);
 };
 
@@ -90,14 +87,14 @@ const logBestTime = async (title: string, storageKey: string, timeElapsedFmt: st
 const processBestTime = async (logTitle: string, storageKey: string, timeElapsed: number, numTests: number) =>
 {
     const title = !logTitle || logTitle.includes("Logging") ? "All Tests " + logTitle : logTitle,
-          msg = (figures.withColor("-- ", figures.colors.magenta) +
-                 figures.withColor(title.toUpperCase(), figures.colors.white) +
-                 figures.withColor(` ${timeSep.substring(0, timeSep.length - title.length - 4)}`, figures.colors.magenta));
-    console.log(`    ${figures.color.info} ${msg}`);
+          msg = (teWrapper.figures.withColor("-- ", teWrapper.figures.colors.magenta) +
+                 teWrapper.figures.withColor(title.toUpperCase(), teWrapper.figures.colors.white) +
+                 teWrapper.figures.withColor(` ${timeSep.substring(0, timeSep.length - title.length - 4)}`, teWrapper.figures.colors.magenta));
+    console.log(`    ${teWrapper.figures.color.info} ${msg}`);
 
     await clearProcessTimeStorage(storageKey, numTests);
 
-    let bestTimeElapsed = await storage.get2<number>(storageKey, 0);
+    let bestTimeElapsed = await teWrapper.storage.get2<number>(storageKey, 0);
     if (bestTimeElapsed === 0) {
         bestTimeElapsed = timeElapsed + 1;
     }
@@ -110,11 +107,11 @@ const processBestTime = async (logTitle: string, storageKey: string, timeElapsed
     }
     else {
         const wsTypeMsg = tc.isMultiRootWorkspace ? "multi-root" : "single-root";
-        const bestTimeElapsedFmt = await storage.get2<string>(storageKey + "Fmt", ""),
+        const bestTimeElapsedFmt = await teWrapper.storage.get2<string>(storageKey + "Fmt", ""),
               msg1 = `The time elapsed was ${timeElapsedFmt}`,
               msg2 = `The fastest time recorded for a ${wsTypeMsg} workspace is ${bestTimeElapsedFmt}`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg1, figures.colors.grey)}`);
-        console.log(`    ${figures.color.info} ${figures.withColor(msg2, figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor(msg1, teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor(msg2, teWrapper.figures.colors.grey)}`);
     }
 };
 
@@ -173,8 +170,8 @@ export const processTimes = async (timeStarted: number, hadRollingCountError: bo
           tzOffset = (new Date()).getTimezoneOffset() * 60000,
           timeFinishedFmt = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Finished: " + timeFinishedFmt, figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Time Finished: " + timeFinishedFmt, teWrapper.figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Time Elapsed: " + getTimeElapsedFmt(timeElapsed), teWrapper.figures.colors.grey)}`);
 
     if (tct.numTestsFail === 0 && !hadRollingCountError)
     {
@@ -188,17 +185,17 @@ export const processTimes = async (timeStarted: number, hadRollingCountError: bo
         const skipMsg = tct.numTestsFail > 0 ?
                             `There were ${tct.numTestsFail} failed tests, best time processing skipped` :
                             "There was a rolling count failure, best time processing skipped";
-        console.log(`    ${figures.color.info} ${figures.withColor(skipMsg, figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor(skipMsg, teWrapper.figures.colors.grey)}`);
     }
 
-    console.log(`    ${figures.color.info} ${figures.withColor(timeSep, figures.colors.magenta)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor(timeSep, teWrapper.figures.colors.magenta)}`);
 };
 
 
 const saveProcessTimeToStorage = async (key: string, timeElapsed: number, timeElapseFmt: string, numTests: number) =>
 {
-    await storage.update2(key, timeElapsed);
-    await storage.update2(key + "Fmt", timeElapseFmt);
-    await storage.update2(key + "NumTests", numTests);
+    await teWrapper.storage.update2(key, timeElapsed);
+    await teWrapper.storage.update2(key + "Fmt", timeElapseFmt);
+    await teWrapper.storage.update2(key + "NumTests", numTests);
 };
 

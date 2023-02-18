@@ -12,7 +12,8 @@ import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { cleanupSettings, initSettings } from "./initSettings";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { ITaskExplorerApi, ITaskExplorerProvider, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
-import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
+import { commands, ConfigurationTarget, Disposable, Event, EventEmitter, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
+
 
 const { symbols } = require("mocha/lib/reporters/base");
 
@@ -405,6 +406,55 @@ export const overrideNextShowInputBox = (value: any) => overridesShowInputBox.pu
 
 
 export const overrideNextShowInfoBox = (value: any) => overridesShowInfoBox.push(value);
+
+
+const passthrough = (value: any, resolve: (value?: any) => void) => resolve(value);
+
+
+export type PromiseAdapter<T, U> = (
+    value: T,
+    resolve:
+        (value: U | PromiseLike<U>) => void,
+    reject:
+        (reason: any) => void
+) => any;
+
+
+export const promiseFromEvent = <T, U>(event: Event<T>, adapter: PromiseAdapter<T, U> = passthrough): { promise: Promise<U>; cancel: EventEmitter<void> } =>
+{
+    let subscription: Disposable;
+    const cancel = new EventEmitter<void>();
+
+    return {
+        promise: new Promise<U>((resolve, reject) =>
+        {
+            cancel.event(_ => reject("Cancelled"));
+            subscription = event((value: T) =>
+            {
+                try
+                {
+                    Promise.resolve(adapter(value, resolve, reject))
+                        .catch(reject);
+                } catch (error)
+                {
+                    reject(error);
+                }
+            });
+        }).then(
+            (result: U) =>
+            {
+                subscription.dispose();
+                return result;
+            },
+            error =>
+            {
+                subscription.dispose();
+                throw error;
+            }
+        ),
+        cancel
+    };
+};
 
 
 export const setFailed = (ctrlc = true) =>

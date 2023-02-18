@@ -2,14 +2,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Extension } from "vscode";
-import { Commands } from "../../lib/command";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
-import { TeWebviewPanel } from "../../webview/webviewPanel";
 import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
-import {
-	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
-} from "../utils/utils";
+import { activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount } from "../utils/utils";
 
 let teWrapper: ITeWrapper;
 let extension: Extension<any>;
@@ -43,7 +39,7 @@ suite("Release Notes Page Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReleaseNotes + 200);
-		await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowReleaseNotesPage, testControl.waitTime.viewReport);
+		await executeTeCommand("taskexplorer.view.releaseNotes.show", testControl.waitTime.viewReport);
 		await sleep(100);
         endRollingCount(this);
 	});
@@ -57,7 +53,7 @@ suite("Release Notes Page Tests", () =>
 		const version = extension.packageJSON.version;
 		extension.packageJSON.version = "17.4444.0";
 		try {
-			await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowReleaseNotesPage, testControl.waitTime.viewReport);
+			await executeTeCommand("taskexplorer.view.releaseNotes.show", testControl.waitTime.viewReport);
 			await sleep(100);
 		}
 		catch (e) { throw e; }

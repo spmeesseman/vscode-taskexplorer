@@ -1,14 +1,33 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 import { expect } from "chai";
-import { ContextKeys } from "../../../lib/context";
 import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
 
 let teWrapper: ITeWrapper;
+
+const enum ContextKeys
+{
+	ActionPrefix = "taskexplorer:action:",
+	KeyPrefix = "taskexplorer:key:",
+	TreeViewPrefix = "taskexplorer:treeView:",
+	WebviewPrefix = "taskexplorer:webview:",
+	WebviewViewPrefix = "taskexplorer:webviewView:",
+	Debugging = "taskexplorer:debugging",
+	Disabled = "taskexplorer:disabled",
+	Enabled = "taskexplorer:enabled",
+	Untrusted = "taskexplorer:untrusted",
+	licensePage = "taskexplorer:licensePage",
+	ParsingReport = "taskexplorer:parsingReport",
+	ReleaseNotes = "taskexplorer:releaseNotes",
+	TaskFiles = "taskexplorer:taskFiles",
+	Tests = "taskexplorer:tests",
+	TestsTest = "taskexplorer:testsTest"
+}
 
 
 suite("Context Tests", () =>
