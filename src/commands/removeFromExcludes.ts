@@ -18,9 +18,9 @@ const removeUriFromExcludes = async(uri: Uri) =>
         if (globKey)
         {
             const taskType = globKey.replace("GLOB_", "").toLowerCase();
-            teWrapper.configwatcher = false;
+            teWrapper.configWatcher.enableConfigWatcher(false);
             await removeFromExcludes([ uri.path ], "exclude", "   ");
-            teWrapper.configwatcher = true;
+            teWrapper.configWatcher.enableConfigWatcher(true);
             await executeCommand(Commands.Refresh, taskType, uri, "   ");
         }
         else{

@@ -5,44 +5,48 @@ import { ITeContext } from "./ITeContext";
 import { ITeWebview } from "./ITeWebview";
 import { ITeFigures } from "./ITeFigures";
 import { IDictionary } from "./IDictionary";
-import { ITeUtilities } from "./ITeUtilities";
 import { ITeFileCache } from "./ITeFileCache";
 import { ITeFilesystem } from "./ITeFilesystem";
 import { IConfiguration } from "./IConfiguration";
+import { ITeFileWatcher } from "./ITeFileWatcher";
+import { ITeUsageWatcher } from "./ITeUsageWatcher";
 import { ITaskExplorerApi } from "./ITaskExplorerApi";
+import { ITeConfigWatcher } from "./ITeConfigWatcher";
+import { ITeLicenseManager } from "./ITeLicenseManager";
 import { ITaskTreeView, ITeTaskTree } from "./ITeTaskTree";
 import { ExtensionContext, TreeItem, TreeView, WorkspaceFolder } from "vscode";
+import { ITeCommonUtilities, ITePathUtilities, ITeTaskUtilities, ITeUtilities } from "./ITeUtilities";
+
 
 export interface ITeWrapper
 {
 	init(): Promise<void>;
 
-	debugging: boolean;
-	env: "dev" | "tests" | "production";
-	id: string;
 	tests: boolean;
-	busy: boolean;
+	readonly debugging: boolean;
+	readonly env: "dev" | "tests" | "production";
+	readonly id: string;
+	readonly busy: boolean;
 
 	api: ITaskExplorerApi;
-	commonUtils: any;
+	commonUtils: ITeCommonUtilities;
 	config: IConfiguration;
 	context: ExtensionContext;
 	contextTe: ITeContext;
-	configwatcher: boolean;
-	// configWatcher: any;
+	configWatcher: ITeConfigWatcher;
 	explorer: ITeTaskTree;
 	explorerView: TreeView<TreeItem>;
-	fileWatcher: any;
+	fileWatcher: ITeFileWatcher;
 	figures: ITeFigures;
 	homeView: ITeWebview;
 	filecache: ITeFileCache;
 	fs: ITeFilesystem;
-	licenseManager: any;
+	licenseManager: ITeLicenseManager;
 	licensePage: ITeWebview;
 	log: ILog;
 	logControl: IDictionary<any>;
 	parsingReportPage: ITeWebview;
-	pathUtils: any;
+	pathUtils: ITePathUtilities;
 	releaseNotesPage: ITeWebview;
 	sidebar: ITeTaskTree;
 	sidebarView: TreeView<TreeItem>;
@@ -52,8 +56,8 @@ export interface ITeWrapper
 	taskManager: any;
 	taskUsageView: ITeWebview;
 	taskCountView: ITeWebview;
-	taskUtils: any;
-	usage: any;
+	taskUtils: ITeTaskUtilities;
+	usage: ITeUsageWatcher;
 	utils: ITeUtilities;
 	views: IDictionary<ITaskTreeView>;
 	wsfolder: WorkspaceFolder;

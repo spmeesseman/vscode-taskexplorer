@@ -2,13 +2,13 @@
 
 import { TeWrapper } from "../wrapper";
 import { ContextKeys } from "../context";
-import { IDictionary } from "../../interface";
 import { Commands, executeCommand } from "../command";
+import { IDictionary, ITeConfigWatcher } from "../../interface";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ConfigurationChangeEvent, workspace, window, Disposable } from "vscode";
 
 
-export class TeConfigWatcher implements Disposable
+export class TeConfigWatcher implements ITeConfigWatcher, Disposable
 {
     private disposables: Disposable[];
     private watcherEnabled = true;
@@ -39,7 +39,7 @@ export class TeConfigWatcher implements Disposable
         this.watcherEnabled = enable;
     };
 
-    isProcessingConfigChange = () => this.processingConfigEvent;
+    isBusy = () => this.processingConfigEvent;
 
 
     private processConfigChanges = async(e: ConfigurationChangeEvent) =>

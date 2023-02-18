@@ -174,9 +174,9 @@ export class TaskTreeManager implements Disposable
             }
         }
 
-        this.wrapper.configwatcher = false;
+        this.wrapper.configWatcher.enableConfigWatcher(false);
         await addToExcludes(pathValues, excludesList, "   ");
-        this.wrapper.configwatcher = true;
+        this.wrapper.configWatcher.enableConfigWatcher(true);
 
         await this.refresh(selection.taskSource, uri, "   ");
 

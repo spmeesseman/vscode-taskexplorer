@@ -10,9 +10,10 @@ import { TeFileCache } from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import * as pathUtils from "./utils/pathUtils";
+import { IStorage } from "../interface/IStorage";
+import { IDictionary, ILog } from "../interface";
 import * as taskUtils from "./utils/taskTypeUtils";
 import * as commonUtils from "./utils/commonUtils";
-import { IStorage } from "../interface/IStorage";
 import { TaskManager } from "src/tree/taskManager";
 import { ContextKeys, TeContext } from "./context";
 import { AntTaskProvider } from "../providers/ant";
@@ -43,7 +44,6 @@ import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
 import { TaskExplorerProvider } from "../providers/provider";
 import { IConfiguration } from "../interface/IConfiguration";
-import { IDictionary, ILog, ITeFigures } from "../interface";
 import { TaskCountView } from "../webview/view/taskCountView";
 import { TaskUsageView } from "../webview/view/taskUsageView";
 import { ReleaseNotesPage } from "../webview/page/releaseNotes";
@@ -349,7 +349,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get busy(): boolean {
 		return this._busy || !this._ready || !this._initialized || this._fileCache.isBusy() || this._treeManager.isBusy() ||
-			   this._fileWatcher.isProcessingFsEvent() || this._configWatcher.isProcessingConfigChange() || this._licenseManager.isBusy();
+			   this._fileWatcher.isBusy() || this._configWatcher.isBusy() || this._licenseManager.isBusy();
 	}
 
 	get commonUtils(): typeof commonUtils {
@@ -360,8 +360,8 @@ export class TeWrapper implements ITeWrapper, Disposable
 		return this._configuration;
 	}
 
-	set configwatcher(e: boolean) {
-		this._configWatcher.enableConfigWatcher(e);
+	get configWatcher(): TeConfigWatcher {
+		return this._configWatcher;
 	}
 
 	get context(): ExtensionContext {

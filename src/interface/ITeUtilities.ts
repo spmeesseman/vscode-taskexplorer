@@ -1,5 +1,29 @@
 
-import { WorkspaceFolder } from "vscode";
+import { WorkspaceFolder, Uri } from "vscode";
+
+export interface ITeCommonUtilities
+{
+	properCase(name: string | undefined, removeSpaces?: boolean): string;
+}
+
+export interface ITePathUtilities
+{
+	getCwd(uri: Uri): string;
+	getInstallPath(): Promise<string>;
+	getPortableDataPath(logPad?: string): string | undefined;
+	getRelativePath(folder: WorkspaceFolder, uri: Uri): string;
+	getUserDataPath(platform?: string, logPad?: string): string;
+}
+
+export interface ITeTaskUtilities
+{
+	getScriptTaskTypes(): string[];
+	getTaskTypes(): string[];
+	getTaskTypeFriendlyName(taskType: string, lowerCase?: boolean): string;
+	getTaskTypeRealName(taskType: string): string;
+	isScriptType(source: string): boolean;
+	isWatchTask(source: string): boolean;
+}
 
 export interface ITeUtilities
 {

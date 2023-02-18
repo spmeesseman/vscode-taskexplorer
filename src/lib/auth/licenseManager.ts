@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { TeWrapper } from "../wrapper";
+import { ITeLicenseManager } from "../../interface";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { IServerResponseData, TeServer } from "./server";
 import { ISessionToken } from "src/interface/IAuthentication";
@@ -9,7 +10,7 @@ import { Disposable, env, EventEmitter, InputBoxOptions, Task, window } from "vs
 import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";
 
 
-export class LicenseManager implements Disposable
+export class LicenseManager implements ITeLicenseManager, Disposable
 {
 	private disposables: Disposable[] = [];
 	private busy = false;
@@ -133,7 +134,7 @@ export class LicenseManager implements Disposable
 	};
 
 
-	getLicenseKey = async() => this.wrapper.storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
+	getLicenseKey = () => this.wrapper.storage.getSecret("license_key"); // for now, "1234-5678-9098-7654321" is a valid license
 
 
 	getMaxNumberOfTasks = (taskType?: string) =>

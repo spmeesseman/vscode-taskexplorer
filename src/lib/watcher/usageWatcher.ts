@@ -1,24 +1,10 @@
 
 import { TeWrapper } from "../wrapper";
-import { IDictionary } from "../../interface";
-import { IStorage } from "../../interface/IStorage";
 import { Disposable, Event, EventEmitter } from "vscode";
-
-export interface TrackedUsage {
-	count: number;
-	countToday: number;
-	firstUsedAt: number;
-	lastUsedAt: number;
-}
-
-export interface UsageChangeEvent
-{
-	readonly key: string;
-	readonly usage?: TrackedUsage;
-};
+import { IDictionary, ITeUsageWatcher, TrackedUsage, UsageChangeEvent } from "../../interface";
 
 
-export class UsageWatcher implements Disposable
+export class UsageWatcher implements ITeUsageWatcher, Disposable
 {
 	private _onDidChange = new EventEmitter<UsageChangeEvent | undefined>();
 

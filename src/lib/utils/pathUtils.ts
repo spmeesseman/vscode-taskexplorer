@@ -36,7 +36,7 @@ export const getInstallPathSync = () =>
 };
 
 
-export const getPortableDataPath = (padding = "") =>
+export const getPortableDataPath = (logPad = "") =>
 {
     /* istanbul ignore else */
     if (process.env.VSCODE_PORTABLE)
@@ -49,7 +49,7 @@ export const getPortableDataPath = (padding = "") =>
             {
                 try {
                     const fullPath = join(uri.fsPath, "user-data", "User");
-                    log.value(padding + "found portable user data path", fullPath, 4);
+                    log.value(logPad + "found portable user data path", fullPath, 4);
                     return fullPath;
                 }
                 catch (e: any)
@@ -85,26 +85,26 @@ export const getTaskRelativePath = (task: Task) =>
 };
 
 
-export const getUserDataPath = (platform?: string, padding = "") =>
+export const getUserDataPath = (platform?: string, logPad = "") =>
 {
     let userPath: string | undefined = "";
 
-    log.write(padding + "get user data path", 4);
-    logUserDataEnv(padding + "   ");
+    log.write(logPad + "get user data path", 4);
+    logUserDataEnv(logPad + "   ");
     //
     // Check if data path was passed on the command line
     //
     let argvIdx = process.argv.indexOf("--user-data-dir");
     if (argvIdx !== -1) {
         userPath = resolve(process.argv[++argvIdx]);
-        log.value(padding + "user path is", userPath, 4);
+        log.value(logPad + "user path is", userPath, 4);
         return userPath;
     }
     //
     // If this is a portable install (zip install), then VSCODE_PORTABLE will be defined in the
     // environment this process is running in
     //
-    userPath = getPortableDataPath(padding + "   ");
+    userPath = getPortableDataPath(logPad + "   ");
     if (!userPath)
     {   //
         // Use system user data path
@@ -112,7 +112,7 @@ export const getUserDataPath = (platform?: string, padding = "") =>
         userPath = getDefaultUserDataPath(platform);
     }
     userPath = resolve(userPath);
-    log.value(padding + "user path is", userPath, 4);
+    log.value(logPad + "user path is", userPath, 4);
     return userPath;
 };
 

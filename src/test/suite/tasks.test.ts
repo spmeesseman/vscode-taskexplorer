@@ -378,7 +378,7 @@ suite("Task Tests", () =>
         expect(tree).to.not.be.oneOf([ undefined, null ]);
         const lastTasksFolder = tree[0] as any;
         const maxLastTasks = teWrapper.config.get<number>("specialFolders.numLastTasks");
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("specialFolders.numLastTasks", 6);
         try {
             lastTasksFolder.saveTask(ant[0], "");
@@ -393,7 +393,7 @@ suite("Task Tests", () =>
         catch (e) { throw e; }
         finally {
             await executeSettingsUpdate("specialFolders.numLastTasks", maxLastTasks);
-            teWrapper.configwatcher = true;
+            teWrapper.configWatcher.enableConfigWatcher(true);
         }
         utils.endRollingCount(this);
     });

@@ -1,8 +1,8 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { extname } from "path";
-import { log } from "../log/log";
 import { TeWrapper } from "../wrapper";
+import { ITeFileWatcher } from "../../interface";
 import { Commands, executeCommand } from "../command";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
@@ -10,7 +10,7 @@ import {
 } from "vscode";
 
 
-export class TeFileWatcher implements TeFileWatcher, Disposable
+export class TeFileWatcher implements ITeFileWatcher, Disposable
 {
 
     private disposables: Disposable[];
@@ -25,7 +25,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
 
     constructor(private readonly wrapper: TeWrapper)
     {
-        log.methodStart("register file watchers", 1, "");
+        this.wrapper.log.methodStart("register file watchers", 1, "");
         this.disposables = [];
 
         //
@@ -36,7 +36,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
         //
         this.rootPath = workspace.rootPath;
         this.currentNumWorkspaceFolders = workspace.workspaceFolders?.length;
-        log.values(1, "   ", [
+        this.wrapper.log.values(1, "   ", [
             [ "workspace root path (deprecated)", workspace.rootPath ],
             [ "workspace root folder[0] name", workspace.workspaceFolders ? workspace.workspaceFolders[0].name : /* istanbul ignore next */"undefined" ],
             [ "workspace root folder[0] path", workspace.workspaceFolders ? workspace.workspaceFolders[0].uri.fsPath : /* istanbul ignore next */"undefined" ],
@@ -50,7 +50,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
         // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
         //
         this.disposables.push(workspace.onDidChangeWorkspaceFolders(this.onWsFoldersChange));
-        log.methodDone("register file watchers", 1, "");
+        this.wrapper.log.methodDone("register file watchers", 1, "");
     }
 
 
@@ -99,20 +99,20 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
 
     private createFileWatchers = async(logPad: string) =>
     {
-        log.methodStart("create file watchers", 1, logPad);
+        this.wrapper.log.methodStart("create file watchers", 1, logPad);
         const taskTypes = getTaskTypes();
         for (const taskType of taskTypes)
         {
-            log.write(`   create file watchers for task type '${taskType}'`, 1, logPad);
+            this.wrapper.log.write(`   create file watchers for task type '${taskType}'`, 1, logPad);
             if (this.wrapper.utils.isTaskTypeEnabled(taskType))
             {
                 await this.registerFileWatcher(taskType, true, true, logPad + "   ");
             }
             else {
-                log.write(`   skip for task type '${taskType}' (disabled in settings)`, 1, logPad);
+                this.wrapper.log.write(`   skip for task type '${taskType}' (disabled in settings)`, 1, logPad);
             }
         }
-        log.methodDone("create file watchers", 1, logPad);
+        this.wrapper.log.methodDone("create file watchers", 1, logPad);
     };
 
 
@@ -147,20 +147,20 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
 
     private getDirWatchGlob = (wsFolders: readonly WorkspaceFolder[]) =>
     {
-        log.write("   Build file watcher glob", 2);
+        this.wrapper.log.write("   Build file watcher glob", 2);
         const watchPaths: string[] = [];
         wsFolders.forEach((wsf) =>
         {
             watchPaths.push(wsf.name);
         });
         const clsPathGlob = `**/{${watchPaths.join(",")}}/**/*`.replace("//**", "/");
-        log.write("   file watcher glob:", 2);
-        log.write(`   ${clsPathGlob}`, 2);
+        this.wrapper.log.write("   file watcher glob:", 2);
+        this.wrapper.log.write(`   ${clsPathGlob}`, 2);
         return clsPathGlob;
     };
 
 
-    isProcessingFsEvent = () => !!this.currentEvent;
+    isBusy = () => !!this.currentEvent;
 
 
     private isSameEvent = (q: any[], kind: string, uri: Uri) => q.find(e => e.event === kind && e.fsPath === uri.fsPath);
@@ -287,7 +287,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     //
     onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     {
-        log.methodStart("[event] workspace folder change", 1);
+        this.wrapper.log.methodStart("[event] workspace folder change", 1);
 
         //
         // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
@@ -304,12 +304,12 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
         /* istanbul ignore if */  // program flow can never fall here during tests as the ext reloads
         if (this.rootPath !== workspace.rootPath)
         {
-            log.write("   workspace deprecated 'root path' has changed", 1);
-            log.values(1, "   ", [[ "new root path", workspace.rootPath ], [ "previous root path", this.rootPath ]]);
+            this.wrapper.log.write("   workspace deprecated 'root path' has changed", 1);
+            this.wrapper.log.values(1, "   ", [[ "new root path", workspace.rootPath ], [ "previous root path", this.rootPath ]]);
             if (this.rootPath === undefined) {
-                log.write("   changing to a multi-root workspace");
+                this.wrapper.log.write("   changing to a multi-root workspace");
             }
-            log.write("   vscode will deactivate and re-activate the extension", 1);
+            this.wrapper.log.write("   vscode will deactivate and re-activate the extension", 1);
             this.rootPath = workspace.rootPath;
             this.wrapper.storage.update2Sync("lastWsRootPathChange", Date.now());
         }
@@ -326,7 +326,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
                 args: [ e, "   " ],
                 event: "workspace change"
             };
-            log.write("   workspace folder has been added or removed, process/queue event", 1);
+            this.wrapper.log.write("   workspace folder has been added or removed, process/queue event", 1);
             //
             // Technically, there should never be a current event when program flow falls here, since
             // VSCode documentation states directly that updateWorkspaceFolders() cannot be called
@@ -349,22 +349,22 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
         // and  the 1st folder `rootPath` did not change
         //
         else {
-            log.write("   workspace folder order has changed", 1);
+            this.wrapper.log.write("   workspace folder order has changed", 1);
             if (!this.wrapper.config.get<boolean>("sortProjectFoldersAlpha"))
             {   //
                 // Refresh tree only, leave file cache and provider invalidation alone.  Setting
                 // the 2nd param in refresh cmd to `false` accomplishes just that.
                 //
-                log.write("   refresh tree order", 1);
+                this.wrapper.log.write("   refresh tree order", 1);
                 await executeCommand(Commands.Refresh, false, undefined, "   ");
             }
             else {
-                log.write("   nothing to do", 1);
+                this.wrapper.log.write("   nothing to do", 1);
             }
         }
 
         this.currentNumWorkspaceFolders = workspace.workspaceFolders?.length;
-        log.methodDone("[event] workspace folder change", 1, "", [[ "current # of workspace folders", this.currentNumWorkspaceFolders ]]);
+        this.wrapper.log.methodDone("[event] workspace folder change", 1, "", [[ "current # of workspace folders", this.currentNumWorkspaceFolders ]]);
     };
 
 
@@ -373,13 +373,13 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
         if (this.eventQueue.length > 0)
         {
             const next = this.currentEvent = this.eventQueue.shift();
-            log.methodStart("file watcher event queue", 1, "", true, [
+            this.wrapper.log.methodStart("file watcher event queue", 1, "", true, [
                 [ "event", next.event ], [ "arg1", this.wrapper.utils.isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
                 [ "arg2", this.wrapper.utils.isUri(next.args[1]) ? next.args[1].fsPath : "none (log padding)" ],
                 [ "# of events still pending", this.eventQueue.length ]
             ]);
             await next.fn(...next.args);
-            log.methodDone("file watcher event queue", 1, "");
+            this.wrapper.log.methodDone("file watcher event queue", 1, "");
         }
         else {
             this.currentEvent = undefined;
@@ -408,17 +408,17 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
      */
     registerFileWatcher = async(taskType: string, firstRun: boolean, enabled: boolean, logPad: string) =>
     {
-        log.methodStart("register file watcher for task type '" + taskType + "'", 1, logPad, false, [[ "enabled", enabled ]]);
+        this.wrapper.log.methodStart("register file watcher for task type '" + taskType + "'", 1, logPad, false, [[ "enabled", enabled ]]);
 
         if (!firstRun && workspace.workspaceFolders)
         {
             if (enabled !== false) {
                 const numFilesFound  = await this.wrapper.filecache.buildTaskTypeCache(taskType, undefined, true, logPad + "   ");
-                log.write(`   ${numFilesFound} files were added to the file cache`, 1, logPad);
+                this.wrapper.log.write(`   ${numFilesFound} files were added to the file cache`, 1, logPad);
             }
             else {
                 const numFilesRemoved = this.wrapper.filecache.removeTaskTypeFromCache(taskType, logPad + "   ");
-                log.write(`   ${numFilesRemoved} files were removed from file cache`, 1, logPad);
+                this.wrapper.log.write(`   ${numFilesRemoved} files were removed from file cache`, 1, logPad);
             }
         }
 
@@ -452,19 +452,19 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
             }
         }
 
-        log.methodDone("register file watcher for task type '" + taskType + "'", 1, logPad);
+        this.wrapper.log.methodDone("register file watcher for task type '" + taskType + "'", 1, logPad);
     };
 
 
     private _procDirCreateEvent = async(uri: Uri, logPad: string) =>
     {
         try
-        {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
+        {   this.wrapper.log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
             const numFilesFound = await this.wrapper.filecache.addFolder(uri, logPad + "   ");
             if (numFilesFound > 0) {
                 await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
             }
-            log.methodDone("[event] directory 'create'", 1, logPad);
+            this.wrapper.log.methodDone("[event] directory 'create'", 1, logPad);
         }
         catch (e) {}
         finally { /* don't await */ this.processQueue(); }
@@ -474,14 +474,14 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     private _procDirDeleteEvent = async(uri: Uri, logPad: string) =>
     {
         try
-        {   log.methodStart("[event] directory 'delete'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
+        {   this.wrapper.log.methodStart("[event] directory 'delete'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
             const numFilesRemoved = this.wrapper.filecache.removeFolderFromCache(uri, logPad + "   ");
             if (numFilesRemoved > 0) {
                 await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
             }
-            log.methodDone("[event] directory 'delete'", 1, logPad);
+            this.wrapper.log.methodDone("[event] directory 'delete'", 1, logPad);
         }
-        catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'dir change' event error", e ]); }
+        catch (e) { /* istanbul ignore next */ this.wrapper.log.error([ "Filesystem watcher 'dir change' event error", e ]); }
         finally { /* don't await */ this.processQueue(); }
     };
 
@@ -489,11 +489,11 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     private _procFileChangeEvent = async(taskType: string, uri: Uri, logPad: string) =>
     {
         try
-        {   log.methodStart("[event] file 'change'", 1, logPad, true, [[ "file", uri.fsPath ]]);
+        {   this.wrapper.log.methodStart("[event] file 'change'", 1, logPad, true, [[ "file", uri.fsPath ]]);
             await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
-            log.methodDone("[event] file 'change'", 1, logPad);
+            this.wrapper.log.methodDone("[event] file 'change'", 1, logPad);
         }
-        catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file change' event error", e ]); }
+        catch (e) { /* istanbul ignore next */ this.wrapper.log.error([ "Filesystem watcher 'file change' event error", e ]); }
         finally { /* don't await */ this.processQueue(); }
     };
 
@@ -501,12 +501,12 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     private _procFileCreateEvent = async(taskType: string, uri: Uri, logPad: string) =>
     {
         try
-        {   log.methodStart("[event] file 'create'", 1, logPad, true, [[ "file", uri.fsPath ]]);
+        {   this.wrapper.log.methodStart("[event] file 'create'", 1, logPad, true, [[ "file", uri.fsPath ]]);
             this.wrapper.filecache.addFileToCache(taskType, uri, logPad + "   ");
             await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
-            log.methodDone("[event] file 'create'", 1, logPad);
+            this.wrapper.log.methodDone("[event] file 'create'", 1, logPad);
         }
-        catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file create' event error", e ]); }
+        catch (e) { /* istanbul ignore next */ this.wrapper.log.error([ "Filesystem watcher 'file create' event error", e ]); }
         finally { /* don't await */ this.processQueue(); }
     };
 
@@ -514,12 +514,12 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     private _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad: string) =>
     {
         try
-        {   log.methodStart("[event] file 'delete'", 1, logPad, true, [[ "file", uri.fsPath ]]);
+        {   this.wrapper.log.methodStart("[event] file 'delete'", 1, logPad, true, [[ "file", uri.fsPath ]]);
             this.wrapper.filecache.removeFileFromCache(taskType, uri, logPad + "   ");
             await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
-            log.methodDone("[event] file 'delete'", 1, logPad);
+            this.wrapper.log.methodDone("[event] file 'delete'", 1, logPad);
         }
-        catch (e) { /* istanbul ignore next */ log.error([ "Filesystem watcher 'file delete' event error", e ]); }
+        catch (e) { /* istanbul ignore next */ this.wrapper.log.error([ "Filesystem watcher 'file delete' event error", e ]); }
         finally { /* don't await */ this.processQueue(); }
     };
 
@@ -527,7 +527,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
     private _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: string) =>
     {
         try
-        {   log.methodStart("workspace folder 'add/remove'", 1, logPad, true, [
+        {   this.wrapper.log.methodStart("workspace folder 'add/remove'", 1, logPad, true, [
                 [ "# added", e.added.length ], [ "# removed", e.removed.length ]
             ]);
             const numFilesFound = await this.wrapper.filecache.addWsFolders(e.added, logPad + "   "),
@@ -538,7 +538,7 @@ export class TeFileWatcher implements TeFileWatcher, Disposable
                 const all =  [ ...e.added, ...e.removed ];
                 await executeCommand(Commands.Refresh, undefined, all.length === 1 ? all[0].uri : false, logPad + "   ");
             }
-            log.methodDone("workspace folder 'add/remove'", 1, logPad, [
+            this.wrapper.log.methodDone("workspace folder 'add/remove'", 1, logPad, [
                 [ "# of files found", numFilesFound ], [ "# of files removed", numFilesRemoved ]
             ]);
         }

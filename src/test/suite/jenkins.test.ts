@@ -36,9 +36,9 @@ suite("Jenkins Tests", () =>
             env.JENKINS_API_TOKEN = "FAKE_TOKEN";
             setEnvJenkinsToken = true;
         }
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("pathToPrograms.jenkins", "https://jenkins.pjats.com");
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         endRollingCount(this, true);
     });
 
@@ -50,9 +50,9 @@ suite("Jenkins Tests", () =>
             delete env.JENKINS_API_TOKEN;
         }
         await teWrapper.fs.deleteFile(fileUri.fsPath);
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("pathToPrograms.jenkins", "");
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         suiteFinished(this);
     });
 

@@ -40,7 +40,7 @@ suite("Configuration / Settings Tests", () =>
     suiteTeardown(async function()
     {
         if (exitRollingCount(this, false, true)) return;
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         try {
             const successCount = getSuccessCount(this);
             if (successCount < 3)
@@ -64,7 +64,7 @@ suite("Configuration / Settings Tests", () =>
             }
         }
         catch {}
-        finally { teWrapper.configwatcher = true; }
+        finally { teWrapper.configWatcher.enableConfigWatcher(true); }
         suiteFinished(this);
     });
 
@@ -77,7 +77,7 @@ suite("Configuration / Settings Tests", () =>
         // Multi-part settings updates (behavior differs when value is an object)
         // Disable config watcher
         //
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         //
         // 3-part i.e. taskexplorer.pathToPrograms.ant
         //
@@ -132,7 +132,7 @@ suite("Configuration / Settings Tests", () =>
         //
         // Re-enable config watcher
         //
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         endRollingCount(this);
     });
 
@@ -270,7 +270,7 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
         // Set up coverage on if() statement in configWatcher ~ ln 260
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", {
             bash: false,
             batch: false,
@@ -280,7 +280,7 @@ suite("Configuration / Settings Tests", () =>
             python: false,
             ruby: false
         });
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         await teWrapper.config.updateVsWs("terminal.integrated.shell.osx", shellOsx);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
@@ -291,9 +291,9 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks.nsis", true);
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         await teWrapper.config.updateVsWs("terminal.integrated.shell.linux", shellLnx);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
@@ -305,9 +305,9 @@ suite("Configuration / Settings Tests", () =>
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.shellChange);
         // Set up coverage on if() statement in configWatcher ~ ln 240
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         await executeSettingsUpdate("enabledTasks", enabledTasks); // reset back to default enabled tasks
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         await teWrapper.config.updateVsWs("terminal.integrated.shell.windows", shellW32);
         await waitForTeIdle(tc.waitTime.config.shellChange);
         endRollingCount(this);
@@ -345,14 +345,14 @@ suite("Configuration / Settings Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.event * 2 + 50);
-        teWrapper.configwatcher = false;
+        teWrapper.configWatcher.enableConfigWatcher(false);
         const logLevel = teWrapper.config.get<number>("logging.level");
         const pathToPrograms = teWrapper.config.get<object>("pathToPrograms");
         const pathToAnt = teWrapper.config.get<object>("pathToPrograms.ant");
         await teWrapper.config.update("logging.level", logLevel);
         await teWrapper.config.update("pathToPrograms.ant", pathToAnt);
         await teWrapper.config.update("pathToPrograms", pathToPrograms);
-        teWrapper.configwatcher = true;
+        teWrapper.configWatcher.enableConfigWatcher(true);
         await teWrapper.config.update("logging.level", logLevel !== 3 ? 3 : 2);
         waitForTeIdle(tc.waitTime.config.event);
         await teWrapper.config.update("logging.level", logLevel);
