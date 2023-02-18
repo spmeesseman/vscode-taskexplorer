@@ -1,5 +1,6 @@
 
 import * as path from "path";
+import { TaskItem } from "./item";
 import { log } from "../lib/log/log";
 import { TaskFolder }  from "./folder";
 import * as util from "../lib/utils/utils";
@@ -9,7 +10,6 @@ import { properCase } from "../lib/utils/commonUtils";
 import { getTaskTypeFriendlyName } from "../lib/utils/taskTypeUtils";
 import { ThemeIcon, TreeItem, TreeItemCollapsibleState, Uri } from "vscode";
 import { getInstallPathSync, getUserDataPath } from "../lib/utils/pathUtils";
-import { TaskItem } from "./item";
 
 
 /**

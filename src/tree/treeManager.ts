@@ -17,14 +17,14 @@ import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
 import { Commands, registerCommand } from "../lib/command";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
-import { IDictionary, TasksChangeEvent } from "../interface";
+import { IDictionary, ITeTreeManager, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
     TreeItem, Uri, workspace, Task, tasks, Disposable, TreeItemCollapsibleState, EventEmitter, Event
 } from "vscode";
 
 
-export class TaskTreeManager implements Disposable
+export class TaskTreeManager implements ITeTreeManager, Disposable
 {
 
     private _tasks: Task[] = [];

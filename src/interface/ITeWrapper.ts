@@ -16,6 +16,8 @@ import { ITeLicenseManager } from "./ITeLicenseManager";
 import { ITaskTreeView, ITeTaskTree } from "./ITeTaskTree";
 import { ExtensionContext, TreeItem, TreeView, WorkspaceFolder } from "vscode";
 import { ITeCommonUtilities, ITePathUtilities, ITeTaskUtilities, ITeUtilities } from "./ITeUtilities";
+import { ITeTreeManager } from "./ITeTreeManager";
+import { ITeTaskManager } from "./ITeTaskManager";
 
 
 export interface ITeWrapper
@@ -52,8 +54,8 @@ export interface ITeWrapper
 	sidebarView: TreeView<TreeItem>;
 	sorters: any;
 	storage: IStorage;
-	treeManager: any;
-	taskManager: any;
+	treeManager: ITeTreeManager;
+	taskManager: ITeTaskManager;
 	taskUsageView: ITeWebview;
 	taskCountView: ITeWebview;
 	taskUtils: ITeTaskUtilities;

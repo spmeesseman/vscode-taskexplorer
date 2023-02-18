@@ -5,19 +5,15 @@ import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { TaskFolder } from "./folder";
 import { Strings } from "../lib/constants";
-import { IDictionary } from "../interface";
 import * as utils from "../lib/utils/utils";
 import * as sortTasks from "../lib/sortTasks";
 import { TaskTreeManager } from "./treeManager";
 import { SpecialTaskFolder } from "./specialFolder";
+import { IDictionary, TaskMap } from "../interface";
 import { statusBarItem } from "../lib/statusBarItem";
 import { configuration } from "../lib/utils/configuration";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
 import { Disposable, Task, TreeItemCollapsibleState } from "vscode";
-
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type TaskMap = { [id: string]: TaskItem | undefined };
 
 
 export class TaskTreeBuilder implements Disposable
