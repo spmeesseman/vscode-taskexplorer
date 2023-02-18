@@ -8,7 +8,6 @@ import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog } from "../interface";
-import { ITeWrapper } from "src/interface/ITeWrapper";
 import { TaskManager } from "src/tree/taskManager";
 import { ContextKeys, TeContext } from "./context";
 import { AntTaskProvider } from "../providers/ant";
@@ -19,7 +18,9 @@ import { MakeTaskProvider } from "../providers/make";
 import { RubyTaskProvider } from "../providers/ruby";
 import { NsisTaskProvider } from "../providers/nsis";
 import { PerlTaskProvider } from "../providers/perl";
+import { ITeWrapper } from "src/interface/ITeWrapper";
 import { UsageWatcher } from "./watcher/usageWatcher";
+import { TeFileWatcher } from "./watcher/fileWatcher";
 import { TaskTreeManager } from "../tree/treeManager";
 import { LicenseManager } from "./auth/licenseManager";
 import { BatchTaskProvider } from "../providers/batch";
@@ -29,6 +30,7 @@ import { registerStatusBarItem } from "./statusBarItem";
 import { GradleTaskProvider } from "../providers/gradle";
 import { PipenvTaskProvider } from "../providers/pipenv";
 import { PythonTaskProvider } from "../providers/python";
+import { TeConfigWatcher } from "./watcher/configWatcher";
 import { LicensePage } from "../webview/page/licensePage";
 import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
@@ -46,9 +48,7 @@ import { ParsingReportPage } from "../webview/page/parsingReportPage";
 import { registerAddToExcludesCommand } from "../commands/addToExcludes";
 import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
 import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
-import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
-import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
 import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView, Disposable } from "vscode";
 
 
@@ -70,10 +70,12 @@ export class TeWrapper implements ITeWrapper, Disposable
 	private readonly _licensePage: LicensePage;
 	private readonly _disposables: Disposable[];
 	private readonly _context: ExtensionContext;
+	private readonly _fileWatcher: TeFileWatcher;
 	private readonly _treeManager: TaskTreeManager;
 	private readonly _taskUsageView: TaskUsageView;
 	private readonly _taskCountView: TaskCountView;
 	private readonly _configuration: IConfiguration;
+	private readonly _configWatcher: TeConfigWatcher;
 	// private readonly _telemetry: TelemetryService;
 	private readonly _licenseManager: LicenseManager;
 	private readonly _releaseNotesPage: ReleaseNotesPage;
@@ -98,6 +100,8 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 		this._teContext = new TeContext();
 		this._fileCache = new TeFileCache(this);
+		this._fileWatcher = new TeFileWatcher(this);
+		this._configWatcher = new TeConfigWatcher(this);
 
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
@@ -147,6 +151,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 			this._homeView,
 			this._treeManager,
 			this._licensePage,
+			this._fileWatcher,
 			this._taskCountView,
 			this._taskUsageView,
 			this._licenseManager,
@@ -185,18 +190,14 @@ export class TeWrapper implements ITeWrapper, Disposable
 		//
 		this.registerTaskProviders();
 		//
-		// Register the configuration/settings watcher
-		//
-		registerConfigWatcher(this);
-		//
-		// Register file type watchers
+		// Init/register file type watchers
 		// This "used" to also start the file scan to build the file task file cache. It now
 		// does not on startup.  We use rebuildCache() below, so as to initiate one scan as
 		// opposed to one scan per task type, like it did previously.  Note that if task types
 		// are enabled or disabled in settings after startup, then the individual calls to
 		// registerFileWatcher() will perform the scan for that task type.
 		//
-		await registerFileWatchers(this, "   ");
+		await this._fileWatcher.init("   ");
 		//
 		// Context
 		//
@@ -257,11 +258,11 @@ export class TeWrapper implements ITeWrapper, Disposable
 		else // See comments/notes above
 		{   //
 			const enablePersistentFileCaching = this.config.get<boolean>("enablePersistentFileCaching");
-			enableConfigWatcher(false);
+			this._configWatcher.enableConfigWatcher(false);
 			await this.config.update("enablePersistentFileCaching", true);
 			await this.filecache.rebuildCache("   ");
 			await this.config.update("enablePersistentFileCaching", enablePersistentFileCaching);
-			enableConfigWatcher(true);
+			this._configWatcher.enableConfigWatcher(true);
 		}
 
 		await this.storage.update2("lastDeactivated", 0);
@@ -341,7 +342,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get busy(): boolean {
 		return this._busy || !this._ready || !this._initialized || this._fileCache.isBusy() || this._treeManager.isBusy() ||
-			   isProcessingFsEvent() || isProcessingConfigChange() || this._licenseManager.isBusy();
+			   this._fileWatcher.isProcessingFsEvent() || this._configWatcher.isProcessingConfigChange() || this._licenseManager.isBusy();
 	}
 
 	get config(): IConfiguration {
@@ -349,7 +350,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 	}
 
 	set configwatcher(e: boolean) {
-		enableConfigWatcher(e);
+		this._configWatcher.enableConfigWatcher(e);
 	}
 
 	get context(): ExtensionContext {
@@ -381,6 +382,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get filecache(): TeFileCache {
 		return this._fileCache;
+	}
+
+	get filewatcher(): TeFileWatcher {
+		return this._fileWatcher;
 	}
 
 	get fs(): typeof fs {

@@ -3,7 +3,6 @@
 import { log } from "./lib/log/log";
 import { TeWrapper } from "./lib/wrapper";
 import { initStorage, storage } from "./lib/utils/storage";
-import { disposeFileWatchers } from "./lib/watcher/fileWatcher";
 import { ExtensionContext, ExtensionMode, workspace } from "vscode";
 import { configuration, registerConfiguration } from "./lib/utils/configuration";
 import { getTaskTypeEnabledSettingName, getTaskTypes, getTaskTypeSettingName } from "./lib/utils/taskTypeUtils";
@@ -69,11 +68,6 @@ export async function activate(context: ExtensionContext)
 
 export async function deactivate()
 {   //
-    // Do some cleanup.  Most of the cleanup will have or will be done  internally by
-    // VSCode as we registered all disposables during initialization.
-    //
-    disposeFileWatchers();
-    //
     // Detect when a folder move occurs and the ext is about to deactivate/re-activate.  A
     // folder move that changes the first workspace folder will restart the extension
     // unfortunately.  Changing the first workspace folder modifies the deprecated `rootPath`
