@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -5,14 +6,26 @@
 import { expect } from "chai";
 import { commands, Uri } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
-import { promiseFromEvent } from "../../lib/utils/promiseUtils";
 import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
-import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
-import { EchoCommandRequestType, EchoCustomCommandRequestType } from "../../webview/common/ipc";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
 import {
-    activate, closeEditors, endRollingCount, exitRollingCount, getWsPath, sleep, suiteFinished, testControl as tc, waitForTeIdle
+    activate, closeEditors, endRollingCount, exitRollingCount, getWsPath, promiseFromEvent, sleep, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
+
+abstract class IpcMessageType<Params = void>
+{
+	_?: Params; // Required for type inferencing to work properly
+	constructor(public readonly method: string, public readonly overwriteable: boolean = false) {}
+}
+interface ExecuteCommandParams
+{
+	command: string;
+	args?: any[];
+}
+class IpcNotificationType<Params = void> extends IpcMessageType<Params> {}
+
+const EchoCommandRequestType = new IpcNotificationType<ExecuteCommandParams>("command/echo");
+const EchoCustomCommandRequestType = new IpcNotificationType<ExecuteCommandParams>("command/custom/echo");
 
 
 let teWrapper: ITeWrapper;
@@ -64,25 +77,25 @@ suite("Webview Tests", () =>
         await teWrapper.homeView.show();
         while (!loaded && loadTime < 21) { await sleep(10); loadTime += 10; }
         d.dispose();
-        await executeCommand(Commands.FocusHomeView);
+        await commands.executeCommand("taskexplorer.view.home.focus");
         await executeSettingsUpdate("enabledTasks.bash", false, tc.waitTime.config.enableEvent);
         await sleep(5);
         await executeSettingsUpdate("enabledTasks.bash", true, tc.waitTime.config.enableEvent);
         expect(teWrapper.homeView.description).to.not.be.undefined;
         await focusExplorerView(teWrapper);
         await sleep(5);
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage }); // not visible, ignored
-        await executeCommand(Commands.FocusHomeView);
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: "taskexplorer.view.releaseNotes.show" }); // not visible, ignored
+        await commands.executeCommand("taskexplorer.view.home.focus");
         await promiseFromEvent(teWrapper.homeView.onReadyReceived).promise;
         await sleep(5);
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowParsingReportPage, args: [ Uri.file(getWsPath(".")) ] });
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: "taskexplorer.view.parsingReport.show", args: [ Uri.file(getWsPath(".")) ] });
         await promiseFromEvent(teWrapper.parsingReportPage.onReadyReceived).promise;
         await sleep(5);
-        await teWrapper.homeView.notify(EchoCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await teWrapper.homeView.notify(EchoCommandRequestType, { command: "taskexplorer.view.releaseNotes.show" });
         await promiseFromEvent(teWrapper.releaseNotesPage.onReadyReceived).promise;
         await sleep(5);
-        await executeCommand(Commands.RefreshHomeView);
-        await executeCommand(Commands.Donate);
+        await commands.executeCommand("taskexplorer.view.home.refresh");
+        await commands.executeCommand("taskexplorer.donate");
         endRollingCount(this);
     });
 
@@ -91,7 +104,7 @@ suite("Webview Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.focusChangeViews);
-        await executeCommand(Commands.FocusTaskUsageView);
+        await commands.executeCommand("taskexplorer.view.taskUsage.focus");
         await focusExplorerView(teWrapper);
         await teWrapper.taskUsageView.show();
         await sleep(5);
@@ -106,7 +119,7 @@ suite("Webview Tests", () =>
         await teWrapper.taskCountView.show();
         await sleep(5);
         await focusExplorerView(teWrapper);
-        await executeCommand(Commands.FocusTaskCountView);
+        await commands.executeCommand("taskexplorer.view.taskCount.focus");
         await sleep(5);
         endRollingCount(this);
     });
@@ -144,8 +157,8 @@ suite("Webview Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.fast + 1100);
-        await executeCommand(Commands.FocusHomeView);
-        await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
+        await commands.executeCommand("taskexplorer.view.home.focus");
+        await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: "taskexplorer.view.releaseNotes.show" });
         await sleep(550); // wait for webworker to respond, takes ~ 400-600ms
         endRollingCount(this);
     });
@@ -165,8 +178,8 @@ suite("Webview Tests", () =>
         await sleep(5);
 	    await teWrapper.parsingReportPage.show();
         await sleep(5);
-        await commands.executeCommand(VsCodeCommands.NextEditor);
-        await commands.executeCommand(VsCodeCommands.NextEditor);
+        await commands.executeCommand("workbench.action.nextEditor");
+        await commands.executeCommand("workbench.action.nextEditor");
         endRollingCount(this);
 	});
 

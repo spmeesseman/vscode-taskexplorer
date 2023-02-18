@@ -6,9 +6,8 @@
 import { expect } from "chai";
 import * as utils from "../utils/utils";
 import { startupFocus } from "../utils/suiteUtils";
-import { IDictionary, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
-import { ITaskFolder } from "../../interface";
 
 let teWrapper: ITeWrapper;
 const tc = utils.testControl;
