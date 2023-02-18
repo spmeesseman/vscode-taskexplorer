@@ -16,24 +16,21 @@
 //        like its supported :(  SO this is the best we can do...
 
 import { join } from "path";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { Task, Uri, workspace, WorkspaceFolder } from "vscode";
-import { enableConfigWatcher } from "../../lib/watcher/configWatcher";
+import { onWsFoldersChange } from "../../lib/watcher/fileWatcher";
+import { ITeWrapper, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { onWsFoldersChange } from "../../lib/watcher/fileWatcher";
-import { TaskItem } from "../../tree/item";
 
 const gruntCt = 7;
 const originalGetWorkspaceFolder = workspace.getWorkspaceFolder;
 
 let fakeWsfStartIdx = 1;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let sortAlpha: boolean;
 let sortAlphaReset: boolean;
 let testsPath: string;
@@ -194,26 +191,26 @@ suite("Multi-Root Workspace Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(tc.slowTime.wsFolder.reorder * 3);
-        enableConfigWatcher(false);
+        teWrapper.configwatcher = false;
         await executeSettingsUpdate("sortProjectFoldersAlpha", true);
-        enableConfigWatcher(true);
+        teWrapper.configwatcher = true;
         await onWsFoldersChange({
             added: [],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.reorderWorkspaceFolders);
-        enableConfigWatcher(false);
+        teWrapper.configwatcher = false;
         await executeSettingsUpdate("sortProjectFoldersAlpha", false);
-        enableConfigWatcher(true);
+        teWrapper.configwatcher = true;
         await onWsFoldersChange({
             added: [],
             removed: []
         });
         await waitForTeIdle(tc.waitTime.reorderWorkspaceFolders);
-        enableConfigWatcher(false);
+        teWrapper.configwatcher = false;
         await executeSettingsUpdate("sortProjectFoldersAlpha", sortAlpha);
         sortAlphaReset = true;
-        enableConfigWatcher(true);
+        teWrapper.configwatcher = true;
         endRollingCount(this);
     });
 
@@ -361,7 +358,7 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId1 = {
                 id: "fakeTaskId1",
                 resourceUri: wsf[fakeWsfStartIdx].uri
-            } as unknown as TaskItem;
+            } as unknown as ITaskItem;
             workspace.getWorkspaceFolder = originalGetWorkspaceFolder;
             await onWsFoldersChange({
                 added: [],
@@ -407,7 +404,7 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId2 = {
                 id: "fakeTaskId2",
                 resourceUri: wsf[fakeWsfStartIdx + 1].uri
-            } as unknown as TaskItem;
+            } as unknown as ITaskItem;
             await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 1] ]
@@ -441,7 +438,7 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId3 = {
                 id: "fakeTaskId3",
                 resourceUri: wsf[fakeWsfStartIdx + 2].uri
-            } as unknown as TaskItem;
+            } as unknown as ITaskItem;
             tasks.push({
                 definition: {
                     type: "grunt",
@@ -451,7 +448,7 @@ suite("Multi-Root Workspace Tests", () =>
             taskMap.fakeTaskId4 = {
                 id: "fakeTaskId4",
                 resourceUri: wsf[fakeWsfStartIdx + 3].uri
-            } as unknown as TaskItem;
+            } as unknown as ITaskItem;
             await onWsFoldersChange({
                 added: [],
                 removed: [ wsf[fakeWsfStartIdx + 2], wsf[fakeWsfStartIdx + 3] ]

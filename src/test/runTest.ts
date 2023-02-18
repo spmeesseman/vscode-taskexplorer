@@ -1,11 +1,9 @@
-import { execSync } from "child_process";
+
+import * as fs from "fs";
 import * as path from "path";
-// import  runConfig from "./runConfig";
+import { execSync } from "child_process";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { runTests } from "@vscode/test-electron";
-import { testControl } from "./control";
-import { copyFile, createDir, deleteDir, pathExistsSync, readFileAsync, writeFile } from "../lib/utils/fs";
-import { getTaskTypeRealName, getTaskTypes } from "../lib/utils/taskTypeUtils";
 
 const VSCODE_TEST_VERSION = "1.63.0";
 
@@ -14,7 +12,94 @@ interface IDictionary<TValue>
     [id: string]: TValue;
 }
 
+const getTaskTypes = () =>
+{
+    return [
+        "ant", "apppublisher", "bash", "batch", "composer",  "gradle", "grunt", "gulp", "jenkins", "make",
+        "maven", "npm", "nsis", "perl", "powershell", "python", "pipenv", "ruby", "tsc", "webpack",  "Workspace"
+    ];
+};
+
+const getTaskTypeRealName = (taskType: string) =>
+{
+    taskType = taskType.toLowerCase();
+    if (taskType === "workspace") {
+        return "Workspace";
+    }
+    return taskType;
+};
+
 const getWsPath = (p: string) => path.normalize(path.resolve(__dirname, "..", "..", "test-fixture", "project1", p));
+
+
+const createDefaultSettings = async() =>
+{   //
+    // Enabled / disabled task defaults
+    //
+    const packageJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..",  ".." , "package.json")).toString());
+    const enabledTasks: IDictionary<boolean> = {};
+    getTaskTypes().map(t => getTaskTypeRealName(t)).forEach(t => {
+        enabledTasks[t] = packageJson.contributes.configuration[1].properties["taskexplorer.enabledTasks"].default[t];
+    });
+
+    return {
+        "terminal.integrated.shell.windows": undefined,
+        "taskexplorer.enableExplorerView": true,
+        "taskexplorer.enableSideBar": true,
+        "taskexplorer.enablePersistentFileCaching": false,
+        "taskexplorer.enabledTasks": enabledTasks,
+        "taskexplorer.pathToPrograms":
+        {
+            ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"),
+            ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"),
+            bash: "bash",
+            composer: "composer",
+            curl: "curl",
+            gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
+            jenkins: "",
+            make: "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
+            maven: "mvn",
+            nsis: "c:\\Code\\nsis\\makensis.exe",
+            perl: "perl",
+            pipenv: "pipenv",
+            powershell: "powershell",
+            python: "c:\\Code\\python\\python.exe",
+            ruby: "ruby"
+        },
+        "taskexplorer.logging.enable": false,
+        "taskexplorer.logging.level": 1,
+        "taskexplorer.logging.enableFile": false,
+        "taskexplorer.logging.enableFileSymbols": false,
+        "taskexplorer.logging.enableOutputWindow": false,
+        "taskexplorer.specialFolders.numLastTasks": 10,
+        "taskexplorer.specialFolders.showFavorites": true,
+        "taskexplorer.specialFolders.showLastTasks": true,
+        "taskexplorer.specialFolders.showUserTasks": true,
+        "taskexplorer.specialFolders.folderState": {
+            favorites: "Expanded",
+            lastTasks: "Expanded",
+            userTasks: "Expanded"
+        },
+        "taskexplorer.taskButtons.clickAction": "Open",
+        "taskexplorer.taskButtons.showFavoritesButton": true,
+        "taskexplorer.taskButtons.showExecuteWithArgumentsButton": false,
+        "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": false,
+        "taskexplorer.visual.disableAnimatedIcons": true,
+        "taskexplorer.enableAnsiconForAnt": false,
+        "taskexplorer.groupMaxLevel": 1,
+        "taskexplorer.groupSeparator": "-",
+        "taskexplorer.groupWithSeparator": true,
+        "taskexplorer.groupStripTaskLabel": true,
+        "taskexplorer.exclude": [],
+        "taskexplorer.includeAnt": [], // Deprecated, use `globPatternsAnt`
+        "taskexplorer.globPatternsAnt": [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ],
+        "taskexplorer.keepTermOnStop": false,
+        "taskexplorer.showHiddenWsTasks": true,
+        "taskexplorer.showRunningTask": true,
+        "taskexplorer.useGulp": false,
+        "taskexplorer.useAnt": false,
+    };
+};
 
 const main = async(args: string[]) =>
 {
@@ -88,19 +173,19 @@ const main = async(args: string[]) =>
         //
         // let settingsJsonOrig: string | undefined;
         if (!multiRoot) {
-            await writeFile(projectSettingsFile, JSON.stringify(defaultSettings));
+            fs.writeFileSync(projectSettingsFile, JSON.stringify(defaultSettings));
         }
         else {
-            await writeFile(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
+            fs.writeFileSync(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
         }
 
         //
         // Copy a "User Tasks" file
         //
-        if (!pathExistsSync(path.join(vscodeTestUserDataPath, "User"))) {
-            await createDir(path.join(vscodeTestUserDataPath, "User"));
+        if (!fs.existsSync(path.join(vscodeTestUserDataPath, "User"))) {
+            fs.mkdirSync(path.join(vscodeTestUserDataPath, "User"));
         }
-        await copyFile(path.join(testWorkspaceMultiRoot, "user-tasks.json"), path.join(vscodeTestUserDataPath, "User", "tasks.json"));
+        fs.copyFileSync(path.join(testWorkspaceMultiRoot, "user-tasks.json"), path.join(vscodeTestUserDataPath, "User", "tasks.json"));
 
         //
         // const runCfg = await runConfig();
@@ -180,12 +265,12 @@ const main = async(args: string[]) =>
             // execSync(`enable-full-coverage.sh --off${logFile ? ` --logfile "${logFile}` : ""}"`, { cwd: "script" });
             execSync("enable-full-coverage.sh --off", { cwd: "script" });
             // if (settingsJsonOrig && !testControl.keepSettingsFileChanges) {
-            if (!testControl.keepSettingsFileChanges)
-            {
+            // if (!testControl.keepSettingsFileChanges)
+            // {
                 console.log("restore tests workspace settings file settings.json");
                 if (!multiRoot)
                 {
-                    await writeFile(projectSettingsFile, JSON.stringify(
+                    fs.writeFileSync(projectSettingsFile, JSON.stringify(
                     {
                         "taskexplorer.exclude": [
                             "**/tasks_test_ignore_/**",
@@ -205,12 +290,12 @@ const main = async(args: string[]) =>
                             "**/hello.xml"
                         ]
                     };
-                    await writeFile(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
+                    fs.writeFileSync(multiRootWsFile, JSON.stringify(mwsConfig, null, 4));
                 }
-            }
+            // }
             console.log("delete any leftover temporary files and/or directories");
-            await deleteDir(path.join(project1Path, "tasks_test_"));
-            await deleteDir(path.join(project1Path, "tasks_test_ignore_"));
+            fs.rmdirSync(path.join(project1Path, "tasks_test_"), { recursive: true });
+            fs.rmdirSync(path.join(project1Path, "tasks_test_ignore_"), { recursive: true });
         }
         catch {}
 
@@ -218,75 +303,6 @@ const main = async(args: string[]) =>
             process.exit(1);
         }
     }
-};
-
-const createDefaultSettings = async() =>
-{   //
-    // Enabled / disabled task defaults
-    //
-    const packageJson = JSON.parse(await readFileAsync(getWsPath("../../package.json")));
-    const enabledTasks: IDictionary<boolean> = {};
-    getTaskTypes().map(t => getTaskTypeRealName(t)).forEach(t => {
-        enabledTasks[t] = packageJson.contributes.configuration[1].properties["taskexplorer.enabledTasks"].default[t];
-    });
-
-    return {
-        "terminal.integrated.shell.windows": undefined,
-        "taskexplorer.enableExplorerView": true,
-        "taskexplorer.enableSideBar": true,
-        "taskexplorer.enablePersistentFileCaching": false,
-        "taskexplorer.enabledTasks": enabledTasks,
-        "taskexplorer.pathToPrograms":
-        {
-            ant: getWsPath("..\\tools\\ant\\bin\\ant.bat"),
-            ansicon: getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"),
-            bash: "bash",
-            composer: "composer",
-            curl: "curl",
-            gradle: "c:\\Code\\gradle\\bin\\gradle.bat",
-            jenkins: "",
-            make: "C:\\Code\\compilers\\c_c++\\9.0\\VC\\bin\\nmake.exe",
-            maven: "mvn",
-            nsis: "c:\\Code\\nsis\\makensis.exe",
-            perl: "perl",
-            pipenv: "pipenv",
-            powershell: "powershell",
-            python: "c:\\Code\\python\\python.exe",
-            ruby: "ruby"
-        },
-        "taskexplorer.logging.enable": false,
-        "taskexplorer.logging.level": 1,
-        "taskexplorer.logging.enableFile": false,
-        "taskexplorer.logging.enableFileSymbols": false,
-        "taskexplorer.logging.enableOutputWindow": false,
-        "taskexplorer.specialFolders.numLastTasks": 10,
-        "taskexplorer.specialFolders.showFavorites": true,
-        "taskexplorer.specialFolders.showLastTasks": true,
-        "taskexplorer.specialFolders.showUserTasks": true,
-        "taskexplorer.specialFolders.folderState": {
-            favorites: "Expanded",
-            lastTasks: "Expanded",
-            userTasks: "Expanded"
-        },
-        "taskexplorer.taskButtons.clickAction": "Open",
-        "taskexplorer.taskButtons.showFavoritesButton": true,
-        "taskexplorer.taskButtons.showExecuteWithArgumentsButton": false,
-        "taskexplorer.taskButtons.showExecuteWithNoTerminalButton": false,
-        "taskexplorer.visual.disableAnimatedIcons": true,
-        "taskexplorer.enableAnsiconForAnt": false,
-        "taskexplorer.groupMaxLevel": 1,
-        "taskexplorer.groupSeparator": "-",
-        "taskexplorer.groupWithSeparator": true,
-        "taskexplorer.groupStripTaskLabel": true,
-        "taskexplorer.exclude": [],
-        "taskexplorer.includeAnt": [], // Deprecated, use `globPatternsAnt`
-        "taskexplorer.globPatternsAnt": [ "**/test.xml", "**/emptytarget.xml", "**/emptyproject.xml", "**/hello.xml" ],
-        "taskexplorer.keepTermOnStop": false,
-        "taskexplorer.showHiddenWsTasks": true,
-        "taskexplorer.showRunningTask": true,
-        "taskexplorer.useGulp": false,
-        "taskexplorer.useAnt": false,
-    };
 };
 
 main(process.argv.slice(2));

@@ -5,22 +5,18 @@ import * as path from "path";
 import { expect } from "chai";
 import * as treeUtils from "./treeUtils";
 import { testControl } from "../control";
-import { TaskTree } from "../../tree/tree";
 import { figures } from "../../lib/figures";
 import { deactivate } from "../../extension";
+import { Strings } from "../../lib/constants";
 import { startInput, stopInput } from "./input";
-import { TeWrapper } from "../../lib/wrapper";
 import { hasExplorerFocused } from "./commandUtils";
-import { Globs, Strings } from "../../lib/constants";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
 import { deleteFile, pathExists } from "../../lib/utils/fs";
 import { configuration } from "../../lib/utils/configuration";
 import initSettings, { cleanupSettings } from "./initSettings";
-import { ITaskExplorerProvider } from "../../interface/ITaskProvider";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
-import { TaskItem } from "../../tree/item";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
@@ -29,11 +25,11 @@ export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
 export let teApi: ITaskExplorerApi;
+export let teWrapper: ITeWrapper;
 
 let activated = false;
 let caughtControlC = false;
 let hasRollingCountError = false;
-let teWrapper: TeWrapper;
 let timeStarted: number;
 let overridesShowInputBox: any[] = [];
 let overridesShowInfoBox: any[] = [];
@@ -333,7 +329,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
 };
 
 
-export const getSpecialTaskItemId = (taskItem: TaskItem) =>
+export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
     taskItem.id.replace(Strings.LAST_TASKS_LABEL + ":", "").replace(Strings.FAV_TASKS_LABEL + ":", "").replace(Strings.USER_TASKS_LABEL + ":", "");
 
 

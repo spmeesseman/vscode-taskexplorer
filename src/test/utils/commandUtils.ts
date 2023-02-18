@@ -1,14 +1,15 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
 import { commands } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
-import { waitForTeIdle, testControl as tc } from "./utils";
-import { configuration } from "../../lib/utils/configuration";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import { waitForTeIdle, testControl as tc, teWrapper } from "./utils";
 
 let explorerHasFocused = false;
 
 
 export const executeSettingsUpdate = async (key: string, value?: any, minWait?: number, maxWait?: number) =>
 {
-    const rc = await configuration.updateWs(key, value);
+    const rc = await teWrapper.config.updateWs(key, value);
     await waitForTeIdle(minWait === 0 ? minWait : (minWait || tc.waitTime.config.event),
                         maxWait === 0 ? maxWait : (maxWait || tc.waitTime.max));
     return rc;
@@ -39,7 +40,7 @@ export const executeTeCommand = async <T>(command: string, minWait?: number, max
 export const executeTeCommand2 = <T>(command: string, args: any[], minWait?: number, maxWait?: number) => executeTeCommand<T>(command, minWait, maxWait, ...args);
 
 
-export const focusExplorerView = async (wrapper: TeWrapper | undefined, instance?: any) =>
+export const focusExplorerView = async (wrapper: ITeWrapper | undefined, instance?: any) =>
 {
     if (!wrapper || !wrapper.treeManager.views.taskExplorer.visible)
     {

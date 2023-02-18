@@ -8,6 +8,7 @@ import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog } from "../interface";
+import { ITeWrapper } from "src/interface/ITeWrapper";
 import { TaskManager } from "src/tree/taskManager";
 import { ContextKeys, TeContext } from "./context";
 import { AntTaskProvider } from "../providers/ant";
@@ -51,7 +52,7 @@ import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } 
 import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView } from "vscode";
 
 
-export class TeWrapper
+export class TeWrapper implements ITeWrapper
 {
 	private _ready = false;
 	private _tests = false;

@@ -1,12 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import { expect } from "chai";
-import { TaskItem } from "../../tree/item";
-import { TeWrapper } from "../../lib/wrapper";
-import { TaskMap } from "../../tree/treeBuilder";
-import { isObjectEmpty } from "../../lib/utils/utils";
 import { executeSettingsUpdate, executeTeCommand } from "./commandUtils";
-import { figures, getTeApi, sleep, testControl as tc, waitForTeIdle } from "./utils";
+import { figures, sleep, testControl as tc, waitForTeIdle } from "./utils";
+import { ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+
+interface TaskMap { [id: string]: ITaskItem | undefined };
 
 let didRefresh = false;
 let didSetGroupLevel = false;
@@ -18,21 +17,21 @@ export const hasRefreshed = () => didRefresh;
 export const findIdInTaskMap = (id: string, tMap: TaskMap) => Object.values(tMap).filter((t) => t && t.id?.includes(id) && !t.isUser).length;
 
 
-export const getTreeTasks = async(teWrapper: TeWrapper, taskType: string, expectedCount: number) =>
+export const getTreeTasks = async(teWrapper: ITeWrapper, taskType: string, expectedCount: number) =>
 {
-    const taskItems: TaskItem[] = [];
+    const taskItems: ITaskItem[] = [];
 
-    const _getTaskMap = async(retries: number) =>
+    const _getTaskMap = async(retries: number): Promise<TaskMap> =>
     {
         let taskMap = teWrapper.treeManager.getTaskMap();
 
-        if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
+        if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             await waitForTeIdle(150, 1600);
             taskMap = teWrapper.treeManager.getTaskMap();
         }
 
-        if (!taskMap || isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
+        if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             if (retries === 0) {
                 console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, retry", figures.colors.grey)}`);
@@ -42,7 +41,7 @@ export const getTreeTasks = async(teWrapper: TeWrapper, taskType: string, expect
                 await refresh();
                 taskMap = teWrapper.treeManager.getTaskMap();
             }
-            if (!taskMap || isObjectEmpty(taskMap))
+            if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap))
             {
                 if (retries === 40) {
                     console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
@@ -109,12 +108,12 @@ export const refresh = async(instance?: any) =>
 
 
 
-export const verifyTaskCountByTree = async(teWrapper: TeWrapper, taskType: string, expectedCount: number, retries = 2) =>
+export const verifyTaskCountByTree = async(teWrapper: ITeWrapper, taskType: string, expectedCount: number, retries = 2) =>
 {
     let taskMap = teWrapper.treeManager.getTaskMap();
     const _getCount = async() =>
     {
-        if (!taskMap || isObjectEmpty(taskMap)) {
+        if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap)) {
             await refresh();
             taskMap = teWrapper.treeManager.getTaskMap();
         }
