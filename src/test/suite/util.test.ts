@@ -38,12 +38,12 @@ suite("Util Tests", () =>
 	suiteTeardown(async function()
 	{
         if (exitRollingCount(this, false, true)) return;
-		teWrapper.log.setWriteToConsole(testControl.teWrapper.log.console, testControl.teWrapper.log.consoleLevel);
-		await executeSettingsUpdate("logging.enable", testControl.teWrapper.log.enabled);
-		await executeSettingsUpdate("logging.enableFile", testControl.teWrapper.log.file);
-		await executeSettingsUpdate("logging.enableOutputWindow", testControl.teWrapper.log.output);
-		await executeSettingsUpdate("logging.enableFileSymbols", testControl.teWrapper.log.fileSymbols);
-		await executeSettingsUpdate("logging.level", testControl.teWrapper.log.level);
+		teWrapper.log.setWriteToConsole(teWrapper.logControl.console, teWrapper.logControl.consoleLevel);
+		await executeSettingsUpdate("logging.enable", teWrapper.logControl.enabled);
+		await executeSettingsUpdate("logging.enableFile", teWrapper.logControl.file);
+		await executeSettingsUpdate("logging.enableOutputWindow", teWrapper.logControl.output);
+		await executeSettingsUpdate("logging.enableFileSymbols", teWrapper.logControl.fileSymbols);
+		await executeSettingsUpdate("logging.level", teWrapper.logControl.level);
         suiteFinished(this);
 	});
 
