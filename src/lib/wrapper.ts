@@ -152,6 +152,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 			this._treeManager,
 			this._licensePage,
 			this._fileWatcher,
+			this._configWatcher,
 			this._taskCountView,
 			this._taskUsageView,
 			this._licenseManager,

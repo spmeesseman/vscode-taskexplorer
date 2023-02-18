@@ -143,9 +143,10 @@ suite("Webview Tests", () =>
     test("Post an Unknown Random Message", async function()
     {
         if (exitRollingCount(this)) return;
+        this.slow(tc.slowTime.commands.fast + 1100);
         await executeCommand(Commands.FocusHomeView);
         await teWrapper.homeView.notify(EchoCustomCommandRequestType, { command: Commands.ShowReleaseNotesPage });
-        await sleep(500);
+        await sleep(550); // wait for webworker to respond, takes ~ 400-600ms
         endRollingCount(this);
     });
 
