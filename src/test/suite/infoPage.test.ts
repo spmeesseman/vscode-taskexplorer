@@ -2,18 +2,15 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Uri, WebviewPanel } from "vscode";
-import { TaskTree } from "../../tree/tree";
 import { Commands } from "../../lib/command";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { TeWebviewPanel } from "../../webview/webviewPanel";
-import { ParsingReportPage } from "../../webview/page/parsingReportPage";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, getWsPath, exitRollingCount, waitForTeIdle, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let projectUri: Uri;
 let userTasks: boolean;
 let pkgMgr: string;
@@ -56,7 +53,7 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 150);
 		await executeSettingsUpdate("specialFolders.showUserTasks", false, testControl.waitTime.config.showHideUserTasks);
-		const panel = await executeTeCommand2<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, [ projectUri ], testControl.waitTime.viewReport);
+		await executeTeCommand2(Commands.ShowParsingReportPage, [ projectUri ], testControl.waitTime.viewReport);
 		await sleep(75);
 		await closeEditors();
         endRollingCount(this);
@@ -68,7 +65,7 @@ suite("Info Report Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.config.showHideUserTasks + 150);
 		await executeSettingsUpdate("specialFolders.showUserTasks", true, testControl.waitTime.config.showHideUserTasks);
-	    const panel = await executeTeCommand2<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, [ projectUri, "", 5 ], testControl.waitTime.viewReport);
+	    await executeTeCommand2(Commands.ShowParsingReportPage, [ projectUri, "", 5 ], testControl.waitTime.viewReport);
 		await sleep(75);
 		await closeEditors();
         endRollingCount(this);
@@ -79,7 +76,7 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 150);
-	    await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
+	    await executeTeCommand(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
 		await closeEditors();
         endRollingCount(this);
@@ -92,7 +89,7 @@ suite("Info Report Tests", () =>
 		this.slow(testControl.slowTime.viewReport + (testControl.slowTime.config.enableEvent * 2) + 150);
         await teWrapper.config.updateVsWs("npm.packageManager", "yarn");
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
-	    await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
+	    await executeTeCommand(Commands.ShowParsingReportPage, testControl.waitTime.viewReport);
 		await sleep(75);
         await teWrapper.config.updateVsWs("npm.packageManager", pkgMgr);
         await waitForTeIdle(testControl.waitTime.config.enableEvent);
@@ -105,8 +102,8 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + testControl.slowTime.licenseMgr.pageWithDetail + 1000);
-	    const panel = await executeTeCommand<TeWebviewPanel<any>>(Commands.ShowLicensePage, testControl.waitTime.viewReport);
-		await panel.view?.webview.postMessage({ command: "showLicensePage" });
+	    const panel = await executeTeCommand(Commands.ShowLicensePage, testControl.waitTime.viewReport);
+		await teWrapper.licensePage.view.webview.postMessage({ command: "showLicensePage" });
 		await sleep(500);
 		await closeEditors();
         endRollingCount(this);
@@ -117,11 +114,11 @@ suite("Info Report Tests", () =>
 	{
         if (exitRollingCount(this)) return;
 		this.slow(testControl.slowTime.viewReport + 30);
-		let panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
+		let panel = createwebviewForRevive("Task Explorer Parsing Report", "parsingReport");
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(5);
 		(teWrapper.parsingReportPage.view as WebviewPanel)?.dispose();
-		panel = createwebviewForRevive(ParsingReportPage.viewTitle, ParsingReportPage.viewId);
+		panel = createwebviewForRevive("Task Explorer Parsing Report", "parsingReport");
 		await sleep(5);
 	    await teWrapper.parsingReportPage.serializer.deserializeWebviewPanel(panel, null);
 		await sleep(5);

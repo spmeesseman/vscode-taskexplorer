@@ -14,6 +14,7 @@ export abstract class IExternalProvider implements ITaskExplorerProvider
 
     public providerName = "external";
     public readonly isExternal = true;
+    public cachedTasks: Task[] | undefined = [];
 
     async provideTasks()
     {

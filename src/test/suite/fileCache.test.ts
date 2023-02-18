@@ -2,10 +2,10 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import * as utils from "../utils/utils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand } from "../utils/commandUtils";
-import { TeWrapper } from "../../lib/wrapper";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 const tc = utils.testControl;
 
 

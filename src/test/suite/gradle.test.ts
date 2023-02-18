@@ -5,11 +5,9 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupBuildTree } from "../utils/suiteUtils";
-import { GradleTaskProvider } from "../../providers/gradle";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITeWrapper, ITaskExplorerProvider } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
@@ -19,8 +17,8 @@ const testsName = "gradle";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: GradleTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 let dirName: string;
 let fileUri: Uri;
 
@@ -32,7 +30,7 @@ suite("Gradle Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as GradleTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         dirName = getWsPath(".");
         fileUri = Uri.file(path.join(dirName, "test2.gradle"));
         endRollingCount(this, true);

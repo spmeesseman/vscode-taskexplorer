@@ -5,14 +5,12 @@
 import { join } from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { BatchTaskProvider } from "../../providers/batch";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITeWrapper, ITaskExplorerProvider } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl, treeUtils, verifyTaskCount, suiteFinished, exitRollingCount,
     waitForTeIdle, endRollingCount, needsTreeBuild
 } from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "batch";
 const startTaskCount = 2;
@@ -20,7 +18,7 @@ const dirName = getWsPath("tasks_test_");
 const fileUriBat = Uri.file(join(dirName, "test_provider_bat.bat"));
 const fileUriCmd = Uri.file(join(dirName, "test_provider-cmd.cmd"));
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
 
 
@@ -56,7 +54,7 @@ suite("Batch Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as BatchTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         expect(provider.getDocumentPosition()).to.be.equal(0, "Script type should return position 0");
         endRollingCount(this);
     });
@@ -74,7 +72,7 @@ suite("Batch Tests", () =>
     test("Resolve Task", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as BatchTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         provider.resolveTask((provider.cachedTasks as any[])[0]);
         endRollingCount(this);
     });

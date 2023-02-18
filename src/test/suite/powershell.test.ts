@@ -4,12 +4,10 @@
 
 import * as path from "path";
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { PowershellTaskProvider } from "../../providers/powershell";
-import {  ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {  ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath,
     logErrorsAreFine, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
@@ -17,7 +15,7 @@ import { activate, endRollingCount, exitRollingCount, getWsPath,
 const testsName = "powershell";
 const startTaskCount = 1;
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
 let pathToTaskProgram: string;
 let enableTaskType: boolean;
@@ -66,7 +64,7 @@ suite("Powershell Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as PowershellTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         expect(provider.getDocumentPosition()).to.be.equal(0, "Script type should return position 0");
         endRollingCount(this);
     });
@@ -75,7 +73,7 @@ suite("Powershell Tests", () =>
     test("Invalid Script Provider Type", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as PowershellTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("test.ps1")));
         logErrorsAreFine();
         endRollingCount(this);

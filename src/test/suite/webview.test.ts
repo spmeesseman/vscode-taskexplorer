@@ -4,9 +4,9 @@
 
 import { expect } from "chai";
 import { commands, Uri } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { promiseFromEvent } from "../../lib/utils/promiseUtils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { Commands, executeCommand, VsCodeCommands } from "../../lib/command";
 import { EchoCommandRequestType, EchoCustomCommandRequestType } from "../../webview/common/ipc";
 import { executeSettingsUpdate, focusExplorerView, focusSidebarView } from "../utils/commandUtils";
@@ -15,7 +15,7 @@ import {
 } from "../utils/utils";
 
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Webview Tests", () =>

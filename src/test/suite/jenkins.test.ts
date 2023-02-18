@@ -6,11 +6,9 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import { env } from "process";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { JenkinsTaskProvider } from "../../providers/jenkins";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
@@ -18,9 +16,9 @@ import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, 
 const testsName = "jenkins";
 let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
-let provider: JenkinsTaskProvider;
+let provider: ITaskExplorerProvider;
 let fileUri: Uri;
 let setEnvJenkinsToken = false;
 
@@ -32,7 +30,7 @@ suite("Jenkins Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
         startTaskCount = tc.isMultiRootWorkspace ? 1 : 0;
-        provider = teApi.providers[testsName] as JenkinsTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "Jenkinsfile"));
         if (!env.JENKINS_API_TOKEN) {
             env.JENKINS_API_TOKEN = "FAKE_TOKEN";

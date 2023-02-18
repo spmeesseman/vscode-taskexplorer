@@ -3,14 +3,13 @@
 /* tslint:disable */
 
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getSuccessCount, suiteFinished, testControl as tc, waitForTeIdle
 } from "../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let globPatterns: string[];
 let globPatternsAnt: string[];
 let globPatternsBash: string[];

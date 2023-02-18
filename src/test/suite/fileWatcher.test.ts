@@ -5,9 +5,8 @@
 import { join } from "path";
 import fsUtils from "../utils/fsUtils";
 import * as utils from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const startTaskCountBash = 1;
@@ -16,7 +15,7 @@ const startTaskCountGrunt = 7;
 const startTaskCountGulp = 17;
 const startTaskCountWs = 13; // 10 + 3 User Tasks
 let startTaskCountNpm = 2;  // set in suiteSetup() as it will change depending on single or multi root ws
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let insideWsDir: string;
 let insideWsDir2: string;
 let insideWsDirIgn: string;

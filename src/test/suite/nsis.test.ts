@@ -4,18 +4,16 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { NsisTaskProvider } from "../../providers/nsis";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl } from "../utils/utils";
 
 const testsName = "nsis";
 const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: NsisTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 let dirName: string;
 let fileUri: Uri;
 
@@ -27,7 +25,7 @@ suite("Nullsoft NSIS Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as NsisTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "new_build.nsi"));
         endRollingCount(this, true);

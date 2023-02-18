@@ -4,11 +4,9 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { GulpTaskProvider } from "../../providers/gulp";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
@@ -17,9 +15,9 @@ import {
 const testsName = "gulp";
 const startTaskCount = 17;
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
-let provider: GulpTaskProvider;
+let provider: ITaskExplorerProvider;
 let fileUri: Uri;
 let file2Uri: Uri;
 
@@ -31,7 +29,7 @@ suite("Gulp Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as GulpTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "gulpfile.js"));
         file2Uri = Uri.file(path.join(getWsPath("."), "gulpfile.mjs"));
         endRollingCount(this, true);

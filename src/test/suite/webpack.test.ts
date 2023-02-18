@@ -5,11 +5,9 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { WebpackTaskProvider } from "../../providers/webpack";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     testInvDocPositions, verifyTaskCount, waitForTeIdle
@@ -22,8 +20,8 @@ const fileUri = Uri.file(path.join(dirName, "webpack.config.js"));
 const fileUri2 = Uri.file(path.join(getWsPath("."), "webpack.config.test.js"));
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: WebpackTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 
 
 suite("Webpack Tests", () =>
@@ -34,7 +32,7 @@ suite("Webpack Tests", () =>
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
         startTaskCount = tc.isMultiRootWorkspace ? 15 : 0;
-        provider = teApi.providers[testsName] as WebpackTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         await teWrapper.fs.createDir(dirName);
         endRollingCount(this, true);
     });

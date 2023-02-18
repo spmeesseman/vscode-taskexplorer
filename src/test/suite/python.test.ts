@@ -6,20 +6,18 @@ import * as path from "path";
 import { expect } from "chai";
 import { startupFocus } from "../utils/suiteUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { PythonTaskProvider } from "../../providers/python";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, logErrorsAreFine, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "python";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let pathToTaskProgram: string;
 let enableTaskType: boolean;
 let wsFolder: WorkspaceFolder;
@@ -70,7 +68,7 @@ suite("Python Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as PythonTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         expect(provider.getDocumentPosition()).to.be.equal(0);
         endRollingCount(this);
     });
@@ -79,7 +77,7 @@ suite("Python Tests", () =>
     test("Invalid ScriptProvider Type", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as PythonTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         expect(!provider.createTask("no_ext", undefined, wsFolder,
                Uri.file(getWsPath("test.py")))).to.not.be.equal(undefined, "ScriptProvider returnned undefined task");
         logErrorsAreFine(true);

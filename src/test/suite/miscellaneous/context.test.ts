@@ -3,12 +3,12 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import { TeWrapper } from "../../../lib/wrapper";
-import { ContextKeys, getContext, setContext } from "../../../lib/context";
-import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
 import { expect } from "chai";
+import { ContextKeys } from "../../../lib/context";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Context Tests", () =>
@@ -32,10 +32,10 @@ suite("Context Tests", () =>
     test("Get Context", async function()
     {
         if (exitRollingCount(this)) return;
-        expect(getContext<boolean>(ContextKeys.Enabled)).to.be.a("boolean").that.is.equal(true);
-        expect(getContext<boolean>(ContextKeys.Enabled,  true)).to.be.a("boolean").that.is.equal(true);
-        expect(getContext<string>(ContextKeys.TestsTest)).to.be.undefined;
-        expect(getContext<string>(ContextKeys.TestsTest, "testing")).to.be.a("string").that.is.equal("testing");
+        expect(teWrapper.contextTe.getContext<boolean>(ContextKeys.Enabled)).to.be.a("boolean").that.is.equal(true);
+        expect(teWrapper.contextTe.getContext<boolean>(ContextKeys.Enabled,  true)).to.be.a("boolean").that.is.equal(true);
+        expect(teWrapper.contextTe.getContext<string>(ContextKeys.TestsTest)).to.be.undefined;
+        expect(teWrapper.contextTe.getContext<string>(ContextKeys.TestsTest, "testing")).to.be.a("string").that.is.equal("testing");
         endRollingCount(this);
     });
 
@@ -43,9 +43,9 @@ suite("Context Tests", () =>
     test("Set Context", async function()
     {
         if (exitRollingCount(this)) return;
-        await setContext(ContextKeys.TestsTest, "testing");
-        expect(getContext<string>(ContextKeys.TestsTest)).to.be.a("string").that.is.equal("testing");
-        await setContext(ContextKeys.TestsTest, undefined);
+        await teWrapper.contextTe.setContext(ContextKeys.TestsTest, "testing");
+        expect(teWrapper.contextTe.getContext<string>(ContextKeys.TestsTest)).to.be.a("string").that.is.equal("testing");
+        await teWrapper.contextTe.setContext(ContextKeys.TestsTest, undefined);
         endRollingCount(this);
     });
 

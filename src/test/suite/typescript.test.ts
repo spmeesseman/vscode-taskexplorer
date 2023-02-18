@@ -1,19 +1,19 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as utils from "../utils/utils";
-import fsUtils from "../utils/fsUtils";
-import { Uri } from "vscode";
 import { join } from "path";
+import { Uri } from "vscode";
+import fsUtils from "../utils/fsUtils";
+import * as utils from "../utils/utils";
 import { ITestControl } from "../control";
 import { startupFocus } from "../utils/suiteUtils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
-import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "tsc";
 const startTaskCount = 0;
 let testControl: ITestControl;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let rootPath: string;
 let dirName: string;
 let fileUri: Uri;

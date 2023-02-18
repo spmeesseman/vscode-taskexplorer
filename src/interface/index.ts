@@ -2,7 +2,7 @@
 export { ILog } from "./ILog";
 export { IEvent } from "./IEvent";
 export { IRecord } from "./IRecord";
-export { ITeWrapper } from "./ITeWrapper";
+export { ITeContext, ITeWrapper } from "./ITeWrapper";
 export { ITaskItem } from "./ITaskItem";
 export { ITaskFile } from "./ITaskFile";
 export { ITaskFolder } from "./ITaskFolder";

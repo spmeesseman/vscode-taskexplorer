@@ -5,13 +5,10 @@
 import { join } from "path";
 import { expect } from "chai";
 import { tasks } from "vscode";
-import { TaskItem } from "../../tree/item";
-import { TaskFile } from "../../tree/file";
 import { refresh } from "../utils/treeUtils";
-import { TeWrapper } from "../../lib/wrapper";
 import { TaskMap } from "../../tree/treeBuilder";
 import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskFile, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle
@@ -20,8 +17,8 @@ import {
 
 const tempFiles: string[] = [];
 
-let teWrapper: TeWrapper;
-let taskFile: TaskFile | undefined;
+let teWrapper: ITeWrapper;
+let taskFile: ITaskFile | undefined;
 let rootPath: string;
 let dirName: string;
 let dirNameL2: string;
@@ -354,7 +351,7 @@ suite("Provider Tests", () =>
               filesOpened: string[] = [];
         for (const t of Object.keys(taskMap))
         {
-            const taskItem = taskMap[t] as TaskItem;
+            const taskItem = taskMap[t] as ITaskItem;
             await executeTeCommand2("open", [ taskItem ], 4);
             if (!filesOpened.includes(taskItem.taskFile.resourceUri.fsPath)) {
                 filesOpened.push(taskItem.taskFile.resourceUri.fsPath);

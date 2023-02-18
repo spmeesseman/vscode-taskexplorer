@@ -1,10 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { TeWrapper } from "../../lib/wrapper";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../utils/utils";
 
 let aKey: string;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Usage / Telemetry Tests", () =>

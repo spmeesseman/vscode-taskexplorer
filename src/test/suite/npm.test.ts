@@ -3,19 +3,17 @@
 /* tslint:disable */
 
 import * as utils from "../utils/utils";
-import { TaskItem } from "../../tree/item";
 import { TaskExecution } from "vscode";
 import { startupFocus } from "../utils/suiteUtils";
-import { getPackageManager } from "../../lib/utils/utils";
 import { executeTeCommand2 } from "../utils/commandUtils";
-import { TeWrapper } from "../../lib/wrapper";
+import { ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 
 const testsName = "npm";
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 const tc = utils.testControl;
 let startTaskCount = 0; // set in suiteSetup() as it will change depending on single or multi root ws
 let packageJsonPath: string | undefined;
-let npmTaskItems: TaskItem[];
+let npmTaskItems: ITaskItem[];
 
 
 suite("NPM Tests", () =>
@@ -118,7 +116,7 @@ suite("NPM Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.eventFast);
-        getPackageManager();
+        utils.getPackageManager();
         utils.endRollingCount(this);
     });
 

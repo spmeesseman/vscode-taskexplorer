@@ -3,17 +3,12 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
-import {
-    executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView
-} from "../utils/commandUtils";
-import {
-    activate, closeEditors, endRollingCount, exitRollingCount, sleep, suiteFinished,
-    testControl as tc, waitForTeIdle
-} from "../utils/utils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import { executeSettingsUpdate, executeTeCommand2, focusFileExplorer, focusSidebarView } from "../utils/commandUtils";
+import { activate, closeEditors, endRollingCount, exitRollingCount, sleep, suiteFinished, testControl as tc, waitForTeIdle } from "../utils/utils";
 
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Initialization", () =>

@@ -6,14 +6,10 @@ import { join } from "path";
 import { expect } from "chai";
 import { Task, WebviewPanel } from "vscode";
 import * as utils from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
-import { LicensePage } from "../../webview/page/licensePage";
-import { LicenseManager } from "../../lib/auth/licenseManager";
 import { promiseFromEvent } from "../../lib/utils/promiseUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { copyDir, createDir, deleteDir, writeFile } from "../../lib/utils/fs";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 
 const tc = utils.testControl;
 const licMgrMaxFreeTasks = 500;             // Should be set to what the constants are in lib/licenseManager
@@ -21,9 +17,8 @@ const licMgrMaxFreeTaskFiles = 100;         // Should be set to what the constan
 const licMgrMaxFreeTasksForTaskType = 100;  // Should be set to what the constants are in lib/licenseManager
 const licMgrMaxFreeTasksForScriptType = 50; // Should be set to what the constants are in lib/licenseManager
 
-let licMgr: LicenseManager;
-let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let licMgr: any;
+let teWrapper: ITeWrapper;
 let tasks: Task[] = [];
 let setTasksCallCount = 0;
 
@@ -46,7 +41,7 @@ suite("License Manager Tests", () =>
 		// and until this is resolved in vscode/test-electron (I think that's wherethe problem is?),
 		// we just disable TLS_REJECT_UNAUTHORIZED in the NodeJS environment.
 		//
-        ({ teApi, teWrapper } = await utils.activate(this));
+        ({ teWrapper } = await utils.activate(this));
 		oLicenseKey = await teWrapper.storage.getSecret("license_key");
 		await teWrapper.storage.updateSecret("license_key_30day", undefined);
 		licMgr = teWrapper.licenseManager;
@@ -299,11 +294,11 @@ suite("License Manager Tests", () =>
 	{
         if (utils.exitRollingCount(this)) return;
 		this.slow(tc.slowTime.viewReport + 30);
-		let panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
+		let panel = utils.createwebviewForRevive("Task Explorer Licensing", "licensePage");
 	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(5);
 		(teWrapper.licensePage.view as WebviewPanel)?.dispose();
-		panel = utils.createwebviewForRevive(LicensePage.viewTitle, LicensePage.viewId);
+		panel = utils.createwebviewForRevive("Task Explorer Licensing", "licensePage");
 		await utils.sleep(5);
 	    await teWrapper.licensePage.serializer.deserializeWebviewPanel(panel, null);
 		await utils.sleep(5);
@@ -539,8 +534,8 @@ suite("License Manager Tests", () =>
         if (utils.exitRollingCount(this)) return;
 		this.slow(Math.round(tc.slowTime.commands.refresh * 0.9) + tc.slowTime.fs.createFolderEvent);
 		const outsideWsDir = utils.getProjectsPath("testA");
-		await createDir(outsideWsDir);
-		await writeFile(
+		await teWrapper.fs.createDir(outsideWsDir);
+		await teWrapper.fs.writeFile(
             join(outsideWsDir, "Gruntfile.js"),
             "module.exports = function(grunt) {\n" +
             '    grunt.registerTask(\n"default13", ["jshint:myproject"]);\n' +
@@ -555,11 +550,11 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		await copyDir(outsideWsDir, utils.getWsPath("."), undefined, true); // Cover fileCache.addFolder()
+		await teWrapper.fs.copyDir(outsideWsDir, utils.getWsPath("."), undefined, true); // Cover fileCache.addFolder()
         await utils.waitForTeIdle(tc.waitTime.fs.createFolderEvent);
-		await deleteDir(join(utils.getWsPath("."), "testA"));
+		await teWrapper.fs.deleteDir(join(utils.getWsPath("."), "testA"));
         await utils.waitForTeIdle(tc.waitTime.fs.deleteFolderEvent);
-		await deleteDir(outsideWsDir);
+		await teWrapper.fs.deleteDir(outsideWsDir);
         utils.endRollingCount(this);
 	});
 

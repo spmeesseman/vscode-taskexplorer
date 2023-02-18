@@ -6,24 +6,21 @@
 import { expect } from "chai";
 import { TaskExecution } from "vscode";
 import * as utils from "../utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
-import { Globs, Strings } from "../../lib/constants";
-import { TaskItem } from "../../tree/item";
-import { SpecialTaskFolder } from "../../tree/specialFolder";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import {ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView, focusSearchView } from "../utils/commandUtils";
+import { ITaskFolder } from "../../interface";
 import { TaskFolder } from "../../tree/folder";
 
 const tc = utils.testControl;
 const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.commands.standard * 2);
 
-let teWrapper: TeWrapper;
-let lastTask: TaskItem | null = null;
-let ant: TaskItem[];
-let bash: TaskItem[];
-let batch: TaskItem[];
-let python: TaskItem[];
-let antTask: TaskItem;
+let teWrapper: ITeWrapper;
+let lastTask: ITaskItem | null = null;
+let ant: ITaskItem[];
+let bash: ITaskItem[];
+let batch: ITaskItem[];
+let python: ITaskItem[];
+let antTask: ITaskItem;
 let clickAction: string;
 
 
@@ -78,9 +75,9 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.run + tc.slowTime.storageUpdate);
-        const tree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
+        const tree = teWrapper.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
-        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        const lastTasksFolder = tree[0] as any;
         lastTasksFolder.clearTaskItems();
         await utils.sleep(1);
         expect(await executeTeCommand("runLastTask", tc.waitTime.runCommandMin)).to.be.equal(undefined, "Return TaskExecution should be undefined");
@@ -223,7 +220,7 @@ suite("Task Tests", () =>
         if (utils.exitRollingCount(this)) return;
         this.slow((tc.slowTime.config.enableEvent * 2) + tc.slowTime.commands.run +
                   tc.slowTime.tasks.antTaskWithAnsicon + 300 + tc.slowTime.commands.focusChangeViews);
-        antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as TaskItem;
+        antTask = ant.find(t => t.taskFile.fileName.includes("hello.xml")) as ITaskItem;
         expect(antTask).to.not.be.equal(undefined, "The 'hello' ant task was not found in the task tree");
         await executeSettingsUpdate("pathToPrograms.ansicon", utils.getWsPath("..\\tools\\ansicon\\x64\\ansicon.exe"), tc.waitTime.config.enableEvent);
         utils.overrideNextShowInfoBox(undefined);
@@ -352,9 +349,9 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.commands.run + (tc.slowTime.storageUpdate * 2));
-        const tree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
+        const tree = teWrapper.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
-        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        const lastTasksFolder = tree[0] as any;
         const lastTasksStore = lastTasksFolder.getStore();
         const item = lastTasksFolder.taskFiles[0];
         expect(item).to.not.equal(undefined, "The 'Last Tasks' folder has no taskitems");
@@ -379,9 +376,9 @@ suite("Task Tests", () =>
     {
         if (utils.exitRollingCount(this)) return;
         this.slow(tc.slowTime.config.showHideSpecialFolder + (tc.slowTime.config.event * 2));
-        const tree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
+        const tree = teWrapper.treeManager.getTaskTree() as ITaskFolder[];
         expect(tree).to.not.be.oneOf([ undefined, null ]);
-        const lastTasksFolder = tree[0] as SpecialTaskFolder;
+        const lastTasksFolder = tree[0] as any;
         const maxLastTasks = teWrapper.config.get<number>("specialFolders.numLastTasks");
         teWrapper.configwatcher = false;
         await executeSettingsUpdate("specialFolders.numLastTasks", 6);
@@ -406,7 +403,7 @@ suite("Task Tests", () =>
 });
 
 
-async function startTask(taskItem: TaskItem, addToSpecial: boolean)
+async function startTask(taskItem: ITaskItem, addToSpecial: boolean)
 {
     if (tc.log.taskExecutionSteps) {
         console.log(`    ${utils.figures.color.info} Run ${taskItem.taskSource} task | ${taskItem.label} | ${taskItem.getFolder()?.name}`);
@@ -421,8 +418,8 @@ async function startTask(taskItem: TaskItem, addToSpecial: boolean)
         const taskTree = teWrapper.treeManager.getTaskTree();
         if (taskTree)
         {
-            const sFolder= taskTree[0].label === Strings.FAV_TASKS_LABEL ? taskTree[0] as SpecialTaskFolder :
-                           (taskTree[1].label === Strings.FAV_TASKS_LABEL ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                           (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 const sTaskItem = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === taskItem.id);

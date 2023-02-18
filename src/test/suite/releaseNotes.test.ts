@@ -3,15 +3,15 @@
 
 import { Extension } from "vscode";
 import { Commands } from "../../lib/command";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeTeCommand } from "../utils/commandUtils";
 import { TeWebviewPanel } from "../../webview/webviewPanel";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
 	activate, closeEditors, testControl, suiteFinished, sleep, exitRollingCount, endRollingCount, createwebviewForRevive
 } from "../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let extension: Extension<any>;
 
 

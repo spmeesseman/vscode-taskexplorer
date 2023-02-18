@@ -5,11 +5,9 @@
 import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { RubyTaskProvider } from "../../providers/ruby";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
     verifyTaskCount, waitForTeIdle
@@ -19,8 +17,8 @@ const testsName = "ruby";
 const startTaskCount = 1;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: RubyTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 let fileUri: Uri;
 
 
@@ -31,7 +29,7 @@ suite("Ruby Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as RubyTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "ruby_script.rb"));
         endRollingCount(this, true);
     });

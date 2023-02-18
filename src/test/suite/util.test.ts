@@ -8,11 +8,11 @@ import { env } from "process";
 import { expect } from "chai";
 import * as afs from "../../lib/utils/fs";
 import * as util from "../../lib/utils/utils";
-import { TeWrapper } from "../../lib/wrapper";
 import { log, logControl } from "../../lib/log/log";
 import * as pathUtils from "../../lib/utils/pathUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
 import { camelCase, properCase } from "../../lib/utils/commonUtils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
@@ -23,7 +23,7 @@ const creator = "spmeesseman",
 	  extension = "vscode-taskexplorer";
 
 let rootUri: Uri;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Util Tests", () =>

@@ -1,11 +1,12 @@
+/* eslint-disable import/no-extraneous-dependencies */
 
-import { TeWrapper } from "../../lib/wrapper";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, focusExplorerView } from "../utils/commandUtils";
 import {
     activate, endRollingCount, exitRollingCount, getSuccessCount, needsTreeBuild, suiteFinished, testControl as tc
 } from "../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Tree Grouping Tests", () =>

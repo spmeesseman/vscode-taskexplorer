@@ -2,10 +2,9 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, needsTreeBuild, suiteFinished, testControl,
     treeUtils
@@ -14,8 +13,7 @@ import {
 const testsName = "Workspace";
 const startTaskCount = 10; // 10 + 3 'User' Tasks, but getTaskCountByTree() will not return the User tasks
 
-let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let wsEnable: boolean;
 
 
@@ -25,7 +23,7 @@ suite("Workspace / VSCode Tests", () =>
     suiteSetup(async function()
     {
         if (exitRollingCount(this, true)) return;
-        ({ teApi, teWrapper } = await activate(this));
+        ({ teWrapper } = await activate(this));
         wsEnable = teWrapper.config.get<boolean>("showHiddenWsTasks");
         endRollingCount(this, true);
     });

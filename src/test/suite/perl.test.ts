@@ -4,18 +4,16 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { PerlTaskProvider } from "../../providers/perl";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl } from "../utils/utils";
 
 const testsName = "perl";
 const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: PerlTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 let dirName: string;
 let fileUri: Uri;
 
@@ -27,7 +25,7 @@ suite("Perl Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as PerlTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         dirName = getWsPath("tasks_test_");
         fileUri = Uri.file(path.join(dirName, "newscript.pl"));
         endRollingCount(this, true);

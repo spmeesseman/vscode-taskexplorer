@@ -1,15 +1,16 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* tslint:disable */
 
 import { Uri } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
+import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath,
     needsTreeBuild, overrideNextShowInfoBox, suiteFinished, testControl as tc, verifyTaskCount
 } from "../utils/utils";
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 const antUri: Uri = Uri.file(getWsPath("build.xml"));
 const gruntFolderUri: Uri = Uri.file(getWsPath("grunt"));
 const pythonUri: Uri = Uri.file(getWsPath("test.py"));

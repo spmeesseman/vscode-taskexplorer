@@ -5,10 +5,9 @@
 
 import { expect } from "chai";
 import { TreeItem } from "vscode";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { IDictionary, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { IDictionary, ITaskExplorerApi, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, suiteFinished, testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
@@ -25,7 +24,7 @@ const gruntStartCount = 7;
 const gulpStartCount = 17;
 const pythonStartCount = 2;
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("NoScripts TreeItem Tests", () =>

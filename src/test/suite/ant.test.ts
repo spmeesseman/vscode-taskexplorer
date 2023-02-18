@@ -3,11 +3,9 @@
 /* tslint:disable */
 
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
-import { AntTaskProvider } from "../../providers/ant";
 import { executeSettingsUpdate } from "../utils/commandUtils";
 import { tasks, Uri, workspace, WorkspaceFolder } from "vscode";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl as tc, verifyTaskCount, logErrorsAreFine, suiteFinished,
     exitRollingCount, waitForTeIdle, treeUtils, overrideNextShowInfoBox, endRollingCount, needsTreeBuild, testInvDocPositions
@@ -17,9 +15,9 @@ const testsName = "ant";
 const startTaskCount = 3;
 const slowTimeforAntRunTasks = (tc.slowTime.fetchTasksCommand * 2) + (tc.slowTime.config.event * 2) + tc.slowTime.tasks.antParser;
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
-let provider: AntTaskProvider;
+let provider: ITaskExplorerProvider;
 let rootWorkspace: WorkspaceFolder;
 let buildXmlFile: string;
 let buildXmlFileUri: Uri;
@@ -34,7 +32,7 @@ suite("Ant Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as AntTaskProvider;
+        provider = teApi.providers[testsName];
         rootWorkspace = (workspace.workspaceFolders as WorkspaceFolder[])[0];
         buildXmlFile = getWsPath("build.xml");
         buildXmlFileUri = Uri.file(buildXmlFile);

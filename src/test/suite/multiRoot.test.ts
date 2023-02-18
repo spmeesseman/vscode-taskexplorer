@@ -22,7 +22,7 @@ import { onWsFoldersChange } from "../../lib/watcher/fileWatcher";
 import { ITeWrapper, ITaskItem } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, focusExplorerView, focusSearchView } from "../utils/commandUtils";
 import {
-    activate, endRollingCount, exitRollingCount, getProjectsPath, needsTreeBuild, sleep, suiteFinished,
+    activate, endRollingCount, exitRollingCount, getProjectsPath, sleep, suiteFinished,
     testControl as tc, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 

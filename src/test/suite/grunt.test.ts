@@ -6,22 +6,20 @@ import * as path from "path";
 import { Uri } from "vscode";
 import { expect } from "chai";
 import fsUtils from "../utils/fsUtils";
-import { TeWrapper } from "../../lib/wrapper";
 import { startupFocus } from "../utils/suiteUtils";
-import { GruntTaskProvider } from "../../providers/grunt";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, suiteFinished, testControl as tc,
-    testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount, waitForTeIdle
+    testInvDocPositions, updateInternalProviderAutoDetect, verifyTaskCount
 } from "../utils/utils";
 
 const testsName = "grunt";
 const startTaskCount = 7;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
-let provider: GruntTaskProvider;
+let teWrapper: ITeWrapper;
+let provider: ITaskExplorerProvider;
 let fileUri: Uri;
 
 
@@ -32,7 +30,7 @@ suite("Grunt Tests", () =>
     {
         if (exitRollingCount(this, true)) return;
         ({ teApi, teWrapper } = await activate(this));
-        provider = teApi.providers[testsName] as GruntTaskProvider;
+        provider = teApi.providers[testsName] as ITaskExplorerProvider;
         fileUri = Uri.file(path.join(getWsPath("."), "gruntfile.js"));
         endRollingCount(this, true);
     });

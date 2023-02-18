@@ -4,11 +4,9 @@
 
 import { join } from "path";
 import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { BashTaskProvider } from "../../providers/bash";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITeWrapper, ITaskExplorerProvider } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, getWsPath, testControl, treeUtils, verifyTaskCount, logErrorsAreFine, suiteFinished,
     exitRollingCount, waitForTeIdle, endRollingCount, needsTreeBuild
@@ -19,7 +17,7 @@ const startTaskCount = 1;
 const dirName = getWsPath("tasks_test_");
 const fileUri = Uri.file(join(dirName, "test_provider.sh"));
 
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let teApi: ITaskExplorerApi;
 let wsFolder: WorkspaceFolder;
 
@@ -57,7 +55,7 @@ suite("Bash Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as BashTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         expect(provider.getDocumentPosition()).to.be.equal(0, "Script type should return position 0");
         endRollingCount(this);
     });
@@ -66,7 +64,7 @@ suite("Bash Tests", () =>
     test("Invalid ScriptProvider Type", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as BashTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         provider.createTask("no_ext", undefined, wsFolder, Uri.file(getWsPath("hello.sh")));
         logErrorsAreFine(true);
         endRollingCount(this);

@@ -4,21 +4,19 @@
 
 import * as path from "path";
 import { Uri } from "vscode";
-import { ComposerTaskProvider } from "../../providers/composer";
+import { expect } from "chai";
 import { executeSettingsUpdate } from "../utils/commandUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITaskExplorerProvider, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild,
     suiteFinished, testControl as tc, testInvDocPositions, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
-import { expect } from "chai";
-import { TeWrapper } from "../../lib/wrapper";
 
 const testsName = "composer";
 const startTaskCount = 2;
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let dirName: string;
 let fileUri: Uri;
 
@@ -74,7 +72,7 @@ suite("Composer Tests", () =>
     test("Document Position", async function()
     {
         if (exitRollingCount(this)) return;
-        const provider = teApi.providers[testsName] as ComposerTaskProvider;
+        const provider = teApi.providers[testsName] as ITaskExplorerProvider;
         // provider.readTasks();
         testInvDocPositions(provider);
         const docText = await teWrapper.fs.readFileAsync(path.join(getWsPath("."), "composer.json"));

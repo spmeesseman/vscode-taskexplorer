@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { VsCodeCommands } from "./command";
-import { IDictionary } from "src/interface";
+import { ITeContext, IDictionary } from "../interface";
 import { commands, Disposable, Event, EventEmitter } from "vscode";
 import type { WebviewIds } from "../webview/webviewPanel";
 import type { WebviewViewIds } from "../webview/webviewView";
@@ -45,7 +45,7 @@ type AllContextKeys =
 	| `${ContextKeys.KeyPrefix}${string}`;
 
 
-export class TeContext implements Disposable
+export class TeContext implements ITeContext, Disposable
 {
 	private contextStorage: IDictionary<unknown> = {};
 	private _onDidChangeContext = new EventEmitter<AllContextKeys>();

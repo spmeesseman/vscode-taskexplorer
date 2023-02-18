@@ -6,10 +6,11 @@ export abstract class ITaskExplorerProvider implements TaskProvider
 {
 
     abstract createTask(target: string, cmd: string | undefined, folder: WorkspaceFolder, uri: Uri, xArgs?: string[], logPad?: string): Task | undefined;
-    abstract getDocumentPosition(taskName: string | undefined, documentText: string | undefined): number;
+    abstract getDocumentPosition(taskName?: string, documentText?: string): number;
     abstract getGlobPattern(): string;
 
     public providerName = "external";
+    public cachedTasks: Task[] | undefined;
     public readonly isExternal: boolean = false;
 
     provideTasks(): ProviderResult<Task[]>

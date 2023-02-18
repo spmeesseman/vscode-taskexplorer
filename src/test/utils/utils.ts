@@ -328,6 +328,14 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
     return !isTeardown ? hasRollingCountError : !suiteResults && hasRollingCountError;
 };
 
+export const getPackageManager = () =>
+{
+    let pkgMgr = workspace.getConfiguration("npm", null).get<string>("packageManager") || "npm";
+    if (pkgMgr.match(/(npm|auto)/)) { // pnpm/auto?  only other option is yarn
+        pkgMgr = "npm";
+    }
+    return pkgMgr;
+};
 
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
     taskItem.id.replace(Strings.LAST_TASKS_LABEL + ":", "").replace(Strings.FAV_TASKS_LABEL + ":", "").replace(Strings.USER_TASKS_LABEL + ":", "");
