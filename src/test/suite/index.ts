@@ -35,7 +35,7 @@ export async function run(): Promise<void>
         console.log("!!!");
         console.log("!!! Error writing coverage file:");
         try {
-            console.log("!!!    " + e.toString());
+            console.log("!!!    " + (e as any).toString());
         }catch {}
         console.log("!!!");
     }

@@ -139,7 +139,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem1 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
+                cstItem1 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === batch[0].id);
                 if (cstItem1)
                 {
                     utils.overrideNextShowInputBox("Label 1");
@@ -191,7 +191,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === bash[0].id);
+                cstItem3 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === bash[0].id);
                 if (cstItem3)
                 {
                     utils.overrideNextShowInputBox("Label 3");
@@ -217,7 +217,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[0].id);
+                cstItem4 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === python[0].id);
                 if (cstItem4)
                 {
                     utils.overrideNextShowInputBox("Label 4");
@@ -243,7 +243,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[1].id);
+                cstItem5 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === python[1].id);
                 if (cstItem5)
                 {
                     utils.overrideNextShowInputBox("Label 5");
@@ -269,7 +269,7 @@ suite("Tree Tests", () =>
                             (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
+                cstItem6 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === ant[0].id);
                 if (cstItem6)
                 {
                     utils.overrideNextShowInputBox("Label 6");

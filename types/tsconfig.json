@@ -1,18 +1,20 @@
 {
 	"compilerOptions": {
-		"target": "es5",
-		"module": "commonjs",
-		"sourceMap": true,
-		"strict": true,
-		"outDir": "lib",
-		"rootDir": "../src/interface",
 		"composite": true,
         "declaration": true,
         "declarationMap": true,
 		"emitDeclarationOnly": false,
-		"downlevelIteration": true
+		"lib": [ "es2020" ],
+		"module": "commonjs",
+		"outDir": "lib",
+		"rootDir": "../src/interface",
+		"sourceMap": false,
+		"strict": true,
+		"target": "es2020",
 	},
-	"include": ["../src/interface"],
+	"include": [
+		"../src/interface"
+	],
 	"exclude": [
 		"../src/common",
 		"../src/commands",

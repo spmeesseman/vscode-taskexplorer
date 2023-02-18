@@ -4,9 +4,8 @@
     "compilerOptions": {
         "paths": {
 			"@env/*": [ "src/lib/env/node/*" ]
-		}
-        // "incremental": true,
-		// "tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
+		},
+		"tsBuildInfoFile": "tsconfig.test.tsbuildinfo"
     },
     "exclude": [
         "node_modules",

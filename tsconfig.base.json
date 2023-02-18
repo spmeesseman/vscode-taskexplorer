@@ -1,56 +1,26 @@
 {
     "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
-        "module": "commonjs",
-        "target": "es2020",
+        "esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"incremental": true,
+		"isolatedModules": true,
 		"lib": [ "es2020" ],
+        "module": "commonjs",
+		"moduleResolution": "node",
 		"noImplicitOverride": true,
+        "noUnusedLocals": false,
+        // "noUnusedParameters": true,
         "outDir": "dist",
 		"rootDir": "src",
         "sourceMap": true,
         "strict": true,
-        "noUnusedLocals": false,
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-		"forceConsistentCasingInFileNames": true,
-        // "moduleResolution": "node"
-        // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-        // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-        // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+        "target": "es2020",
+		"useDefineForClassFields": true,
+		"useUnknownInCatchVariables": false
     },
     "include": [
         "src/**/*"
     ]
 }
-// {
-// 	"compilerOptions": {
-// 		// "allowSyntheticDefaultImports":true,
-//         // "allowSyntheticDefaultImports": true,
-// 		"baseUrl": ".",
-// 		// "esModuleInterop": true,
-// 		"experimentalDecorators": true,
-// 		"forceConsistentCasingInFileNames": true,
-// 		"incremental": true,
-// 		"isolatedModules": true,
-// 		"lib": [ "es2020" ],
-//         "module": "commonjs",
-// 		// "module": "esnext",
-// 		// "moduleResolution": "node",
-// 		// "noFallthroughCasesInSwitch": true,
-// 		"noImplicitOverride": true,
-// 		// "noImplicitReturns": true,
-// 		"noUnusedLocals": false,
-//         // "noUnusedParameters": true,
-// 		"outDir": "dist",
-// 		"resolveJsonModule": true,
-// 		"rootDir": "src",
-// 		"skipLibCheck": true,
-// 		"sourceMap": true,
-// 		"strict": true,
-// 		"target": "es2020",
-// 		"useDefineForClassFields": true,
-// 		// "useUnknownInCatchVariables": false
-// 	},
-// 	"include": ["src/**/*"]
-// }
-// 

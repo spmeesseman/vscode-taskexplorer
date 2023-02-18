@@ -17,7 +17,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 {
 	private _description: string | undefined;
 	private _disposableView: Disposable | undefined;
-	protected override _view: WebviewView | undefined;
+	protected override _view: WebviewView | undefined = undefined;
 
 
 	constructor(

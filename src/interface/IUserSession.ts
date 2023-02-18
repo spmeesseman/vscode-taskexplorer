@@ -1,6 +1,6 @@
 
 
-interface StoredSession
+export interface StoredSession
 {
 	id: string;
 	accessToken: string;

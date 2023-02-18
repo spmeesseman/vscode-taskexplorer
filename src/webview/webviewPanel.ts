@@ -15,7 +15,7 @@ export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes";
 export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> implements Disposable
 {
 	private _disposablePanel: Disposable | undefined;
-	protected override _view: WebviewPanel | undefined;
+	protected override _view: WebviewPanel | undefined = undefined;
 
 
 	constructor(wrapper: TeWrapper,
