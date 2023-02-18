@@ -49,7 +49,7 @@ export default async() =>
         hookRunInThisContext: true,
         // useSpawnWrap: true,
         include: [ "dist/**/*.js" ],
-        exclude: [ "dist/test/**" ],
+        exclude: [ "dist/test/**", "node_modules/**" ],
     });
     await nyc.wrap();
 

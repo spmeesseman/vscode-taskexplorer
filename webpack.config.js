@@ -6,7 +6,7 @@ const JSON5 = require("json5");
 const esbuild = require("esbuild");
 const { spawnSync } = require("child_process");
 const { wpPlugin } = require("./webpack.plugin");
-const nodeExternals = require('webpack-node-externals');
+const nodeExternals = require("webpack-node-externals");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 /** @typedef {import("./types/webpack").WebpackBuild} WebpackBuild */
@@ -242,12 +242,12 @@ const entry = (env, wpConfig) =>
  */
 const externals = (env, wpConfig) =>
 {
-	if (env.build !== "extension_tests")
+	if (env.environment !== "test")
 	{
 		wpConfig.externals =
 		{   //
 			// the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot
-			// be webpack"ed, -> https://webpack.js.org/configuration/externals/
+			// be webpack'ed, -> https://webpack.js.org/configuration/externals/
 			//
 			vscode: "commonjs vscode"
 		};
