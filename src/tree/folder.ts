@@ -18,7 +18,7 @@ export class TaskFolder extends TreeItem
     public workspaceFolder: WorkspaceFolder | undefined;
 
 
-    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState = TreeItemCollapsibleState.Expanded)
+    constructor(folder: WorkspaceFolder | string, state: TreeItemCollapsibleState)
     {
         super(isString(folder) ? folder  : folder.name, state);
 
