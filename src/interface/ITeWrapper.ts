@@ -1,23 +1,24 @@
 
-import { ExtensionContext, TreeItem, TreeView, WorkspaceFolder } from "vscode";
-import { IConfiguration } from "./IConfiguration";
-import { ITeFileCache } from "./ITeFileCache";
-import { ITeFilesystem } from "./ITeFilesystem";
 import { ILog } from "./ILog";
 import { IStorage } from "./IStorage";
-import { ITaskExplorerApi } from "./ITaskExplorerApi";
 import { ITeContext } from "./ITeContext";
-import { ITeUtilities } from "./ITeUtilities";
 import { ITeWebview } from "./ITeWebview";
+import { ITeFigures } from "./ITeFigures";
 import { IDictionary } from "./IDictionary";
+import { ITeUtilities } from "./ITeUtilities";
+import { ITeFileCache } from "./ITeFileCache";
+import { ITeFilesystem } from "./ITeFilesystem";
+import { IConfiguration } from "./IConfiguration";
+import { ITaskExplorerApi } from "./ITaskExplorerApi";
 import { ITaskTreeView, ITeTaskTree } from "./ITeTaskTree";
+import { ExtensionContext, TreeItem, TreeView, WorkspaceFolder } from "vscode";
 
 export interface ITeWrapper
 {
 	init(): Promise<void>;
 
 	debugging: boolean;
-	env: string;
+	env: "dev" | "tests" | "production";
 	id: string;
 	tests: boolean;
 	busy: boolean;
@@ -32,7 +33,7 @@ export interface ITeWrapper
 	explorer: ITeTaskTree;
 	explorerView: TreeView<TreeItem>;
 	fileWatcher: any;
-	figures: any;
+	figures: ITeFigures;
 	homeView: ITeWebview;
 	filecache: ITeFileCache;
 	fs: ITeFilesystem;

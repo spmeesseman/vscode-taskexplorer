@@ -1,23 +1,5 @@
+import { ILogColors, LogColor, LogStyle } from "../interface";
 
-export type LogColor = [ number, number ];
-export type LogStyle = [ number, number ];
-
-interface ILogColors
-{
-    bold: LogColor;
-    italic: LogColor;
-    underline: LogColor;
-    inverse: LogColor;
-    white: LogColor;
-    grey: LogColor;
-    black: LogColor;
-    blue: LogColor;
-    cyan: LogColor;
-    green: LogColor;
-    magenta: LogColor;
-    red: LogColor;
-    yellow: LogColor;
-};
 
 export class LogColors implements ILogColors
 {

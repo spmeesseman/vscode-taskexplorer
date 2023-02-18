@@ -4,6 +4,8 @@ export interface ITaskTreeView
 {
     view: TreeView<TreeItem>;
     tree: ITeTaskTree;
+    readonly enabled: boolean;
+    readonly visible: boolean;
 }
 
 export interface ITeTaskTree
