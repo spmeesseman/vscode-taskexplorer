@@ -106,10 +106,6 @@ export const activate = async (instance?: Mocha.Context) =>
         timeStarted = Date.now();
         const tzOffset = (new Date()).getTimezoneOffset() * 60000,
               locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
-
-        console.log(`    ${teWrapper.figures.color.info}`);
-        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Tests startup", teWrapper.figures.colors.grey)}`);
-        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Time started: " + locISOTime, teWrapper.figures.colors.grey)}`);
         //
         // Set startup settings for this tests run using workspace settings scope.
         // The initSettings() functions does it's own logging to the console.
@@ -129,8 +125,10 @@ export const activate = async (instance?: Mocha.Context) =>
         // Activate extension
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
-        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Activating extension", teWrapper.figures.colors.grey)}`);
         teWrapper = await (ext as any).activate();
+        console.log(`    ${teWrapper.figures.color.info}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Tests startup", teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Time started: " + locISOTime, teWrapper.figures.colors.grey)}`);
         console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Extension successfully activated", teWrapper.figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully

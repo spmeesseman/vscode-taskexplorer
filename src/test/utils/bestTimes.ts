@@ -6,6 +6,31 @@ import { teWrapper } from "./utils";
 const tct = tc.tests;
 const timeSep = "----------------------------------------------------------------------------------------------------";
 
+const properCase = (name: string | undefined, removeSpaces?: boolean) =>
+{
+    if (!name) {
+      return "";
+    }
+    return name.replace(/(?:^\w|[A-Z]|\b\w)/g, (ltr) => ltr.toUpperCase()).replace(/[ ]+/g, !removeSpaces ? " " : "");
+};
+
+const lowerCaseFirstChar = (s: string, removeSpaces: boolean) =>
+{
+    let fs = "";
+    if (s)
+    {
+        fs = s[0].toString().toLowerCase();
+        if (s.length > 1) {
+            fs += s.substring(1);
+        }
+        if (removeSpaces) {
+            fs = fs.replace(/ /g, "");
+        }
+    }
+    return fs;
+};
+
+
 
 const clearProcessTimeStorage = async (storageKey: string, numTests: number) =>
 {
@@ -37,9 +62,9 @@ export const getSuiteFriendlyName = (suiteName: string) => suiteName.replace(" T
 export const getSuiteKey = (suiteName: string, preKey = "") =>
 {
     if (preKey) {
-        return preKey + teWrapper.utils.properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
+        return preKey + properCase(suiteName.replace(" Tests", "")).replace(/[ \W]/g, "");
     }
-    return teWrapper.utils.lowerCaseFirstChar(teWrapper.utils.properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
+    return lowerCaseFirstChar(properCase(suiteName.replace(" Tests", "")), true).replace(/\W/g, "");
 };
 
 
