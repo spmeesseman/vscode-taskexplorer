@@ -53,4 +53,6 @@ export interface ITeWrapper
 	logControl: any;
 	pathUtils: any;
 	taskUtils: any;
+	sorters: any;
+	commonUtils: any;
 }

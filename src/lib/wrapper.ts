@@ -4,12 +4,14 @@ import * as fs from "./utils/fs";
 import { figures } from "./figures";
 import { Strings } from "./constants";
 import { logControl } from "./log/log";
+import * as sorters from "./sortTasks";
 import { TeServer } from "./auth/server";
 import { TeFileCache } from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import * as pathUtils from "./utils/pathUtils";
 import * as taskUtils from "./utils/taskTypeUtils";
+import * as commonUtils from "./utils/commonUtils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog } from "../interface";
 import { TaskManager } from "src/tree/taskManager";
@@ -350,6 +352,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 			   this._fileWatcher.isProcessingFsEvent() || this._configWatcher.isProcessingConfigChange() || this._licenseManager.isBusy();
 	}
 
+	get commonUtils(): typeof commonUtils {
+		return commonUtils;
+	}
+
 	get config(): IConfiguration {
 		return this._configuration;
 	}
@@ -459,6 +465,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 
     get sidebarView(): TreeView<TreeItem> {
         return this.treeManager.views.taskExplorerSideBar.view;
+    }
+
+    get sorters(): typeof sorters {
+        return sorters;
     }
 
 	get storage(): IStorage {
