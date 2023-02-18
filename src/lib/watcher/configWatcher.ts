@@ -1,22 +1,18 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import { log } from "../log/log";
 import { TeWrapper } from "../wrapper";
 import { ContextKeys } from "../context";
-import { persistCache } from "../fileCache";
 import { IDictionary } from "../../interface";
-import { pushIfNotExists } from "../utils/utils";
 import { registerFileWatcher } from "./fileWatcher";
 import { Commands, executeCommand } from "../command";
-import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ExtensionContext, ConfigurationChangeEvent, workspace, window } from "vscode";
 
 let _wrapper: TeWrapper;
 let watcherEnabled = true;
 let processingConfigEvent = false;
-const enabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks", {});
-const pathToPrograms = configuration.get<IDictionary<string>>("pathToPrograms", {});
+let enabledTasks: IDictionary<boolean>;
+let pathToPrograms: IDictionary<string>;
 
 
 export function enableConfigWatcher(enable: boolean)
@@ -30,7 +26,7 @@ export const isProcessingConfigChange = () => processingConfigEvent;
 
 async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChangeEvent)
 {
-    log.methodStart("Process config changes", 1, "", true);
+    _wrapper.log.methodStart("Process config changes", 1, "", true);
 
     // context = ctx;
     processingConfigEvent = true;
@@ -38,15 +34,15 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     let refresh = false;
     let refresh2 = false; // Uses 1st param 'false' in refresh(), for cases where task files have not changed
     const refreshTaskTypes: string[] = [];
-    const registerChange = (taskType: string) => pushIfNotExists(refreshTaskTypes, taskType);
+    const registerChange = (taskType: string) => _wrapper.utils.pushIfNotExists(refreshTaskTypes, taskType);
 
     //
     // if the application has called 'enableConfigWatcher' to disable, then there's nothing to do
     //
     if (!watcherEnabled)
     {
-        log.write("   Config watcher is disabled", 1);
-        log.methodDone("Process config changes", 1, "");
+        _wrapper.log.write("   Config watcher is disabled", 1);
+        _wrapper.log.methodDone("Process config changes", 1, "");
         processingConfigEvent = false;
         return;
     }
@@ -56,9 +52,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskexplorer.exclude") || e.affectsConfiguration("taskexplorer.excludeTask"))
     {
-        log.write("   the 'exclude/excludeTask' setting has changed", 1);
-        log.value("      exclude changed", e.affectsConfiguration("taskexplorer.exclude"), 1);
-        log.value("      excludeTask changed", e.affectsConfiguration("taskexplorer.excludeTask"), 1);
+        _wrapper.log.write("   the 'exclude/excludeTask' setting has changed", 1);
+        _wrapper.log.value("      exclude changed", e.affectsConfiguration("taskexplorer.exclude"), 1);
+        _wrapper.log.value("      excludeTask changed", e.affectsConfiguration("taskexplorer.excludeTask"), 1);
         refresh = true;
     }
 
@@ -68,8 +64,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskexplorer.specialFolders.showUserTasks"))
     {
-        log.write("   the 'specialFolders.showUserTasks' setting has changed", 1);
-        log.value("      new value", configuration.get<boolean>("specialFolders.showUserTasks"), 1);
+        _wrapper.log.write("   the 'specialFolders.showUserTasks' setting has changed", 1);
+        _wrapper.log.value("      new value", _wrapper.config.get<boolean>("specialFolders.showUserTasks"), 1);
         refresh = true;
     }
 
@@ -82,7 +78,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.enabledTasks"))
         {
-            const newEnabledTasks = configuration.get<IDictionary<boolean>>("enabledTasks");
+            const newEnabledTasks = _wrapper.config.get<IDictionary<boolean>>("enabledTasks");
             for (const p of Object.keys(enabledTasks))
             {
                 const taskType = getTaskTypeRealName(p),
@@ -90,8 +86,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                       newValue = newEnabledTasks[p];
                 if (newValue !== oldValue)
                 {
-                    log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
-                    log.value("      new value", newValue, 1);
+                    _wrapper.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
+                    _wrapper.log.value("      new value", newValue, 1);
                     await registerFileWatcher(ctx, taskType, false, newValue, "   ");
                     registerChange(taskType);
                 }
@@ -105,11 +101,11 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         if (e.affectsConfiguration("taskexplorer.groupWithSeparator") || e.affectsConfiguration("taskexplorer.groupSeparator") ||
             e.affectsConfiguration("taskexplorer.groupMaxLevel") || e.affectsConfiguration("taskexplorer.groupStripTaskLabel"))
         {
-            log.write("   A tree grouping setting has changed", 1);
-            log.value("      groupWithSeparator changed", configuration.get<boolean>("groupWithSeparator"), 1);
-            log.value("      groupSeparator changed", configuration.get<boolean>("groupSeparator"), 1);
-            log.value("      groupMaxLevel changed", configuration.get<boolean>("groupMaxLevel"), 1);
-            log.value("      groupStripTaskLabel changed", configuration.get<boolean>("groupStripTaskLabel"), 1);
+            _wrapper.log.write("   A tree grouping setting has changed", 1);
+            _wrapper.log.value("      groupWithSeparator changed", _wrapper.config.get<boolean>("groupWithSeparator"), 1);
+            _wrapper.log.value("      groupSeparator changed", _wrapper.config.get<boolean>("groupSeparator"), 1);
+            _wrapper.log.value("      groupMaxLevel changed", _wrapper.config.get<boolean>("groupMaxLevel"), 1);
+            _wrapper.log.value("      groupStripTaskLabel changed", _wrapper.config.get<boolean>("groupStripTaskLabel"), 1);
             refresh2 = true; // refresh2 will rebuild the tree but won't trigger a file cache build and/or task provider invalidation
         }
 
@@ -118,8 +114,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.sortProjectFoldersAlpha"))
         {
-            log.write("   the 'sortProjectFoldersAlpha' setting has changed", 1);
-            log.value("      new value", configuration.get<boolean>("sortProjectFoldersAlpha"), 1);
+            _wrapper.log.write("   the 'sortProjectFoldersAlpha' setting has changed", 1);
+            _wrapper.log.value("      new value", _wrapper.config.get<boolean>("sortProjectFoldersAlpha"), 1);
             refresh2 = true; // refresh2 will rebuild the tree but won't trigger a file cache build and/or task provider invalidation
         }
 
@@ -128,7 +124,7 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.pathToPrograms"))
         {
-            const newPathToPrograms = configuration.get<IDictionary<string>>("pathToPrograms");
+            const newPathToPrograms = _wrapper.config.get<IDictionary<string>>("pathToPrograms");
             for (const p of Object.keys(pathToPrograms))
             {
                 const taskType = getTaskTypeRealName(p),
@@ -136,8 +132,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
                       newValue = newPathToPrograms[p];
                 if (newValue !== oldValue)
                 {
-                    log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
-                    log.value("      new value", newValue, 1);
+                    _wrapper.log.write(`   the 'pathToPrograms.${taskType}' setting has changed`, 1);
+                    _wrapper.log.value("      new value", newValue, 1);
                     if (taskType !== "ansicon" && taskType !== "curl") {// these paths are ont 'task types'
                         registerChange(taskType);
                     }
@@ -155,8 +151,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.globPatternsBash") && !refreshTaskTypes.includes("bash"))
         {
-            log.write("   the 'globPatternsBash' setting has changed", 1);
-            await registerFileWatcher(ctx, "bash", false, configuration.get<boolean>("enabledTasks.bash"), "   ");
+            _wrapper.log.write("   the 'globPatternsBash' setting has changed", 1);
+            await registerFileWatcher(ctx, "bash", false, _wrapper.config.get<boolean>("enabledTasks.bash"), "   ");
             registerChange("bash");
         }
 
@@ -165,8 +161,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if ((e.affectsConfiguration("taskexplorer.includeAnt") || e.affectsConfiguration("taskexplorer.globPatternsAnt")) && !refreshTaskTypes.includes("ant"))
         {
-            log.write("   the 'globPatternsAnt' setting has changed", 1);
-            await registerFileWatcher(ctx, "ant", false, configuration.get<boolean>("enabledTasks.ant"), "   ");
+            _wrapper.log.write("   the 'globPatternsAnt' setting has changed", 1);
+            await registerFileWatcher(ctx, "ant", false, _wrapper.config.get<boolean>("enabledTasks.ant"), "   ");
             registerChange("ant");
         }
 
@@ -175,9 +171,9 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.enableAnsiconForAnt"))
         {
-            const newValue = configuration.get<boolean>("enableAnsiconForAnt");
-            log.write("   the '.enableAnsiconForAnt' setting has changed", 1);
-            log.value("      new value", newValue, 1);
+            const newValue = _wrapper.config.get<boolean>("enableAnsiconForAnt");
+            _wrapper.log.write("   the '.enableAnsiconForAnt' setting has changed", 1);
+            _wrapper.log.value("      new value", newValue, 1);
             if (newValue) {
                 window.showInformationMessage("For Ant/Ansicon configuration change to take effect, close all open terminals");
             }
@@ -189,8 +185,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.useAnt"))
         {
-            log.write("   the 'useAnt' setting has changed", 1);
-            log.value("      new value", configuration.get<boolean>("useAnt"), 1);
+            _wrapper.log.write("   the 'useAnt' setting has changed", 1);
+            _wrapper.log.value("      new value", _wrapper.config.get<boolean>("useAnt"), 1);
             registerChange("ant");
         }
 
@@ -199,8 +195,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.useGulp"))
         {
-            log.write("   the 'useGulp' setting has changed", 1);
-            log.value("      new value", configuration.get<boolean>("useGulp"), 1);
+            _wrapper.log.write("   the 'useGulp' setting has changed", 1);
+            _wrapper.log.value("      new value", _wrapper.config.get<boolean>("useGulp"), 1);
             registerChange("gulp");
         }
 
@@ -210,8 +206,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("npm.packageManager"))
         {
-            log.write("   the 'npm.packageManager' setting has changed", 1);
-            log.value("      new value", configuration.getVs<boolean>("npm.packageManager"), 1);
+            _wrapper.log.write("   the 'npm.packageManager' setting has changed", 1);
+            _wrapper.log.value("      new value", _wrapper.config.getVs<boolean>("npm.packageManager"), 1);
             registerChange("npm");
         }
 
@@ -222,8 +218,8 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         //
         if (e.affectsConfiguration("taskexplorer.showHiddenWsTasks"))
         {
-            log.write("   the 'npm.showHiddenWsTasks' setting has changed", 1);
-            log.value("      new value", configuration.get<boolean>("showHiddenWsTasks"), 1);
+            _wrapper.log.write("   the 'npm.showHiddenWsTasks' setting has changed", 1);
+            _wrapper.log.value("      new value", _wrapper.config.get<boolean>("showHiddenWsTasks"), 1);
             registerChange("Workspace");
         }
 
@@ -237,10 +233,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         {   //
             // Script type task defs will change with terminal change
             //
-            log.write("   a terminal shell setting has changed", 1);
-            log.value("      windows shell", configuration.getVs<boolean>("terminal.integrated.shell.windows"), 2);
-            log.value("      linux shell", configuration.getVs<boolean>("terminal.integrated.shell.linux"), 2);
-            log.value("      osx shell", configuration.getVs<boolean>("terminal.integrated.shell.osx"), 2);
+            _wrapper.log.write("   a terminal shell setting has changed", 1);
+            _wrapper.log.value("      windows shell", _wrapper.config.getVs<boolean>("terminal.integrated.shell.windows"), 2);
+            _wrapper.log.value("      linux shell", _wrapper.config.getVs<boolean>("terminal.integrated.shell.linux"), 2);
+            _wrapper.log.value("      osx shell", _wrapper.config.getVs<boolean>("terminal.integrated.shell.osx"), 2);
             getScriptTaskTypes().forEach(t => { if (enabledTasks[t]) registerChange(t); });
         }
     }
@@ -250,19 +246,19 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskexplorer.enableExplorerView"))
     {
-        const newValue = configuration.get<boolean>("enableExplorerView");
-        log.write("   the 'enableExplorerView' setting has changed", 1);
-        log.value("      new value", newValue, 1);
-        await _wrapper.contextTe.setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                                                 configuration.get<boolean>("enableSideBar"));
+        const newValue = _wrapper.config.get<boolean>("enableExplorerView");
+        _wrapper.log.write("   the 'enableExplorerView' setting has changed", 1);
+        _wrapper.log.value("      new value", newValue, 1);
+        await _wrapper.contextTe.setContext(ContextKeys.Enabled, _wrapper.config.get<boolean>("enableExplorerView") ||
+                                                                 _wrapper.config.get<boolean>("enableSideBar"));
     }
     if (e.affectsConfiguration("taskexplorer.enableSideBar"))
     {
-        const newValue = configuration.get<boolean>("enableSideBar");
-        log.write("   the 'enableSideBar' setting has changed", 1);
-        log.value("      new value", newValue, 1);
-        await _wrapper.contextTe.setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                                                 configuration.get<boolean>("enableSideBar"));
+        const newValue = _wrapper.config.get<boolean>("enableSideBar");
+        _wrapper.log.write("   the 'enableSideBar' setting has changed", 1);
+        _wrapper.log.value("      new value", newValue, 1);
+        await _wrapper.contextTe.setContext(ContextKeys.Enabled, _wrapper.config.get<boolean>("enableExplorerView") ||
+                                                                 _wrapper.config.get<boolean>("enableSideBar"));
     }
 
     //
@@ -270,10 +266,10 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
     //
     if (e.affectsConfiguration("taskexplorer.enablePersistentFileCaching"))
     {
-        const newValue = configuration.get<boolean>("enablePersistentFileCaching");
-        log.write("   the 'enablePersistentFileCaching' setting has changed", 1);
-        log.value("      new value", newValue, 1);
-        persistCache(!newValue);
+        const newValue = _wrapper.config.get<boolean>("enablePersistentFileCaching");
+        _wrapper.log.write("   the 'enablePersistentFileCaching' setting has changed", 1);
+        _wrapper.log.value("      new value", newValue, 1);
+        _wrapper.filecache.persistCache(!newValue);
     }
 
     //
@@ -294,22 +290,24 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
             await executeCommand(Commands.Refresh, false, undefined, "   ");
         }
         else {
-            log.write("   Current changes require no processing", 1);
+            _wrapper.log.write("   Current changes require no processing", 1);
         }
     }
     catch (e) {
         /* istanbul ignore next */
-        log.error(e);
+        _wrapper.log.error(e);
     }
 
     processingConfigEvent = false;
-    log.methodDone("Process config changes", 1);
+    _wrapper.log.methodDone("Process config changes", 1);
 }
 
 
 export const registerConfigWatcher = (wrapper: TeWrapper) =>
 {
     _wrapper = wrapper;
+    enabledTasks = _wrapper.config.get<IDictionary<boolean>>("enabledTasks", {});
+    pathToPrograms = _wrapper.config.get<IDictionary<string>>("pathToPrograms", {});
     const d = workspace.onDidChangeConfiguration(async e => { await processConfigChanges(wrapper.context, e); });
     wrapper.context.subscriptions.push(d);
 };

@@ -2,7 +2,6 @@
 import { Task, workspace } from "vscode";
 import { TeWrapper } from "../../lib/wrapper";
 import { IDictionary } from "../../interface";
-import { getTaskFiles } from "../../lib/fileCache";
 import { getTaskTypes } from "../../lib/utils/taskTypeUtils";
 import { removeLicenseButtons } from "./removeLicenseButtons";
 import { getWorkspaceProjectName, isWorkspaceFolder } from "../../lib/utils/utils";
@@ -30,7 +29,7 @@ export const createTaskCountTable = async(wrapper: TeWrapper, project?: string, 
     let tableTemplate = getHtml();
     getTaskTypes().forEach((tcKey) =>
     {
-        const taskFiles = getTaskFiles(tcKey) || [];
+        const taskFiles = wrapper.filecache.getTaskFiles(tcKey) || [];
         fileCount += taskFiles.length;
         tableTemplate = tableTemplate.replace(new RegExp(`#{taskCounts.${tcKey}}`, "g"), (taskCounts[tcKey] || 0).toString());
     });

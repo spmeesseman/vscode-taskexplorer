@@ -9,7 +9,6 @@ import { TeWrapper } from "../lib/wrapper";
 import { TaskManager } from "./taskManager";
 import { isDirectory } from "../lib/utils/fs";
 import { TaskTreeBuilder } from "./treeBuilder";
-import { rebuildCache } from "../lib/fileCache";
 import { getTerminal } from "../lib/getTerminal";
 import { SpecialTaskFolder } from "./specialFolder";
 import { statusBarItem } from "../lib/statusBarItem";
@@ -349,7 +348,7 @@ export class TaskTreeManager implements Disposable
         {
             this.wrapper.log.write("   handling 'rebuild cache' event", 1, logPad + "   ");
             this.setMessage(Strings.ScanningTaskFiles);
-            await rebuildCache(logPad + "   ");
+            await this.wrapper.filecache.rebuildCache(logPad + "   ");
             this.wrapper.log.write("   handling 'rebuild cache' event complete", 1, logPad + "   ");
         }
         this.wrapper.log.write("   handling 'invalidate tasks cache' event", 1, logPad);

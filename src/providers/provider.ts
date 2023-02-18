@@ -3,7 +3,6 @@ import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { extname } from "path";
 import { TeWrapper } from "../lib/wrapper";
-import { getTaskFiles } from "../lib/fileCache";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { configuration } from "../lib/utils/configuration";
 import { isDirectory, pathExistsSync } from "../lib/utils/fs";
@@ -28,7 +27,6 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
 
 
     constructor(protected readonly wrapper: TeWrapper, name: string) {
-        this.wrapper = wrapper;
         this.providerName = name;
     }
 
@@ -94,7 +92,7 @@ export abstract class TaskExplorerProvider implements ITaskExplorerProvider
     {
         const allTasks: Task[] = [],
               visitedFiles: string[] = [],
-              paths = getTaskFiles(this.providerName),
+              paths = this.wrapper.filecache.getTaskFiles(this.providerName),
               enabled = isTaskTypeEnabled(this.providerName);
 
         log.methodStart(`read ${this.providerName} tasks`, 2, logPad, false, [[ "enabled", enabled ]], this.logQueueId);

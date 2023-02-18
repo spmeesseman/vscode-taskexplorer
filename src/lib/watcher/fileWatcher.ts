@@ -6,11 +6,7 @@
 
 import { extname } from "path";
 import { log } from "../log/log";
-import * as cache from "../fileCache";
-import * as util from "../utils/utils";
 import { TeWrapper } from "../wrapper";
-import { isDirectory } from "../utils/fs";
-import { isString } from "../utils/utils";
 import { Commands, executeCommand } from "../command";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
@@ -54,7 +50,7 @@ async function createFileWatchers(context: ExtensionContext, logPad: string)
     for (const taskType of taskTypes)
     {
         log.write(`   create file watchers for task type '${taskType}'`, 1, logPad);
-        if (util.isTaskTypeEnabled(taskType))
+        if (_wrapper.utils.isTaskTypeEnabled(taskType))
         {
             await registerFileWatcher(context, taskType, true, true, logPad + "   ");
         }
@@ -136,7 +132,7 @@ const isSameEvent = (q: any[], kind: string, uri: Uri) => q.find(e => e.event ==
 
 async function onDirCreate(uri: Uri)
 {
-    if (isDirectory(uri.fsPath) && !util.isExcluded(uri.fsPath))
+    if (_wrapper.fs.isDirectory(uri.fsPath) && !_wrapper.utils.isExcluded(uri.fsPath))
     {
         const e = {
             fn: _procDirCreateEvent,
@@ -161,7 +157,7 @@ async function onDirDelete(uri: Uri)
     // Rely on the fact if it has no extension, then it's a directory.  I supposed we
     // can track existing directories, ut ugh.  Maybe someday.
     //
-    if (!extname(uri.fsPath) && !util.isExcluded(uri.fsPath)) // ouch
+    if (!extname(uri.fsPath) && !_wrapper.utils.isExcluded(uri.fsPath)) // ouch
     {
         const e = {
             fn: _procDirDeleteEvent,
@@ -182,7 +178,7 @@ async function onDirDelete(uri: Uri)
 
 const onFileChange = async(taskType: string, uri: Uri) =>
 {
-    if (!util.isExcluded(uri.fsPath))
+    if (!_wrapper.utils.isExcluded(uri.fsPath))
     {
         const e = {
             fn: _procFileChangeEvent,
@@ -202,7 +198,7 @@ const onFileChange = async(taskType: string, uri: Uri) =>
 
 const onFileCreate = async(taskType: string, uri: Uri) =>
 {
-    if (!util.isExcluded(uri.fsPath))
+    if (!_wrapper.utils.isExcluded(uri.fsPath))
     {
         const e = {
             fn: _procFileCreateEvent,
@@ -222,7 +218,7 @@ const onFileCreate = async(taskType: string, uri: Uri) =>
 
 const onFileDelete = async(taskType: string, uri: Uri) =>
 {
-    if (!util.isExcluded(uri.fsPath))
+    if (!_wrapper.utils.isExcluded(uri.fsPath))
     {
         const e = {
             fn: _procFileDeleteEvent,
@@ -342,8 +338,8 @@ const processQueue = async () =>
     {
         const next = currentEvent = eventQueue.shift();
         log.methodStart("file watcher event queue", 1, "", true, [
-            [ "event", next.event ], [ "arg1", isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
-            [ "arg2", util.isUri(next.args[1]) ? next.args[1].fsPath : "none (log padding)" ],
+            [ "event", next.event ], [ "arg1", _wrapper.utils.isString(next.args[0]) ? next.args[0] : next.args[0].fsPath ],
+            [ "arg2", _wrapper.utils.isUri(next.args[1]) ? next.args[1].fsPath : "none (log padding)" ],
             [ "# of events still pending", eventQueue.length ]
         ]);
         await next.fn(...next.args);
@@ -381,11 +377,11 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
     if (!firstRun && workspace.workspaceFolders)
     {
         if (enabled !== false) {
-            const numFilesFound  = await cache.buildTaskTypeCache(taskType, undefined, true, logPad + "   ");
+            const numFilesFound  = await _wrapper.filecache.buildTaskTypeCache(taskType, undefined, true, logPad + "   ");
             log.write(`   ${numFilesFound} files were added to the file cache`, 1, logPad);
         }
         else {
-            const numFilesRemoved = cache.removeTaskTypeFromCache(taskType, logPad + "   ");
+            const numFilesRemoved = _wrapper.filecache.removeTaskTypeFromCache(taskType, logPad + "   ");
             log.write(`   ${numFilesRemoved} files were removed from file cache`, 1, logPad);
         }
     }
@@ -409,7 +405,7 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
         const ignoreModify = isScriptType(taskType) || taskType === "apppublisher" || taskType === "maven" ||
                              taskType === "tsc" || taskType === "jenkins" || taskType === "webpack";
         if (!watcher) {
-            watcher = workspace.createFileSystemWatcher(util.getGlobPattern(taskType));
+            watcher = workspace.createFileSystemWatcher(_wrapper.utils.getGlobPattern(taskType));
             watchers[taskType] = watcher;
             context.subscriptions.push(watcher);
         }
@@ -465,7 +461,7 @@ const _procDirCreateEvent = async(uri: Uri, logPad: string) =>
 {
     try
     {   log.methodStart("[event] directory 'create'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
-        const numFilesFound = await cache.addFolder(uri, logPad + "   ");
+        const numFilesFound = await _wrapper.filecache.addFolder(uri, logPad + "   ");
         if (numFilesFound > 0) {
             await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
         }
@@ -480,7 +476,7 @@ const _procDirDeleteEvent = async(uri: Uri, logPad: string) =>
 {
     try
     {   log.methodStart("[event] directory 'delete'", 1, logPad, true, [[ "dir", uri.fsPath ]]);
-        const numFilesRemoved = cache.removeFolderFromCache(uri, logPad + "   ");
+        const numFilesRemoved = _wrapper.filecache.removeFolderFromCache(uri, logPad + "   ");
         if (numFilesRemoved > 0) {
             await executeCommand(Commands.Refresh, undefined, uri, logPad + "   ");
         }
@@ -507,7 +503,7 @@ const _procFileCreateEvent = async(taskType: string, uri: Uri, logPad: string) =
 {
     try
     {   log.methodStart("[event] file 'create'", 1, logPad, true, [[ "file", uri.fsPath ]]);
-        cache.addFileToCache(taskType, uri, logPad + "   ");
+        _wrapper.filecache.addFileToCache(taskType, uri, logPad + "   ");
         await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
         log.methodDone("[event] file 'create'", 1, logPad);
     }
@@ -520,7 +516,7 @@ const _procFileDeleteEvent = async(taskType: string, uri: Uri, logPad: string) =
 {
     try
     {   log.methodStart("[event] file 'delete'", 1, logPad, true, [[ "file", uri.fsPath ]]);
-        cache.removeFileFromCache(taskType, uri, logPad + "   ");
+        _wrapper.filecache.removeFileFromCache(taskType, uri, logPad + "   ");
         await executeCommand(Commands.Refresh, taskType, uri, logPad + "   ");
         log.methodDone("[event] file 'delete'", 1, logPad);
     }
@@ -535,8 +531,8 @@ const _procWsDirAddRemoveEvent = async(e: WorkspaceFoldersChangeEvent, logPad: s
     {   log.methodStart("workspace folder 'add/remove'", 1, logPad, true, [
             [ "# added", e.added.length ], [ "# removed", e.removed.length ]
         ]);
-        const numFilesFound = await cache.addWsFolders(e.added, logPad + "   "),
-              numFilesRemoved = cache.removeWsFolders(e.removed, logPad + "   ");
+        const numFilesFound = await _wrapper.filecache.addWsFolders(e.added, logPad + "   "),
+              numFilesRemoved = _wrapper.filecache.removeWsFolders(e.removed, logPad + "   ");
         createDirWatcher(extContext);
         if (numFilesFound > 0 || numFilesRemoved > 0)
         {
