@@ -6,15 +6,9 @@
 import { join } from "path";
 import { env } from "process";
 import { expect } from "chai";
-import * as afs from "../../lib/utils/fs";
-import * as util from "../../lib/utils/utils";
-import { log, logControl } from "../../lib/log/log";
-import * as pathUtils from "../../lib/utils/pathUtils";
 import { Uri, workspace, WorkspaceFolder } from "vscode";
-import { camelCase, properCase } from "../../lib/utils/commonUtils";
 import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
-import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
 	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
 } from "../utils/utils";
@@ -44,12 +38,12 @@ suite("Util Tests", () =>
 	suiteTeardown(async function()
 	{
         if (exitRollingCount(this, false, true)) return;
-		log.setWriteToConsole(testControl.log.console, testControl.log.consoleLevel);
-		await executeSettingsUpdate("logging.enable", testControl.log.enabled);
-		await executeSettingsUpdate("logging.enableFile", testControl.log.file);
-		await executeSettingsUpdate("logging.enableOutputWindow", testControl.log.output);
-		await executeSettingsUpdate("logging.enableFileSymbols", testControl.log.fileSymbols);
-		await executeSettingsUpdate("logging.level", testControl.log.level);
+		teWrapper.log.setWriteToConsole(testControl.teWrapper.log.console, testControl.teWrapper.log.consoleLevel);
+		await executeSettingsUpdate("logging.enable", testControl.teWrapper.log.enabled);
+		await executeSettingsUpdate("logging.enableFile", testControl.teWrapper.log.file);
+		await executeSettingsUpdate("logging.enableOutputWindow", testControl.teWrapper.log.output);
+		await executeSettingsUpdate("logging.enableFileSymbols", testControl.teWrapper.log.fileSymbols);
+		await executeSettingsUpdate("logging.level", testControl.teWrapper.log.level);
         suiteFinished(this);
 	});
 
@@ -70,69 +64,69 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 175);
 
-        log.error(`        ${creator}.${extension}`);
-        log.error([ `        ${creator}.${extension}`,
+        teWrapper.log.error(`        ${creator}.${extension}`);
+        teWrapper.log.error([ `        ${creator}.${extension}`,
                     `        ${creator}.${extension}`,
                     `        ${creator}.${extension}` ]);
 
-		log.error("Test5 error");
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error([ "Test error 3", null, "Test error 4", "" ]);
-		log.error([ "Test error 3", "Test error 4" ]);
-		log.error([ "Test error 3", "Test error 4" ]);
-		log.error([ "", "Test error 5", undefined, "Test error 6", "" ]);
-		log.error([ "Test error 7", "", "Test error 8", "" ]);
-		log.error([ "Test error 9",  new Error("Test error object 10") ]);
-		log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
-		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
-		logControl.useTags = true;
+		teWrapper.log.error("Test5 error");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error([ "Test error 3", null, "Test error 4", "" ]);
+		teWrapper.log.error([ "Test error 3", "Test error 4" ]);
+		teWrapper.log.error([ "Test error 3", "Test error 4" ]);
+		teWrapper.log.error([ "", "Test error 5", undefined, "Test error 6", "" ]);
+		teWrapper.log.error([ "Test error 7", "", "Test error 8", "" ]);
+		teWrapper.log.error([ "Test error 9",  new Error("Test error object 10") ]);
+		teWrapper.log.error([ "Test error 11", "Test error 12" ], [[ "Test param error 13", "Test param value 14" ]]);
+		teWrapper.log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
+		teWrapper.logControl.useTags = true;
 		const err = new Error("Test error object");
 		err.stack = undefined;
-		log.error(err);
-		log.error(true);
-		log.error(undefined);
-		log.error({
+		teWrapper.log.error(err);
+		teWrapper.log.error(true);
+		teWrapper.log.error(undefined);
+		teWrapper.log.error({
 			status: false,
 			message: "Test error 15"
 		});
-		log.error({
+		teWrapper.log.error({
 			status: false,
 			message: "Test error 16",
 			messageX: "Test error 16 X"
 		});
-		log.error({
+		teWrapper.log.error({
 			status: false
 		});
-		log.error({
+		teWrapper.log.error({
 			status: false
 		});
-		const scaryOff = logControl.isTestsBlockScaryColors;
-		logControl.isTestsBlockScaryColors = false;
-		log.error("Scary error");
-		log.error("error line1\nline2");
-		log.error("error line1\r\nline2");
-		log.error(new Error("Test error object"));
-		logControl.useTags = false;
-		logControl.isTestsBlockScaryColors = true;
-		log.error("Scary error");
-		logControl.isTestsBlockScaryColors = scaryOff;
+		const scaryOff = teWrapper.logControl.isTestsBlockScaryColors;
+		teWrapper.logControl.isTestsBlockScaryColors = false;
+		teWrapper.log.error("Scary error");
+		teWrapper.log.error("error line1\nline2");
+		teWrapper.log.error("error line1\r\nline2");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.logControl.useTags = false;
+		teWrapper.logControl.isTestsBlockScaryColors = true;
+		teWrapper.log.error("Scary error");
+		teWrapper.logControl.isTestsBlockScaryColors = scaryOff;
 		logErrorsAreFine(true);
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.error("Test5 error");
-		log.error("Test5 error");
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error([ "Test error 1", undefined, "Test error 2" ]);
-		log.error([ "Test error 1",  new Error("Test error object") ]);
-		log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
-		log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
+		teWrapper.log.error("Test5 error");
+		teWrapper.log.error("Test5 error");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error([ "Test error 1", undefined, "Test error 2" ]);
+		teWrapper.log.error([ "Test error 1",  new Error("Test error object") ]);
+		teWrapper.log.error([ "Test error 1", "Test error 2" ], [[ "Test param error", "Test param value" ]]);
+		teWrapper.log.error("this is a test4", [[ "test6", true ],[ "test6", false ],[ "test7", "1111" ],[ "test8", [ 1, 2, 3 ]]]);
 		const err2 = new Error("Test error object");
 		err2.stack = undefined;
-		log.error(err2);
+		teWrapper.log.error(err2);
 		//
 		// Re-enable logging
 		//
@@ -147,37 +141,37 @@ suite("Util Tests", () =>
 		this.slow((testControl.slowTime.config.event * 7) + 150);
 		await executeSettingsUpdate("logging.enableFile", false);
 		await executeSettingsUpdate("logging.enableFile", true);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.error("Test3 error");
-		log.error({});
-		log.error("error line1\nline2");
-		log.error("error line1\r\nline2");
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error("Test4 error", [[ "p1", "e1" ]]);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
+		teWrapper.log.error("Test3 error");
+		teWrapper.log.error({});
+		teWrapper.log.error("error line1\nline2");
+		teWrapper.log.error("error line1\r\nline2");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableFileSymbols", true);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.error("Test2 error");
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error("Test4 error", [[ "p1", "e1" ]]);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
+		teWrapper.log.error("Test2 error");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableFileSymbols", false);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
 		logErrorsAreFine(true);
-		log.error("Error1");
-		log.warn("Warning1");
-		log.value("Test3", "value3", 1);
+		teWrapper.log.error("Error1");
+		teWrapper.log.warn("Warning1");
+		teWrapper.log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableFile", false);
-		log.getLogFileName();
+		teWrapper.log.getLogFileName();
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.error("Error1");
-		log.warn("Warning1");
+		teWrapper.log.error("Error1");
+		teWrapper.log.warn("Warning1");
 		//
 		// Re-enable logging
 		//
@@ -191,24 +185,24 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 75);
 
-		log.methodStart("methodName");
-		log.methodDone("methodName");
-		log.methodStart("methodName", 1);
-		log.methodDone("methodName", 1);
-		log.methodStart("methodName", 1, "");
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", false);
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", true);
-		log.methodDone("methodName", 1, "");
-		log.methodStart("methodName", 1, "", false, [[ "p1", "v1" ]]);
-		log.methodDone("methodName", 1, "", [[ "p2", "v2" ]]);
+		teWrapper.log.methodStart("methodName");
+		teWrapper.log.methodDone("methodName");
+		teWrapper.log.methodStart("methodName", 1);
+		teWrapper.log.methodDone("methodName", 1);
+		teWrapper.log.methodStart("methodName", 1, "");
+		teWrapper.log.methodDone("methodName", 1, "");
+		teWrapper.log.methodStart("methodName", 1, "", false);
+		teWrapper.log.methodDone("methodName", 1, "");
+		teWrapper.log.methodStart("methodName", 1, "", true);
+		teWrapper.log.methodDone("methodName", 1, "");
+		teWrapper.log.methodStart("methodName", 1, "", false, [[ "p1", "v1" ]]);
+		teWrapper.log.methodDone("methodName", 1, "", [[ "p2", "v2" ]]);
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.methodStart("methodName");
-		log.methodDone("methodName");
+		teWrapper.log.methodStart("methodName");
+		teWrapper.log.methodDone("methodName");
 		//
 		// Re-enable logging
 		//
@@ -222,22 +216,22 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.error("Test5 error");
-		log.error(new Error("Test5 error"));
-		log.error({});
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error("Test4 error", [[ "p1", "e1" ]]);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
+		teWrapper.log.error("Test5 error");
+		teWrapper.log.error(new Error("Test5 error"));
+		teWrapper.log.error({});
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error("Test4 error", [[ "p1", "e1" ]]);
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.error("Test5 error");
-		log.error({});
-		log.error(new Error("Test error object"));
-		log.error([ "Test error 1", "Test error 2" ]);
-		log.error("Test4 error", [[ "p1", "e1" ]]);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
+		teWrapper.log.error("Test5 error");
+		teWrapper.log.error({});
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.error([ "Test error 1", "Test error 2" ]);
+		teWrapper.log.error("Test4 error", [[ "p1", "e1" ]]);
         endRollingCount(this);
 	});
 
@@ -247,28 +241,28 @@ suite("Util Tests", () =>
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 
         if (exitRollingCount(this)) return;
-		log.dequeue("queueTestId");
-		log.write("test1", 1, "", "queueTestId");
-		log.write("test2", 1, "", "queueTestId");
-		log.write("test3", 1, "", "queueTestId");
-		log.value("test3", "value1", 1, "", "queueTestId");
-		log.error("test4", undefined, "queueTestId");
-		log.error("test5", [[ "param1", 1 ]], "queueTestId");
-		log.error("error line1\nline2", undefined, "queueTestId");
-		log.error("error line1\r\nline2", undefined, "queueTestId");
-		log.error("error line1\r\nline2", undefined, "queueTestId");
-		log.write("line1\r\nline2", 1, "   ", "queueTestId");
-		log.error(new Error("Test error object"));
-		log.dequeue("queueTestId");
+		teWrapper.log.dequeue("queueTestId");
+		teWrapper.log.write("test1", 1, "", "queueTestId");
+		teWrapper.log.write("test2", 1, "", "queueTestId");
+		teWrapper.log.write("test3", 1, "", "queueTestId");
+		teWrapper.log.value("test3", "value1", 1, "", "queueTestId");
+		teWrapper.log.error("test4", undefined, "queueTestId");
+		teWrapper.log.error("test5", [[ "param1", 1 ]], "queueTestId");
+		teWrapper.log.error("error line1\nline2", undefined, "queueTestId");
+		teWrapper.log.error("error line1\r\nline2", undefined, "queueTestId");
+		teWrapper.log.error("error line1\r\nline2", undefined, "queueTestId");
+		teWrapper.log.write("line1\r\nline2", 1, "   ", "queueTestId");
+		teWrapper.log.error(new Error("Test error object"));
+		teWrapper.log.dequeue("queueTestId");
 
 		await executeSettingsUpdate("logging.enableFile", true);
-		log.write("test1", 1, "", "queueTest2Id", false, false);
-		log.error("test4", undefined, "queueTest2Id");
-		log.value("test3", "value1", 1, "", "queueTest2Id");
-		log.error("test5", [[ "param1", 1 ]], "queueTest2Id");
-		log.error("error line1\nline2", undefined, "queueTest2Id");
-		log.write("line1\r\nline2", 1, "   ", "queueTest2Id");
-		log.dequeue("queueTest2Id");
+		teWrapper.log.write("test1", 1, "", "queueTest2Id", false, false);
+		teWrapper.log.error("test4", undefined, "queueTest2Id");
+		teWrapper.log.value("test3", "value1", 1, "", "queueTest2Id");
+		teWrapper.log.error("test5", [[ "param1", 1 ]], "queueTest2Id");
+		teWrapper.log.error("error line1\nline2", undefined, "queueTest2Id");
+		teWrapper.log.write("line1\r\nline2", 1, "   ", "queueTest2Id");
+		teWrapper.log.dequeue("queueTest2Id");
 		await executeSettingsUpdate("logging.enableFile", false);
 
         endRollingCount(this);
@@ -279,53 +273,53 @@ suite("Util Tests", () =>
     {
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 4) + 75);
-        log.value(`        ${creator}.${extension}`, null);
-        log.value(`        ${creator}.${extension}`, undefined);
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-		log.value("null value", null);
-		log.value("empty string value", "");
-		log.value("line break lf value", "line1\nline2");
-		log.value("line break crlf value", "line1\r\nline2");
+        teWrapper.log.value(`        ${creator}.${extension}`, null);
+        teWrapper.log.value(`        ${creator}.${extension}`, undefined);
+		teWrapper.log.value(null as unknown as string, 1);
+		teWrapper.log.value(undefined as unknown as string, 1);
+		teWrapper.log.value("null value", null);
+		teWrapper.log.value("empty string value", "");
+		teWrapper.log.value("line break lf value", "line1\nline2");
+		teWrapper.log.value("line break crlf value", "line1\r\nline2");
 		await executeSettingsUpdate("logging.enableOutputWindow", false);
-		log.value("null value", null);
-		log.value("Test3", "value3", 1);
+		teWrapper.log.value("null value", null);
+		teWrapper.log.value("Test3", "value3", 1);
 		await executeSettingsUpdate("logging.enableOutputWindow", true);
-		log.value("", "");
-		log.value("", null);
-		log.value("", undefined);
-		log.value("undefined value 1", undefined);
-		log.value("undefined value 2", undefined, 1);
-		log.values(1, "   ", [[ "Test5", "5" ]]);
-		log.value("object value", {
+		teWrapper.log.value("", "");
+		teWrapper.log.value("", null);
+		teWrapper.log.value("", undefined);
+		teWrapper.log.value("undefined value 1", undefined);
+		teWrapper.log.value("undefined value 2", undefined, 1);
+		teWrapper.log.values(1, "   ", [[ "Test5", "5" ]]);
+		teWrapper.log.value("object value", {
 			p1: 1,
 			p2: "test"
 		});
 		//
 		// Console On
 		//
-		log.setWriteToConsole(true);
-		log.value("test", "1");
-		log.value("test", "1", 1);
-		log.value("test", "1", 5);
+		teWrapper.log.setWriteToConsole(true);
+		teWrapper.log.value("test", "1");
+		teWrapper.log.value("test", "1", 1);
+		teWrapper.log.value("test", "1", 5);
 		//
 		// Console Off
 		//
-		log.setWriteToConsole(false);
+		teWrapper.log.setWriteToConsole(false);
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.value("test", "1");
-		log.value(null as unknown as string, 1);
-		log.value(undefined as unknown as string, 1);
-		log.write("test");
-		log.write("Test1", 1);
-		log.write("Test1", 1);
-		log.value("Test2", "value", 1);
-		log.value("Test3", null, 1);
-		log.value("Test4", undefined, 1);
-		log.values(1, "   ", [[ "Test5", "5" ]]);
+		teWrapper.log.value("test", "1");
+		teWrapper.log.value(null as unknown as string, 1);
+		teWrapper.log.value(undefined as unknown as string, 1);
+		teWrapper.log.write("test");
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.value("Test2", "value", 1);
+		teWrapper.log.value("Test3", null, 1);
+		teWrapper.log.value("Test4", undefined, 1);
+		teWrapper.log.values(1, "   ", [[ "Test5", "5" ]]);
 		//
 		// Re-enable logging
 		//
@@ -338,20 +332,20 @@ suite("Util Tests", () =>
     {
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
-		log.warn("test1");
-		log.warn("test2");
-		const scaryOff = logControl.isTestsBlockScaryColors;
-		logControl.isTestsBlockScaryColors = false;
-		log.warn("test3");
-		logControl.isTestsBlockScaryColors = true;
-		log.warn("test3");
-		logControl.isTestsBlockScaryColors = scaryOff;
+		teWrapper.log.warn("test1");
+		teWrapper.log.warn("test2");
+		const scaryOff = teWrapper.logControl.isTestsBlockScaryColors;
+		teWrapper.logControl.isTestsBlockScaryColors = false;
+		teWrapper.log.warn("test3");
+		teWrapper.logControl.isTestsBlockScaryColors = true;
+		teWrapper.log.warn("test3");
+		teWrapper.logControl.isTestsBlockScaryColors = scaryOff;
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.warn("test1");
-		log.warn("test2");
+		teWrapper.log.warn("test1");
+		teWrapper.log.warn("test2");
 		//
 		// Re-enable logging
 		//
@@ -365,43 +359,43 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 65);
 
-        log.blank();
-        log.blank(1);
-		log.write(null as unknown as string);
-		log.write(undefined as unknown as string);
-		log.write("");
-		log.write("");
+        teWrapper.log.blank();
+        teWrapper.log.blank(1);
+		teWrapper.log.write(null as unknown as string);
+		teWrapper.log.write(undefined as unknown as string);
+		teWrapper.log.write("");
+		teWrapper.log.write("");
 		//
 		// Console On
 		//
-		log.setWriteToConsole(true);
-		log.write("test");
+		teWrapper.log.setWriteToConsole(true);
+		teWrapper.log.write("test");
 		//
 		// Console Off
 		//
-		log.setWriteToConsole(false);
+		teWrapper.log.setWriteToConsole(false);
 		//
 		// Tags
 		//
-		const useTags = logControl.useTags;
-		logControl.useTags = false;
-		log.blank(2);
-		log.write("test1");
-		logControl.useTags = true;
-		log.blank(3);
-		log.write("test1", 1);
-		log.withColor("Test1", teWrapper.figures.colors.blue);
-		logControl.useTags = useTags;
+		const useTags = teWrapper.logControl.useTags;
+		teWrapper.logControl.useTags = false;
+		teWrapper.log.blank(2);
+		teWrapper.log.write("test1");
+		teWrapper.logControl.useTags = true;
+		teWrapper.log.blank(3);
+		teWrapper.log.write("test1", 1);
+		teWrapper.log.withColor("Test1", teWrapper.figures.colors.blue);
+		teWrapper.logControl.useTags = useTags;
 		//
 		// Disable logging
 		//
 		await executeSettingsUpdate("logging.enable", false);
-		log.blank(1);
-		log.dequeue("");
-		log.write("test");
-		log.write("Test1", 1);
-		log.write("Test1", 1);
-		log.withColor("Test1", teWrapper.figures.colors.blue);
+		teWrapper.log.blank(1);
+		teWrapper.log.dequeue("");
+		teWrapper.log.write("test");
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.write("Test1", 1);
+		teWrapper.log.withColor("Test1", teWrapper.figures.colors.blue);
 		//
 		// Re-enable logging
 		//
@@ -414,7 +408,7 @@ suite("Util Tests", () =>
     {
         if (exitRollingCount(this)) return;
 		teWrapper.explorer?.isVisible();
-        await pathUtils.getInstallPath();
+        await teWrapper.pathUtils.getInstallPath();
         endRollingCount(this);
     });
 
@@ -424,101 +418,101 @@ suite("Util Tests", () =>
         if (exitRollingCount(this)) return;
 		this.slow((testControl.slowTime.config.event * 2) + 50);
 
-        util.timeout(10);
+        teWrapper.utils.timeout(10);
 
-        expect(camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
-        expect(camelCase(undefined, 4)).to.be.equal(undefined);
-        expect(camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
-        expect(camelCase("test", -1)).to.be.equal("test");
+        expect(teWrapper.utils.camelCase("taskexplorer", 4)).to.be.equal("taskExplorer");
+        expect(teWrapper.utils.camelCase(undefined, 4)).to.be.equal(undefined);
+        expect(teWrapper.utils.camelCase("testgreaterindex", 19)).to.be.equal("testgreaterindex");
+        expect(teWrapper.utils.camelCase("test", -1)).to.be.equal("test");
 
-        expect(properCase("taskexplorer")).to.be.equal("Taskexplorer");
-        expect(properCase(undefined)).to.be.equal("");
-		expect(properCase("dc is here", true)).to.be.equal("DcIsHere");
-		expect(properCase("dc is here", false)).to.be.equal("Dc Is Here");
-		expect(properCase("dc is here")).to.be.equal("Dc Is Here");
-		expect(properCase("dc was here", true)).to.be.equal("DcWasHere");
-		expect(properCase("dc was here", false)).to.be.equal("Dc Was Here");
-		expect(properCase(undefined)).to.equal("");
-		expect(properCase("")).to.equal("");
+        expect(teWrapper.utils.properCase("taskexplorer")).to.be.equal("Taskexplorer");
+        expect(teWrapper.utils.properCase(undefined)).to.be.equal("");
+		expect(teWrapper.utils.properCase("dc is here", true)).to.be.equal("DcIsHere");
+		expect(teWrapper.utils.properCase("dc is here", false)).to.be.equal("Dc Is Here");
+		expect(teWrapper.utils.properCase("dc is here")).to.be.equal("Dc Is Here");
+		expect(teWrapper.utils.properCase("dc was here", true)).to.be.equal("DcWasHere");
+		expect(teWrapper.utils.properCase("dc was here", false)).to.be.equal("Dc Was Here");
+		expect(teWrapper.utils.properCase(undefined)).to.equal("");
+		expect(teWrapper.utils.properCase("")).to.equal("");
 
-        expect(isScriptType("batch"));
-        expect(getScriptTaskTypes().length > 0);
+        expect(teWrapper.taskUtils.isScriptType("batch"));
+        expect(teWrapper.taskUtils.getScriptTaskTypes().length > 0);
 
         const arr = [ 1, 2, 3, 4, 5 ];
-        util.removeFromArray(arr, 3);
-        util.removeFromArray(arr, 1);
+        teWrapper.utils.removeFromArray(arr, 3);
+        teWrapper.utils.removeFromArray(arr, 1);
         expect(arr.length).to.be.equal(3);
 
-        expect(pathUtils.getCwd(rootUri)).to.not.be.equal(undefined);
-        expect (util.getGroupSeparator()).to.be.equal("-");
+        expect(teWrapper.pathUtils.getCwd(rootUri)).to.not.be.equal(undefined);
+        expect (teWrapper.utils.getGroupSeparator()).to.be.equal("-");
 
-		expect(util.lowerCaseFirstChar("s", true)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("s", false)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("S", true)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("S", false)).to.be.equal("s");
-		expect(util.lowerCaseFirstChar("scott meesseman", true)).to.be.equal("scottmeesseman");
-		expect(util.lowerCaseFirstChar("Scott meesseman", false)).to.be.equal("scott meesseman");
-		expect(util.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
-		expect(util.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
-		expect(util.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
+		expect(teWrapper.utils.lowerCaseFirstChar("s", true)).to.be.equal("s");
+		expect(teWrapper.utils.lowerCaseFirstChar("s", false)).to.be.equal("s");
+		expect(teWrapper.utils.lowerCaseFirstChar("S", true)).to.be.equal("s");
+		expect(teWrapper.utils.lowerCaseFirstChar("S", false)).to.be.equal("s");
+		expect(teWrapper.utils.lowerCaseFirstChar("scott meesseman", true)).to.be.equal("scottmeesseman");
+		expect(teWrapper.utils.lowerCaseFirstChar("Scott meesseman", false)).to.be.equal("scott meesseman");
+		expect(teWrapper.utils.lowerCaseFirstChar("TestApp", true)).to.be.equal("testApp");
+		expect(teWrapper.utils.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
+		expect(teWrapper.utils.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
 
-		getTaskTypeFriendlyName("Workspace");
-		getTaskTypeFriendlyName("Workspace", true);
-		getTaskTypeFriendlyName("apppublisher");
-		getTaskTypeFriendlyName("apppublisher", true);
-		getTaskTypeFriendlyName("tsc");
-		getTaskTypeFriendlyName("tsc", true);
-		getTaskTypeFriendlyName("ant");
-		getTaskTypeFriendlyName("ant", true);
+		teWrapper.taskUtils.teWrappergetTaskTypeFriendlyName("Workspace");
+		teWrapper.taskUtils.getTaskTypeFriendlyName("Workspace", true);
+		teWrapper.taskUtils.getTaskTypeFriendlyName("apppublisher");
+		teWrapper.taskUtils.getTaskTypeFriendlyName("apppublisher", true);
+		teWrapper.taskUtils.getTaskTypeFriendlyName("tsc");
+		teWrapper.taskUtils.getTaskTypeFriendlyName("tsc", true);
+		teWrapper.taskUtils.getTaskTypeFriendlyName("ant");
+		teWrapper.taskUtils.getTaskTypeFriendlyName("ant", true);
 
-		expect(util.isNumber(10)).to.equal(true);
-		expect(util.isNumber(0)).to.equal(true);
-		expect(util.isNumber(undefined)).to.equal(false);
-		expect(util.isNumber("not a number")).to.equal(false);
-		expect(util.isNumber({ test: true })).to.equal(false);
-		expect(util.isNumber([ 1, 2 ])).to.equal(false);
+		expect(teWrapper.utils.isNumber(10)).to.equal(true);
+		expect(teWrapper.utils.isNumber(0)).to.equal(true);
+		expect(teWrapper.utils.isNumber(undefined)).to.equal(false);
+		expect(teWrapper.utils.isNumber("not a number")).to.equal(false);
+		expect(teWrapper.utils.isNumber({ test: true })).to.equal(false);
+		expect(teWrapper.utils.isNumber([ 1, 2 ])).to.equal(false);
 
-		expect(util.isObject("1")).to.equal(false);
-		expect(util.isObject(1)).to.equal(false);
-		expect(util.isObject([])).to.equal(false);
-		expect(util.isObject([ "1" ])).to.equal(false);
-		expect(util.isObject({ a: 1 })).to.equal(true);
-		expect(util.isObjectEmpty({})).to.equal(true);
-		expect(util.isObjectEmpty({ a: 1 })).to.equal(false);
-		util.isObjectEmpty([]);
-		util.isObjectEmpty([ 1, 2 ]);
-		util.isObjectEmpty(this);
-		util.isObjectEmpty(workspace);
-		util.isObjectEmpty(Object.setPrototypeOf({}, { a: 1}));
-		util.isObjectEmpty(Object.setPrototypeOf({ a: 1 }, { b: 1}));
-		util.isObjectEmpty({ ...Object.setPrototypeOf({ a: 1 }, { b: 1}) });
-		util.isObjectEmpty("aaa" as unknown as object);
-		util.isObjectEmpty("" as unknown as object);
-		util.isObjectEmpty(undefined as unknown as object);
+		expect(teWrapper.utils.isObject("1")).to.equal(false);
+		expect(teWrapper.utils.isObject(1)).to.equal(false);
+		expect(teWrapper.utils.isObject([])).to.equal(false);
+		expect(teWrapper.utils.isObject([ "1" ])).to.equal(false);
+		expect(teWrapper.utils.isObject({ a: 1 })).to.equal(true);
+		expect(teWrapper.utils.isObjectEmpty({})).to.equal(true);
+		expect(teWrapper.utils.isObjectEmpty({ a: 1 })).to.equal(false);
+		teWrapper.utils.isObjectEmpty([]);
+		teWrapper.utils.isObjectEmpty([ 1, 2 ]);
+		teWrapper.utils.isObjectEmpty(this);
+		teWrapper.utils.isObjectEmpty(workspace);
+		teWrapper.utils.isObjectEmpty(Object.setPrototypeOf({}, { a: 1}));
+		teWrapper.utils.isObjectEmpty(Object.setPrototypeOf({ a: 1 }, { b: 1}));
+		teWrapper.utils.isObjectEmpty({ ...Object.setPrototypeOf({ a: 1 }, { b: 1}) });
+		teWrapper.utils.isObjectEmpty("aaa" as unknown as object);
+		teWrapper.utils.isObjectEmpty("" as unknown as object);
+		teWrapper.utils.isObjectEmpty(undefined as unknown as object);
 
 		const d1 = Date.now() - 6400000;
 		const d2 = Date.now();
 		const dt1 = new Date();
-		util.getDateDifference(d1, d2, "d");
-		util.getDateDifference(d1, d2, "h");
-		util.getDateDifference(d1, d2, "m");
-		util.getDateDifference(d1, d2, "s");
-		util.getDateDifference(d1, d2);
-		util.getDateDifference(dt1, d2, "d");
-		util.getDateDifference(dt1, d2, "h");
-		util.getDateDifference(dt1, d2, "m");
-		util.getDateDifference(dt1, d2, "s");
-		util.getDateDifference(dt1, d2);
-		util.getDateDifference(d1, dt1, "d");
-		util.getDateDifference(d1, dt1, "h");
-		util.getDateDifference(d1, dt1, "m");
-		util.getDateDifference(d1, dt1, "s");
-		util.getDateDifference(d1, dt1);
-		util.getDateDifference(d2, dt1, "d");
-		util.getDateDifference(d2, dt1, "h");
-		util.getDateDifference(d2, dt1, "m");
-		util.getDateDifference(d2, dt1, "s");
-		util.getDateDifference(d2, dt1);
+		teWrapper.utils.getDateDifference(d1, d2, "d");
+		teWrapper.utils.getDateDifference(d1, d2, "h");
+		teWrapper.utils.getDateDifference(d1, d2, "m");
+		teWrapper.utils.getDateDifference(d1, d2, "s");
+		teWrapper.utils.getDateDifference(d1, d2);
+		teWrapper.utils.getDateDifference(dt1, d2, "d");
+		teWrapper.utils.getDateDifference(dt1, d2, "h");
+		teWrapper.utils.getDateDifference(dt1, d2, "m");
+		teWrapper.utils.getDateDifference(dt1, d2, "s");
+		teWrapper.utils.getDateDifference(dt1, d2);
+		teWrapper.utils.getDateDifference(d1, dt1, "d");
+		teWrapper.utils.getDateDifference(d1, dt1, "h");
+		teWrapper.utils.getDateDifference(d1, dt1, "m");
+		teWrapper.utils.getDateDifference(d1, dt1, "s");
+		teWrapper.utils.getDateDifference(d1, dt1);
+		teWrapper.utils.getDateDifference(d2, dt1, "d");
+		teWrapper.utils.getDateDifference(d2, dt1, "h");
+		teWrapper.utils.getDateDifference(d2, dt1, "m");
+		teWrapper.utils.getDateDifference(d2, dt1, "s");
+		teWrapper.utils.getDateDifference(d2, dt1);
 
         endRollingCount(this);
 	});
@@ -532,31 +526,31 @@ suite("Util Tests", () =>
 		// path get here for linux and mac for increased coverage since we're only
 		// running the tests in a windows machine for release right now with ap.
 		//
-		let dataPath: string | undefined = pathUtils.getUserDataPath("darwin");
-		dataPath = pathUtils.getUserDataPath("linux");
+		let dataPath: string = teWrapper.pathUtils.getUserDataPath("darwin");
+		dataPath = teWrapper.pathUtils.getUserDataPath("linux");
 
-		pathUtils.getPortableDataPath();
+		teWrapper.pathUtils.getPortableDataPath();
 
 		//
 		// Simulate --user-data-dir vscode command line option
 		//
 		const oArgv = process.argv;
 		process.argv = [ "--user-data-dir", dataPath ];
-		expect(pathUtils.getUserDataPath("linux")).to.be.equal(dataPath);
-		expect(pathUtils.getUserDataPath("win32")).to.be.equal(dataPath);
-		expect(pathUtils.getUserDataPath("darwin")).to.be.equal(dataPath);
+		expect(teWrapper.pathUtils.getUserDataPath("linux")).to.be.equal(dataPath);
+		expect(teWrapper.pathUtils.getUserDataPath("win32")).to.be.equal(dataPath);
+		expect(teWrapper.pathUtils.getUserDataPath("darwin")).to.be.equal(dataPath);
 
 		//
-		// 0 args, which would probably never happen but the pathUtils.getUserDataPath() call
+		// 0 args, which would probably never happen but the teWrapper.pathUtils.getUserDataPath() call
 		// handles it an ;et's cover it
 		//
 		process.argv = [];
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 
 		//
 		// Save current environment
 		//
-		dataPath = process.env.VSCODE_PORTABLE;
+		dataPath = process.env.VSCODE_PORTABLE as string;
 		const dataPath1 = dataPath;
 		const dataPath2 = process.env.APPDATA;
 		const dataPath3 = process.env.USERPROFILE;
@@ -564,10 +558,10 @@ suite("Util Tests", () =>
 		//
 		// Set environment variables for specific test
 		//
-		process.env.VSCODE_PORTABLE = pathUtils.getUserDataPath("win32");
+		process.env.VSCODE_PORTABLE = teWrapper.pathUtils.getUserDataPath("win32");
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "test";
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\test\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -576,7 +570,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = dataPath;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = pathUtils.getUserDataPath("nothing");
+		dataPath = teWrapper.pathUtils.getUserDataPath("nothing");
 		expect(dataPath).to.be.oneOf([ `C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}`, "C:\\Code\\data\\user-data\\User\\user-data\\User" ]);
 		//
 		// Set environment variables for specific test
@@ -584,7 +578,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = undefined;
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -592,7 +586,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "c:\\some\\invalid\\path";
 		process.env.APPDATA = dataPath2;
 		process.env.USERPROFILE = dataPath3;
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Users\\smeesseman.PERRYJOHNSON01\\AppData\\Roaming\\vscode");
 		//
 		// Set environment variables for specific test
@@ -600,7 +594,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Set environment variables for specific test
@@ -608,7 +602,7 @@ suite("Util Tests", () =>
 		process.env.VSCODE_PORTABLE = "";
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\AppData\\Roaming\\vscode`);
 		//
 		// Set environment variables for specific test
@@ -617,38 +611,38 @@ suite("Util Tests", () =>
 		process.env.APPDATA = "";
 		process.env.USERPROFILE = "";
 		process.env.VSCODE_APPDATA = "";
-		dataPath = pathUtils.getUserDataPath("linux");
+		dataPath = teWrapper.pathUtils.getUserDataPath("linux");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\.config\\vscode`);
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\AppData\\Roaming\\vscode`);
-		dataPath = pathUtils.getUserDataPath("darwin");
+		dataPath = teWrapper.pathUtils.getUserDataPath("darwin");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}\\Library\\Application Support\\vscode`);
-		dataPath = pathUtils.getUserDataPath("invalid_platform");
+		dataPath = teWrapper.pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal(`C:\\Projects\\${extension}\\.vscode-test\\vscode-win32-x64-archive-${env.vsCodeTestVersion}`);
 		//
 		// Set environment variables for specific test
 		//
 		process.env.VSCODE_APPDATA = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = pathUtils.getUserDataPath("linux");
+		dataPath = teWrapper.pathUtils.getUserDataPath("linux");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = pathUtils.getUserDataPath("win32");
+		dataPath = teWrapper.pathUtils.getUserDataPath("win32");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = pathUtils.getUserDataPath("darwin");
+		dataPath = teWrapper.pathUtils.getUserDataPath("darwin");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
-		dataPath = pathUtils.getUserDataPath("invalid_platform");
+		dataPath = teWrapper.pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\vscode");
 		//
 		// Set portable / invalid platform
 		//
 		process.env.VSCODE_PORTABLE = "C:\\Code\\data\\user-data\\User\\workspaceStorage";
-		dataPath = pathUtils.getUserDataPath("invalid_platform");
+		dataPath = teWrapper.pathUtils.getUserDataPath("invalid_platform");
 		expect(dataPath).to.be.equal("C:\\Code\\data\\user-data\\User\\workspaceStorage\\user-data\\User");
 		//
 		// Empty platform
 		//
-		dataPath = pathUtils.getUserDataPath("");
+		dataPath = teWrapper.pathUtils.getUserDataPath("");
 		process.env.VSCODE_PORTABLE = "";
-		dataPath = pathUtils.getUserDataPath("");
+		dataPath = teWrapper.pathUtils.getUserDataPath("");
 		//
 		//
 		// Restore process argv
@@ -669,50 +663,50 @@ suite("Util Tests", () =>
 	test("File System", async function()
     {
         if (exitRollingCount(this)) return;
-		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
-		await afs.createDir(__dirname);
+		await teWrapper.fs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
+		await teWrapper.fs.createDir(__dirname);
 		try {
-			await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder2"));
+			await teWrapper.fs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder2"));
 		} catch {}
 		try {
-			await afs.copyFile(join(__dirname, "folder1", "noFile.txt"), join(__dirname, "folder2"));
+			await teWrapper.fs.copyFile(join(__dirname, "folder1", "noFile.txt"), join(__dirname, "folder2"));
 		} catch {}
 		try {
-			await afs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
+			await teWrapper.fs.copyDir(join(getWsPath("."), "hello.bat"), join(__dirname, "folder2"));
 		} catch {}
-		await afs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
-		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder5"), undefined, true);
-		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder6"));
-		await afs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder7"), /folder/, true);
-		await afs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
-		await afs.deleteDir(join(__dirname, "folder1"));
-		await afs.deleteDir(join(__dirname, "folder5"));
-		await afs.deleteDir(join(__dirname, "folder6"));
-		await afs.deleteDir(join(__dirname, "folder7"));
-		await afs.createDir(join(__dirname, "folder1"));
-		await afs.deleteFile(join(__dirname, "folder1", "file1.png"));
-		await afs.writeFile(join(__dirname, "folder1", "file1.png"), "");
-		try { await afs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
-		try { await afs.readJsonAsync(join(__dirname, "folder1", "file1.png")); } catch {}
-		try { afs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
-		try { afs.readJsonSync(join(__dirname, "folder1", "file1.png")); } catch {}
-		await afs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
-		await afs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
-		await afs.deleteDir(join(__dirname, "folder1"));
-		try { await afs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
-		try { afs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
-		await afs.numFilesInDirectory(rootUri.fsPath);
+		await teWrapper.fs.createDir(join(__dirname, "folder1", "folder2", "folder3", "folder4"));
+		await teWrapper.fs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder5"), undefined, true);
+		await teWrapper.fs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder6"));
+		await teWrapper.fs.copyDir(join(__dirname, "folder1"), join(__dirname, "folder7"), /folder/, true);
+		await teWrapper.fs.deleteDir(join(__dirname, "folder1", "folder2", "folder3"));
+		await teWrapper.fs.deleteDir(join(__dirname, "folder1"));
+		await teWrapper.fs.deleteDir(join(__dirname, "folder5"));
+		await teWrapper.fs.deleteDir(join(__dirname, "folder6"));
+		await teWrapper.fs.deleteDir(join(__dirname, "folder7"));
+		await teWrapper.fs.createDir(join(__dirname, "folder1"));
+		await teWrapper.fs.deleteFile(join(__dirname, "folder1", "file1.png"));
+		await teWrapper.fs.writeFile(join(__dirname, "folder1", "file1.png"), "");
+		try { await teWrapper.fs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { await teWrapper.fs.readJsonAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { teWrapper.fs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { teWrapper.fs.readJsonSync(join(__dirname, "folder1", "file1.png")); } catch {}
+		await teWrapper.fs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
+		await teWrapper.fs.copyFile(join(__dirname, "folder1", "file1.png"), join(__dirname, "folder1", "file2.png"));
+		await teWrapper.fs.deleteDir(join(__dirname, "folder1"));
+		try { await teWrapper.fs.readFileAsync(join(__dirname, "folder1", "file1.png")); } catch {}
+		try { teWrapper.fs.readFileSync(join(__dirname, "folder1", "file1.png")); } catch {}
+		await teWrapper.fs.numFilesInDirectory(rootUri.fsPath);
 		try {
-			await afs.numFilesInDirectory(join(rootUri.fsPath, "tasks_test_"));
+			await teWrapper.fs.numFilesInDirectory(join(rootUri.fsPath, "tasks_test_"));
 		}
 		catch {}
-		await afs.getDateModified(join(__dirname, "folder1", "folder2", "folder3"));
-		await afs.getDateModified(join(__dirname, "hello.sh"));
-		await afs.getDateModified(__dirname);
-		await afs.getDateModified("");
-		await afs.getDateModified(null as unknown as string);
-		try { await afs.writeFile(getWsPath("."), "its a dir"); } catch {}
-		try { afs.writeFileSync(getWsPath("."), "its a dir"); } catch {}
+		await teWrapper.fs.getDateModified(join(__dirname, "folder1", "folder2", "folder3"));
+		await teWrapper.fs.getDateModified(join(__dirname, "hello.sh"));
+		await teWrapper.fs.getDateModified(__dirname);
+		await teWrapper.fs.getDateModified("");
+		await teWrapper.fs.getDateModified(null as unknown as string);
+		try { await teWrapper.fs.writeFile(getWsPath("."), "its a dir"); } catch {}
+		try { teWrapper.fs.writeFileSync(getWsPath("."), "its a dir"); } catch {}
         endRollingCount(this);
 	});
 
@@ -747,7 +741,7 @@ suite("Util Tests", () =>
 			await sleep(1);
 			disposable.dispose();
 
-			log.write("STORAGE KEYS: " + teWrapper.storage.keys().join(", "));
+			teWrapper.log.write("STORAGE KEYS: " + teWrapper.storage.keys().join(", "));
         }
         endRollingCount(this);
     });

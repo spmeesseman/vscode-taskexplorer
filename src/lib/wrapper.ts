@@ -3,10 +3,13 @@ import { TeApi } from "./api";
 import * as fs from "./utils/fs";
 import { figures } from "./figures";
 import { Strings } from "./constants";
+import { logControl } from "./log/log";
 import { TeServer } from "./auth/server";
 import { TeFileCache } from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
+import * as pathUtils from "./utils/pathUtils";
+import * as taskUtils from "./utils/taskTypeUtils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog } from "../interface";
 import { TaskManager } from "src/tree/taskManager";
@@ -410,6 +413,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 		return this._log;
 	}
 
+	get logControl(): typeof logControl {
+		return logControl;
+	}
+
 	// get onInitialized() {
 	// 	return this._onInitialized.event;
 	// }
@@ -432,6 +439,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get parsingReportPage(): ParsingReportPage {
 		return this._parsingReportPage;
+	}
+
+	get pathUtils(): typeof pathUtils {
+		return pathUtils;
 	}
 
 	get releaseNotesPage(): ReleaseNotesPage {
@@ -464,6 +475,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get taskUsageView(): TaskUsageView {
 		return this._taskUsageView;
+	}
+
+	get taskUtils(): typeof taskUtils {
+		return taskUtils;
 	}
 
 	get tests(): boolean {

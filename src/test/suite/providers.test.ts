@@ -4,10 +4,8 @@
 
 import { join } from "path";
 import { expect } from "chai";
-import { tasks } from "vscode";
-import { TaskFile } from "../../tree/file";
 import { refresh } from "../utils/treeUtils";
-import { TaskMap } from "../../tree/treeBuilder";
+import { tasks, TreeItemCollapsibleState } from "vscode";
 import { ITaskFile, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
 import {
@@ -15,6 +13,7 @@ import {
     treeUtils, verifyTaskCount, waitForTeIdle
 } from "../utils/utils";
 
+interface TaskMap { [id: string]: ITaskItem | undefined };
 
 const tempFiles: string[] = [];
 
@@ -491,9 +490,9 @@ suite("Provider Tests", () =>
             if (taskItem && taskItem.taskSource === "grunt")
             {
                 let taskFile = taskItem.taskFile;
-                while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0] instanceof TaskFile && !taskFile.isGroup)
+                while (taskFile.treeNodes.length === 1 && taskFile.treeNodes[0].collapsibleState !== TreeItemCollapsibleState.None && !taskFile.isGroup)
                 {
-                    taskFile = taskFile.treeNodes[0];
+                    taskFile = taskFile.treeNodes[0] as ITaskFile;
                 }
                 if (taskFile && taskFile.isGroup && !taskItem.taskFile.path.startsWith("grunt"))
                 {

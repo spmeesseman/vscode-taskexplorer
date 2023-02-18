@@ -50,4 +50,7 @@ export interface ITeWrapper
 	fileWatcher: any;
 	figures: any;
 	init(): Promise<void>;
+	logControl: any;
+	pathUtils: any;
+	taskUtils: any;
 }

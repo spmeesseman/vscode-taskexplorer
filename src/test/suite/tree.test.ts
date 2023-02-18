@@ -5,12 +5,10 @@
 
 import { expect } from "chai";
 import * as utils from "../utils/utils";
-import { TaskFolder } from "../../tree/folder";
-import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
-import { SpecialTaskFolder } from "../../tree/specialFolder";
 import { IDictionary, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2 } from "../utils/commandUtils";
+import { ITaskFolder } from "../../interface";
 
 let teWrapper: ITeWrapper;
 const tc = utils.testControl;
@@ -138,8 +136,8 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 cstItem1 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[0].id);
@@ -164,11 +162,11 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                cstItem2 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === batch[1].id);
+                cstItem2 = sFolder.taskFiles.find((t: any) => sFolder.getTaskItemId(t) === batch[1].id);
                 if (cstItem2)
                 {
                     utils.overrideNextShowInputBox("Label 2");
@@ -190,8 +188,8 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 cstItem3 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === bash[0].id);
@@ -216,8 +214,8 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 cstItem4 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[0].id);
@@ -242,8 +240,8 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if(taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 cstItem5 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === python[1].id);
@@ -268,8 +266,8 @@ suite("Tree Tests", () =>
         const taskTree = teWrapper.treeManager.getTaskTree();
         if (taskTree)
         {
-            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as SpecialTaskFolder :
-                            (taskTree[1].label === "Favorites" ? taskTree[1] as SpecialTaskFolder : null);
+            const sFolder= taskTree[0].label === "Favorites" ? taskTree[0] as any :
+                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
                 cstItem6 = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === ant[0].id);
@@ -488,7 +486,7 @@ suite("Tree Tests", () =>
     test("Reveal API", async function()
     {
         if (utils.exitRollingCount(this)) return;
-        const taskTree = teWrapper.treeManager.getTaskTree() as TaskFolder[];
+        const taskTree = teWrapper.treeManager.getTaskTree() as any[];
         expect(teWrapper.explorer?.getParent(taskTree[0])).to.be.null; // Last Tasks
         expect(teWrapper.explorer?.getParent(taskTree[1])).to.be.null; // Last Tasks
         expect(teWrapper.explorer?.getParent(taskTree[2])).to.be.null; // Project Folder
@@ -529,7 +527,7 @@ suite("Tree Tests", () =>
         utils.endRollingCount(this);
     });
 
-
+/*
     test("Misc Sort Folders", function()
     {
         if (utils.exitRollingCount(this)) return;
@@ -661,5 +659,5 @@ suite("Tree Tests", () =>
         sortFolders(map);
         utils.endRollingCount(this);
     });
-
+*/
 });

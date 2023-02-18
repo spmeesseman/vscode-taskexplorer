@@ -12,5 +12,6 @@ export interface ILog
     value(msg: string, value: any, level?: number, logPad?: string, queueId?: string): void;
     values(level: number, logPad: string, params: any | (string|any)[][], queueId?: string): void;
     warn(msg: any, params?: (string|any)[][], queueId?: string): void;
-    write(msg: string, level?: number, logPad?: string, queueId?: string): void;
+    write(msg: string, level?: number, logPad?: string, queueId?: string, isValue?: boolean, isError?: boolean): void;
+    withColor(msg: string, color: any): void;
 }
