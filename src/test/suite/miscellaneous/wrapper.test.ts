@@ -4,13 +4,12 @@
 /* tslint:disable */
 
 import { expect } from "chai";
-import { TeWrapper } from "../../../lib/wrapper";
 import { startupFocus } from "../../utils/suiteUtils";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
-import { activate, endRollingCount, exitRollingCount, suiteFinished, testControl as tc } from "../../utils/utils";
+import { ITaskExplorerApi, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import { activate, endRollingCount, exitRollingCount, suiteFinished } from "../../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 
 
 suite("Wrapper Tests", () =>

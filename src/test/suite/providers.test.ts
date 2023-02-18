@@ -5,10 +5,11 @@
 import { join } from "path";
 import { expect } from "chai";
 import { tasks } from "vscode";
+import { TaskFile } from "../../tree/file";
 import { refresh } from "../utils/treeUtils";
 import { TaskMap } from "../../tree/treeBuilder";
+import { ITaskFile, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2, focusExplorerView } from "../utils/commandUtils";
-import { ITaskExplorerApi, ITaskFile, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getWsPath, needsTreeBuild, suiteFinished, testControl as tc,
     treeUtils, verifyTaskCount, waitForTeIdle

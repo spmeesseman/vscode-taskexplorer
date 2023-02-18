@@ -1,16 +1,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import { Globs } from "../../../lib/constants";
-import { getDevPath } from "../../utils/sharedUtils";
-import { getRelativePath } from "../../../lib/utils/pathUtils";
-import { IExternalProvider, ITaskDefinition } from "../../../interface";
-import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, TaskGroup } from "vscode";
+import { getDevPath, getRelativePath } from "../../utils/sharedUtils";
+import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, TaskGroup, commands } from "vscode";
+import { ITaskDefinition, IExternalProvider, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 
-export class ExternalTaskProvider2 extends IExternalProvider implements IExternalProvider
+export class ExternalTaskProvider2 implements IExternalProvider
 {
-    public override providerName = "external2";
+    isExternal: true = true;
+    cachedTasks: Task[] | undefined;
+    public providerName = "external2";
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
@@ -37,7 +37,7 @@ export class ExternalTaskProvider2 extends IExternalProvider implements IExterna
 
     public getGlobPattern(): string
     {
-        return Globs.GLOB_EXTERNAL;
+        return "**/tasks.test";
     }
 
 
@@ -60,6 +60,20 @@ export class ExternalTaskProvider2 extends IExternalProvider implements IExterna
 
 
     async invalidate(uri?: Uri, logPad?: string): Promise<void>
+    {
+        return undefined;
+    }
+
+    async provideTasks()
+    {
+        const teApi = await commands.executeCommand<ITaskExplorerApi>("taskexplorer.getApi");
+        if (teApi.providers[this.providerName])
+        {
+            return this.getTasks();
+        }
+    }
+
+    resolveTask(task: Task)
     {
         return undefined;
     }

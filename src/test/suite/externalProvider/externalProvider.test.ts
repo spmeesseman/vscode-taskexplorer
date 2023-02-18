@@ -5,21 +5,19 @@
 import { join } from "path";
 import fsUtils from "../../utils/fsUtils";
 import { refresh } from "../../utils/treeUtils";
-import { Commands } from "../../../lib/command";
-import { TeWrapper } from "../../../lib/wrapper";
 import { executeTeCommand } from "../../utils/commandUtils";
 import { ExternalTaskProvider1 } from "./externalProvider1";
 import { ExternalTaskProvider2 } from "./externalProvider2";
 import { ExternalTaskProvider3 } from "./externalProvider3";
 import { Uri, workspace, WorkspaceFolder, tasks, Disposable } from "vscode";
-import { ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
+import { ITaskExplorerApi, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import {
     activate, endRollingCount, exitRollingCount, getProjectsPath, getWsPath, needsTreeBuild, suiteFinished,
     testControl, treeUtils, verifyTaskCount, waitForTeIdle
 } from "../../utils/utils";
 
 let teApi: ITaskExplorerApi;
-let teWrapper: TeWrapper;
+let teWrapper: ITeWrapper;
 let dispose: Disposable;
 let dispose2: Disposable;
 let dispose3: Disposable;
@@ -75,7 +73,7 @@ suite("External Provider Tests", () =>
     {
         if (exitRollingCount(this)) return;
         this.slow(testControl.slowTime.commands.fast + 75);
-        teApi = await executeTeCommand<ITaskExplorerApi>(Commands.GetApi);
+        teApi = await executeTeCommand<ITaskExplorerApi>("taskexplorer.getApi");
         endRollingCount(this);
     });
 

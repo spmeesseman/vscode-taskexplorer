@@ -1,6 +1,6 @@
 
 import { log } from "../log/log";
-import * as minimatch from "minimatch";
+import minimatch = require("minimatch");
 import { TaskFile } from "../../tree/file";
 import { TaskItem } from "../../tree/item";
 import { basename, extname, sep } from "path";
@@ -8,7 +8,7 @@ import { Globs, Strings } from "../constants";
 import { configuration } from "./configuration";
 import { Commands, executeCommand } from "../command";
 import { LicenseManager } from "../auth/licenseManager";
-import { WorkspaceFolder, Uri, workspace, window, Event, Disposable } from "vscode";
+import { WorkspaceFolder, Uri, workspace, window } from "vscode";
 
 
 export const getCombinedGlobPattern = (defaultPattern: string, globs: string[]) =>

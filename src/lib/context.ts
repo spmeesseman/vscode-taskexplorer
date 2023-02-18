@@ -45,7 +45,7 @@ type AllContextKeys =
 	| `${ContextKeys.KeyPrefix}${string}`;
 
 
-export class TeContext implements ITeContext, Disposable
+export class TeContext implements ITeContext
 {
 	private contextStorage: IDictionary<unknown> = {};
 	private _onDidChangeContext = new EventEmitter<AllContextKeys>();
@@ -54,11 +54,6 @@ export class TeContext implements ITeContext, Disposable
 	constructor()
 	{
 		this.onDidChangeContext = this._onDidChangeContext.event;
-	}
-
-	dispose()
-	{
-		throw new Error("Method not implemented.");
 	}
 
 	getContext = <T>(key: AllContextKeys, defaultValue?: T) => this.contextStorage[key] as T | undefined || defaultValue;

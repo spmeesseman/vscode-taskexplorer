@@ -49,10 +49,10 @@ import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
 import { isProcessingFsEvent, registerFileWatchers } from "./watcher/fileWatcher";
 import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
 import { enableConfigWatcher, isProcessingConfigChange, registerConfigWatcher } from "./watcher/configWatcher";
-import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView } from "vscode";
+import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView, Disposable } from "vscode";
 
 
-export class TeWrapper implements ITeWrapper
+export class TeWrapper implements ITeWrapper, Disposable
 {
 	private _ready = false;
 	private _tests = false;
@@ -72,6 +72,7 @@ export class TeWrapper implements ITeWrapper
 	private readonly _taskUsageView: TaskUsageView;
 	private readonly _taskCountView: TaskCountView;
 	private readonly _configuration: IConfiguration;
+	private readonly _disposables: Disposable[];
 	// private readonly _telemetry: TelemetryService;
 	private readonly _licenseManager: LicenseManager;
 	private readonly _releaseNotesPage: ReleaseNotesPage;
@@ -138,8 +139,7 @@ export class TeWrapper implements ITeWrapper
 		// 	endTime,
 		// );
 
-		context.subscriptions.push(
-			this._teContext,
+		this._disposables = [
 			this._usage,
 			this._homeView,
 			this._treeManager,
@@ -149,8 +149,20 @@ export class TeWrapper implements ITeWrapper
 			this._licenseManager,
 			this._releaseNotesPage,
 			this._parsingReportPage
-		);
+		];
+
+		context.subscriptions.push(this);
 	}
+
+
+	dispose()
+	{
+		this._disposables.forEach((d) => {
+            d.dispose();
+        });
+        this._disposables.splice(0);
+	}
+
 
 	init = async() =>
 	{

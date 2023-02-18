@@ -6,10 +6,8 @@
 import { expect } from "chai";
 import { TaskExecution } from "vscode";
 import * as utils from "../utils/utils";
-import {ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
+import {ITaskItem, ITeWrapper, ITaskFolder } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand, executeTeCommand2, focusExplorerView, focusSearchView } from "../utils/commandUtils";
-import { ITaskFolder } from "../../interface";
-import { TaskFolder } from "../../tree/folder";
 
 const tc = utils.testControl;
 const startTaskSlowTime = tc.slowTime.config.event + (tc.slowTime.config.showHideSpecialFolder * 2) + (tc.slowTime.commands.standard * 2);
@@ -422,7 +420,7 @@ async function startTask(taskItem: ITaskItem, addToSpecial: boolean)
                            (taskTree[1].label === "Favorites" ? taskTree[1] as any : null);
             if (sFolder)
             {
-                const sTaskItem = sFolder.taskFiles.find(t => sFolder.getTaskItemId(t) === taskItem.id);
+                const sTaskItem = sFolder.taskFiles.find((t: ITaskItem) => sFolder.getTaskItemId(t) === taskItem.id);
                 if (sTaskItem)
                 {
                     utils.overrideNextShowInputBox("test label");

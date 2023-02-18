@@ -207,18 +207,11 @@ export class LicenseManager implements Disposable
 
 	private setLicenseKeyFromRsp = async(jso: IServerResponseData, logPad: string) =>
 	{
-		if (this.wrapper.utils.isString(jso.token))
-		{
-			this.wrapper.log.write("license key", 1, logPad, jso.token);
-			await this.setLicenseKey(jso.token);
-		}
-		else {
-			const token = jso.token as ISessionToken;
-			this.wrapper.log.value("license key", token.token, 1, logPad);
-			this.wrapper.log.value("   issued", token.issuedFmt, 1, logPad);
-			this.wrapper.log.value("   expires", token.expiresFmt /* || jso.expiresFmt */, 1, logPad);
-			await this.setLicenseKey(token.token);
-		}
+		const token = jso.token as ISessionToken;
+		this.wrapper.log.value("license key", token.token, 1, logPad);
+		this.wrapper.log.value("   issued", token.issuedFmt, 1, logPad);
+		this.wrapper.log.value("   expires", token.expiresFmt /* || jso.expiresFmt */, 1, logPad);
+		await this.setLicenseKey(token.token);
 		this.wrapper.log.write("license key saved to secure storage", 1, logPad);
 	};
 

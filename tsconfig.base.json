@@ -10,11 +10,10 @@
         "sourceMap": true,
         "strict": true,
         "noUnusedLocals": false,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
         // "moduleResolution": "node"
-		// "allowSyntheticDefaultImports":true,
-        // "allowSyntheticDefaultImports": true,
-        // "esModuleInterop": true,
         // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
         // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
         // "noUnusedParameters": true,  /* Report errors on unused parameters. */

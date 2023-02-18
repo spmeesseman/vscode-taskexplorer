@@ -5,6 +5,7 @@
 
 import { expect } from "chai";
 import * as utils from "../utils/utils";
+import { TaskFolder } from "../../tree/folder";
 import { sortFolders } from "../../lib/sortTasks";
 import { startupFocus } from "../utils/suiteUtils";
 import { SpecialTaskFolder } from "../../tree/specialFolder";

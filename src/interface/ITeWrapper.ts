@@ -43,4 +43,8 @@ export interface ITeWrapper
 	views: any;
 	wsfolder: WorkspaceFolder;
 	usage: any;
+	env: string;
+	id: string;
+	taskManager: any;
+	init(): Promise<void>;
 }

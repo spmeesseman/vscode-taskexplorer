@@ -1,21 +1,19 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import * as path from "path";
-import { Globs } from "../../../lib/constants";
-import { getDevPath } from "../../utils/sharedUtils";
-import { getRelativePath } from "../../../lib/utils/pathUtils";
-import { IExternalProvider, ITaskDefinition } from "../../../interface";
-import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
-// import { ExternalExplorerProvider, TaskExplorerDefinition } from "@spmeesseman/vscode-taskexplorer-types";
-//  Test bombs with this reference ^^^
+import { getDevPath, getRelativePath } from "../../utils/sharedUtils";
+import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, commands } from "vscode";
+import { IExternalProvider,  ITaskDefinition, ITaskExplorerApi } from "@spmeesseman/vscode-taskexplorer-types";
 
 
 /**
  * Test class for external task providers
  */
-export class ExternalTaskProvider3 extends IExternalProvider implements IExternalProvider
+export class ExternalTaskProvider3 implements IExternalProvider
 {
-    public override providerName = "external3";
+    isExternal: true = true;
+    cachedTasks: Task[] | undefined;
+    public providerName = "external3";
 
 
     public createTask(target: string, cmd: string, folder: WorkspaceFolder, uri: Uri): Task
@@ -43,7 +41,7 @@ export class ExternalTaskProvider3 extends IExternalProvider implements IExterna
 
     public getGlobPattern(): string
     {
-        return Globs.GLOB_EXTERNAL;
+        return "**/tasks.test";
     }
 
 
@@ -67,6 +65,20 @@ export class ExternalTaskProvider3 extends IExternalProvider implements IExterna
     async invalidate(uri?: Uri, logPad?: string): Promise<void>
     {
         return;
+    }
+
+    async provideTasks()
+    {
+        const teApi = await commands.executeCommand<ITaskExplorerApi>("taskexplorer.getApi");
+        if (teApi.providers[this.providerName])
+        {
+            return this.getTasks();
+        }
+    }
+
+    resolveTask(task: Task)
+    {
+        return undefined;
     }
 
 }

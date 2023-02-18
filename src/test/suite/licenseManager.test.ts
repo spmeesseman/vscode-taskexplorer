@@ -507,7 +507,7 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(teWrapper.treeManager.getTasks().filter(t => t.source === "gulp").length).to.be.equal(10);
+		expect(teWrapper.treeManager.getTasks().filter((t: Task) => t.source === "gulp").length).to.be.equal(10);
         utils.endRollingCount(this);
 	});
 
@@ -524,7 +524,7 @@ suite("License Manager Tests", () =>
 		});
 		utils.overrideNextShowInfoBox(undefined);
 		await utils.treeUtils.refresh();
-		expect(teWrapper.treeManager.getTasks().filter(t => t.source === "batch").length).to.be.equal(1);
+		expect(teWrapper.treeManager.getTasks().filter((t: Task) => t.source === "batch").length).to.be.equal(1);
         utils.endRollingCount(this);
 	});
 

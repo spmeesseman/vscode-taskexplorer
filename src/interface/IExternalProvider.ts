@@ -1,7 +1,7 @@
 
-import { commands, ProviderResult, Task, Uri, WorkspaceFolder } from "vscode";
 import { ITaskExplorerApi } from "./ITaskExplorerApi";
 import { ITaskExplorerProvider } from "./ITaskProvider";
+import { commands, ProviderResult, Task, Uri, WorkspaceFolder } from "vscode";
 
 
 export abstract class IExternalProvider implements ITaskExplorerProvider
