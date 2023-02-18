@@ -106,7 +106,7 @@ export class TeConfigWatcher implements Disposable
                     {
                         this.wrapper.log.write(`   the 'enabledTasks.${taskType}' setting has changed`, 1);
                         this.wrapper.log.value("      new value", newValue, 1);
-                        await this.wrapper.filewatcher.registerFileWatcher(taskType, false, newValue, "   ");
+                        await this.wrapper.fileWatcher.registerFileWatcher(taskType, false, newValue, "   ");
                         registerChange(taskType);
                     }
                 }
@@ -170,7 +170,7 @@ export class TeConfigWatcher implements Disposable
             if (e.affectsConfiguration("taskexplorer.globPatternsBash") && !refreshTaskTypes.includes("bash"))
             {
                 this.wrapper.log.write("   the 'globPatternsBash' setting has changed", 1);
-                await this.wrapper.filewatcher.registerFileWatcher("bash", false, this.wrapper.config.get<boolean>("enabledTasks.bash"), "   ");
+                await this.wrapper.fileWatcher.registerFileWatcher("bash", false, this.wrapper.config.get<boolean>("enabledTasks.bash"), "   ");
                 registerChange("bash");
             }
 
@@ -180,7 +180,7 @@ export class TeConfigWatcher implements Disposable
             if ((e.affectsConfiguration("taskexplorer.includeAnt") || e.affectsConfiguration("taskexplorer.globPatternsAnt")) && !refreshTaskTypes.includes("ant"))
             {
                 this.wrapper.log.write("   the 'globPatternsAnt' setting has changed", 1);
-                await this.wrapper.filewatcher.registerFileWatcher("ant", false, this.wrapper.config.get<boolean>("enabledTasks.ant"), "   ");
+                await this.wrapper.fileWatcher.registerFileWatcher("ant", false, this.wrapper.config.get<boolean>("enabledTasks.ant"), "   ");
                 registerChange("ant");
             }
 

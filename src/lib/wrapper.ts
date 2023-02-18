@@ -289,11 +289,11 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	private registerContextMenuCommands = () =>
 	{
-		registerDonateCommand(this._context.subscriptions);
-		registerAddToExcludesCommand(this._context.subscriptions);
-		registerDisableTaskTypeCommand(this._context.subscriptions);
-		registerEnableTaskTypeCommand(this._context.subscriptions);
-		registerRemoveFromExcludesCommand(this._context.subscriptions);
+		registerDonateCommand(this._disposables);
+		registerDisableTaskTypeCommand(this._disposables);
+		registerEnableTaskTypeCommand(this._disposables);
+		registerAddToExcludesCommand(this, this._disposables);
+		registerRemoveFromExcludesCommand(this, this._disposables);
 	};
 
 
@@ -384,7 +384,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 		return this._fileCache;
 	}
 
-	get filewatcher(): TeFileWatcher {
+	get fileWatcher(): TeFileWatcher {
 		return this._fileWatcher;
 	}
 

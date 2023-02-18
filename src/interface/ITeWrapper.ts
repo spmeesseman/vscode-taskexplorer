@@ -46,5 +46,7 @@ export interface ITeWrapper
 	env: string;
 	id: string;
 	taskManager: any;
+	// configWatcher: any;
+	fileWatcher: any;
 	init(): Promise<void>;
 }
