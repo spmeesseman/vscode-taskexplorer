@@ -3,7 +3,7 @@ import { TeApi } from "./api";
 import * as fs from "./utils/fs";
 import { Strings } from "./constants";
 import { TeServer } from "./auth/server";
-import * as fileCache from "./fileCache";
+import { TeFileCache } from "./fileCache";
 import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import { IStorage } from "../interface/IStorage";
@@ -66,13 +66,14 @@ export class TeWrapper implements ITeWrapper, Disposable
 	private readonly _homeView: HomeView;
 	private readonly _usage: UsageWatcher;
 	private readonly _teContext: TeContext;
+	private readonly _fileCache: TeFileCache;
 	private readonly _licensePage: LicensePage;
+	private readonly _disposables: Disposable[];
 	private readonly _context: ExtensionContext;
 	private readonly _treeManager: TaskTreeManager;
 	private readonly _taskUsageView: TaskUsageView;
 	private readonly _taskCountView: TaskCountView;
 	private readonly _configuration: IConfiguration;
-	private readonly _disposables: Disposable[];
 	// private readonly _telemetry: TelemetryService;
 	private readonly _licenseManager: LicenseManager;
 	private readonly _releaseNotesPage: ReleaseNotesPage;
@@ -96,6 +97,8 @@ export class TeWrapper implements ITeWrapper, Disposable
 		this._previousVersion = this._storage.get<string>("taskexplorer.version");
 
 		this._teContext = new TeContext();
+		this._fileCache = new TeFileCache(this);
+
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
 		this._usage = new UsageWatcher(this);
@@ -185,10 +188,6 @@ export class TeWrapper implements ITeWrapper, Disposable
 		// Register the configuration/settings watcher
 		//
 		registerConfigWatcher(this);
-		//
-		// Register file cache manager
-		//
-		await fileCache.registerFileCache(this);
 		//
 		// Register file type watchers
 		// This "used" to also start the file scan to build the file task file cache. It now
@@ -341,7 +340,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 	}
 
 	get busy(): boolean {
-		return this._busy || !this._ready || !this._initialized || fileCache.isBusy() || this._treeManager.isBusy() ||
+		return this._busy || !this._ready || !this._initialized || this._fileCache.isBusy() || this._treeManager.isBusy() ||
 			   isProcessingFsEvent() || isProcessingConfigChange() || this._licenseManager.isBusy();
 	}
 
@@ -380,8 +379,8 @@ export class TeWrapper implements ITeWrapper, Disposable
         return this.treeManager.views.taskExplorer.view;
     }
 
-	get filecache(): typeof fileCache {
-		return fileCache;
+	get filecache(): TeFileCache {
+		return this._fileCache;
 	}
 
 	get fs(): typeof fs {
