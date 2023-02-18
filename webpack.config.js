@@ -62,7 +62,8 @@ module.exports = (env, argv) =>
 		return [
 			// getWebpackConfig("extension_tests", env, argv),
 			// getWebpackConfig("extension", { ...env, ...{ environment: "dev" }}, argv)
-			getWebpackConfig("extension", env, argv)
+			getWebpackConfig("extension", env, argv),
+			getWebpackConfig("webview", { ...env, ...{ environment: "dev" }}, argv)
 		];
 	}
 
