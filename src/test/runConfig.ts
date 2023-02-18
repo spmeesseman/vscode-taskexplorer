@@ -29,27 +29,31 @@ export default async() =>
 {
     const xArgs = JSON.parse(process.env.xArgs || "[]"),
           testArgs = JSON.parse(process.env.testArgs || "[]"),
-          // testsRoot = path.resolve(__dirname, ".."),  // <- WP    // Webpack is fn'g garbage.  Same paths. but somehow
-          // nycRoot = path.resolve(__dirname, "..", "..", ".."),    // fucked up to were everything is mapped one level down.
-          testsRoot = path.resolve(__dirname),           // <- TS    // So fng sick of Webpack.  Sick of spending 17 hours for
-          nycRoot = path.resolve(__dirname, "..", ".."); // <- TS    // every little thing that needs to be done w/ it.  Fng garbage.
+          // testsRoot = path.resolve(__dirname, ".."),  // <- WP
+          // nycRoot = path.resolve(__dirname, "..", "..", ".."),
+          testsRoot = path.resolve(__dirname),           // <- TS
+          nycRoot = path.resolve(__dirname, "..", ".."); // <- TS
 
     // Setup coverage pre-test, including post-test hook to report
     const nyc = new NYC({
-        // ...baseConfig,
         extends: "@istanbuljs/nyc-config-typescript",
         cwd: nycRoot,
+        reportDir: "./.coverage",
+        tempDir: "./.nyc_output",
         reporter: [ "text-summary", "html", "lcov", "cobertura" ],
         all: true,
-        cache: true,
+        // cache: false,
         silent: false,
         instrument: true,
+        // sourceMap: true,
+        // instrument: false,
+        // sourceMap: false,
         hookRequire: true,
         hookRunInContext: true,
         hookRunInThisContext: true,
         // useSpawnWrap: true,
         include: [ "dist/**/*.js" ],
-        exclude: [ "dist/test/**", "node_modules/**" ],
+        exclude: [ "dist/test/**", "**/external*.*", "external*" ],
     });
     await nyc.wrap();
 

@@ -6,6 +6,7 @@ out
 *.buildinfo
 *.tsbuildinfo
 coverage
+.coverage
 .nyc_output
 install_extensions.bat
 res/release-notes.html
