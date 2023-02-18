@@ -404,7 +404,7 @@ suite("Task Tests", () =>
 async function startTask(taskItem: ITaskItem, addToSpecial: boolean)
 {
     if (tc.log.taskExecutionSteps) {
-        console.log(`    ${utils.figures.color.info} Run ${taskItem.taskSource} task | ${taskItem.label} | ${taskItem.getFolder()?.name}`);
+        console.log(`    ${teWrapper.figures.color.info} Run ${taskItem.taskSource} task | ${taskItem.label} | ${taskItem.getFolder()?.name}`);
     }
     if (addToSpecial)
     {

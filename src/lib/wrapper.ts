@@ -1,6 +1,7 @@
 
 import { TeApi } from "./api";
 import * as fs from "./utils/fs";
+import { figures } from "./figures";
 import { Strings } from "./constants";
 import { TeServer } from "./auth/server";
 import { TeFileCache } from "./fileCache";
@@ -380,6 +381,10 @@ export class TeWrapper implements ITeWrapper, Disposable
     get explorerView(): TreeView<TreeItem> {
         return this.treeManager.views.taskExplorer.view;
     }
+
+	get figures(): typeof figures {
+		return figures;
+	}
 
 	get filecache(): TeFileCache {
 		return this._fileCache;

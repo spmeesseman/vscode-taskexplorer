@@ -2,7 +2,7 @@
 
 import { expect } from "chai";
 import { executeSettingsUpdate, executeTeCommand } from "./commandUtils";
-import { figures, sleep, testControl as tc, waitForTeIdle } from "./utils";
+import { sleep, testControl as tc, waitForTeIdle } from "./utils";
 import { ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 
 interface TaskMap { [id: string]: ITaskItem | undefined };
@@ -34,7 +34,7 @@ export const getTreeTasks = async(teWrapper: ITeWrapper, taskType: string, expec
         if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap) || !findIdInTaskMap(`:${taskType}:`, taskMap))
         {
             if (retries === 0) {
-                console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty, retry", figures.colors.grey)}`);
+                console.log(`    ${teWrapper.figures.color.warning} ${teWrapper.figures.withColor("Task map is empty, retry", teWrapper.figures.colors.grey)}`);
             }
             if (retries % 10 === 0)
             {
@@ -44,7 +44,7 @@ export const getTreeTasks = async(teWrapper: ITeWrapper, taskType: string, expec
             if (!taskMap || teWrapper.utils.isObjectEmpty(taskMap))
             {
                 if (retries === 40) {
-                    console.log(`    ${figures.color.error} ${figures.withColor("Task map is empty, test will fail in 3, 2, 1...", figures.colors.grey)}`);
+                    console.log(`    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("Task map is empty, test will fail in 3, 2, 1...", teWrapper.figures.colors.grey)}`);
                 }
                 else {
                     await sleep(250);
@@ -60,10 +60,10 @@ export const getTreeTasks = async(teWrapper: ITeWrapper, taskType: string, expec
     const taskCount = taskMap ? findIdInTaskMap(`:${taskType}:`, taskMap) : 0;
     if (taskCount !== expectedCount)
     {
-        console.log(`    ${figures.color.warning} ${figures.withColor("Task map is empty.", figures.colors.grey)}`);
-        console.log(figures.withColor(`    ${figures.color.warning} TaskMap files:\n    ${figures.color.warning}    ` +
-                    Object.keys(taskMap).join(`\n    ${figures.color.warning}    `), figures.colors.grey));
-        expect.fail(`${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+        console.log(`    ${teWrapper.figures.color.warning} ${teWrapper.figures.withColor("Task map is empty.", teWrapper.figures.colors.grey)}`);
+        console.log(teWrapper.figures.withColor(`    ${teWrapper.figures.color.warning} TaskMap files:\n    ${teWrapper.figures.color.warning}    ` +
+                    Object.keys(taskMap).join(`\n    ${teWrapper.figures.color.warning}    `), teWrapper.figures.colors.grey));
+        expect.fail(`${teWrapper.figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
     }
 
     Object.values(taskMap).forEach((taskItem) =>
@@ -125,5 +125,5 @@ export const verifyTaskCountByTree = async(teWrapper: ITeWrapper, taskType: stri
         await sleep(300);
         taskCount = await _getCount();
     }
-    expect(taskCount).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
+    expect(taskCount).to.be.equal(expectedCount, `${teWrapper.figures.color.error} Unexpected ${taskType} task count (Found ${taskCount} of ${expectedCount})`);
 };

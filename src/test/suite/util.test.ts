@@ -16,7 +16,7 @@ import { ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { executeSettingsUpdate, executeTeCommand2 } from "../utils/commandUtils";
 import { getScriptTaskTypes, getTaskTypeFriendlyName, isScriptType } from "../../lib/utils/taskTypeUtils";
 import {
-	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep, figures
+	activate, testControl, logErrorsAreFine, suiteFinished, exitRollingCount, getWsPath, endRollingCount, sleep
 } from "../utils/utils";
 
 const creator = "spmeesseman",
@@ -390,7 +390,7 @@ suite("Util Tests", () =>
 		logControl.useTags = true;
 		log.blank(3);
 		log.write("test1", 1);
-		log.withColor("Test1", figures.colors.blue);
+		log.withColor("Test1", teWrapper.figures.colors.blue);
 		logControl.useTags = useTags;
 		//
 		// Disable logging
@@ -401,7 +401,7 @@ suite("Util Tests", () =>
 		log.write("test");
 		log.write("Test1", 1);
 		log.write("Test1", 1);
-		log.withColor("Test1", figures.colors.blue);
+		log.withColor("Test1", teWrapper.figures.colors.blue);
 		//
 		// Re-enable logging
 		//

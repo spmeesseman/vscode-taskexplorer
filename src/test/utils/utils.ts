@@ -5,22 +5,17 @@ import * as path from "path";
 import { expect } from "chai";
 import * as treeUtils from "./treeUtils";
 import { testControl } from "../control";
-import { figures } from "../../lib/figures";
 import { deactivate } from "../../extension";
-import { Strings } from "../../lib/constants";
 import { startInput, stopInput } from "./input";
 import { hasExplorerFocused } from "./commandUtils";
 import { getWsPath, getProjectsPath } from "./sharedUtils";
-import { deleteFile, pathExists } from "../../lib/utils/fs";
-import { configuration } from "../../lib/utils/configuration";
-import initSettings, { cleanupSettings } from "./initSettings";
+import { cleanupSettings, initSettings } from "./initSettings";
 import { getSuiteFriendlyName, getSuiteKey, processTimes } from "./bestTimes";
 import { ITaskExplorerApi, ITaskExplorerProvider, ITaskItem, ITeWrapper } from "@spmeesseman/vscode-taskexplorer-types";
 import { commands, ConfigurationTarget, Extension, extensions, Task, TaskExecution, tasks, Uri, ViewColumn, window, workspace } from "vscode";
 
 const { symbols } = require("mocha/lib/reporters/base");
 
-export { figures };
 export { testControl };
 export { treeUtils };
 export { getWsPath, getProjectsPath };
@@ -111,9 +106,9 @@ export const activate = async (instance?: Mocha.Context) =>
         const tzOffset = (new Date()).getTimezoneOffset() * 60000,
               locISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, -1).replace("T", " ").replace(/[\-]/g, "/");
 
-        console.log(`    ${figures.color.info}`);
-        console.log(`    ${figures.color.info} ${figures.withColor("Tests startup", figures.colors.grey)}`);
-        console.log(`    ${figures.color.info} ${figures.withColor("Time started: " + locISOTime, figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Tests startup", teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Time started: " + locISOTime, teWrapper.figures.colors.grey)}`);
         //
         // Set startup settings for this tests run using workspace settings scope.
         // The initSettings() functions does it's own logging to the console.
@@ -133,16 +128,16 @@ export const activate = async (instance?: Mocha.Context) =>
         // Activate extension
         // Note that the '*' is removed from package.json[activationEvents] before the runTest() call
         //
-        console.log(`    ${figures.color.info} ${figures.withColor("Activating extension", figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Activating extension", teWrapper.figures.colors.grey)}`);
         teWrapper = await (ext as any).activate();
-        console.log(`    ${figures.color.info} ${figures.withColor("Extension successfully activated", figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Extension successfully activated", teWrapper.figures.colors.grey)}`);
         //
         // Ensure extension initialized successfully
         //
         teApi = teWrapper.api;
         expect(teApi).to.not.be.empty;
         expect(teWrapper.explorer).to.not.be.empty;
-        expect(isReady()).to.be.equal(true, `    ${figures.color.error} TeApi not ready`);
+        expect(isReady()).to.be.equal(true, `    ${teWrapper.figures.color.error} TeApi not ready`);
         //
         // Set a valid license key to run in 'licensed mode' at startup
         //
@@ -150,7 +145,7 @@ export const activate = async (instance?: Mocha.Context) =>
         //
         // waitForIdle() added 1/2/03 - Tree loads in delay 'after' activate()
         //
-        console.log(`    ${figures.color.info} ${figures.withColor("Waiting for extension to initialize", figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Waiting for extension to initialize", teWrapper.figures.colors.grey)}`);
         await waitForTeIdle();
         //
         // Write to console is just a tests feature, it's not controlled by settings, set it here if needed
@@ -164,9 +159,9 @@ export const activate = async (instance?: Mocha.Context) =>
         // All done
         //
         activated = true;
-        console.log(`    ${figures.color.info} ${figures.withColor("Tests initialization completed, ready", figures.colors.grey)}`);
-        console.log(`    ${figures.color.info}`);
-		console.log(`    ${figures.color.warningTests} ${figures.withColor(disableSSLMsg, figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Tests initialization completed, ready", teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info}`);
+		console.log(`    ${teWrapper.figures.color.warningTests} ${teWrapper.figures.withColor(disableSSLMsg, teWrapper.figures.colors.grey)}`);
     }
     return {
         teApi,
@@ -178,18 +173,18 @@ export const activate = async (instance?: Mocha.Context) =>
 
 export const cleanup = async () =>
 {
-    console.log(`    ${figures.color.info}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Tests complete, clean up", figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Tests complete, clean up", teWrapper.figures.colors.grey)}`);
     if (caughtControlC) {
-        console.log(`    ${figures.color.info} ${figures.withColor("User cancelled (caught CTRL+C)", figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("User cancelled (caught CTRL+C)", teWrapper.figures.colors.grey)}`);
     }
 
     if (tc.log.enabled && tc.log.file && tc.log.openFileOnFinish)
     {
-        console.log(`    ${figures.color.info}`);
-        console.log(`    ${figures.color.info} ${figures.withColor("Log File Location:", figures.colors.grey)}`);
-        console.log(`    ${figures.color.info} ${figures.withColor("   " + teWrapper.log.getLogFileName(), figures.colors.grey)}`);
-        console.log(`    ${figures.color.info}`);
+        console.log(`    ${teWrapper.figures.color.info}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Log File Location:", teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("   " + teWrapper.log.getLogFileName(), teWrapper.figures.colors.grey)}`);
+        console.log(`    ${teWrapper.figures.color.info}`);
     }
 
     //
@@ -202,19 +197,19 @@ export const cleanup = async () =>
     //
     await cleanupSettings();
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Deactivating extension", figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Deactivating extension", teWrapper.figures.colors.grey)}`);
     try { await deactivate(); } catch {}
-    console.log(`    ${figures.color.info} ${figures.withColor("Extension successfully deactivated", figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Extension successfully deactivated", teWrapper.figures.colors.grey)}`);
 
     window.showInputBox = originalShowInputBox;
     window.showInformationMessage = originalShowInfoBox;
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = NODE_TLS_REJECT_UNAUTHORIZED;
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Removing any leftover temporary files", figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Removing any leftover temporary files", teWrapper.figures.colors.grey)}`);
     try {
         const packageLockFile = path.join(getWsPath("."), "package-lock.json");
-        if (await pathExists(packageLockFile)) {
-            await deleteFile(packageLockFile);
+        if (await teWrapper.fs.pathExists(packageLockFile)) {
+            await teWrapper.fs.deleteFile(packageLockFile);
         }
     } catch (e) { console.error(e); }
 
@@ -222,13 +217,13 @@ export const cleanup = async () =>
     // Reset Grunt and Gulp VSCode internal task providers, which we enabled b4 extension activation.
     // These get reset at the end of the Gulp suite's tests, but just in case we do it again here...
     //
-    console.log(`    ${figures.color.info} ${figures.withColor("Resetting modified global settings", figures.colors.grey)}`);
-    await configuration.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
-    await configuration.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Resetting modified global settings", teWrapper.figures.colors.grey)}`);
+    await teWrapper.config.updateVs("grunt.autoDetect", tc.vsCodeAutoDetectGrunt);
+    await teWrapper.config.updateVs("gulp.autoDetect", tc.vsCodeAutoDetectGulp);
     // await workspace.getConfiguration("grunt").update("autoDetect", tc.vsCodeAutoDetectGrunt, ConfigurationTarget.Global);
     // await workspace.getConfiguration("gulp").update("autoDetect", tc.vsCodeAutoDetectGulp, ConfigurationTarget.Global);
 
-    console.log(`    ${figures.color.info} ${figures.withColor("Cleanup complete", figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Cleanup complete", teWrapper.figures.colors.grey)}`);
 
     //
     // Process execution timesand do the dorky best time thing that I forsome reason spent a whole
@@ -239,14 +234,14 @@ export const cleanup = async () =>
     //
     // Exit
     //
-    console.log(`    ${figures.color.info} ${figures.withColor("Exiting", figures.colors.grey)}`);
-    console.log(`    ${figures.color.info}`);
+    console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor("Exiting", teWrapper.figures.colors.grey)}`);
+    console.log(`    ${teWrapper.figures.color.info}`);
 
     //
     // If rolling count error is set, reset the mocha success icon for "cleanup" final test/step
     //
     if (hasRollingCountError) {
-        symbols.ok = figures.color.success;
+        symbols.ok = teWrapper.figures.color.success;
     }
 };
 
@@ -317,7 +312,7 @@ export const exitRollingCount = (instance: Mocha.Context, isSetup?: boolean, isT
     {
         if (!hasRollingCountError) {
             const msg = `rolling success count failure @ test ${(testIdx || -1) + 1}, all further tests will be skipped`;
-            console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+            console.log(`    ${teWrapper.figures.color.info} ${teWrapper.figures.withColor(msg, teWrapper.figures.colors.grey)}`);
         }
         setFailed(false);
         if (suite.tests.filter(t => t.isFailed).length === 0) {
@@ -338,7 +333,7 @@ export const getPackageManager = () =>
 };
 
 export const getSpecialTaskItemId = (taskItem: ITaskItem) =>
-    taskItem.id.replace(Strings.LAST_TASKS_LABEL + ":", "").replace(Strings.FAV_TASKS_LABEL + ":", "").replace(Strings.USER_TASKS_LABEL + ":", "");
+    taskItem.id.replace("Last Tasks:", "").replace("Favorites:", "").replace("User Tasks:", "");
 
 
 export const getTeApi = () => teApi;
@@ -363,20 +358,20 @@ export const needsTreeBuild = (isFocus?: boolean) => (isFocus || !treeUtils.hasR
 const isReady = (taskType?: string) =>
 {
     let err: string | undefined;
-    if (!teApi)                                 err = `    ${figures.color.error} ${figures.withColor("TeApi null", figures.colors.grey)}`;
+    if (!teApi)                                 err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("TeApi null", teWrapper.figures.colors.grey)}`;
     else {
-        if (!teWrapper.explorer)                err = `    ${figures.color.error} ${figures.withColor("TeApi Explorer provider == null", figures.colors.grey)}`;
-        // /else if (!teApi.sidebar)            err = `    ${figures.color.error} ${figures.withColor("TeApi Sidebar Provider == null", figures.colors.grey)}`;
-        else if (!teApi.providers)              err = `    ${figures.color.error} ${figures.withColor("Providers null", figures.colors.grey)}`;
+        if (!teWrapper.explorer)                err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("TeApi Explorer provider == null", teWrapper.figures.colors.grey)}`;
+        // /else if (!teApi.sidebar)            err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("TeApi Sidebar Provider == null", teWrapper.figures.colors.grey)}`;
+        else if (!teApi.providers)              err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("Providers null", teWrapper.figures.colors.grey)}`;
     }
     if (!err && taskType) {
-        if (!teApi.providers[taskType])         err = `    ${figures.color.error} ${taskType} ${figures.withColor("Provider == null", figures.colors.grey)}`;
+        if (!teApi.providers[taskType])         err = `    ${teWrapper.figures.color.error} ${taskType} ${teWrapper.figures.withColor("Provider == null", teWrapper.figures.colors.grey)}`;
     }
     if (!err && !(workspace.workspaceFolders ? workspace.workspaceFolders[0] : undefined)) {
-                                                err = `    ${figures.color.error} ${figures.withColor("Workspace folder does not exist", figures.colors.grey)}`;
+                                                err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("Workspace folder does not exist", teWrapper.figures.colors.grey)}`;
     }
     if (!err && !extensions.getExtension("spmeesseman.vscode-taskexplorer")) {
-                                                err = `    ${figures.color.error} ${figures.withColor("Extension not found", figures.colors.grey)}`;
+                                                err = `    ${teWrapper.figures.color.error} ${teWrapper.figures.withColor("Extension not found", teWrapper.figures.colors.grey)}`;
     }
     if (err) {
         console.log(err);
@@ -389,19 +384,19 @@ export const logErrorsAreFine = (willFail = true) =>
 {
     if (willFail && tc.log.enabled && teWrapper.config.get<boolean>("logging.enabled"))
     {
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.up}  ${figures.withColor("  THESE ERRORS WERE SUPPOSED TO HAPPEN!!!  ", figures.colors.green)}  ` +
-                    `${figures.color.up}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
-        console.log(`    ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ` +
-                    `${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}  ${figures.color.success}`);
+        console.log(`    ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}`);
+        console.log(`    ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.up}  ${teWrapper.figures.withColor("  THESE ERRORS WERE SUPPOSED TO HAPPEN!!!  ", teWrapper.figures.colors.green)}  ` +
+                    `${teWrapper.figures.color.up}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}`);
+        console.log(`    ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ` +
+                    `${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}  ${teWrapper.figures.color.success}`);
     }
 };
 
@@ -416,7 +411,7 @@ export const setFailed = (ctrlc = true) =>
 {
     caughtControlC = ctrlc;
     hasRollingCountError = true;
-    symbols.ok = figures.withColor(figures.pointer, figures.colors.blue);
+    symbols.ok = teWrapper.figures.withColor(teWrapper.figures.pointer, teWrapper.figures.colors.blue);
 };
 
 
@@ -515,7 +510,7 @@ export const verifyTaskCount = async (taskType: string, expectedCount: number, r
         }
     }
     if (expectedCount >= 0) {
-        expect(tTasks.length).to.be.equal(expectedCount, `${figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
+        expect(tTasks.length).to.be.equal(expectedCount, `${teWrapper.figures.color.error} Unexpected ${taskType} task count (Found ${tTasks.length} of ${expectedCount})`);
     }
     return tTasks.length;
 };
@@ -531,7 +526,7 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             hasExec = false,
             isExec = !!isExecuting(exec.task);
         if (tc.log.taskExecutionSteps) {
-            console.log(`    ${figures.color.infoTask}   ${figures.withColor(`Waiting for '${taskName}' task execution`, figures.colors.grey)}`);
+            console.log(`    ${teWrapper.figures.color.infoTask}   ${teWrapper.figures.withColor(`Waiting for '${taskName}' task execution`, teWrapper.figures.colors.grey)}`);
         }
         while ((isExec && (maxWait === undefined || waitedAfterStarted < maxWait)) || (!isExec && !hasExec && waitedHasNotStarted < 3000))
         {
@@ -539,7 +534,7 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             isExec = !!isExecuting(exec.task);
             if (isExec) {
                 if (!hasExec && tc.log.taskExecutionSteps) {
-                    console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution started, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+                    console.log(`    ${teWrapper.figures.color.infoTask}     ${teWrapper.figures.withColor(`Task execution started, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, teWrapper.figures.colors.grey)}`);
                 }
                 hasExec = isExec;
                 waitedAfterStarted += 50;
@@ -547,7 +542,7 @@ export const waitForTaskExecution = async (exec: TaskExecution | undefined, maxW
             else if (!hasExec) { waitedHasNotStarted += 50; }
         }
         if (tc.log.taskExecutionSteps) {
-            console.log(`    ${figures.color.infoTask}     ${figures.withColor(`Task execution wait finished, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, figures.colors.grey)}`);
+            console.log(`    ${teWrapper.figures.color.infoTask}     ${teWrapper.figures.withColor(`Task execution wait finished, waited ${waitedAfterStarted + waitedHasNotStarted} ms`, teWrapper.figures.colors.grey)}`);
         }
     }
 };

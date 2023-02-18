@@ -48,5 +48,6 @@ export interface ITeWrapper
 	taskManager: any;
 	// configWatcher: any;
 	fileWatcher: any;
+	figures: any;
 	init(): Promise<void>;
 }

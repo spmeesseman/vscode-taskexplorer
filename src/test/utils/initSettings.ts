@@ -1,21 +1,42 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
-import { figures } from "../../lib/figures";
 import { testControl as tc } from "../control";
-import { isObject } from "../../lib/utils/utils";
 import { ConfigurationTarget, workspace } from "vscode";
 import { IDictionary } from "@spmeesseman/vscode-taskexplorer-types";
 
+const isArray = <T>(value: any): value is T[] => !!value && Array.isArray(value);
+const isObject = (value: any): value is { [key: string]: any } => !!value && (value instanceof Object || typeof value === "object") && !isArray(value);
 
-const initSettings = async () =>
+const withColor = (msg: string, color: LogColor) =>
+{
+    return "\x1B[" + color[0] + "m" + msg + "\x1B[" + color[1] + "m";
+};
+
+type LogColor = [ number, number ];
+
+class LogColors
+{
+    grey: LogColor = [ 90, 39 ];
+    magenta: LogColor = [ 35, 39 ];
+};
+
+const colors = new LogColors();
+
+const color =
+{
+    info: withColor("ℹ", colors.magenta)
+};
+
+
+export const initSettings = async () =>
 {
     const config = workspace.getConfiguration("taskexplorer");
-    console.log(`    ${figures.color.info} ${figures.withColor("Initializing settings", figures.colors.grey)}`);
+    console.log(`    ${color.info} ${withColor("Initializing settings", colors.grey)}`);
     //
     // This function runs BEFORE the extension is initialized, so any updates have no immediate
     // effect.  All settings set here will get read on on extension activation, coming up next.
     //
-    // Update- Actually - VSCode reads thedefaultsettings from package.json b4 the extension is
+    // Update- Actually - VSCode reads the default settings from package.json b4 the extension is
     // even activated.  Now creating a default config file in runTest.js, before VSCode is started.
     //
     // Create .vscode directory if it doesn't exist, so the we have perms to
@@ -84,7 +105,7 @@ const initSettings = async () =>
         });
 
         const msg = `Logging is enabled (level ${tc.log.level}) [ File: ${tc.log.file} | Output Window: ${tc.log.output} | console: ${tc.log.console} ]`;
-        console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
+        console.log(`    ${color.info} ${withColor(msg, colors.grey)}`);
     }
 
     if (workspace.workspaceFolders && workspace.workspaceFolders.length > 1)
@@ -95,8 +116,8 @@ const initSettings = async () =>
     }
 
     const msg = `The test environment is a '${tc.isMultiRootWorkspace ? "multi-root" : "single-root"}' workspace`;
-    console.log(`    ${figures.color.info} ${figures.withColor(msg, figures.colors.grey)}`);
-    console.log(`    ${figures.color.info} ${figures.withColor("Settings initialization completed", figures.colors.grey)}`);
+    console.log(`    ${color.info} ${withColor(msg, colors.grey)}`);
+    console.log(`    ${color.info} ${withColor("Settings initialization completed", colors.grey)}`);
 };
 
 
@@ -107,6 +128,3 @@ export const cleanupSettings = async() =>
     await workspace.getConfiguration("grunt").update("autoDetect", "off", ConfigurationTarget.Global);
     await workspace.getConfiguration("gulp").update("autoDetect", "on", ConfigurationTarget.Global);
 };
-
-
-export default initSettings;
