@@ -451,7 +451,7 @@ suite("Util Tests", () =>
 		expect(teWrapper.utils.lowerCaseFirstChar("testApp", false)).to.be.equal("testApp");
 		expect(teWrapper.utils.lowerCaseFirstChar("test App", true)).to.be.equal("testApp");
 
-		teWrapper.taskUtils.teWrappergetTaskTypeFriendlyName("Workspace");
+		teWrapper.taskUtils.getTaskTypeFriendlyName("Workspace");
 		teWrapper.taskUtils.getTaskTypeFriendlyName("Workspace", true);
 		teWrapper.taskUtils.getTaskTypeFriendlyName("apppublisher");
 		teWrapper.taskUtils.getTaskTypeFriendlyName("apppublisher", true);
