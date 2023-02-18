@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
 const { renameSync } = require("fs");
+const { spawnSync } = require("child_process");
 const CopyPlugin = require("copy-webpack-plugin");
 const HtmlPlugin = require("html-webpack-plugin");
 const CspHtmlPlugin = require("csp-html-webpack-plugin");
@@ -43,7 +44,7 @@ const wpPlugin =
 		{
 			plugin =
 			{   /** @param {import("webpack").Compiler} compiler Compiler */
-				apply: (compiler) =>   
+				apply: (compiler) =>
 				{
 					compiler.hooks.done.tap("AfterDonePlugin", () =>
 					{
@@ -54,6 +55,19 @@ const wpPlugin =
 					});
 				}
 			};
+		}
+		else if (env.build === "extension" && env.environment === "test")
+		{
+			const babel = [
+				"babel", "./src/test", "--out-dir", "./dist/test", "--extensions", ".ts",
+				"--presets=@babel/preset-env,@babel/preset-typescript",
+			];
+			spawnSync("npx", babel,
+			{
+				cwd: __dirname,
+				encoding: "utf8",
+				shell: true
+			});
 		}
 		if (!plugin) {
 			plugin = /** @type {webpack.BannerPlugin} */(/** @type {unknown} */(undefined));

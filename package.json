@@ -71,7 +71,7 @@
         "test-coverage-full_off": "script\\enable-full-coverage.sh --off",
         "test-coverage-codecov-publish": "node_modules/.bin/codecov --disable=gcov --disable=detect",
         "test-all": " npm run tsc-build_test && node ./dist/test/runTest.js",
-        "test-all_wp": "npm run webpack-build:test && node ./dist/test/runTest.js",
+        "test-all_wp": "node ./dist/test/runTest.js",
         "test-all_mws": "npm run tsc-build_test && node ./dist/test/runTest.js --multi-root",
         "test-all_mws_nc": "node ./dist/test/runTest.js --no-clean --multi-root",
         "test-ant": "npm run tsc-build_test && node ./dist/test/runTest.js ant xDeactivate",
@@ -174,6 +174,10 @@
         "xml2js": "^0.4.23"
     },
     "devDependencies": {
+        "@babel/cli": "^7.20.7",
+        "@babel/core": "^7.20.12",
+        "@babel/preset-env": "^7.20.2",
+        "@babel/preset-typescript": "^7.18.6",
         "@fortawesome/fontawesome-free": "^6.2.1",
         "@fortawesome/fontawesome-pro": "^6.2.1",
         "@istanbuljs/nyc-config-typescript": "^1.0.1",
@@ -193,6 +197,7 @@
         "@typescript-eslint/parser": "^5.11.0",
         "@vscode/test-electron": "^2.2.2",
         "@vscode/vsce": "^2.17.0",
+        "babel-loader": "^9.1.2",
         "chai": "^4.3.7",
         "circular-dependency-plugin": "^5.2.2",
         "clean-webpack-plugin": "^4.0.0",

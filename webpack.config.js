@@ -1,6 +1,6 @@
 //@ts-check
 // const fs = require("fs");
-var glob = require('glob');
+const glob = require('glob');
 const path = require("path");
 const JSON5 = require("json5");
 const esbuild = require("esbuild");
@@ -60,7 +60,7 @@ module.exports = (env, argv) =>
 	if (env.environment === "test") {
 		// env.esbuild = true;
 		return [
-			getWebpackConfig("extension_tests", env, argv),
+			// getWebpackConfig("extension_tests", env, argv),
 			// getWebpackConfig("extension", { ...env, ...{ environment: "dev" }}, argv)
 			getWebpackConfig("extension", env, argv)
 		];
@@ -468,7 +468,7 @@ const output = (env, wpConfig) =>
 					// module: true,
 					chunkFormat: "commonjs",
 					library: {
-						type: "commonjs"
+						type: "commonjs2"
 					}
 				};
 			}
@@ -481,7 +481,7 @@ const output = (env, wpConfig) =>
 					chunkFormat: "commonjs",
 					// module: true,
 					library: {
-						type: "commonjs"
+						type: "commonjs2"
 					}
 				};
 			}
@@ -657,6 +657,25 @@ const rules = (env, wpConfig) =>
 			}]
 		}]);
 	}
+	// else if (env.build === "extension_tests")
+	// {
+	// 	wpConfig.module.rules.push(...[
+	// 	{
+	// 		exclude: [/node_modules/, /\.d\.ts$/ ],
+	// 		include: path.join(__dirname, "src", "test"),
+	// 		test: /\.tsx?$/,
+	// 		use: {
+	// 			loader: 'babel-loader',
+	// 			options: {
+	// 				presets: [
+	// 					"@babel/preset-env",
+	// 					"@babel/preset-typescript"
+	// 				],
+	// 				// configFile: path.join(__dirname, "tsconfig.test.json")
+	// 			}
+	// 		}
+	// 	}]);
+	// }
 	else
 	{
 		wpConfig.module.rules.push(...[
@@ -668,8 +687,7 @@ const rules = (env, wpConfig) =>
 		// 	}]
 		// },
 		{
-			exclude: env.environment !== "test" ? [/node_modules/, /test/, /\.d\.ts$/ ] : [/node_modules/, /\.d\.ts$/ ],
-			// include: env.environment !== "test" ? path.join(__dirname, "src") : path.join(__dirname, "src", "test"),
+			exclude: [/node_modules/, /test/, /\.d\.ts$/ ],
 			include: path.join(__dirname, "src"),
 			test: /\.tsx?$/,
 			// @ts-ignore
@@ -681,20 +699,14 @@ const rules = (env, wpConfig) =>
 					loader: "tsx",
 					target: ["es2020", "chrome91", "node14.16"],
 					tsconfigRaw: resolveTSConfig(
-						path.join(
-							__dirname,
-							env.build === "extension_web" ? "tsconfig.browser.json" : (env.build !== "extension_tests" ? "tsconfig.json" : "tsconfig.test.json"),
-						),
+						path.join(__dirname, env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json"),
 					),
 				},
 			} :
 			{
 				loader: "ts-loader",
 				options: {
-					configFile: path.join(
-						__dirname,
-						env.build === "extension_web" ? "tsconfig.browser.json" : (env.build !== "extension_tests" ? "tsconfig.json" : "tsconfig.test.json"),
-					),
+					configFile: path.join(__dirname, env.build === "extension_web" ? "tsconfig.browser.json" : "tsconfig.json"),
 					experimentalWatchApi: true,
 					transpileOnly: true
 				},
