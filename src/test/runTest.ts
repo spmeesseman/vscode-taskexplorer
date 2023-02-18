@@ -294,8 +294,8 @@ const main = async(args: string[]) =>
                 }
             // }
             console.log("delete any leftover temporary files and/or directories");
-            fs.rmdirSync(path.join(project1Path, "tasks_test_"), { recursive: true });
-            fs.rmdirSync(path.join(project1Path, "tasks_test_ignore_"), { recursive: true });
+            fs.rmSync(path.join(project1Path, "tasks_test_"), { recursive: true });
+            fs.rmSync(path.join(project1Path, "tasks_test_ignore_"), { recursive: true });
         }
         catch {}
 
