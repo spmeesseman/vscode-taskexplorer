@@ -3,7 +3,7 @@ import { TaskFile } from "./file";
 import { TaskItem } from "./item";
 import { log } from "../lib/log/log";
 import { TaskFolder } from "./folder";
-import { IEvent } from "../interface";
+import { IEvent, ITeTaskTree } from "../interface";
 import { TreeViewIds } from "./treeView";
 import { TaskTreeManager } from "./treeManager";
 import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } from "vscode";
@@ -33,7 +33,7 @@ import { Event, EventEmitter, Task, TreeItem, Disposable, TreeDataProvider } fro
  *        refresh the tree ui, with the TreeItem that needs to be provided (or undefined/null if
  *        asking to provide the entire tree).
  */
-export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
+export class TaskTree implements TreeDataProvider<TreeItem>, ITeTaskTree, Disposable
 {
     private visible = false;
     private wasVisible = false;
@@ -179,7 +179,7 @@ export class TaskTree implements TreeDataProvider<TreeItem>, Disposable
     getName = () => this.name;
 
 
-    public getParent(element: TreeItem): TreeItem | null
+    getParent(element: TreeItem): TreeItem | null
     {
         if (element instanceof TaskItem)
         {

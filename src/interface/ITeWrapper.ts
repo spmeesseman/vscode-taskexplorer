@@ -1,5 +1,5 @@
 
-import { ExtensionContext, WorkspaceFolder } from "vscode";
+import { ExtensionContext, TreeItem, TreeView, WorkspaceFolder } from "vscode";
 import { IConfiguration } from "./IConfiguration";
 import { ITeFileCache } from "./ITeFileCache";
 import { ITeFilesystem } from "./ITeFilesystem";
@@ -9,6 +9,8 @@ import { ITaskExplorerApi } from "./ITaskExplorerApi";
 import { ITeContext } from "./ITeContext";
 import { ITeUtilities } from "./ITeUtilities";
 import { ITeWebview } from "./ITeWebview";
+import { IDictionary } from "./IDictionary";
+import { ITaskTreeView, ITeTaskTree } from "./ITeTaskTree";
 
 export interface ITeWrapper
 {
@@ -27,8 +29,8 @@ export interface ITeWrapper
 	contextTe: ITeContext;
 	configwatcher: boolean;
 	// configWatcher: any;
-	explorer: any;
-	explorerView: any;
+	explorer: ITeTaskTree;
+	explorerView: TreeView<TreeItem>;
 	fileWatcher: any;
 	figures: any;
 	homeView: ITeWebview;
@@ -37,12 +39,12 @@ export interface ITeWrapper
 	licenseManager: any;
 	licensePage: ITeWebview;
 	log: ILog;
-	logControl: any;
+	logControl: IDictionary<any>;
 	parsingReportPage: ITeWebview;
 	pathUtils: any;
 	releaseNotesPage: ITeWebview;
-	sidebar: any;
-	sidebarView: any;
+	sidebar: ITeTaskTree;
+	sidebarView: TreeView<TreeItem>;
 	sorters: any;
 	storage: IStorage;
 	treeManager: any;
@@ -52,6 +54,6 @@ export interface ITeWrapper
 	taskUtils: any;
 	usage: any;
 	utils: ITeUtilities;
-	views: any;
+	views: IDictionary<ITaskTreeView>;
 	wsfolder: WorkspaceFolder;
 }

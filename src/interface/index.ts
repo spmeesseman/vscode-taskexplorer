@@ -21,3 +21,4 @@ export type { ITaskExplorerProvider } from "./ITaskProvider";
 export type { IExternalProvider } from "./IExternalProvider";
 export type { TeSessionChangeEvent } from "./IAuthentication";
 export type { IStorage, StorageChangeEvent } from "./IStorage";
+export type { ITeTaskTree, ITaskTreeView } from "./ITeTaskTree";
