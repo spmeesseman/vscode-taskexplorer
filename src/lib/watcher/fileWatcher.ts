@@ -8,17 +8,17 @@ import { extname } from "path";
 import { log } from "../log/log";
 import * as cache from "../fileCache";
 import * as util from "../utils/utils";
+import { TeWrapper } from "../wrapper";
 import { isDirectory } from "../utils/fs";
 import { isString } from "../utils/utils";
-import { storage } from "../utils/storage";
 import { Commands, executeCommand } from "../command";
-import { configuration } from "../utils/configuration";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
     Disposable, ExtensionContext, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent
 } from "vscode";
 
 let currentEvent: any;
+let _wrapper: TeWrapper;
 let extContext: ExtensionContext;
 let rootPath: string | undefined;
 let workspaceWatcher: Disposable | undefined;
@@ -279,7 +279,7 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
         }
         log.write("   vscode will deactivate and re-activate the extension", 1);
         rootPath = workspace.rootPath;
-        storage.update2Sync("lastWsRootPathChange", Date.now());
+        _wrapper.storage.update2Sync("lastWsRootPathChange", Date.now());
     }
 
     //
@@ -318,7 +318,7 @@ export const onWsFoldersChange = async(e: WorkspaceFoldersChangeEvent) =>
     //
     else {
         log.write("   workspace folder order has changed", 1);
-        if (!configuration.get<boolean>("sortProjectFoldersAlpha"))
+        if (!_wrapper.config.get<boolean>("sortProjectFoldersAlpha"))
         {   //
             // Refresh tree only, leave file cache and provider invalidation alone.  Setting
             // the 2nd param in refresh cmd to `false` accomplishes just that.
@@ -424,10 +424,13 @@ export const registerFileWatcher = async(context: ExtensionContext, taskType: st
 };
 
 
-export const registerFileWatchers = async(context: ExtensionContext, logPad: string) =>
+export const registerFileWatchers = async(wrapper: TeWrapper, logPad: string) =>
 {
-    extContext = context;
     log.methodStart("register file watchers", 1, logPad);
+
+    _wrapper = wrapper;
+    extContext = wrapper.context;
+
     //
     // Record ws folder count and `rootPath` (which is deprecated but still causes the dumb extension
     // restart when changed?) so that we can detect when a workspace is opened/closed, when a single
@@ -445,15 +448,15 @@ export const registerFileWatchers = async(context: ExtensionContext, logPad: str
     //
     // Watch for folder adds and deletes within the project folder
     //
-    createDirWatcher(context);
+    createDirWatcher(extContext);
     //
     // Watch individual task type files within the project folder
     //
-    await createFileWatchers(context, logPad + "   ");
+    await createFileWatchers(extContext, logPad + "   ");
     //
     // Refresh tree when folders/projects are added/removed from the workspace, in a multi-root ws
     //
-    createWorkspaceWatcher(context);
+    createWorkspaceWatcher(extContext);
     log.methodDone("register file watchers", 1, logPad);
 };
 

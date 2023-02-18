@@ -2,11 +2,11 @@
 
 import { log } from "../log/log";
 import { TeWrapper } from "../wrapper";
+import { ContextKeys } from "../context";
 import { persistCache } from "../fileCache";
 import { IDictionary } from "../../interface";
 import { pushIfNotExists } from "../utils/utils";
 import { registerFileWatcher } from "./fileWatcher";
-import { setContext, ContextKeys } from "../context";
 import { Commands, executeCommand } from "../command";
 import { configuration } from "../utils/configuration";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
@@ -253,16 +253,16 @@ async function processConfigChanges(ctx: ExtensionContext, e: ConfigurationChang
         const newValue = configuration.get<boolean>("enableExplorerView");
         log.write("   the 'enableExplorerView' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                              configuration.get<boolean>("enableSideBar"));
+        await _wrapper.contextTe.setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                                                 configuration.get<boolean>("enableSideBar"));
     }
     if (e.affectsConfiguration("taskexplorer.enableSideBar"))
     {
         const newValue = configuration.get<boolean>("enableSideBar");
         log.write("   the 'enableSideBar' setting has changed", 1);
         log.value("      new value", newValue, 1);
-        await setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
-                                              configuration.get<boolean>("enableSideBar"));
+        await _wrapper.contextTe.setContext(ContextKeys.Enabled, configuration.get<boolean>("enableExplorerView") ||
+                                                                 configuration.get<boolean>("enableSideBar"));
     }
 
     //

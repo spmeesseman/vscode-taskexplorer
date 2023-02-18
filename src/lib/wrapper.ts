@@ -9,9 +9,9 @@ import * as utilities from "./utils/utils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog } from "../interface";
 import { TaskManager } from "src/tree/taskManager";
+import { ContextKeys, TeContext } from "./context";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
-import { ContextKeys, setContext } from "./context";
 import { BashTaskProvider } from "../providers/bash";
 import { GulpTaskProvider } from "../providers/gulp";
 import { MakeTaskProvider } from "../providers/make";
@@ -64,6 +64,7 @@ export class TeWrapper
 	private readonly _storage: IStorage;
 	private readonly _homeView: HomeView;
 	private readonly _usage: UsageWatcher;
+	private readonly _teContext: TeContext;
 	private readonly _licensePage: LicensePage;
 	private readonly _context: ExtensionContext;
 	private readonly _treeManager: TaskTreeManager;
@@ -92,6 +93,7 @@ export class TeWrapper
 		this._version = this._context.extension.packageJSON.version;
 		this._previousVersion = this._storage.get<string>("taskexplorer.version");
 
+		this._teContext = new TeContext();
 		this._licenseManager = new LicenseManager(this);
 		this._treeManager = new TaskTreeManager(this);
 		this._usage = new UsageWatcher(this);
@@ -136,6 +138,7 @@ export class TeWrapper
 		// );
 
 		context.subscriptions.push(
+			this._teContext,
 			this._usage,
 			this._homeView,
 			this._treeManager,
@@ -181,14 +184,14 @@ export class TeWrapper
 		// are enabled or disabled in settings after startup, then the individual calls to
 		// registerFileWatcher() will perform the scan for that task type.
 		//
-		await registerFileWatchers(this._context, "   ");
+		await registerFileWatchers(this, "   ");
 		//
 		// Context
 		//
 		this.registerContextMenuCommands();
-		await setContext(ContextKeys.Debugging, this.debugging);
-		await setContext(ContextKeys.Tests, this.tests);
-        await setContext(ContextKeys.Enabled, this.config.get<boolean>("enableSideBar") ||
+		await this._teContext.setContext(ContextKeys.Debugging, this.debugging);
+		await this._teContext.setContext(ContextKeys.Tests, this.tests);
+        await this._teContext.setContext(ContextKeys.Enabled, this.config.get<boolean>("enableSideBar") ||
                    /* istanbul ignore next */ this.config.get<boolean>("enableExplorerView"));
 		//
 		// Signal we are ready/done
@@ -339,6 +342,10 @@ export class TeWrapper
 
 	get context(): ExtensionContext {
 		return this._context;
+	}
+
+	get contextTe(): TeContext {
+		return this._teContext;
 	}
 
 	get debugging(): boolean {

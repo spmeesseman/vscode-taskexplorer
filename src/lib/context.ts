@@ -3,14 +3,9 @@
 
 import { VsCodeCommands } from "./command";
 import { IDictionary } from "src/interface";
-import { commands, EventEmitter } from "vscode";
+import { commands, Disposable, Event, EventEmitter } from "vscode";
 import type { WebviewIds } from "../webview/webviewPanel";
 import type { WebviewViewIds } from "../webview/webviewView";
-
-const contextStorage: IDictionary<unknown> = {};
-const _onDidChangeContext = new EventEmitter<AllContextKeys>();
-export const onDidChangeContext = _onDidChangeContext.event;
-
 
 export const enum ContextKeys
 {
@@ -31,7 +26,6 @@ export const enum ContextKeys
 	TestsTest = "taskexplorer:testsTest"
 }
 
-
 type WebviewPageContextKeys =
 	| `${ContextKeys.WebviewPrefix}${WebviewIds}:active`
 	| `${ContextKeys.WebviewPrefix}${WebviewIds}:focus`
@@ -51,12 +45,30 @@ type AllContextKeys =
 	| `${ContextKeys.KeyPrefix}${string}`;
 
 
-export const getContext = <T>(key: AllContextKeys, defaultValue?: T) => contextStorage[key] as T | undefined || defaultValue;
-
-
-export  const setContext = async(key: AllContextKeys, value: unknown): Promise<void> =>
+export class TeContext implements Disposable
 {
-	contextStorage[key] = value;
-	void (await commands.executeCommand(VsCodeCommands.SetContext, key, value));
-	_onDidChangeContext.fire(key);
-};
+	private contextStorage: IDictionary<unknown> = {};
+	private _onDidChangeContext = new EventEmitter<AllContextKeys>();
+	public onDidChangeContext: Event<AllContextKeys>;
+
+	constructor()
+	{
+		this.onDidChangeContext = this._onDidChangeContext.event;
+	}
+
+	dispose()
+	{
+		throw new Error("Method not implemented.");
+	}
+
+	getContext = <T>(key: AllContextKeys, defaultValue?: T) => this.contextStorage[key] as T | undefined || defaultValue;
+
+
+	setContext = async(key: AllContextKeys, value: unknown): Promise<void> =>
+	{
+		this.contextStorage[key] = value;
+		void (await commands.executeCommand(VsCodeCommands.SetContext, key, value));
+		this._onDidChangeContext.fire(key);
+	};
+
+}

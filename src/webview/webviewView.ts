@@ -1,10 +1,9 @@
 
-import { log } from "../lib/log/log";
+import { ContextKeys } from "../lib/context";
 import { TeWrapper } from "../lib/wrapper";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
 import { registerCommand } from "../lib/command";
-import { setContext, ContextKeys } from "../lib/context";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands, Uri
@@ -109,15 +108,15 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 
 	private resetContextKeys()
 	{
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, false);
-		void setContext(`${this.contextKeyPrefix}:focus`, false);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:inputFocus`, false);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:focus`, false);
 	}
 
 
 	private setContextKeys(focus: boolean, inputFocus: boolean)
 	{
-		void setContext(`${this.contextKeyPrefix}:focus`, focus);
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, inputFocus);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:focus`, focus);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:inputFocus`, inputFocus);
 	}
 
 

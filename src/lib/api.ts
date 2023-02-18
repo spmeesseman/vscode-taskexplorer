@@ -1,6 +1,6 @@
 
 import { TeWrapper } from "./wrapper";
-import { ContextKeys, setContext } from "./context";
+import { ContextKeys } from "./context";
 import { IExternalProvider, ITaskExplorerApi } from "../interface";
 import { executeCommand, registerCommand, Commands } from "./command";
 
@@ -15,7 +15,7 @@ export class TeApi implements ITaskExplorerApi
         this._tests = this._wrapper.tests;
         /* istanbul ignore else */
         if (this._tests) {
-            void setContext(ContextKeys.Tests, true);
+            void _wrapper.contextTe.setContext(ContextKeys.Tests, true);
         }
         this._wrapper.context.subscriptions.push(registerCommand("taskexplorer.getApi", () => this, this));
     }

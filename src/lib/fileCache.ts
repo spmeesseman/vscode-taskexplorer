@@ -4,9 +4,9 @@ import { join } from "path";
 import { log } from "./log/log";
 import * as util from "./utils/utils";
 import { TeWrapper } from "./wrapper";
+import { ContextKeys } from "./context";
 import { storage } from "./utils/storage";
 import { statusBarItem } from "./statusBarItem";
-import { ContextKeys, setContext } from "./context";
 import { configuration } from "./utils/configuration";
 import * as taskTypeUtils from "./utils/taskTypeUtils";
 import { IDictionary, ICacheItem } from "../interface";
@@ -387,7 +387,7 @@ const finishBuild = async(skipPersist?: boolean) =>
         }
     }
     taskFiles.sort();
-    await setContext(ContextKeys.TaskFiles, taskFiles);
+    await _wrapper.contextTe.setContext(ContextKeys.TaskFiles, taskFiles);
     // await commands.executeCommand("setContext", "vscodeTaskExplorer.taskTypes", taskTypes);
     statusBarItem.hide();
     cacheBuilding = false;

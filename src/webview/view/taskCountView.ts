@@ -1,8 +1,7 @@
 
-import { Disposable } from "vscode";
 import { State } from "../common/state";
 import { TeWrapper } from "../../lib/wrapper";
-import { ContextKeys, getContext } from "../../lib/context";
+import { ContextKeys } from "../../lib/context";
 import { TasksChangeEvent } from "../../interface";
 import { TeWebviewView, WebviewViewIds } from "../webviewView";
 import { createTaskCountTable } from "../common/taskCountTable";
@@ -55,7 +54,7 @@ export class TaskCountView extends TeWebviewView<State>
 	private async getState(): Promise<State> { // For coverage, haven't messed with states yet
 		return {
 			pinned: true, // this.wrapper.storage.get('home:state:pinned') ?? true;
-			extensionEnabled: !!getContext(ContextKeys.Enabled, false)
+			extensionEnabled: !!this.wrapper.contextTe.getContext(ContextKeys.Enabled, false)
 		};
 	}
 

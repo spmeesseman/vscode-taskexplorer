@@ -1,8 +1,8 @@
 
 import { TeWrapper } from "../lib/wrapper";
+import { ContextKeys } from "../lib/context";
 import { TeWebviewBase } from "./webviewBase";
 import { isObject, timeout } from "../lib/utils/utils";
-import { ContextKeys, setContext } from "../lib/context";
 import { Commands, registerCommand } from "../lib/command";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
@@ -135,17 +135,17 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 
 	private resetContextKeys()
 	{
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, false);
-		void setContext(`${this.contextKeyPrefix}:focus`, false);
-		void setContext(`${this.contextKeyPrefix}:active`, false);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:inputFocus`, false);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:focus`, false);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:active`, false);
 	}
 
 
 	private setContextKeys(active: boolean | undefined, focus?: boolean, inputFocus?: boolean)
 	{
-		void setContext(`${this.contextKeyPrefix}:active`, !!active);
-		void setContext(`${this.contextKeyPrefix}:focus`, !!active && !!focus);
-		void setContext(`${this.contextKeyPrefix}:inputFocus`, !!active && !!inputFocus);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:active`, !!active);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:focus`, !!active && !!focus);
+		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:inputFocus`, !!active && !!inputFocus);
 	}
 
 
