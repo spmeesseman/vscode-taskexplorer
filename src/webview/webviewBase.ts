@@ -11,7 +11,7 @@ import { ITeWebview } from "../interface";
 // import { getNonce } from "@env/crypto";
 import { TeWrapper } from "../lib/wrapper";
 import { getNonce } from "../lib/env/node/crypto";
-import { Commands, executeCommand } from "../lib/command";
+import { Commands, executeCommand } from "../lib/command/command";
 import { Disposable, EventEmitter, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc, LogWriteCommandType,

@@ -1,6 +1,6 @@
 
 import { State } from "../common/state";
-import { Commands } from "../../lib/command";
+import { Commands } from "../../lib/command/command";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/context";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";

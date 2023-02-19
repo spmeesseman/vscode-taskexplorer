@@ -2,7 +2,7 @@
 import { TeWrapper } from "./wrapper";
 import { ContextKeys } from "./context";
 import { IExternalProvider, ITaskExplorerApi } from "../interface";
-import { executeCommand, registerCommand, Commands } from "./command";
+import { executeCommand, registerCommand, Commands } from "./command/command";
 
 
 export class TeApi implements ITaskExplorerApi

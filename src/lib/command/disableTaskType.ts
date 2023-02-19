@@ -1,10 +1,10 @@
 
-import { log } from "../lib/log/log";
-import { Globs } from "../lib/constants";
+import { log } from "../log/log";
+import { Globs } from "../constants";
 import { Disposable, Uri } from "vscode";
-import { testPattern } from "../lib/utils/utils";
-import { configuration } from "../lib/utils/configuration";
-import { Commands, registerCommand } from "../lib/command";
+import { testPattern } from "../utils/utils";
+import { Commands, registerCommand } from "./command";
+import { configuration } from "../utils/configuration";
 
 
 const disableTaskType = async(uri: Uri) =>

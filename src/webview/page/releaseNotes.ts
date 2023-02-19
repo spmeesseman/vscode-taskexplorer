@@ -3,7 +3,7 @@ import { marked } from "marked";
 import { TextDecoder } from "util";
 import { State } from "../common/state";
 import { Uri, workspace } from "vscode";
-import { Commands } from "../../lib/command";
+import { Commands } from "../../lib/command/command";
 import { TeWrapper } from "../../lib/wrapper";
 import { ContextKeys } from "../../lib/context";
 import { TeWebviewPanel, WebviewIds } from "../webviewPanel";

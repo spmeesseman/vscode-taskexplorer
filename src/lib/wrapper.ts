@@ -36,9 +36,9 @@ import { registerStatusBarItem } from "./statusBarItem";
 import { GradleTaskProvider } from "../providers/gradle";
 import { PipenvTaskProvider } from "../providers/pipenv";
 import { PythonTaskProvider } from "../providers/python";
+import { registerDonateCommand } from "./command/donate";
 import { TeConfigWatcher } from "./watcher/configWatcher";
 import { LicensePage } from "../webview/page/licensePage";
-import { registerDonateCommand } from "../commands/donate";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
@@ -51,10 +51,10 @@ import { PowershellTaskProvider } from "../providers/powershell";
 import { ITaskExplorerProvider } from "../interface/ITaskProvider";
 import { AppPublisherTaskProvider } from "../providers/appPublisher";
 import { ParsingReportPage } from "../webview/page/parsingReportPage";
-import { registerAddToExcludesCommand } from "../commands/addToExcludes";
-import { registerEnableTaskTypeCommand } from "../commands/enableTaskType";
-import { registerDisableTaskTypeCommand } from "../commands/disableTaskType";
-import { registerRemoveFromExcludesCommand } from "../commands/removeFromExcludes";
+import { registerAddToExcludesCommand } from "./command/addToExcludes";
+import { registerEnableTaskTypeCommand } from "./command/enableTaskType";
+import { registerDisableTaskTypeCommand } from "./command/disableTaskType";
+import { registerRemoveFromExcludesCommand } from "./command/removeFromExcludes";
 import { ExtensionContext, ExtensionMode, tasks, workspace, WorkspaceFolder, env, TreeItem, TreeView, Disposable } from "vscode";
 
 

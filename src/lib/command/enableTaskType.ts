@@ -1,11 +1,11 @@
 
-import { log } from "../lib/log/log";
-import { Globs } from "../lib/constants";
+import { log } from "../log/log";
+import { Globs } from "../constants";
+import { testPattern } from "../utils/utils";
 import { loadMessageBundle } from "vscode-nls";
-import { testPattern } from "../lib/utils/utils";
 import { Disposable, Uri, window } from "vscode";
-import { configuration } from "../lib/utils/configuration";
-import { Commands, registerCommand } from "../lib/command";
+import { configuration } from "../utils/configuration";
+import { Commands, registerCommand } from "./command";
 
 const localize = loadMessageBundle();
 

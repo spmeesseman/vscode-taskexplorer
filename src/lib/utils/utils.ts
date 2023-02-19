@@ -6,7 +6,7 @@ import { TaskItem } from "../../tree/item";
 import { basename, extname, sep } from "path";
 import { Globs, Strings } from "../constants";
 import { configuration } from "./configuration";
-import { Commands, executeCommand } from "../command";
+import { Commands, executeCommand } from "../command/command";
 import { LicenseManager } from "../auth/licenseManager";
 import { WorkspaceFolder, Uri, workspace, window } from "vscode";
 

@@ -15,7 +15,7 @@ import { statusBarItem } from "../lib/statusBarItem";
 import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
 import { TaskWatcher } from "../lib/watcher/taskWatcher";
-import { Commands, registerCommand } from "../lib/command";
+import { Commands, registerCommand } from "../lib/command/command";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
 import { IDictionary, ITeTreeManager, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";

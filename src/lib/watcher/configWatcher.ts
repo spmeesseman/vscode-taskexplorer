@@ -2,7 +2,7 @@
 
 import { TeWrapper } from "../wrapper";
 import { ContextKeys } from "../context";
-import { Commands, executeCommand } from "../command";
+import { Commands, executeCommand } from "../command/command";
 import { IDictionary, ITeConfigWatcher } from "../../interface";
 import { getScriptTaskTypes, getTaskTypeRealName } from "../utils/taskTypeUtils";
 import { ConfigurationChangeEvent, workspace, window, Disposable } from "vscode";

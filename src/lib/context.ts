@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { VsCodeCommands } from "./command";
+import { VsCodeCommands } from "./command/command";
 import { ITeContext, IDictionary } from "../interface";
 import { commands, Disposable, Event, EventEmitter } from "vscode";
 import type { WebviewIds } from "../webview/webviewPanel";

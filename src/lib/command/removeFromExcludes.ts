@@ -1,10 +1,10 @@
 
-import { Globs } from "../lib/constants";
+import { Globs } from "../constants";
 import { TeWrapper } from "src/lib/wrapper";
 import { loadMessageBundle } from "vscode-nls";
 import { Disposable, Uri, window } from "vscode";
-import { removeFromExcludes } from "../lib/addToExcludes";
-import { Commands, executeCommand, registerCommand } from "../lib/command";
+import { removeFromExcludes } from "../addToExcludes";
+import { Commands, executeCommand, registerCommand } from "./command";
 
 const localize = loadMessageBundle();
 let teWrapper: TeWrapper;

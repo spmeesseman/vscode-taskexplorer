@@ -3,7 +3,7 @@
 import { extname } from "path";
 import { TeWrapper } from "../wrapper";
 import { ITeFileWatcher } from "../../interface";
-import { Commands, executeCommand } from "../command";
+import { Commands, executeCommand } from "../command/command";
 import { getTaskTypes, isScriptType } from "../utils/taskTypeUtils";
 import {
     Disposable, FileSystemWatcher, workspace, WorkspaceFolder, Uri, WorkspaceFoldersChangeEvent

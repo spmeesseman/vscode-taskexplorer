@@ -3,7 +3,7 @@ import { TeWrapper } from "../lib/wrapper";
 import { ContextKeys } from "../lib/context";
 import { TeWebviewBase } from "./webviewBase";
 import { isObject, timeout } from "../lib/utils/utils";
-import { Commands, registerCommand } from "../lib/command";
+import { Commands, registerCommand } from "../lib/command/command";
 import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
     Disposable, Uri, ViewColumn, window, WebviewPanelSerializer

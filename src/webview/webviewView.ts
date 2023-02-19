@@ -3,7 +3,7 @@ import { ContextKeys } from "../lib/context";
 import { TeWrapper } from "../lib/wrapper";
 import { timeout } from "../lib/utils/utils";
 import { TeWebviewBase } from "./webviewBase";
-import { registerCommand } from "../lib/command";
+import { registerCommand } from "../lib/command/command";
 import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands, Uri
