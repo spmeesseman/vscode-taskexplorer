@@ -469,3 +469,25 @@ export const writeFileSync = (file: string, data: string): void =>
         throw new Error("Specified path is a directory");
     }
 };
+
+/*
+export const afs: ITeFilesystem =
+{
+    copyDir,
+    copyFile,
+    createDir,
+    deleteDir,
+    deleteFile,
+    isDirectory,
+    getDateModified,
+    numFilesInDirectory,
+    pathExists,
+    pathExistsSync,
+    readFileAsync,
+    readFileSync,
+    readJsonAsync,
+    readJsonSync,
+    writeFile,
+    writeFileSync
+};
+*/

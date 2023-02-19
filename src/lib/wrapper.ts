@@ -11,7 +11,7 @@ import { TaskTree } from "src/tree/tree";
 import * as utilities from "./utils/utils";
 import * as pathUtils from "./utils/pathUtils";
 import { IStorage } from "../interface/IStorage";
-import { IDictionary, ILog } from "../interface";
+import { IDictionary, ILog, ITeFilesystem } from "../interface";
 import * as taskUtils from "./utils/taskTypeUtils";
 import * as commonUtils from "./utils/commonUtils";
 import { TaskManager } from "src/tree/taskManager";
@@ -403,7 +403,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 		return this._fileWatcher;
 	}
 
-	get fs(): typeof fs {
+	get fs(): ITeFilesystem {
 		return fs;
 	}
 

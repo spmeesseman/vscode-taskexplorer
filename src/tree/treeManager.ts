@@ -1,4 +1,3 @@
-/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { TaskFile } from "./file";
 import { TaskItem } from "./item";
@@ -7,6 +6,7 @@ import { TeTreeView } from "./treeView";
 import { Strings } from "../lib/constants";
 import { TeWrapper } from "../lib/wrapper";
 import { TaskManager } from "./taskManager";
+import { TaskWatcher } from "./taskWatcher";
 import { isDirectory } from "../lib/utils/fs";
 import { TaskTreeBuilder } from "./treeBuilder";
 import { getTerminal } from "../lib/getTerminal";
@@ -14,9 +14,8 @@ import { SpecialTaskFolder } from "./specialFolder";
 import { statusBarItem } from "../lib/statusBarItem";
 import { addToExcludes } from "../lib/addToExcludes";
 import { isTaskIncluded } from "../lib/isTaskIncluded";
-import { TaskWatcher } from "../lib/watcher/taskWatcher";
-import { Commands, registerCommand } from "../lib/command/command";
 import { getTaskRelativePath } from "../lib/utils/pathUtils";
+import { Commands, registerCommand } from "../lib/command/command";
 import { IDictionary, ITeTreeManager, TasksChangeEvent } from "../interface";
 import { getTaskTypeFriendlyName, isScriptType } from "../lib/utils/taskTypeUtils";
 import {
