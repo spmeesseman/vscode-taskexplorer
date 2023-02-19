@@ -60,15 +60,12 @@ module.exports = (env, argv) =>
 	if (env.environment === "test") {
 		// env.esbuild = true;
 		return [
-			// getWebpackConfig("extension_tests", env, argv),
-			// getWebpackConfig("extension", { ...env, ...{ environment: "dev" }}, argv)
 			getWebpackConfig("extension", env, argv),
 			getWebpackConfig("webview", { ...env, ...{ environment: "dev" }}, argv)
 		];
 	}
 
 	if (env.environment === "testprod") {
-		// env.esbuild = true;
 		return [
 			getWebpackConfig("extension", env, argv),
 			getWebpackConfig("webview", { ...env, ...{ environment: "prod" }}, argv)
@@ -166,17 +163,32 @@ const devTool = (env, wpConfig) =>
 	if (env.environment === "dev" || wpConfig.mode === "development")
 	{
 		wpConfig.devtool = "source-map";
+		// wpConfig.devtool = "eval";
 	}
 	else if (env.environment === "test")
 	{
 		wpConfig.devtool = "source-map";
+		wpConfig.devtool = "inline-cheap-module-source-map";
 	}
 	if (!wpConfig.output) {
 		wpConfig.output = {};
 	}
 	if (env.environment === "test") {
-		wpConfig.output.devtoolModuleFilenameTemplate = '[absolute-resource-path]',
-    	wpConfig.output.devtoolFallbackModuleFilenameTemplate = '[absolute-resource-path]?[hash]'
+		wpConfig.output.devtoolModuleFilenameTemplate = '[absolute-resource-path]';
+    	wpConfig.output.devtoolFallbackModuleFilenameTemplate = '[absolute-resource-path]?[hash]';
+		// wpConfig.output.devtoolModuleFilenameTemplate = "../[resource-path]";
+		// wpConfig.output.devtoolModuleFilenameTemplate = (info) => {
+		// 	console.log("--------------------------------------------");
+		// 	console.log("1: " + info.absoluteResourcePath);
+		// 	console.log("2: " + info.resourcePath);
+		// 	console.log("3: " + info.resource);
+		// 	console.log("4: " + info.namespace);
+		// 	console.log("5: " + info.loaders);
+		// 	// if(info.resourcePath.includes("external")) {
+		// 	// 	return null;
+		// 	// }
+		// 	return `${info.absoluteResourcePath}`;
+		// };
 	}
 	else {
 		wpConfig.output.devtoolModuleFilenameTemplate = "../[resource-path]";
@@ -469,7 +481,7 @@ const output = (env, wpConfig) =>
 			{
 				wpConfig.output = {
 					globalObject: "this",
-					libraryTarget: 'commonjs2',
+					//libraryTarget: 'commonjs2',
 					path: path.join(__dirname, "dist"),
 					filename: '[name].js',
 					//library: {
@@ -477,9 +489,9 @@ const output = (env, wpConfig) =>
 					//}
 					// module: true,
 					// chunkFormat: "commonjs",
-					// library: {
-					// 	type: "commonjs2"
-					// }
+					library: {
+						type: "commonjs2"
+					}
 				};
 			}
 			else {
