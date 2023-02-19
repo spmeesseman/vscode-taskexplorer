@@ -4,6 +4,8 @@ import "./monitor.css";
 import "./monitor.scss";
 import "../common/scss/codicons.scss";
 import React from "react";
+// eslint-disable-next-line import/extensions
+import { createRoot } from "react-dom/client";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
 import { TeReactTaskTimer } from "./cmp/timer";
@@ -24,20 +26,15 @@ class TaskMonitorWebviewApp extends TeWebviewApp<State>
 		const disposables = super.onBind?.() ?? [];
 		this.log(`${this.appName}.onBind`);
 
-		// this.ensureTheming(this.state);
-
-		const root = document.getElementById("root");
+		// const root = document.getElementById("root");
+        const root = createRoot(document.getElementById("root") as HTMLElement);
 		if (root)
         {
-			render(
-				<TeReactTaskTimer
-					state={this.state}
-				/>,
-				root
-			);
-
+            root.render(<TeReactTaskTimer state={this.state} />);
+			// render(<TeReactTaskTimer state={this.state} />, root);
 			disposables.push({
-				dispose: () => unmountComponentAtNode(root),
+				dispose: () => root.unmount()
+				// dispose: () => unmountComponentAtNode(root),
                 // DOM.on(window, 'keyup', e => this.onKeyUp(e))
 			});
 		}
@@ -46,13 +43,14 @@ class TaskMonitorWebviewApp extends TeWebviewApp<State>
 	}
 
 
-	// private onKeyUp(e: KeyboardEvent) {
+	// private onKeyUp(e: KeyboardEvent)
+    // {
 	// 	if (e.key === 'Enter' || e.key === ' ') {
 	// 		const inputFocused = e.composedPath().some(el => (el as HTMLElement).tagName === 'INPUT');
-	// 		if (!inputFocused) return;
-
-	// 		const $target = e.target as HTMLElement;
-	// 	}
+	// 		if (inputFocused) {
+	// 		   const $target = e.target as HTMLElement;
+    //      }
+	// 	 }
 	// }
 
 
@@ -73,8 +71,8 @@ class TaskMonitorWebviewApp extends TeWebviewApp<State>
 		this.log(`${this.appName}.setState`);
 		// const themingChanged = this.ensureTheming(state);
 
-		// Avoid calling the base for now, since we aren't using the vscode state
 		this.state = state;
+		// Avoid calling the base for now, since we aren't using the vscode state
 		// super.setState(state);
 
 		// this.callback?.(this.state, type, themingChanged);
