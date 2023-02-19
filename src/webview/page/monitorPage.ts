@@ -10,7 +10,7 @@ import { TeWebviewPanel, WebviewIds } from "../webviewPanel";
 export class MonitorPage extends TeWebviewPanel<State>
 {
 	static viewTitle = "Task Monitor";
-	static viewId: WebviewIds = "taskMonitor"; // Must match view id in package.jso
+	static viewId: WebviewIds = "taskMonitor"; // Must match view id in package.json
 
 
 	constructor(wrapper: TeWrapper)
@@ -31,14 +31,12 @@ export class MonitorPage extends TeWebviewPanel<State>
 	}
 
 
-	private async getState(): Promise<State>
+	protected override async getState(): Promise<State>
 	{
 		return {
-			extensionEnabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
-			pinned: false,
+			...super.getState(),
 			seconds: 0,
-			taskType: "grunt",
-			webroot: this.getWebRoot()
+			taskType: "grunt"
 		};
 	}
 
@@ -60,16 +58,16 @@ export class MonitorPage extends TeWebviewPanel<State>
 	}
 
 
-	protected override onVisibilityChanged(_visible: boolean)
+	protected override onVisibilityChanged(visible: boolean)
 	{
-		this.wrapper.log.methodStart("MonitorPage Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodStart("MonitorPage Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad(), false, [[ "visible", visible ]]);
 		this.wrapper.log.methodDone("MonitorPage Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 
 	protected override onFocusChanged(focused: boolean): void
 	{
-		this.wrapper.log.methodStart("MonitorPage Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodStart("MonitorPage Event: onFocusChanged", 2, this.wrapper.log.getLogPad(), false, [[ "focus", focused ]]);
 		this.wrapper.log.methodDone("MonitorPage Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
 	}
 

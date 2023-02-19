@@ -42,20 +42,12 @@ export class TaskCountView extends TeWebviewView<State>
 	protected override includeBody = async() => createTaskCountTable(this.wrapper);
 
 
-	protected override includeHead = async() => ""; // For coverage, until 'head' is used someday
+	protected override includeHead = async() => "";
 
 
-	protected override includeEndOfBody = async() => ""; // For coverage, until 'head' is used someday
+	protected override includeEndOfBody = async() => "";
 
 
-	protected override includeBootstrap = (): Promise<State> => this.getState(); // For coverage, haven't messed with states yet
-
-
-	private async getState(): Promise<State> { // For coverage, haven't messed with states yet
-		return {
-			pinned: true, // this.wrapper.storage.get('home:state:pinned') ?? true;
-			extensionEnabled: !!this.wrapper.contextTe.getContext(ContextKeys.Enabled, false)
-		};
-	}
+	protected override includeBootstrap = (): Promise<State> => this.getState();
 
 }

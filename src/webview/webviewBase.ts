@@ -334,4 +334,14 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 		setTimeout(() => this._onContentLoaded.fire(html), 1);
 	}
 
+
+	protected async getState(): Promise<State>
+	{
+		return {
+			extensionEnabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
+			pinned: false,
+			webroot: this.getWebRoot()
+		} as State;
+	}
+
 }
