@@ -7,14 +7,14 @@ import { logControl } from "./log/log";
 import * as sorters from "./sortTasks";
 import { TeServer } from "./auth/server";
 import { TeFileCache } from "./fileCache";
-import { TaskTree } from "src/tree/tree";
+import { TaskTree } from "../tree/tree";
 import * as utilities from "./utils/utils";
 import * as pathUtils from "./utils/pathUtils";
 import { IStorage } from "../interface/IStorage";
 import { IDictionary, ILog, ITeFilesystem } from "../interface";
 import * as taskUtils from "./utils/taskTypeUtils";
 import * as commonUtils from "./utils/commonUtils";
-import { TaskManager } from "src/tree/taskManager";
+import { TaskManager } from "../tree/taskManager";
 import { ContextKeys, TeContext } from "./context";
 import { AntTaskProvider } from "../providers/ant";
 import { HomeView } from "../webview/view/homeView";
@@ -24,7 +24,7 @@ import { MakeTaskProvider } from "../providers/make";
 import { RubyTaskProvider } from "../providers/ruby";
 import { NsisTaskProvider } from "../providers/nsis";
 import { PerlTaskProvider } from "../providers/perl";
-import { ITeWrapper } from "src/interface/ITeWrapper";
+import { ITeWrapper } from "../interface/ITeWrapper";
 import { UsageWatcher } from "./watcher/usageWatcher";
 import { TeFileWatcher } from "./watcher/fileWatcher";
 import { TaskTreeManager } from "../tree/treeManager";
@@ -39,6 +39,7 @@ import { PythonTaskProvider } from "../providers/python";
 import { registerDonateCommand } from "./command/donate";
 import { TeConfigWatcher } from "./watcher/configWatcher";
 import { LicensePage } from "../webview/page/licensePage";
+import { MonitorPage } from "../webview/page/monitorPage";
 import { WebpackTaskProvider } from "../providers/webpack";
 import { JenkinsTaskProvider } from "../providers/jenkins";
 import { ComposerTaskProvider } from "../providers/composer";
@@ -74,6 +75,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 	private readonly _teContext: TeContext;
 	private readonly _fileCache: TeFileCache;
 	private readonly _licensePage: LicensePage;
+	private readonly _monitorPage: MonitorPage;
 	private readonly _disposables: Disposable[];
 	private readonly _context: ExtensionContext;
 	private readonly _fileWatcher: TeFileWatcher;
@@ -118,6 +120,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 		this._taskUsageView = new TaskUsageView(this);
 
 		this._licensePage = new LicensePage(this);
+		this._monitorPage = new MonitorPage(this);
 		this._parsingReportPage = new ParsingReportPage(this);
 		this._releaseNotesPage = new ReleaseNotesPage(this);
 
@@ -157,6 +160,7 @@ export class TeWrapper implements ITeWrapper, Disposable
 			this._homeView,
 			this._treeManager,
 			this._licensePage,
+			this._monitorPage,
 			this._fileWatcher,
 			this._configWatcher,
 			this._taskCountView,
@@ -441,6 +445,10 @@ export class TeWrapper implements ITeWrapper, Disposable
 
 	get licensePage(): LicensePage {
 		return this._licensePage;
+	}
+
+	get monitorPage(): MonitorPage {
+		return this._monitorPage;
 	}
 
 	get parsingReportPage(): ParsingReportPage {

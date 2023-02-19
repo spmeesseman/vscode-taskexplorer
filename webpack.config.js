@@ -20,6 +20,7 @@ const webviewApps =
 {
 	home: "./home/home.ts",
 	license: "./license/license.ts",
+	monitor: "./monitor/monitor.tsx",
 	parsingReport: "./parsingReport/parsingReport.ts",
 	releaseNotes: "./releaseNotes/releaseNotes.ts",
 	taskCount: "./taskCount/taskCount.ts",

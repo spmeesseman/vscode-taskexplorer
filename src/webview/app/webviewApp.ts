@@ -34,12 +34,13 @@ export abstract class TeWebviewApp<State = undefined>
 
 	constructor(protected readonly appName: string)
 	{
+		this.state = (window as any).bootstrap;
+		(window as any).bootstrap = undefined;
+
 		const disposables: Disposable[] = [];
 		this.log(`${this.appName}()`);
 
 		this._vscode = acquireVsCodeApi();
-		this.state = (window as any).bootstrap;
-		(window as any).bootstrap = undefined;
 
 		// requestAnimationFrame(() =>
 		DOM.on(window, "load", () =>

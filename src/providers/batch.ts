@@ -1,7 +1,7 @@
 
-import { TeWrapper } from "src/lib/wrapper";
-import { TaskExplorerProvider } from "./provider";
+import { TeWrapper } from "../lib/wrapper";
 import { ScriptTaskProvider } from "./script";
+import { TaskExplorerProvider } from "./provider";
 
 export class BatchTaskProvider extends ScriptTaskProvider implements TaskExplorerProvider
 {

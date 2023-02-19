@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { log } from "../lib/log/log";
 import { exec } from "child_process";
 import { basename, dirname } from "path";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { timeout } from "../lib/utils/utils";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";

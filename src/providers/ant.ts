@@ -3,7 +3,7 @@ import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
 import { execSync } from "child_process";
 import { IDictionary } from "../interface";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { parseStringPromise } from "xml2js";
 import { basename, dirname, join } from "path";
 import { TaskExplorerProvider } from "./provider";

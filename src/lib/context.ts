@@ -3,7 +3,7 @@
 
 import { VsCodeCommands } from "./command/command";
 import { ITeContext, IDictionary } from "../interface";
-import { commands, Disposable, Event, EventEmitter } from "vscode";
+import { commands, Event, EventEmitter } from "vscode";
 import type { WebviewIds } from "../webview/webviewPanel";
 import type { WebviewViewIds } from "../webview/webviewView";
 
@@ -18,7 +18,8 @@ export const enum ContextKeys
 	Disabled = "taskexplorer:disabled",
 	Enabled = "taskexplorer:enabled",
 	Untrusted = "taskexplorer:untrusted",
-	licensePage = "taskexplorer:licensePage",
+	LicensePage = "taskexplorer:licensePage",
+	TaskMonitor  = "taskexplorer:taskMonitor",
 	ParsingReport = "taskexplorer:parsingReport",
 	ReleaseNotes = "taskexplorer:releaseNotes",
 	TaskFiles = "taskexplorer:taskFiles",

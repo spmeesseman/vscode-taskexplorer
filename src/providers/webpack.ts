@@ -1,12 +1,12 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
+import { configuration } from "../lib/utils/configuration";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
-import { configuration } from "../lib/utils/configuration";
 
 
 export class WebpackTaskProvider extends TaskExplorerProvider implements TaskExplorerProvider

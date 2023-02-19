@@ -9,7 +9,7 @@ import {
     Disposable, Uri, ViewColumn, window, WebviewPanelSerializer
 } from "vscode";
 
-export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes";
+export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes" | "taskMonitor";
 
 
 export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> implements Disposable
@@ -22,7 +22,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				fileName: string,
 				title: string,
 				private readonly iconPath: string,
-				public readonly id: `taskexplorer.${WebviewIds}`,
+				public readonly id: `taskexplorer.view.${WebviewIds}`,
 				private readonly contextKeyPrefix: `${ContextKeys.WebviewPrefix}${WebviewIds}`,
 				private readonly trackingFeature: string,
 				showCommand: Commands)

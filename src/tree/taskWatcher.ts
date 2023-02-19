@@ -1,11 +1,11 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
-import * as util from "../utils/utils";
-import { log } from "../log/log";
-import { TaskItem } from "../../tree/item";
-import { configuration } from "../utils/configuration";
-import { TaskTreeManager } from "src/tree/treeManager";
-import { SpecialTaskFolder } from "../../tree/specialFolder";
+import { TaskItem } from "./item";
+import { log } from "../lib/log/log";
+import * as util from "../lib/utils/utils";
+import { TaskTreeManager } from "./treeManager";
+import { SpecialTaskFolder } from "./specialFolder";
+import { configuration } from "../lib/utils/configuration";
 import {
     Disposable, WorkspaceFolder, tasks, TaskStartEvent, StatusBarItem, StatusBarAlignment, Task, window, TaskEndEvent
 } from "vscode";

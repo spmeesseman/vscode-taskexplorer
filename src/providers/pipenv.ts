@@ -1,13 +1,13 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import * as bombadil from "@sgarciac/bombadil";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
-import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { configuration } from "../lib/utils/configuration";
+import { ITaskDefinition } from "../interface/ITaskDefinition";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace, ShellExecutionOptions } from "vscode";
 
 

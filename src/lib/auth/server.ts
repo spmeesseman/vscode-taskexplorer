@@ -6,7 +6,7 @@ import { Disposable } from "vscode";
 import { figures } from "../figures";
 import { TeWrapper } from "../wrapper";
 import { IncomingMessage } from "http";
-import { ISessionToken } from "src/interface/IAuthentication";
+import { ISessionToken } from "../../interface/IAuthentication";
 
 
 export interface IServerResponseData

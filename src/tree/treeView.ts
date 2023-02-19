@@ -1,8 +1,8 @@
 
 import { TaskTree } from "./tree";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { ITaskTreeView } from "../interface";
-import { ContextKeys } from "src/lib/context";
+import { ContextKeys } from "../lib/context";
 import { TaskTreeManager } from "./treeManager";
 import {
     Disposable, TreeItem, TreeView, /* TreeViewExpansionEvent, TreeViewSelectionChangeEvent, */

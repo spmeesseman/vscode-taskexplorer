@@ -6,4 +6,6 @@ export interface State
 	webroot?: string;
 	avatar?: string;
 	pinned: boolean;
+	nonce?: string;
+	seconds?: number;
 }

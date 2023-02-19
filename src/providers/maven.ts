@@ -1,7 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { parseStringPromise } from "xml2js";
 import { readFileAsync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";

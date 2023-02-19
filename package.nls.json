@@ -150,6 +150,7 @@
 	"command.view.licensePage.show" : "Task Explorer: View licensing information",
 	"command.view.releaseNotes.show" : "Task Explorer: View release notes",
 	"command.view.parsingReport.show" : "Task Explorer: View parsing report",
+	"command.view.taskMonitor.show" : "Task Explorer: Open task monitor",
 
 	"messages.noAssociatedTaskType": "This file does not appear to be associated to any known task type"
 }

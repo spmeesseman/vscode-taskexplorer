@@ -1,6 +1,6 @@
 
 import { Globs } from "../constants";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../wrapper";
 import { loadMessageBundle } from "vscode-nls";
 import { Disposable, Uri, window } from "vscode";
 import { removeFromExcludes } from "../addToExcludes";

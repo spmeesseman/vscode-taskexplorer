@@ -56,8 +56,7 @@ svg {
 }
 
 .homeview-info-panel {
-    min-width: 170px;
-    max-width: 190px;
+    width: 160px;
     padding-right: 5px;
     display: inline-block;
 }

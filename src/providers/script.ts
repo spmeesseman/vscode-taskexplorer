@@ -1,7 +1,7 @@
 
 import { log } from "../lib/log/log";
 import { Globs } from "../lib/constants";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
 import { readFileSync } from "../lib/utils/fs";
 import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";

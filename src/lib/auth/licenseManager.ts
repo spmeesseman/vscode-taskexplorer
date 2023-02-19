@@ -4,7 +4,7 @@ import { TeWrapper } from "../wrapper";
 import { ITeLicenseManager } from "../../interface";
 import { isScriptType } from "../utils/taskTypeUtils";
 import { IServerResponseData, TeServer } from "./server";
-import { ISessionToken } from "src/interface/IAuthentication";
+import { ISessionToken } from "../../interface/IAuthentication";
 import { executeCommand, registerCommand, Commands } from "../command/command";
 import { Disposable, env, EventEmitter, InputBoxOptions, Task, window } from "vscode";
 import { TeAuthenticationProvider, TeAuthenticationSessionChangeEvent } from "./authProvider";

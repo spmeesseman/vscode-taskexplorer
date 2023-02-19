@@ -192,6 +192,8 @@
         "@types/mocha": "^9.1.1",
         "@types/node": "^14.17.1",
         "@types/node-fetch": "^2.6.0",
+        "@types/react": "^18.0.28",
+        "@types/react-dom": "^18.0.11",
         "@types/uuid": "^9.0.0",
         "@types/vscode": "^1.63.0",
         "@types/xml2js": "^0.4.8",
@@ -368,6 +370,10 @@
             {
                 "command": "taskexplorer.view.parsingReport.show",
                 "title": "%command.view.parsingReport.show%"
+            },
+            {
+                "command": "taskexplorer.view.taskMonitor.show",
+                "title": "%command.view.taskMonitor.show%"
             },
             {
                 "command": "taskexplorer.enableTaskType",
@@ -611,6 +617,14 @@
                 },
                 {
                     "command": "taskexplorer.clearTaskStats",
+                    "when": "taskexplorer:enabled"
+                },
+                {
+                    "command": "taskexplorer.view.parsingReport.show",
+                    "when": "taskexplorer:enabled"
+                },
+                {
+                    "command": "taskexplorer.view.taskMonitor.show",
                     "when": "taskexplorer:enabled"
                 },
                 {

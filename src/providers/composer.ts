@@ -2,12 +2,12 @@
 import { log } from "../lib/log/log";
 import { basename, dirname } from "path";
 import { IDictionary } from "../interface";
-import { TeWrapper } from "src/lib/wrapper";
+import { TeWrapper } from "../lib/wrapper";
+import { readJsonAsync } from "../lib/utils/fs";
+import { TaskExplorerProvider } from "./provider";
 import { getRelativePath } from "../lib/utils/pathUtils";
 import { configuration } from "../lib/utils/configuration";
-import { TaskExplorerProvider } from "./provider";
 import { ITaskDefinition } from "../interface/ITaskDefinition";
-import { readJsonAsync } from "../lib/utils/fs";
 import { Task, TaskGroup, WorkspaceFolder, ShellExecution, Uri, workspace } from "vscode";
 
 
