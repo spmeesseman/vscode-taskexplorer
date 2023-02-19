@@ -31,6 +31,9 @@ export class ReleaseNotesPage extends TeWebviewPanel<State>
 	}
 
 
+	protected override includeCodicon = () => true;
+
+
 	protected override onHtmlFinalize = async(html: string) =>
 	{
 		const changelogUri = Uri.joinPath(this.wrapper.context.extensionUri, "CHANGELOG.md"),

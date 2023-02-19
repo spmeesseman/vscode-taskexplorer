@@ -8,4 +8,6 @@ export interface State
 	pinned: boolean;
 	nonce?: string;
 	seconds?: number;
+	icon?: string;
+	taskType?: string;
 }

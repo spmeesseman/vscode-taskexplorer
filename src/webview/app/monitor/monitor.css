@@ -1,0 +1,41 @@
+
+.te-tsx-container.te-tsx-monitor-container {
+    border: 5px solid var(--vscode-button-background);
+    height: 200px;
+}
+
+.te-monitor-control-container {
+    opacity: 1;
+}
+
+.te-monitor-control-content-container {
+    opacity: 1;
+}
+
+.te-monitor-control-timer {
+    font-size: 70px;
+    line-height: 70px;
+}
+
+.te-monitor-control-row {
+    display: flex;
+    align-items: stretch;
+}
+  
+.te-monitor-control-top-row {
+    height: 100px;
+}
+  
+.te-monitor-control-icon-column {
+    width: 100px;
+}
+  
+.te-monitor-control-content-column {
+    flex: 1;
+}
+  
+.te-monitor-control-timer-column {
+    width: 200px;
+    padding-right: 10px;
+    text-align: right;
+}

@@ -107,7 +107,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 				this._view,
 				this._view.onDidDispose(this.onPanelDisposed, this),
 				this._view.onDidChangeViewState(this.onViewStateChanged, this),
-				this._view.webview.onDidReceiveMessage(this.onMessageReceivedCore, this),
+				this._view.webview.onDidReceiveMessage(this.onMessageReceivedBase, this),
 				...(this.onInitializing?.() ?? []),
 				...(this.registerCommands?.() ?? []),
 				window.onDidChangeWindowState(this.onWindowStateChanged, this),
@@ -193,7 +193,7 @@ export abstract class TeWebviewPanel<State> extends TeWebviewBase<State> impleme
 	}
 
 
-	protected override onHtmlPreviewCore = async(html: string, ...args: unknown[]) =>
+	protected override onHtmlPreviewBase = async(html: string, ...args: unknown[]) =>
 	{
 		return this.onHtmlPreview(html.replace(/\#\{title\}/g,
 `<table><tr>

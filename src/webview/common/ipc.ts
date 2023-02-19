@@ -86,3 +86,7 @@ export const DidChangeConfigurationType = new IpcNotificationType<DidChangeConfi
 export const EchoCommandRequestType = new IpcNotificationType<ExecuteCommandParams>("command/echo");
 
 export const EchoCustomCommandRequestType = new IpcNotificationType<ExecuteCommandParams>("command/custom/echo");
+
+export type InternalNotificationType = "tempStateEvent";
+
+export type UpdateStateCallback = (state: any /* State */, type?: IpcNotificationType<any> | InternalNotificationType, themingChanged?: boolean) => void;

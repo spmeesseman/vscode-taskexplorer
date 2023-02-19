@@ -4,17 +4,18 @@ import "./monitor.css";
 import "./monitor.scss";
 import "../common/scss/codicons.scss";
 import React from "react";
-// eslint-disable-next-line import/extensions
-import { createRoot } from "react-dom/client";
 import { State } from "../../common/state";
 import { TeWebviewApp } from "../webviewApp";
-import { TeReactTaskTimer } from "./cmp/timer";
-import { render, unmountComponentAtNode } from "react-dom";
-import { IpcMessage, IpcNotificationType } from "../../common/ipc";
+import { TeTaskControl } from "./cmp/control";
+// eslint-disable-next-line import/extensions
+import { createRoot } from "react-dom/client";
+import { IpcMessage, IpcNotificationType, UpdateStateCallback } from "../../common/ipc";
 
 
 class TaskMonitorWebviewApp extends TeWebviewApp<State>
 {
+    private callback?: UpdateStateCallback;
+
     constructor()
     {
 		super("TaskMonitorWebviewApp");
@@ -26,18 +27,18 @@ class TaskMonitorWebviewApp extends TeWebviewApp<State>
 		const disposables = super.onBind?.() ?? [];
 		this.log(`${this.appName}.onBind`);
 
-		// const root = document.getElementById("root");
         const root = createRoot(document.getElementById("root") as HTMLElement);
-		if (root)
-        {
-            root.render(<TeReactTaskTimer state={this.state} />);
-			// render(<TeReactTaskTimer state={this.state} />, root);
-			disposables.push({
-				dispose: () => root.unmount()
-				// dispose: () => unmountComponentAtNode(root),
-                // DOM.on(window, 'keyup', e => this.onKeyUp(e))
-			});
-		}
+        root.render(
+            <TeTaskControl
+                state={this.state}
+                subscribe={(callback: UpdateStateCallback) => this.registerEvents(callback)}
+            />
+        );
+
+        disposables.push({
+            dispose: () => root.unmount()
+            // DOM.on(window, 'keyup', e => this.onKeyUp(e))
+        });
 
 		return disposables;
 	}
@@ -69,13 +70,18 @@ class TaskMonitorWebviewApp extends TeWebviewApp<State>
 	protected override setState(state: State, type?: IpcNotificationType<any>) // | InternalNotificationType)
     {
 		this.log(`${this.appName}.setState`);
-		// const themingChanged = this.ensureTheming(state);
-
 		this.state = state;
-		// Avoid calling the base for now, since we aren't using the vscode state
-		// super.setState(state);
+		// super.setState(state); // Don't call base (for now), not using internally provided vscode state
+		this.callback?.(this.state, type);
+	}
 
-		// this.callback?.(this.state, type, themingChanged);
+
+	private registerEvents(callback: UpdateStateCallback): () => void
+    {
+		this.callback = callback;
+		return () => {
+			this.callback = undefined;
+		};
 	}
 
 }

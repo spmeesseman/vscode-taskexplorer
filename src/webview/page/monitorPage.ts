@@ -36,7 +36,9 @@ export class MonitorPage extends TeWebviewPanel<State>
 		return {
 			extensionEnabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
 			pinned: false,
-			seconds: 0
+			seconds: 0,
+			taskType: "grunt",
+			webroot: this.getWebRoot()
 		};
 	}
 
@@ -44,11 +46,31 @@ export class MonitorPage extends TeWebviewPanel<State>
 	protected override includeBootstrap = (): Promise<State> => this.getState();
 
 
+	protected override includeCodicon = () => true;
+
+
+	protected override includeFontAwesome = () => ({ duotone: true, regular: true });
+
+
     private async onTasksChanged(e: TasksChangeEvent)
 	{
 		if (this.isFirstLoadComplete) {
 			await this.refresh();
 		}
+	}
+
+
+	protected override onVisibilityChanged(_visible: boolean)
+	{
+		this.wrapper.log.methodStart("MonitorPage Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("MonitorPage Event: onVisibilityChanged", 2, this.wrapper.log.getLogPad());
+	}
+
+
+	protected override onFocusChanged(focused: boolean): void
+	{
+		this.wrapper.log.methodStart("MonitorPage Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("MonitorPage Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 }

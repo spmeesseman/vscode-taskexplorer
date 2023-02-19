@@ -86,6 +86,12 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
+	protected override includeCodicon = () => true;
+
+
+	protected override includeFontAwesome = () => ({});
+
+
 	private onConfigurationChanged(e: ConfigurationChangeEvent)
 	{
 		this.wrapper.log.methodStart("HomeView Event: onConfigurationChanged", 2, this.wrapper.log.getLogPad());
@@ -126,6 +132,13 @@ export class HomeView extends TeWebviewView<State>
 	{
 		this.wrapper.log.methodStart("HomeView Event: onReady", 2, this.wrapper.log.getLogPad());
 		this.wrapper.log.methodDone("HomeView Event: onReady", 2, this.wrapper.log.getLogPad());
+	}
+
+
+	protected override onFocusChanged(_focused: boolean): void
+	{
+		this.wrapper.log.methodStart("HomeView Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
+		this.wrapper.log.methodDone("HomeView Event: onFocusChanged", 2, this.wrapper.log.getLogPad());
 	}
 
 

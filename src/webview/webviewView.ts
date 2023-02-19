@@ -60,19 +60,6 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	protected override includeBootstrap?(): SerializedState | Promise<SerializedState>;
 
 
-	async show(options?: { preserveFocus?: boolean })
-	{
-		while (this.wrapper.busy) {
-			/* istanbul ignore next */
-			await timeout(100);
-		}
-		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
-		void (await commands.executeCommand(`${this.id}.focus`, options));
-		this.setContextKeys(true, false);
-		return this;
-	}
-
-
 	async resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken): Promise<void>
 	{
 		while (this.wrapper.busy) {
@@ -94,7 +81,7 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 		this._disposableView = Disposable.from(
 			this._view.onDidDispose(this.onViewDisposed, this),
 			this._view.onDidChangeVisibility(() => this.onViewVisibilityChanged(this.visible), this),
-			this._view.webview.onDidReceiveMessage(this.onMessageReceivedCore, this),
+			this._view.webview.onDidReceiveMessage(this.onMessageReceivedBase, this),
 			window.onDidChangeWindowState(this.onWindowStateChanged, this),
 			...(this.onInitializing?.() ?? []),
 			...(this.registerCommands?.() ?? []),
@@ -117,6 +104,19 @@ export abstract class TeWebviewView<State, SerializedState = State> extends TeWe
 	{
 		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:focus`, focus);
 		void this.wrapper.contextTe.setContext(`${this.contextKeyPrefix}:inputFocus`, inputFocus);
+	}
+
+
+	async show(options?: { preserveFocus?: boolean })
+	{
+		while (this.wrapper.busy) {
+			/* istanbul ignore next */
+			await timeout(100);
+		}
+		void this.wrapper.usage.track(`${this.trackingFeature}:shown`);
+		void (await commands.executeCommand(`${this.id}.focus`, options));
+		this.setContextKeys(true, false);
+		return this;
 	}
 
 

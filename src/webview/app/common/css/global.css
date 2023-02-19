@@ -1,0 +1,17 @@
+
+.te-tsx-container {
+    color: var(--vscode-foreground);
+    align-content: stretch;
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    height: 100%;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
