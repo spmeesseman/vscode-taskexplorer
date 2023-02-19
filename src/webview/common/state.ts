@@ -1,13 +1,15 @@
 
 
-export interface State
+export interface State extends BaseState
 {
-	extensionEnabled: boolean;
-	webroot?: string;
-	avatar?: string;
-	pinned: boolean;
-	nonce?: string;
 	seconds?: number;
-	icon?: string;
 	taskType?: string;
+}
+
+export interface BaseState
+{
+	enabled: boolean;
+	nonce?: string;
+	pinned: boolean;
+	webroot?: string;
 }

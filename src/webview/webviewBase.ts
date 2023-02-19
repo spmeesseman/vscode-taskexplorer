@@ -18,6 +18,7 @@ import {
 	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
 } from "./common/ipc";
 import { randomUUID } from "crypto";
+import { BaseState } from "./common/state";
 
 
 export interface FontAwesomeClass
@@ -335,13 +336,14 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	}
 
 
-	protected async getState(): Promise<State>
+	protected async getState(): Promise<BaseState>
 	{
 		return {
-			extensionEnabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
+			enabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
+			nonce: this._cspNonce,
 			pinned: false,
 			webroot: this.getWebRoot()
-		} as State;
+		};
 	}
 
 }
