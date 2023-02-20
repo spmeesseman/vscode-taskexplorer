@@ -15,17 +15,27 @@ import { Commands, executeCommand } from "../lib/command/command";
 import { Disposable, EventEmitter, Uri, Webview, WebviewPanel, WebviewView, workspace } from "vscode";
 import {
 	ExecuteCommandType, IpcMessage, IpcMessageParams, IpcNotificationType, onIpc, LogWriteCommandType,
-	WebviewFocusChangedCommandType, WebviewFocusChangedParams, WebviewReadyCommandType
+	/* WebviewFocusChangedCommandType, */ WebviewFocusChangedParams, WebviewReadyCommandType
 } from "./common/ipc";
 import { randomUUID } from "crypto";
 import { BaseState } from "./common/state";
 
 
+export interface CodiconClass
+{
+	all?: boolean;
+	icons?: string[];
+	size?: number;
+}
+
+
 export interface FontAwesomeClass
 {
 	duotone?: boolean;
+	icons?: string[];
 	light?: boolean;
 	regular?: boolean;
+	size?: number;
 	solid?: boolean;
 	thin?: boolean;
 }
@@ -39,7 +49,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 
 	protected includeBody?(...args: unknown[]): string | Promise<string>;
 	protected includeBootstrap?(...args: unknown[]): any;
-	protected includeCodicon?(): boolean;
+	protected includeCodicon?(): CodiconClass;
 	protected includeEndOfBody?(...args: unknown[]): string | Promise<string>;
 	protected includeFontAwesome?(): FontAwesomeClass;
 	protected includeHead?(...args: unknown[]): string | Promise<string>;
@@ -84,7 +94,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	}
 
 
-	get isFirstLoadComplete() {
+	get isFirstLoadComplete(): boolean {
 		return this._isFirstLoadComplete;
 	}
 
@@ -96,31 +106,32 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 		return this._onReadyReceived.event;
 	}
 
-	get title() {
+	get title(): string {
 		return this._view?.title ?? this._title;
 	}
 
 	set title(title: string)
 	{
 		this._title = title;
-		if (!this._view) return;
-		this._view.title = title;
+		if (this._view) {
+			this._view.title = title;
+		}
 	}
 
-	get originalTitle() {
+	get originalTitle(): string | undefined {
 		return this._originalTitle;
 	}
 
-	get view() {
+	get view(): WebviewView | WebviewPanel | undefined {
 		return this._view;
 	}
 
-	get visible() {
+	get visible(): boolean {
 		return this._view?.visible ?? false;
 	}
 
 
-	protected async getHtml(webview: Webview, ...args: unknown[])
+	protected async getHtml(webview: Webview, ...args: unknown[]): Promise<string>
 	{
 		const webRootUri = Uri.joinPath(this.wrapper.context.extensionUri, "res"),
 			  uri = Uri.joinPath(webRootUri, "page", this.fileName),
@@ -150,7 +161,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 					case "body":
 						return repl(body ?? "");
 					case "endOfBody":
-						return this.getEndOfBodyHtml(webRoot, bootstrap, endOfBody);
+						return this.getHtmlEndOfBody(webRoot, bootstrap, endOfBody);
 					case "cspSource":
 						return cspSource;
 					case "cspNonce":
@@ -173,19 +184,33 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	}
 
 
-	private getEndOfBodyHtml = (webRoot: string, bootstrap: string | undefined, endOfBody: string | undefined) =>
+	private getHtmlEndOfBody = (webRoot: string, bootstrap: string | undefined, endOfBody: string | undefined): string =>
 	{
 		let html = "";
 
-		if (this.includeCodicon?.() === true)
+		const codicon = this.includeCodicon?.();
+		if (codicon)
 		{
+			const getIconChar = () =>
+			{
+
+			};
+
 			html += `<style nonce="${this._cspNonce}">
 						@font-face {
 							font-family:'codicon';
 							font-display:block;
 							src:url('${webRoot}/page/codicon.ttf?${randomUUID()}') format('truetype'); 
-						}
-					</style>`;
+						}`;
+			if (codicon.icons)
+			{
+				for (const icon of codicon.icons)
+				{
+					const cls = `.codicon-${icon}:before`;
+					html += `${cls} { content: '\\ea75'; }`;
+				}
+			}
+			html += "</style>";
 		}
 
 		if (this.includeFontAwesome?.())
@@ -220,17 +245,27 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	};
 
 
-	protected getWebRoot()
+	protected async getState(): Promise<BaseState>
 	{
-		if (this._view)
-		{
+		return {
+			enabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
+			nonce: this._cspNonce,
+			pinned: false,
+			webroot: this.getWebRoot()
+		};
+	}
+
+
+	protected getWebRoot(): string | undefined
+	{
+		if (this._view) {
 			const webRootUri = Uri.joinPath(this.wrapper.context.extensionUri, "res");
 			return this._view.webview.asWebviewUri(webRootUri).toString();
 		}
 	}
 
 
-    private nextIpcId  = () =>
+    private nextIpcId = (): string =>
     {
 		/* istanbul ignore if */
         if (this._ipcSequence === this._maxSmallIntegerV8)
@@ -244,14 +279,14 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
     };
 
 
-	notify<T extends IpcNotificationType<any>>(type: T, params: IpcMessageParams<T>, completionId?: string)
+	notify<T extends IpcNotificationType<any>>(type: T, params: IpcMessageParams<T>, completionId?: string): Promise<boolean>
 	{
 		return this.postMessage(
 		{
 			id: this.nextIpcId(),
 			method: type.method,
 			params,
-			completionId,
+			completionId
 		});
 	}
 
@@ -268,7 +303,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	protected onHtmlFinalizeBase = async(html: string, ...args: unknown[]): Promise<string> => this.onHtmlFinalize(html, ...args);
 
 
-	protected onMessageReceivedBase(e: IpcMessage)
+	protected onMessageReceivedBase(e: IpcMessage): void
 	{
 		switch (e.method)
 		{
@@ -301,7 +336,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	}
 
 
-	private postMessage(message: IpcMessage)
+	private postMessage(message: IpcMessage): Promise<boolean>
 	{
 		if (!this._view || !this._isReady || !this.visible) {
 			return Promise.resolve(false);
@@ -319,7 +354,7 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 	}
 
 
-	protected async refresh(force?: boolean, ...args: unknown[])
+	protected async refresh(force?: boolean, ...args: unknown[]): Promise<void>
     {
 		if (!this._view) return;
 		this._isReady = false;
@@ -333,17 +368,6 @@ export abstract class TeWebviewBase<State> implements ITeWebview, Disposable
 		}
 		this._view.webview.html = html;
 		setTimeout(() => this._onContentLoaded.fire(html), 1);
-	}
-
-
-	protected async getState(): Promise<BaseState>
-	{
-		return {
-			enabled: this.wrapper.views.taskExplorer.enabled || this.wrapper.views.taskExplorerSideBar.enabled,
-			nonce: this._cspNonce,
-			pinned: false,
-			webroot: this.getWebRoot()
-		};
 	}
 
 }

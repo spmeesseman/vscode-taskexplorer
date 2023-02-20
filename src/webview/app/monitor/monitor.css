@@ -1,9 +1,4 @@
 
-.te-tsx-container.te-tsx-monitor-container {
-    border: 5px solid var(--vscode-button-background);
-    height: 200px;
-}
-
 .te-monitor-control-container {
     opacity: 1;
 }

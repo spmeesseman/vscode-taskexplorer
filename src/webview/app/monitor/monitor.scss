@@ -1,0 +1,10 @@
+
+.te-tsx-container.te-tsx-monitor-container {
+    height: 200px;
+	.vscode-light & {
+		border: 5px solid var(--vscode-button-background);
+	}
+	.vscode-dark & {
+		border: 5px solid var(--vscode-button-background);
+	}
+}

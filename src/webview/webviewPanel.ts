@@ -8,6 +8,7 @@ import {
     WebviewOptions, WebviewPanel, WebviewPanelOnDidChangeViewStateEvent, WebviewPanelOptions, WindowState,
     Disposable, Uri, ViewColumn, window, WebviewPanelSerializer
 } from "vscode";
+import { BaseState } from "./common/state";
 
 export type WebviewIds = "parsingReport" | "licensePage" | "releaseNotes" | "taskMonitor";
 

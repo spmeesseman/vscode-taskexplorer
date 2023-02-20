@@ -86,7 +86,7 @@ export class HomeView extends TeWebviewView<State>
 	}
 
 
-	protected override includeCodicon = () => true;
+	protected override includeCodicon = () => ({ icons: [ "lock" ] });
 
 
 	protected override includeFontAwesome = () => ({});

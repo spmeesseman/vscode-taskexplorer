@@ -1,0 +1,33 @@
+
+.te-page-button {
+
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    padding: 8px 12px;
+    cursor: pointer;
+    width: 150px;
+    border-radius: 5px;
+    border: gray 1px solid;
+
+	.vscode-light & {
+        border: rgb(58, 56, 56) 1px solid;
+	}
+	.vscode-dark & {
+        border: gray 1px solid;
+	}
+	transition: background-color 250ms, border-color 250ms, color 250ms;
+
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
+		.vscode-light & {
+            border: rgb(58, 56, 56) 1px solid;
+		}
+		.vscode-dark & {
+            border: gray 1px solid;
+		}
+	}
+
+	.preload & {
+		transition-duration: 0s !important;
+	}
+}

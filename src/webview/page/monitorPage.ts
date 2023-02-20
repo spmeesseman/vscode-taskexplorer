@@ -34,7 +34,7 @@ export class MonitorPage extends TeWebviewPanel<State>
 	protected override async getState(): Promise<State>
 	{
 		return {
-			...super.getState(),
+			...(await super.getState()),
 			seconds: 0,
 			taskType: "grunt"
 		};
@@ -44,7 +44,7 @@ export class MonitorPage extends TeWebviewPanel<State>
 	protected override includeBootstrap = (): Promise<State> => this.getState();
 
 
-	protected override includeCodicon = () => true;
+	protected override includeCodicon = () => ({ icons: [ "lock" ] });
 
 
 	protected override includeFontAwesome = () => ({ duotone: true, regular: true });

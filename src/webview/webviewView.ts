@@ -8,6 +8,7 @@ import {
 	CancellationToken, WebviewView, WebviewViewProvider, WebviewViewResolveContext,
 	WindowState, Disposable, window, commands, Uri
 } from "vscode";
+import { BaseState } from "./common/state";
 
 
 export type WebviewViewIds = "home" | "taskCount" | "taskUsage";
