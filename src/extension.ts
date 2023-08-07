@@ -15,6 +15,7 @@ import { ScriptTaskProvider } from "./providers/script";
 import { GradleTaskProvider } from "./providers/gradle";
 import { GruntTaskProvider } from "./providers/grunt";
 import { ComposerTaskProvider } from "./providers/composer";
+import { LaravelTaskProvider } from "./providers/laravel";
 import { PipenvTaskProvider } from "./providers/pipenv";
 import { GulpTaskProvider } from "./providers/gulp";
 import { AppPublisherTaskProvider } from "./providers/appPublisher";
@@ -664,6 +665,7 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("make", new MakeTaskProvider(), context);                    // C/C++ Makefile
     registerTaskProvider("maven", new MavenTaskProvider(), context);                  // Apache Maven Toolset
     registerTaskProvider("pipenv", new PipenvTaskProvider(), context);                // Pipfile for Python pipenv package manager
+    registerTaskProvider("laravel", new LaravelTaskProvider(), context);              // Laravel Laravel
     //
     // The 'script' provider handles all file based 'scripts', e.g. batch files, bash, powershell, etc
     //

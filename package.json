@@ -1551,6 +1551,10 @@
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableAppPublisher%"
                         },
+                        "laravel": {
+                            "type": "boolean",
+                            "description": "%config.taskExplorer.enableLaravel%"
+                        },
                         "bash": {
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableBash%"
@@ -1619,6 +1623,7 @@
                     "default": {
                         "ant": true,
                         "appPublisher": false,
+                        "laravel": true,
                         "bash": true,
                         "batch": true,
                         "composer": true,
@@ -1682,6 +1687,10 @@
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAppPublisher%"
                         },
+                        "laravel": {
+                            "type": "string",
+                            "description": "%config.taskExplorer.pathToLaravel%"
+                        },
                         "ansicon": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToAnsicon%"
@@ -1735,6 +1744,7 @@
                         "ant": "ant.bat",
                         "appPublisher": "",
                         "ansicon": "",
+                        "laravel": "./artisan",
                         "bash": "bash",
                         "composer": "composer",
                         "gradle": "gradle.bat",
@@ -2207,6 +2217,36 @@
             },
             {
                 "type": "composer",
+                "required": [],
+                "properties": {
+                    "script": {
+                        "type": "string",
+                        "description": "%taskdef.task.script%"
+                    },
+                    "target": {
+                        "type": "string",
+                        "description": "%taskdef.task.target%"
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "%taskdef.task.path%"
+                    },
+                    "fileName": {
+                        "type": "string",
+                        "description": "%taskdef.task.fileName%"
+                    },
+                    "uri": {
+                        "type": "object",
+                        "description": "%taskdef.task.fileUri%"
+                    },
+                    "taskItemId": {
+                        "type": "string",
+                        "description": "%taskdef.task.taskItemId%"
+                    }
+                }
+            },
+            {
+                "type": "laravel",
                 "required": [],
                 "properties": {
                     "script": {
