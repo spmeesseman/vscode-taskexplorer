@@ -35,6 +35,7 @@
         "gulp",
         "yarn",
         "ant",
+        "deno",
         "makefile",
         "composer",
         "php",
@@ -1559,6 +1560,10 @@
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableComposer%"
                         },
+                        "deno": {
+                            "type": "boolean",
+                            "description": "%config.taskExplorer.enableDeno%"
+                        },
                         "gradle": {
                             "type": "boolean",
                             "description": "%config.taskExplorer.enableGradle%"
@@ -1622,6 +1627,7 @@
                         "bash": true,
                         "batch": true,
                         "composer": true,
+                        "deno": true,
                         "gradle": true,
                         "grunt": true,
                         "gulp": true,
@@ -1693,6 +1699,10 @@
                         "composer": {
                             "type": "string",
                             "description": "%config.taskExplorer.pathToComposer%"
+                        },
+                        "deno": {
+                            "type": "string",
+                            "description": "%config.taskExplorer.pathToDeno%"
                         },
                         "gradle": {
                             "type": "string",

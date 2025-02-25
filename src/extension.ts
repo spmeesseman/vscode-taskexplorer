@@ -30,6 +30,7 @@ import {
     window, FileSystemWatcher, ConfigurationChangeEvent, WorkspaceFolder
 } from "vscode";
 import { LicenseManager } from "./lib/licenseManager";
+import { DenoTaskProvider } from "./providers/deno";
 
 
 export let teApi: TaskExplorerApi;
@@ -658,6 +659,7 @@ function registerTaskProviders(context: ExtensionContext)
     registerTaskProvider("ant", new AntTaskProvider(), context);                      // Apache Ant Build Automation Tool
     registerTaskProvider("app-publisher", new AppPublisherTaskProvider(), context);   // App Publisher (work related)
     registerTaskProvider("composer", new ComposerTaskProvider(), context);            // PHP / composer.json
+    registerTaskProvider("deno", new DenoTaskProvider(), context);                    // Deno
     registerTaskProvider("gradle", new GradleTaskProvider(), context);                // Gradle multi-Language Automation Tool
     registerTaskProvider("grunt", new GruntTaskProvider(), context);                  // Gulp JavaScript Toolkit
     registerTaskProvider("gulp", new GulpTaskProvider(), context);                    // Grunt JavaScript Task Runner

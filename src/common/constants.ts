@@ -30,6 +30,7 @@ const constants: IDictionary<string> =
     GLOB_NSIS: "**/*.[Nn][Ss][Ii]",
     GLOB_PERL: "**/*.[Pp][Ll]",
     GLOB_COMPOSER: "**/composer.json",
+    GLOB_DENO: "**/deno.json",
     GLOB_POWERSHELL: "**/*.[Pp][Ss]1",
     GLOB_PYTHON: "**/*.[Pp][Yy]",
     GLOB_PIPENV: "**/[Pp][Ii][Pp][Ff][Ii][Ll][Ee]",
