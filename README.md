@@ -1,33 +1,19 @@
-# Task Explorer - View and Run Tasks from Visual Studio Code
+# Task Explorer - Visual Task Runner and Management
 
-# PROJECT ON HOLD
+_**The most downloaded task related extension on the marketplace**_
 
-# IF YOU HAVE KIDS, HUG THEM. EVERY CHANCE YOU GET
+LATEST UPDATE - PROJECT RESUMED ON 7/1/25 AFTER 2+ YEARS DOWNTIME ... SCHEDULED V3 RELEASE IS ~ SEPT 1
 
-# I LOST MY DAUGHTER ALMOST A YEAR AGO, EACH AND EVERY DAY IS FILLED WITH OVERWHELMING SADNESS AND TEARS
+IMPORTANT NOTE - MY APOLOGIES TO ALL USERS FOR THE DOWNTIME, I AM ACTIVELY WORKING ON v3 AND WILL BEGIN LOOKING AT TICKETS AGAIN SOON AS WELL... IF YOU HAVE KIDS, HUG THEM. SQUEEZE THEM, EVEN IF IT ANNOYS THEM TO NO END (OVER 12/13?), **EVERY** SINGLE CHANCE YOU GET....  I LOST MY BELOVED DAUGHTER A FEW YEARS AGO NOW, I LOVED HER WITH EVERY OUNCE OF MY BEING AND EACH AND EVERY DAY IS FILLED WITH OVERWHELMING PAIN AND SADNESS, I AM... FOREVER BROKEN.  IT'S BEEN EXTREMELY HARD TRYING TO GET THIS GOING AGAIN BECAUSE WE WERE WOKING ON IT TOGETHER WHEN SHE LEFT ME. PLEASE CONSIDER PURCHASING A (CHEAP++) LICENSE WHEN THE LICENSING GOES INTO EFFECT AFTER INITIAL v3 TESTING, IT IS MY LAST HOPE TO BRING SOME LIGHT TO THE DARKENED WORLD THAT HAS BEFALLEN ME. I WOULD BE FOREVER GRATEFUL TO ALL WHO DO.
 
-# I AM... FOREVER BROKEN.
+| ![srcmain](public/logo/logo-bl.png) | This extension has surpassed where I was ever going to take it, and the time that ended up going into it were more than I ever intended.  Considering a pay scheme (cheap, e.g. $10 - $20), with free usage up to the # of to-be-determined number of parsed tasks.  Note the license, this codebase is NOT permitted to be copied or distributed without my permission. |
+| ----------------------------------------- | ------------------------------------------------------------------ |
 
-**The most downloaded task related extension on the Marketplace**
+[![home](https://img.shields.io/badge/spmhome.io-6F02B5.svg?logo=visual%20studio%20code)](https://www.spmhome.io) [![project type](https://img.shields.io/badge/category-ci-blue.svg)](https://www.spmhome.io) [![project lang](https://img.shields.io/badge/language-javascript-blue.svg)](https://www.spmhome.io) [![vscode-taskexplorer](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-webpack--wrap-00aa00.svg)](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) [![app-publisher](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-app--publisher-e10000.svg)](https://gitlab.spmhome.io/spmhome/ci/app-publisher) [![eslint-utils](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-eslint--utils-e10000.svg)](https://gitlab.spmhome.io/spmhome/utils/eslint-utils)
 
-[![authors](https://img.shields.io/badge/authors-scott%20meesseman-6F02B5.svg?logo=visual%20studio%20code)](https://www.littlesm.com)
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-extjs)
-[![Downloads](https://img.shields.io/visual-studio-marketplace/d/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-extjs)
-[![Ratings](https://img.shields.io/visual-studio-marketplace/r/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-extjs&ssr=false#review-details)
-[![PayPalDonate](https://img.shields.io/badge/paypal-donate-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YWZXT3KE2L4BA&item_name=taskexplorer&currency_code=USD)
-
-[![codecov](https://codecov.io/gh/spmeesseman/vscode-taskexplorer/branch/master/graph/badge.svg)](https://codecov.io/gh/spmeesseman/vscode-taskexplorer)
-[![CodeFactor](https://www.codefactor.io/repository/github/spmeesseman/vscode-taskexplorer/badge)](https://www.codefactor.io/repository/github/spmeesseman/vscode-taskexplorer)
-[![app-publisher](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-app--publisher-e10000.svg)](https://github.com/spmeesseman/app-publisher)
-
-[![GitHub issues open](https://img.shields.io/github/issues-raw/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/issues)
-[![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
-[![GitHub last commit](https://img.shields.io/github/last-commit/spmeesseman/vscode%2dtaskexplorer.svg?logo=github)](https://github.com/spmeesseman/vscode-taskexplorer)
+[![vcs](https://img.shields.io/badge/vcs-gitlab-blue.svg)](https://gitlab.spmhome.io) [![Installs](https://img.shields.io/visual-studio-marketplace/i/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Downloads](https://img.shields.io/visual-studio-marketplace/d/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Ratings](https://img.shields.io/visual-studio-marketplace/r/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplore&ssr=false#review-details)
 
 ![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src0y](res/sources/yarn.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true) ![src13](res/sources/maven.png?raw=true)
-
-_**IMPORTANT NOTE**_: This extension has surpassed where I was ever going to take it, and the time that ended up going into it were more than I ever intended.  Considering a pay scheme (cheap, e.g. $10 - $20), with free usage up to the # of to-be-determined number of parsed tasks.  Note the license, this codebase is NOT permitted to be copied or distributed without my permission.
 
 ## Description
 
@@ -35,7 +21,7 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 
 ## Table of Contents
 
-- [Task Explorer - View and Run Tasks from Visual Studio Code](#task-explorer---view-and-run-tasks-from-visual-studio-code)
+- [Task Explorer - Visual Task Runner and Management](#task-explorer---visual-task-runner-and-management)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
   - [Screenshots by Version](#screenshots-by-version)
@@ -54,8 +40,6 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
   - [Feedback \& Contributing](#feedback--contributing)
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
   - [Thank You](#thank-you)
-  - [Open Source Projects](#open-source-projects)
-  - [Donations](#donations)
 
 ## Screenshots by Version
 
@@ -146,7 +130,7 @@ App-Publisher is a multi-purpose versioning/release tool that can be used for, b
 - MantisBT releases via the [Releases Plugin](https://github.com/mantisbt-plugins/Releases).
 - View/output changelogs for a pending release.
 
-![ap0](res/app-publisher-taskview.png?raw=true)
+![ap0](public/app-publisher-taskview.png?raw=true)
 
 ## Configuring Global Excludes, Apache Ant and Bash Globs
 
@@ -183,7 +167,7 @@ For example, consider 10 npm tasks, 5 of which all start with the string *dev-*,
         dev-build
         dev-build-server
         dev-build-themes
-        dev-cp-from-bin
+        dev-cp-from-binVV
         dev-clean
         prod-build
         prod-build-server
@@ -395,7 +379,7 @@ Putting it all together:
     }
 
 - As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
-- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/sources` or `res/dark` / `res/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
+- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/sources` or `public/dark` / `public/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
 
 ## Feedback & Contributing
 
@@ -426,41 +410,3 @@ Other Contributors:
 - tiansin
 - JacobParis
 - Spitfire1900
-
-## Open Source Projects
-
-|Package|Use Case|Repository|Marketplace|
-|-|-|-|-|
-|app-publisher|Release Automation / CI|[GitHub](https://www.npmjs.com/package/@spmeesseman/app-publisher)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/app-publisher)|
-|arg-parser|Node Argument Parser|[GitHub](https://github.com/spmeesseman/arg-parser)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/arg-parser)|
-|code-package|Code Dev Environment|[GitHub](https://github.com/spmeesseman/code-package)|[GitHub Releases](https://github.com/spmeesseman/code-package/releases)|
-|env-ci|CI ENvironment Detection|[GitHub](https://github.com/spmeesseman/env-ci)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/env-ci)|
-|extjs-pkg-filterbar|ExtJS Grid Filter Bar|[GitHub](https://github.com/spmeesseman/extjs-pkg-filterbar)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-filterbar)|
-|extjs-pkg-fontawesome|ExtJS FontAwesome Integration|[GitHub](https://github.com/spmeesseman/extjs-pkg-fontawesome)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-fontawesome)|
-|extjs-pkg-fontawesome-pro|ExtJS FontAwesome Pro Integration|[GitHub](https://github.com/spmeesseman/extjs-pkg-fontawesome-pro)|[Npmjs.org Private Registry](https://www.npmjs.com/package/@spmeesseman/@spmeesseman/extjs-pkg-fontawesome-pro)|
-|extjs-pkg-intltelinput|ExtJS IntlTelInput Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-intltelinput)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-intltelinput)|
-|extjs-pkg-mantis|ExtJS MantisBT Integration|[GitHub](https://github.com/spmeesseman/extjs-pkg-mantis)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-mantis)|
-|extjs-pkg-plyr|ExtJS Plyr Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-plyr)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-plyr)|
-|extjs-pkg-tinymce|ExtJS TinyMCE Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-tinymce)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-tinymce)|
-|extjs-pkg-websocket|ExtJS WebSocket Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-websocket)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-websocket)|
-|extjs-pkg-webworker|ExtJS WebWorker Wrapper|[GitHub](https://github.com/spmeesseman/extjs-pkg-webworker)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/extjs-pkg-webworker)|
-|jenkins-mantisbt-plugin|Jenkins MantisBT Integration|[GitHub](https://github.com/spmeesseman/jenkins-mantisbt-plugin)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/jenkins-mantisbt-plugin)|
-|jenkins-utility-server|Jenkins Desktop Server|[GitHub](https://github.com/spmeesseman/jenkins-utility-server)|[Npmjs.org Registry](https://www.npmjs.com/package/@spmeesseman/jenkins-utility-server)|
-|mantisbt|MantisBT Custom Site|[GitHub](https://github.com/spmeesseman/mantisbt)|[GitHub Releases](https://github.com/spmeesseman/mantisbt/releases)|
-|ApiExtend|MantisBT API Extensions|[GitHub](https://github.com/mantisbt-plugins/ApiExtend)|[GitHub Releases](https://github.com/mantisbt-plugins/ApiExtend/releases)|
-|CommitReact|MantisBT Post Commit Actions|[GitHub](https://github.com/mantisbt-plugins/CommitReact)|[GitHub Releases](https://github.com/mantisbt-plugins/CommitReact/releases)|
-|GanttChart|MantisBT Gantt Chart|[GitHub](https://github.com/mantisbt-plugins/GanttChart)|[GitHub Releases](https://github.com/mantisbt-plugins/GanttChart/releases)|
-|IFramed|MantisBT IFramed Pages|[GitHub](https://github.com/mantisbt-plugins/IFramed)|[GitHub Releases](https://github.com/mantisbt-plugins/IFramed/releases)|
-|ProjectPages|MantisBT Custom Nav Buttons|[GitHub](https://github.com/mantisbt-plugins/ProjectPages)|[GitHub Releases](https://github.com/mantisbt-plugins/ProjectPages/releases)|
-|Releases|MantisBT Releases Management|[GitHub](https://github.com/mantisbt-plugins/Releases)|[GitHub Releases](https://github.com/mantisbt-plugins/Releases/releases)|
-|SecurityExtend|MantisBT SPAM Filter|[GitHub](https://github.com/mantisbt-plugins/SecurityExtend)|[GitHub Releases](https://github.com/mantisbt-plugins/SecurityExtend/releases)|
-|ServerFiles|MantisBT Server File Editor|[GitHub](https://github.com/mantisbt-plugins/ServerFiles)|[GitHub Releases](https://github.com/mantisbt-plugins/ServerFiles/releases)|
-|svn-scm-ext|VSCode SVN Extension|[GitHub](https://github.com/spmeesseman/svn-scm-ext)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.svn-scm-ext)|
-|vscode-extjs|VSCode ExtJS Intellisense|[GitHub](https://github.com/spmeesseman/vscode-extjs)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-extjs)|
-|vscode-taskexplorer|VSCode Tasks Management|[GitHub](https://github.com/spmeesseman/vscode-taskexplorer)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-taskexplorer)|
-|vscode-vslauncher|VSCode VS Project Launcher|[GitHub](https://github.com/spmeesseman/vscode-vslauncher)|[Visual Studio Marketplace](https://marketplace.visualstudio.com/itemdetails?itemName=spmeesseman.vscode-vslauncher)|
-
-
-## Donations
-
-If my work and this extension has made your life easier, consider a [donation](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YWZXT3KE2L4BA&item_name=taskexplorer&currency_code=USD).  All donations go straight to the *Single Dad ATM*.
