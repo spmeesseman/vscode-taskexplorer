@@ -1,67 +1,86 @@
-# Task Explorer - Visual Task Runner and Management
+# Task Explorer - Tasks and Scripts Visual Control
 
-_**The most downloaded task related extension on the marketplace**_
+| ![logo](res/img/logo-bl.png) | If you have kids, hug and squeeze them **every** single chance you get... I lost my daughter ~2 years ago, I loved her with every ounce of my soul, now every day is filled with overwhelming sadness, I am... 4everbroken. We were working on this together when she left me, please consider purchasing a (cheap++) license when the licensing scheme goes into effect. | ![cmdline-banner](res/readme/cmdline-banner.png) |
+| ---------- | ------------------------------- | -------------------------------------------------------- |
 
-LATEST UPDATE - PROJECT RESUMED ON 7/1/25 AFTER 2+ YEARS DOWNTIME ... SCHEDULED V3 RELEASE IS ~ SEPT 1
+[![home](https://img.shields.io/badge/org-spmhome.io-0556d7.svg)](https://www.spmhome.io) [![vcs](https://img.shields.io/badge/vcs-gitlab-4287f5.svg)](https://gitlab.spmhome.io) [![projecttype](https://img.shields.io/badge/category-apps-4287f5.svg)](https://www.spmhome.io) [![projectlang](https://img.shields.io/badge/language-typescript-4287f5.svg)](https://www.spmhome.io) [![webpack-wrap](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-webpack--wrap-4287f5.svg)](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) [![app-publisher](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-app--publisher-4287f5.svg)](https://gitlab.spmhome.io/spmhome/ci/app-publisher) [![eslint-config](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-eslint--config-4287f5.svg)](https://gitlab.spmhome.io/spmhome/utils/eslint-config)
 
-IMPORTANT NOTE - MY APOLOGIES TO ALL USERS FOR THE DOWNTIME, I AM ACTIVELY WORKING ON v3 AND WILL BEGIN LOOKING AT TICKETS AGAIN SOON AS WELL... IF YOU HAVE KIDS, HUG THEM. SQUEEZE THEM, EVEN IF IT ANNOYS THEM TO NO END (OVER 12/13?), **EVERY** SINGLE CHANCE YOU GET....  I LOST MY BELOVED DAUGHTER A FEW YEARS AGO NOW, I LOVED HER WITH EVERY OUNCE OF MY BEING AND EACH AND EVERY DAY IS FILLED WITH OVERWHELMING PAIN AND SADNESS, I AM... FOREVER BROKEN.  IT'S BEEN EXTREMELY HARD TRYING TO GET THIS GOING AGAIN BECAUSE WE WERE WOKING ON IT TOGETHER WHEN SHE LEFT ME. PLEASE CONSIDER PURCHASING A (CHEAP++) LICENSE WHEN THE LICENSING GOES INTO EFFECT AFTER INITIAL v3 TESTING, IT IS MY LAST HOPE TO BRING SOME LIGHT TO THE DARKENED WORLD THAT HAS BEFALLEN ME. I WOULD BE FOREVER GRATEFUL TO ALL WHO DO.
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Downloads](https://img.shields.io/visual-studio-marketplace/d/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Ratings](https://img.shields.io/visual-studio-marketplace/r/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplore&ssr=false#review-details)
 
-| ![srcmain](public/logo/logo-bl.png) | This extension has surpassed where I was ever going to take it, and the time that ended up going into it were more than I ever intended.  Considering a pay scheme (cheap, e.g. $10 - $20), with free usage up to the # of to-be-determined number of parsed tasks.  Note the license, this codebase is NOT permitted to be copied or distributed without my permission. |
-| ----------------------------------------- | ------------------------------------------------------------------ |
-
-[![home](https://img.shields.io/badge/spmhome.io-6F02B5.svg?logo=visual%20studio%20code)](https://www.spmhome.io) [![project type](https://img.shields.io/badge/category-ci-blue.svg)](https://www.spmhome.io) [![project lang](https://img.shields.io/badge/language-javascript-blue.svg)](https://www.spmhome.io) [![vscode-taskexplorer](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-webpack--wrap-00aa00.svg)](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) [![app-publisher](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-app--publisher-e10000.svg)](https://gitlab.spmhome.io/spmhome/ci/app-publisher) [![eslint-utils](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-eslint--utils-e10000.svg)](https://gitlab.spmhome.io/spmhome/utils/eslint-utils)
-
-[![vcs](https://img.shields.io/badge/vcs-gitlab-blue.svg)](https://gitlab.spmhome.io) [![Installs](https://img.shields.io/visual-studio-marketplace/i/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Downloads](https://img.shields.io/visual-studio-marketplace/d/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Ratings](https://img.shields.io/visual-studio-marketplace/r/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplore&ssr=false#review-details)
-
-![src0](res/sources/npm.png?raw=true) ![src1](res/sources/ant.png?raw=true) ![src0y](res/sources/yarn.png?raw=true) ![src2](res/sources/grunt.png?raw=true) ![src3](res/sources/gulp.png?raw=true) ![src13](res/sources/gradle.png?raw=true) ![src4](res/sources/workspace.png?raw=true) ![src5](res/sources/make.png?raw=true) ![src6](res/sources/ts.png?raw=true) ![src7](res/sources/bat.png?raw=true) ![src8](res/sources/ruby.png?raw=true) ![src9](res/sources/powershell.png?raw=true) ![src10](res/sources/bash.png?raw=true) ![src11](res/sources/python.png?raw=true) ![src12](res/sources/nsis.png?raw=true) ![src13](res/sources/maven.png?raw=true)
+![src0_1](res/img/sources/npm.png) ![src0_2](res/img/sources/node.png) ![src11](res/img/sources/python.png) ![src4](res/img/sources/workspace.png) ![src6](res/img/sources/ts.png) ![src1](res/img/sources/ant.png) ![src0y](res/img/sources/yarn.png) ![src14e](res/img/sources/eslint.png) ![src2](res/img/sources/grunt.png) ![src3](res/img/sources/gulp.png) ![src8](res/img/sources/ruby.png) ![src9](res/img/sources/powershell.png) ![src13](res/img/sources/gradle.png) ![src5_1](res/img/sources/cmake.png) ![src5_2](res/img/sources/make.png) ![src7](res/img/sources/bat.png) ![src10](res/img/sources/bash.png) ![src12](res/img/sources/nsis.png) ![src14](res/img/sources/webpack.png) ![src13](res/img/sources/maven.png)
 
 ## Description
 
-Provides a view in either (or both) the SideBar and/or Explorer that displays all supported tasks organized into a treeview, with parent task file nodes, grouped nodes, and project folders (convenient for large multi-root workspaces).  Tasks can be opened for view/edit, executed, and stopped, among other things for specific task types, for example NPM file nodes support common npm command(s) (i.e. 'install') via context menu.
+Provides configurable treeviews that display all supported tasks and scripts, organized by project folder and groupings.  Tasks can be opened for view/edit, executed, stopped, restarted, etc.
 
 ## Table of Contents
 
-- [Task Explorer - Visual Task Runner and Management](#task-explorer---visual-task-runner-and-management)
+- [Task Explorer - Tasks and Scripts Visual Control](#task-explorer---tasks-and-scripts-visual-control)
   - [Description](#description)
   - [Table of Contents](#table-of-contents)
   - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
-  - [Features by Version](#features-by-version)
-  - [Version 2](#version-2)
-  - [App-Publisher](#app-publisher)
+  - [Version 3](#version-3)
+  - [Features by Pre-V3 Release](#features-by-pre-v3-release)
   - [Configuring Global Excludes, Apache Ant and Bash Globs](#configuring-global-excludes-apache-ant-and-bash-globs)
   - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups with a Separator](#using-groups-with-a-separator)
   - [Internally Provided Tasks vs. VSCode Provided Tasks](#internally-provided-tasks-vs-vscode-provided-tasks)
-  - [Running bash/sh scripts in Windows Environment](#running-bashsh-scripts-in-windows-environment)
-  - [Running Task Icon Animations](#running-task-icon-animations)
-  - [Parsing Reports](#parsing-reports)
-  - [External Provider Integration API](#external-provider-integration-api)
+  - [Running Shell Scripts](#running-shell-scripts)
+  - [Task Icon Animations](#task-icon-animations)
+  - [Task Monitor](#task-monitor)
+  - [Task Reports and Details](#task-reports-and-details)
   - [Feedback \& Contributing](#feedback--contributing)
+  - [App-Publisher and Webpack-Wrap](#app-publisher-and-webpack-wrap)
     - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
+    - [Licensing](#licensing)
   - [Thank You](#thank-you)
 
 ## Screenshots by Version
 
-| Original Explorer Tray                    | Sidebar View (v1.7)                       | Task Type Groups (v1.13)                  |
+| Latest Explorer Tray                    | Sidebar View (v1.7)                       | Task Type Groups (v1.13)                  |
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
-| ![ss0](res/readme/taskview1.png?raw=true) | ![ss1](res/readme/taskview2.png?raw=true) | ![ss2](res/readme/taskview3.png?raw=true) |
+| ![ss0](res/readme/treeview1.png) | ![ss1](res/readme/taskview2.png) | ![ss2](res/readme/taskview3.png) |
 
 | Grunt/Gulp in Subfolders (v1.14)          | Npm Commands (v1.16)                      | Task Groupings (v1.23)                    |
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
-| ![ss4](res/readme/taskview4.png?raw=true) | ![ss5](res/readme/taskview5.png?raw=true) | ![ss6](res/readme/taskview6.png?raw=true) |
+| ![ss4](res/readme/taskview4.png) | ![ss5](res/readme/taskview5.png) | ![ss6](res/readme/taskview6.png) |
 
 | Multi-Level Task Groupings (v1.29)        | Run with Args, No Terminal (1.30)         | Last Tasks (1.25) Favorites (2.0)         |
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |
-| ![ss7](res/readme/taskview7.png?raw=true) | ![ss8](res/readme/taskview8.png?raw=true) | ![ss9](res/readme/taskview9.png?raw=true) |
+| ![ss7](res/readme/taskview7.png) | ![ss8](res/readme/taskview8.png) | ![ss9](res/readme/taskview9.png) |
 
 ## Requirements
 
-- Visual Studio Code v1.50+
+- NodeJS 22.15+
+- Visual Studio Code v1.102+
 
-"Should" work with VSCode versions 1.30 and above, but am no longer running tests against VSCode versions below 1.50 as of 2/5/2021 (v1.28.0).
+"Should" work with NodeJS 18 and VSCode 1.68+, recommended version of VSCode is 1.102.x or above and NodeJS 22.15+.
 
-## Features by Version
+## Version 3
+
+- Significant performance enhancements
+- Several fixes including longtime pre-v2 bugs
+- **TaskMonitor** View | fullscreen task controls
+- ESLint static type task provider
+- NodeJS script type task provider
+- NPM task provider to replace the limited VSCode provider
+- Improvements running NPM tasks for both internal and VSCode provider
+- Typescript task provider to replace the limited VSCode provider
+- Laravel task provider (via collabarator)
+- Optional encrypted data persistence
+- Taskfile caching (optional) | lower startup times
+- Restoration of tasktree 'collapsed' or 'expanded' node states
+- Stats and Runtime Tracking
+- Stats and Runtime Quick Reports
+- Re-organized Settings with groups
+- Enhanced Sidebar View container
+- Improved grouping of multiple taskfiles in same project
+- Support for up to 15 tree grouping levels
+- Release Notes View
+- Improved logging for better support and faster resolution of issues
+
+## Features by Pre-V3 Release
 
 - v2.7 - External provider integration API [#22](https://github.com/spmeesseman/vscode-taskexplorer/issues/22)
 - v2.6 - Composer support [#150](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Include shellscripts with no extension [#153](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Rename tasks [#164](https://github.com/spmeesseman/vscode-taskexplorer/issues/164)
@@ -104,39 +123,11 @@ Provides a view in either (or both) the SideBar and/or Explorer that displays al
 - v1.1 - Supports multi-root or single-root workspaces
 - v1.0 - Open and launch NPM scripts as tasks
 
-## Version 2
-
-Version 2 highlights 2 major performance enhancements along with several features and bug fixes, notably:
-
-1. An async/await approach for all processing has improved task load time performance 10-20%.
-2. Launching tasks is more than 2x more responsive in the Tree UI, as well as when tasks finish.
-3. Favorites List.
-4. Clear buttons for Favorites and last Tasks lists (**need icon!!!**).
-5. Much improved logging for debugging user issues.
-6. Completely refactored classes, interfaces, and commenting for easier community contributions.
-
-## App-Publisher
-
-![app-publisher-cmdline-banner](https://github.com/spmeesseman/app-publisher/blob/master/res/readme/cmdline-banner.png?raw=true)
-
-Integrates with the [app-publisher](https://github.com/spmeesseman/app-publisher) tool.
-
-App-Publisher is a multi-purpose versioning/release tool that can be used for, but not limited to, the following:
-
-- Publish releases in a CI like manner on a local system, with version calculation.
-- Several task-mode tasks such as generating the next version from commit message subjects.
-- NPM releases.
-- GitHub Releases.
-- MantisBT releases via the [Releases Plugin](https://github.com/mantisbt-plugins/Releases).
-- View/output changelogs for a pending release.
-
-![ap0](public/app-publisher-taskview.png?raw=true)
-
 ## Configuring Global Excludes, Apache Ant and Bash Globs
 
 The setting *exclude* defines a file/directory pattern or an array of file/directory patterns to ignore using *Glob Patterns* or a valid *File URI*.  The setting applies to all script types.  For example:
 
-- `taskExplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
+- `taskexplorer.exclude: [ "**/.vscode-test/**", "**/vendor/**", "**/out/**", "**/output/**", "/c:/projects/project1/src/theme/test/package.json" ]`
 
 Note that the glob pattern "\*\*/node_modules/\*\*" is applied by default to the excludes list in all cases.  Using the *exclude* configuration can greatly improve performance in large workspaces if configured correctly.
 
@@ -144,13 +135,13 @@ Task files that are found by Task Explorer can also be added to the *excludes* l
 
 **Apache Ant** uses an .xml file extension, the setting *globPatternsAnt* can be used to specify other file names other than [Bb]uild.xml to include as ant files so that all xml files do not need to be searched (slowing down tree refreshes in large workspaces or project with a large number of various xml files).  The setting defines a file pattern or an array of file patterns to include using *Glob Patterns* or a valid *File URI*, for example:
 
-- `taskExplorer.globPatternsAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
+- `taskexplorer.globPatternsAnt: [ "**/extraTasks.xml", "**/scripts/ant/*.xml", "/c:/projects/project1/scripts/test/antetests.xml" ]`
 
 Note that the glob pattern "\*\*/[Bb]uild.xml" is applied by default to the **Ant** includes list in all cases.  If you don't include the asterisked glob pattern `**/` first in the string, files in sub-folders will not be found.
 
 In the same way as for **Ant** tasks, **Bash** scripts without extensions can be configured to be found by the Bash Task Provider by using glob patterns in the same way, with the *globPatternsBash* setting:
 
-- `taskExplorer.globPatternsBash: [ "**/bash_scripts/**", "**/sh/scripts/**", "/usr/local/bin/start_task" ]`
+- `taskexplorer.globPatternsBash: [ "**/bash_scripts/**", "**/sh/scripts/**", "/usr/local/bin/start_task" ]`
 
 ## Ant and Gulp Self-Provided Tasks
 
@@ -158,8 +149,7 @@ By default, a custom parser is used to locate Ant and Gulp tasks in respective f
 
 ## Using Groups with a Separator
 
-**EXPERIMENTAL**
-The *Groups With Separator* option is simply an extra level of task groupings that can be made based on a configured separation character in the script name.  This option can be turned on/off with the *Group With Seperator* option in Settings, the default is OFF. The default separator is a dash ("-").
+The *Groups With Separator* option is an extra level of task groupings that can be made based on a configured separation character in the script or task name.  This option can be turned on/off with the *Group With Seperator* `'Settings -> Extensions -> Task Explorer -> Grouping'` options in the VSC Settings, the default is *on* and the default separator is a dash/hyphen ("-").
 
 For example, consider 10 npm tasks, 5 of which all start with the string *dev-*, 5 of which start with the string *prod-*.  Prior to Version 1.23, this would create 10 individual task nodes within the main npm task node in the task tree:
 
@@ -193,193 +183,29 @@ By enabling the *Group With Separator* option in Settings and setting the *Group
 
 ## Internally Provided Tasks vs. VSCode Provided Tasks
 
-The following tasks are provided by VSCode:
+Workspace (.vscode/tasks.json) tasks are provided by VSCode.  All other task types are or can be internally provided by TE.  It is recommended to use the TE NPM provider as opposed to the provider that ships with the VSC IDE, and for a significant increase in performance, ensure that the `'Settings -> Extensions -> Npm -> Auto Detect'` options is turned **off**** in VSCode Settings.  By default this is turned on, so if NPM tasks are randomly not displaying or NPM task startup is lagging, please check this setting.  It is also recommended that the Grunt and Gulp providers that ship with the VSC IDE are turned **off** as well, `'Settings -> Extensions -> Grunt -> Auto Detect'` and `'Settings -> Extensions -> Gulp -> Auto Detect'`.
 
-- Workspace (.vscode/tasks.json)
-- NPM (**/package.json)
+Detection of all internally provided task types can be turned on/off in Settings - `'Settings -> Extensions -> Task Explorer -> Task Providers'`.
 
-All other tasks are internally provided.  Workspace tasks are detected by VSCode in all cases.  However, NPM tasks are detected only if the setting `'Npm -> Auto Detect'` is turned on in VSCode Settings.  By default this is turned on, but if NPM tasks are not displaying, please check this setting, also check the setting that turns npm package management off in favor of Yarn `'Npm -> Package manager'`.  A future release will contain internally provided NPM and Yarn tasks.  Note these tasks are still displayed in the Task Tree, just not "provided" by this extension.
+## Running Shell Scripts
 
-Detection of all internally provided task types can be turned on/off in Settings - `'Task Explorer -> Enable [Tasktype]'`.
+Shell scripts, e.g. Bash/sh, batch, powershell, will have the shell executable automatically set to the corresponding shell when the script is ran.  The shell executable used can be set explicitly in the VSC Settings, i.e. `'Settings -> Extensions -> Task Explorer -> Providers -> Paths to Programs'`.
 
-## Running bash/sh scripts in Windows Environment
-
-Bash/sh scripts in Windows will have the shell executable automatically set to a bash shell (if the default shell set in VSCode is not bash).  The shell executable used can be set in Settings using the `pathToBash` setting.  If there is no value set in Settings, and Git Bash exists at the default installation installation, Git Bash will be used (MinGW).  If Git Bash does not exist at the default install location, it is assumed the the path to bash.exe is part of the system PATH variable.  If you experience errors running Bash scripts in Windows, please check these items.
-
-## Running Task Icon Animations
+## Task Icon Animations
 
 FOr whatever reason, on some systems the animated running task icon eats a lot of CPU.  If this is your case, the animated icon can be turned off in settings (on by default).
 
-## Parsing Reports
+## Task Monitor
 
-For debugging or curiosity, a report can be generated listing all parsed components and the properties found.  You can generate a report in the explorer context menus using the `Task Explorer: View Parsing Report` menu item.
+The Task Monitor is a webview style task console, i.e. a glorified console for developers going blind, offering some different options and a different look and feel as opposed to the original task treeviews.
 
-![parsing-report-img](resources/readme/../../res/readme/parsingreport.png)
+![task-monitor-img1](res/readme/taskmonitor1.png) ![task-monitor-img2](res/readme/taskmonitor2.png)
 
+## Task Reports and Details
 
-## External Provider Integration API
+For debugging or curiosity, sme initial reports or details pages can be generated listing all parsed tasks, usage over time, etc.  You can generate reports and/or details pages via various context menus or navigation header icon buttons.
 
-Any extension that implements `TaskProvider` (specifically it's `provideTasks` method) can add it's tasks to the Task Explorer tree.  To register an external provider with Task Explorer, follow these steps:
-
-Get the TaskExplorer API object:
-
-    const teApi = await vscode.commands.executeCommand("taskExplorer.getApi");
-
-Alternatively, using the Task Explorer type definitions:
-
-    let teApi;
-    const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-    if (taskExplorer && taskExplorer.isActive)
-    {
-        teApi = taskExplorer.exports as TaskExplorerApi;
-    }
-
-**Note:** Before using any of the API functions, check busy status using the `teApi.isBusy` API function first, to ensure the indexer is not running.
-
-Register the instance of `TaskProvider` or `ExternalExplorerProvider` using the `register` method of the Task Explorer API object:
-
-    await teApi.register("taskTypeName", myProvider as TaskProvider);
-
-Where *taskTypeName* is the name of the task type, i.e. "npm", "ant", "gulp", etc, and `myProvider` is the instance of TaskProvider that implements the `provideTasks` method.
-
-Any provider(s) should be unregistered in the deactivate method of an extension, to remove a provider:
-
-    await teApi.unregister("taskTypeName");
-
-Where *taskTypeName* is the name of the task type, i.e. "npm", "ant", "gulp".
-
-You can optionally install the Task Explorer API types:
-
-    npm install @spmeesseman/vscode-taskexplorer-types
-
-The provided tasks must implement the taskExplorer.external task interface:
-
-    {
-        script: "the task name",
-        target: "command to run",
-        path: "file path",
-        fileName: "file name",
-        uri: file `Uri`,
-        taskItemId: (internal use, ignore),
-        icon: {
-            light: "/path/to/light.svg",
-            dark: "/path/to/dark.svg"
-        }
-    }
-
-The task definition must also define most of the interface properties in the package.json, for completeness, the entire definition is:
-
-    "taskDefinitions": [
-    {
-        "type": "extjs",
-        "required": [],
-        "properties": {
-            "script": {
-                "type": "string",
-                "description": "taskdef.task.script"
-            },
-            "target": {
-                "type": "string",
-                "description": "taskdef.task.target"
-            },
-            "cmdLine": {
-                "type": "string",
-                "description": "taskdef.task.cmdLine"
-            },
-            "fileName": {
-                "type": "string",
-                "description": "taskdef.task.fileName"
-            },
-            "icon": {
-                "type": "string",
-                "description": "taskdef.task.icon"
-            },
-            "iconDark": {
-                "type": "string",
-                "description": "taskdef.task.icon.dark"
-            },
-            "isDefault": {
-                "type": "boolean",
-                "description": "taskdef.task.isDefault"
-            },
-            "path": {
-                "type": "string",
-                "description": "taskdef.task.path"
-            },
-            "taskItemId": {
-                "type": "string",
-                "description": "taskdef.task.taskItemId"
-            },
-            "uri": {
-                "type": "object",
-                "description": "taskdef.task.fileUri"
-            }
-        }
-    }]
-
-The definition will be reduced in the future.  This definition is remnant of Task Explorer's early days and is in need of a cleanup.
-
-For reference, the entire Task Explorer API object is:
-
-    interface TaskExplorerApi
-    {
-        log: any;
-        utilities: any;
-        fileCache: any;
-        explorerProvider: TaskTreeDataProvider | undefined;
-        sidebarProvider: TaskTreeDataProvider | undefined;
-        taskProviders: Map<string, TaskExplorerProvider>;
-        registerProvider(providerName: string, provider: TaskProvider): void;
-        unregisterProvider(providerName: string): void;
-    }
-
-Putting it all together:
-
-    async function activate()
-    {
-        ... other code ...
-        const taskProvider = new ExtJsTaskProvider();
-        context.subscriptions.push(tasks.registerTaskProvider("extjs", taskProvider));
-        registerWithTaskExplorer(taskProvider);
-        ... other code ...
-    }
-
-    async function deactivate()
-    {
-        ... other code ...
-        const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (taskExplorer && taskExplorer.isActive && taskExplorerRegistered)
-        {
-            const teApi = taskExplorer.exports as TaskExplorerApi;
-            await teApi.unregister("extjs");
-        }
-        ... other code ...
-        return Promise.resolve();
-    }
-
-    function registerWithTaskExplorer(taskProvider: ExternalExplorerProvider)
-    {
-        const taskExplorer = extensions.getExtension("spmeesseman.vscode-taskexplorer");
-        if (taskExplorer && taskExplorer.isActive)
-        {
-            const teApi = taskExplorer.exports as TaskExplorerApi;
-            if (!teApi.isBusy())
-            {
-                await teApi.register("taskTypeName", taskProvider);
-                taskExplorerRegistered = true;
-            }
-            else {
-                setTimeout(() => registerWithTaskExplorer(taskProvider), 1000);
-            }
-        }
-        else
-        {
-            setTimeout(() => registerWithTaskExplorer(taskProvider), 5000);
-        }
-    }
-
-- As of v2.7.0, the external task API has not been formally tested, a.  Who will be the guineau?  Hahaha ;)
-- As of v2.7.0, the API does not support custom icons from the task definition, but for extension testing you can place an icon in `res/sources` or `public/dark` / `public/light` of the TaskExplorer installation folder, named using the same task type name in the `registerProvider` call mentioned above, and will be used by the Task Explorer tree.
+![parsing-report-img](res/readme/parsingreport.png) ![task-details-img](res/readme/taskdetails1.png)
 
 ## Feedback & Contributing
 
@@ -389,9 +215,19 @@ Putting it all together:
   [Pull Requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
 - [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
 
+## App-Publisher and Webpack-Wrap
+
+![app-publisher-cmdline-banner](res/readme/cmdline-banner-ap.png) ![spmh-cmdline-banner2](res/readme/cmdline-banner.png)
+
+Integrates with the [app-publisher](https://gitlab.spmhome.io/spmhome/ci/app-publisher) and [webpack-wrap](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) utility packages that emulate a small scale ci environment run locally from a project workspace, i.e. *CI without the headache* for individual devs and small teams.
+
 ### Rate It - Leave Some Stars
 
 Please rate your experience with stars... [like five of them ;)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer&ssr=false#review-details)
+
+### Licensing
+
+Please consider [purchasing a cheap++ license](https://www.spmhome.io) to support continued development and my beloved daughter's plan.
 
 ## Thank You
 
