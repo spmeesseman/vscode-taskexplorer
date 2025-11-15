@@ -1,13 +1,13 @@
 # Task Explorer - Tasks and Scripts Visual Control
 
-| ![logo](res/img/logo-bl.png) | If you have kids, hug and squeeze them **every** single chance you get... I lost my daughter ~2 years ago, I loved her with every ounce of my soul, now every day is filled with overwhelming sadness, I am... 4everbroken. We were working on this together when she left me, please consider purchasing a (cheap++) license when the licensing scheme goes into effect. | ![cmdline-banner](res/readme/cmdline-banner.png) |
+| ![logo](res/img/logo-bl.png) | M.I.A.... A Short Story and an apology... From this extension's inception many years ago, to the time my beloved daughter and I were working on it together in 2022 and 2023 with her high hopes of it turning into a licensable product (i.e. *$$$* in her eyes), to the time life changed 4ever when I lost her in April of '23 and became undoubtedly 4everbroken, to now the present day... after the overwhelming pain of each and every day had started to seem normalized, what we had last worked on together I was finally able to pick back up and continue, and now the initial preview versions have started to be released. I sincerely apologize to all users for the absence of any development over the last few years.s | ![cmdline-banner](res/readme/cmdline-banner.png) |
 | ---------- | ------------------------------- | -------------------------------------------------------- |
 
 [![home](https://img.shields.io/badge/org-spmhome.io-0556d7.svg)](https://www.spmhome.io) [![vcs](https://img.shields.io/badge/vcs-gitlab-4287f5.svg)](https://gitlab.spmhome.io) [![projecttype](https://img.shields.io/badge/category-apps-4287f5.svg)](https://www.spmhome.io) [![projectlang](https://img.shields.io/badge/language-typescript-4287f5.svg)](https://www.spmhome.io) [![webpack-wrap](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-webpack--wrap-4287f5.svg)](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) [![app-publisher](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-app--publisher-4287f5.svg)](https://gitlab.spmhome.io/spmhome/ci/app-publisher) [![eslint-config](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-eslint--config-4287f5.svg)](https://gitlab.spmhome.io/spmhome/utils/eslint-config)
 
 [![Installs](https://img.shields.io/visual-studio-marketplace/i/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Downloads](https://img.shields.io/visual-studio-marketplace/d/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer) [![Ratings](https://img.shields.io/visual-studio-marketplace/r/spmeesseman.vscode-taskexplorer.svg)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplore&ssr=false#review-details)
 
-![src0_1](res/img/sources/npm.png) ![src0_2](res/img/sources/node.png) ![src11](res/img/sources/python.png) ![src4](res/img/sources/workspace.png) ![src6](res/img/sources/ts.png) ![src1](res/img/sources/ant.png) ![src0y](res/img/sources/yarn.png) ![src14e](res/img/sources/eslint.png) ![src2](res/img/sources/grunt.png) ![src3](res/img/sources/gulp.png) ![src8](res/img/sources/ruby.png) ![src9](res/img/sources/powershell.png) ![src13](res/img/sources/gradle.png) ![src5_1](res/img/sources/cmake.png) ![src5_2](res/img/sources/make.png) ![src7](res/img/sources/bat.png) ![src10](res/img/sources/bash.png) ![src12](res/img/sources/nsis.png) ![src14](res/img/sources/webpack.png) ![src13](res/img/sources/maven.png)
+![src0](res/img/sources/npm.png) ![src1](res/img/sources/nodejs.png) ![src2](res/img/sources/python.png) ![src3](res/img/sources/workspace.png) ![src4](res/img/sources/ts.png) ![src5](res/img/sources/ant.png) ![src6](res/img/sources/yarn.png) ![src7](res/img/sources/eslint.png) ![src8](res/img/sources/grunt.png) ![src9](res/img/sources/gulp.png) ![src10](res/img/sources/ruby.png) ![src11](res/img/sources/powershell.png) ![src12](res/img/sources/gradle.png) ![src13](res/img/sources/cmake.png) ![src14](res/img/sources/make.png) ![src15](res/img/sources/bat.png) ![src16](res/img/sources/bash.png) ![src17](res/img/sources/nsis.png) ![src18](res/img/sources/webpack.png) ![src19](res/img/sources/maven.png)
 
 ## Description
 
@@ -21,7 +21,7 @@ Provides configurable treeviews that display all supported tasks and scripts, or
   - [Screenshots by Version](#screenshots-by-version)
   - [Requirements](#requirements)
   - [Version 3](#version-3)
-  - [Features by Pre-V3 Release](#features-by-pre-v3-release)
+  - [Licensing](#licensing)
   - [Configuring Global Excludes, Apache Ant and Bash Globs](#configuring-global-excludes-apache-ant-and-bash-globs)
   - [Ant and Gulp Self-Provided Tasks](#ant-and-gulp-self-provided-tasks)
   - [Using Groups with a Separator](#using-groups-with-a-separator)
@@ -30,11 +30,13 @@ Provides configurable treeviews that display all supported tasks and scripts, or
   - [Task Icon Animations](#task-icon-animations)
   - [Task Monitor](#task-monitor)
   - [Task Reports and Details](#task-reports-and-details)
-  - [Feedback \& Contributing](#feedback--contributing)
+  - [Roadmap Version 3.x](#roadmap-version-3x)
+  - [Roadmap Version 4 (Preliminary)](#roadmap-version-4-preliminary)
   - [App-Publisher and Webpack-Wrap](#app-publisher-and-webpack-wrap)
-    - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
-    - [Licensing](#licensing)
+  - [Feedback \& Issues](#feedback--issues)
+  - [Rate It - Leave Some Stars](#rate-it---leave-some-stars)
   - [Thank You](#thank-you)
+  - [Pre-V3 Release Features History](#pre-v3-release-features-history)
 
 ## Screenshots by Version
 
@@ -80,48 +82,11 @@ Provides configurable treeviews that display all supported tasks and scripts, or
 - Release Notes View
 - Improved logging for better support and faster resolution of issues
 
-## Features by Pre-V3 Release
+## Licensing
 
-- v2.7 - External provider integration API [#22](https://github.com/spmeesseman/vscode-taskexplorer/issues/22)
-- v2.6 - Composer support [#150](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Include shellscripts with no extension [#153](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Rename tasks [#164](https://github.com/spmeesseman/vscode-taskexplorer/issues/164)
-- v2.5 - Webpack build - Runs 10-15% faster.
-- v2.4 - Add Pipenv support for Python Pipfile scripts. (thanks **rob4226**) [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
-- v2.3 - App-Publisher v2.0 support.  Several fixes including long time issue [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143).
-- v2.2 - Support for Maven (closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107))
-- v2.1 - App Publisher changelog pull tasks
-- v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
-- v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Add 'Run with Arguments' command (closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)), Add 'Run with NoTerminal' command (closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39)) (note that as of VSCode 1.53, there seems to be a bug that prevents running tasks without showing the terminal).
-- v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
-- v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
-- v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
-- v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
-- v1.25 - Add 'Last Tasks' pseudo-folder
-- v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
-- v1.23 - Task groupings with dashed task groups (Off by default)
-- v1.22 - Major performance enhancements - Task Tree / Task Scanning
-- v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
-- v1.20 - Add support for restarting task (thanks **antfu**)
-- v1.19 - App-Publisher task support for BETA testing
-- v1.18 - Add 'Add to excludes' action in task file node context menu
-- v1.17 - Add 'Run last task' button to titlebar
-- v1.16 - Add npm management tasks to npm file node context menus
-- v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
-- v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
-- v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
-- v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
-- v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
-- v1.10 - Support for Makefiles (includes provider)
-- v1.9 - Support for gulp and grunt tasks (includes provider)
-- v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
-- v1.7 - Two view types - Use one or both of either SideBar View and/or Explorer Tray
-- v1.6 - Progress icons for running tasks
-- v1.6 - Stop execution button for running tasks
-- v1.5 - Support for Apache Ant tasks (includes provider)
-- v1.4 - Support for TSC tasks
-- v1.3 - Support for Visual Studio Code tasks
-- v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
-- v1.1 - Supports multi-root or single-root workspaces
-- v1.0 - Open and launch NPM scripts as tasks
+Note that this release and all upcoming **preview** releases are fully functionality and for all intents and purposes is what will eventually be the "licensed version" of this extension once the licensing scheme goes into effect. Afterwards, a 30-day trial can be activated, and if necessary an additional 30-day trial can be activated by making a formal request through the website's [contact page](https://www.spmhome.io/contact).  Also no worries if a license may not be an option, because the free-for-use functionality is probably comparable to what any current users had already been used to from v2.
+
+When the extension's **Preview** phase is over and the licensing scheme becomes active, please consider [purchasing a cheap++ license](https://www.spmhome.io/payment/taskexplorer/vsc) to unlock all features and support both continued development and my beloved never-forgotten daughter's grand plan.  During the **Preview** phase licensing is not active and the extension is fully functional.
 
 ## Configuring Global Excludes, Apache Ant and Bash Globs
 
@@ -207,13 +172,44 @@ For debugging or curiosity, sme initial reports or details pages can be generate
 
 ![parsing-report-img](res/readme/parsingreport.png) ![task-details-img](res/readme/taskdetails1.png)
 
-## Feedback & Contributing
+## Roadmap Version 3.x
 
-- Please report any bugs, suggestions or documentation requests via the
-  [Issues](https://github.com/spmeesseman/vscode-taskexplorer/issues)
-- Feel free to submit
-  [Pull Requests](https://github.com/spmeesseman/vscode-taskexplorer/pulls)
-- [Contributors](https://github.com/spmeesseman/vscode-taskexplorer/graphs/contributors)
+- **TaskBuddy** View
+- Configure additional/external task providers not implemented internally
+- **TaskMonitor** View sorting and filtering
+- TaskMonitor View 'All' Tab task control collapsible groupings by project
+- Drag and Drop **TaskMonitor** View Integration with TaskBuddy View and/or Reporting
+- Telemetry | Usage Reporting
+- NodeJS .bin type task provider
+- Run count competitions for taskfabulous prizes
+- Support for jsconfig.json files in Typescript provider
+- Additional Typescript static tasks, e.g. js/ts syntax checks, esm/cjs tests, etc
+- Configurable Glob Patterns to customize provider file matching
+- Support for level-1 task grouping by project in Favorites folder
+- Create inline or parallel ran "composite tasks" via treenode multi-selection
+- Github static type task provider
+- Gitlab static type provider
+- Jenkins static type task provider
+- Additional performance enhancements
+- Webpack-Wrap task provider and integration | localized ci-like implementation
+- App-Publisher task provider and integration | localized ci-like implementation
+- Auto-detect project svg logos to display in Favorites folder groups
+- Web Portal providing account login and license assets / info
+- Integrated Web Portal pages providing settings configuration from a rich UI
+- React based Settings View providing settings configuration from a rich in-Vscode UI
+- Visual Studio Extension **preview** release
+
+## Roadmap Version 4 (Preliminary)
+
+- ASR support - configurable voice recognition
+- TTS support - configurable audible notifications
+- Smart Home support
+- Support multiple configurable instances of **TaskBuddy** View
+- ** Github Issues integration
+- ** Gitlab Issues integration
+- ** MantisBT Issues integration
+- Integrated Web Portal pages providing task automation from a rich UI
+- VSCode Web browser build
 
 ## App-Publisher and Webpack-Wrap
 
@@ -221,13 +217,17 @@ For debugging or curiosity, sme initial reports or details pages can be generate
 
 Integrates with the [app-publisher](https://gitlab.spmhome.io/spmhome/ci/app-publisher) and [webpack-wrap](https://gitlab.spmhome.io/spmhome/ci/webpack-wrap) utility packages that emulate a small scale ci environment run locally from a project workspace, i.e. *CI without the headache* for individual devs and small teams.
 
-### Rate It - Leave Some Stars
+## Feedback & Issues
+
+Report any feedback, bugs, suggestions or requests via [Github Issues](https://github.com/spmeesseman/vscode-taskexplorer/issues)
+
+You can make direct inquiries as well using the website's [contact page](https://www.spmhome.io/contact)
+
+Feel free to check out the [Version Control System](https://gitlab.spmhme.io) for open source utilities and libraries used in all *@spmhome* projects, of course available for public use with an account and licensed under the MIT license and other well known open source license, with the latter project dependent according to any 3rd party package dependencies used by that particular package/project.
+
+## Rate It - Leave Some Stars
 
 Please rate your experience with stars... [like five of them ;)](https://marketplace.visualstudio.com/items?itemName=spmeesseman.vscode-taskexplorer&ssr=false#review-details)
-
-### Licensing
-
-Please consider [purchasing a cheap++ license](https://www.spmhome.io) to support continued development and my beloved daughter's plan.
 
 ## Thank You
 
@@ -246,3 +246,46 @@ Other Contributors:
 - tiansin
 - JacobParis
 - Spitfire1900
+
+## Pre-V3 Release Features History
+
+- v2.7 - External provider integration API [#22](https://github.com/spmeesseman/vscode-taskexplorer/issues/22)
+- v2.6 - Composer support [#150](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Include shellscripts with no extension [#153](https://github.com/spmeesseman/vscode-taskexplorer/issues/153) Rename tasks [#164](https://github.com/spmeesseman/vscode-taskexplorer/issues/164)
+- v2.5 - Webpack build - Runs 10-15% faster.
+- v2.4 - Add Pipenv support for Python Pipfile scripts. (thanks **rob4226**) [#155](https://github.com/spmeesseman/vscode-taskexplorer/issues/155)
+- v2.3 - App-Publisher v2.0 support.  Several fixes including long time issue [#143](https://github.com/spmeesseman/vscode-taskexplorer/issues/143).
+- v2.2 - Support for Maven (closes [#107](https://github.com/spmeesseman/vscode-taskexplorer/issues/107))
+- v2.1 - App Publisher changelog pull tasks
+- v2.0  - All async-await processing, Favorites (closes [#101](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Clear special task lists
+- v1.30 - Configurable default click action (closes [#97](https://github.com/spmeesseman/vscode-taskexplorer/issues/97)), Add 'Run with Arguments' command (closes [#88](https://github.com/spmeesseman/vscode-taskexplorer/issues/88)), Add 'Run with NoTerminal' command (closes [#39](https://github.com/spmeesseman/vscode-taskexplorer/issues/39)) (note that as of VSCode 1.53, there seems to be a bug that prevents running tasks without showing the terminal).
+- v1.29 - Support multi-level task groupings (closes [#129](https://github.com/spmeesseman/vscode-taskexplorer/issues/129)), Support user tasks (closes [#127](https://github.com/spmeesseman/vscode-taskexplorer/issues/127))
+- v1.28 - Support Makefile aliases (thanks **MichaelCurrin**)
+- v1.27 - Use gulp and ant to find their respective tasks (configurable on/off) (closes [#105](https://github.com/spmeesseman/vscode-taskexplorer/issues/105)), Make grouping separator configurable (thanks **richarddavenport**)
+- v1.26 - Add 'Running Task' status bar message (refs [#47](https://github.com/spmeesseman/vscode-taskexplorer/issues/47))
+- v1.25 - Add 'Last Tasks' pseudo-folder
+- v1.24 - Add 'Open Terminal' button to running tasks (closes [#23](https://github.com/spmeesseman/vscode-taskexplorer/issues/23))
+- v1.23 - Task groupings with dashed task groups (Off by default)
+- v1.22 - Major performance enhancements - Task Tree / Task Scanning
+- v1.21 - Add option to keep terminal open after stopping task (closes [#51](https://github.com/spmeesseman/vscode-taskexplorer/issues/51))
+- v1.20 - Add support for restarting task (thanks **antfu**)
+- v1.19 - App-Publisher task support for BETA testing
+- v1.18 - Add 'Add to excludes' action in task file node context menu
+- v1.17 - Add 'Run last task' button to titlebar
+- v1.16 - Add npm management tasks to npm file node context menus
+- v1.15 - Support for gradle tasks (includes provider) (closes [#15](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
+- v1.14 - Support for grunt and gulp task files not located in the project root (closes [#12](https://github.com/spmeesseman/vscode-taskexplorer/issues/15))
+- v1.13 - Multiple task files of the same type placed within a group node for less clutter in folder level nodes
+- v1.12 - Support for bash, batch, perl, powershell, python, ruby, and nsis scripts (includes provider)
+- v1.11 - N/A - Obsolete Batch Task Provider replaced by v1.12 ScriptProvider
+- v1.10 - Support for Makefiles (includes provider)
+- v1.9 - Support for gulp and grunt tasks (includes provider)
+- v1.8 - Support for ant files not named [Bb]uild.xml, ansicon output colorization fixed
+- v1.7 - Two view types - Use one or both of either SideBar View and/or Explorer Tray
+- v1.6 - Progress icons for running tasks
+- v1.6 - Stop execution button for running tasks
+- v1.5 - Support for Apache Ant tasks (includes provider)
+- v1.4 - Support for TSC tasks
+- v1.3 - Support for Visual Studio Code tasks
+- v1.2 - Convenient layout - groups all tasks by project folder, by task file, by task
+- v1.1 - Supports multi-root or single-root workspaces
+- v1.0 - Open and launch NPM scripts as tasks

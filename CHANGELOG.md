@@ -1,5 +1,19 @@
 # VSCODE-TASKEXPLORER CHANGE LOG
 
+## Version 3.0.3 (November 11th, 2025)
+
+### Bug Fixes
+
+- **Startup:** installed files validation check on startup causing multiple issues (disabled in v3.0.1) 
+
+### Documentation
+
+- **Readme:** add some v3 content 
+
+### Refactoring
+
+- **General:** convert awaited storage reads to synchronouse reads from cache where applicable
+
 ## Version 3.0.2 (November 10th, 2025)
 
 ### Bug Fixes
